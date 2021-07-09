@@ -6,7 +6,7 @@ namespace Generation.IoC
 {
     public interface INodeTemplateExpanderFactory
     {
-        IStepper makeNodeTemplateExpander(IoCContainer ioc_container,
+        IStepper MakeNodeTemplateExpander(IoCContainer ioc_container,
               Graph g, INode n, Template t, GeneratorConfig c);
     }
 }
