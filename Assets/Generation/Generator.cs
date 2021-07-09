@@ -11,11 +11,11 @@ namespace Assets.Generation
         [SerializeField]
         private GeneratorConfig Config;
 
-        private IoCContainer ioc;
+        private IoCContainer m_ioc;
 
         private void Start()
         {
-            ioc = new IoCContainer(new RelaxerStepperFactory(),
+            m_ioc = new IoCContainer(new RelaxerStepperFactory(),
                                    new TryAllNodesExpandStepperFactory(),
                                    new TryAllTemplatesOnOneNodeStepperFactory(),
                                    new TryTemplateExpandStepperFactory(),

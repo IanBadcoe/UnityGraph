@@ -55,9 +55,9 @@ namespace Assets.Generation
             // (node <-> node and node <-> edge forces have to be stronger than edge forces
             // as we rely on edges stretching (in other cases) to tell ue when we need to
             // lengthen an edge (inserting a corner)
-            ShortestPathFinder spf = new ShortestPathFinder();
+            m_node_dists = new ShortestPathFinder();
 
-            spf.FindPathLengths(m_graph, x => (x.MaxLength + x.MinLength) / 2);
+            m_node_dists.FindPathLengths(m_graph, x => (x.MaxLength + x.MinLength) / 2);
 
             m_setup_done = true;
         }

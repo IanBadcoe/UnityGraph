@@ -3,6 +3,7 @@ using Assets.Generation.G;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Collections.ObjectModel;
 
 namespace Assets.Generation.Templates
 {
@@ -10,12 +11,31 @@ namespace Assets.Generation.Templates
     {
         private readonly int m_num_in_nodes;
         private readonly int m_num_out_nodes;
+        private readonly int m_num_internal_nodes;
 
-        private readonly Dictionary<string, NodeRecord> m_nodes;
-        private readonly Dictionary<string, ConnectionRecord> m_connections;
+        private readonly ReadOnlyDictionary<string, NodeRecord> m_nodes;
+        private readonly ReadOnlyDictionary<string, ConnectionRecord> m_connections;
 
         public string Name { get; private set; }
         public string Codes { get; private set; }
+
+        public Template(TemplateBuilder builder)
+        {
+            Name = builder.Name;
+            Codes = builder.Codes;
+
+            m_nodes = builder.GetUnmodifiableNodes();
+            m_connections = builder.GetUnmodifiableConnections();
+
+            m_num_in_nodes = builder.GetNumInNodes();
+            m_num_out_nodes = builder.GetNumOutNodes();
+            m_num_internal_nodes = builder.GetNumInternalNodes();
+
+            //m_post_expand = builder.GetPostExpand();
+
+            // cannot use this again
+            builder.Clear();
+        }
 
         private NodeRecord FindNodeRecord(string name)
         {
@@ -182,6 +202,11 @@ namespace Assets.Generation.Templates
             }
 
             return GraphUtil.FindCrossingEdges(graph.GetAllEdges()).Count == 0;
+        }
+
+        public static String MakeConnectionName(String from, String to)
+        {
+            return from + "->" + to;
         }
 
         //private void ApplyPostExpand(Dictionary<NodeRecord, INode> template_to_graph)

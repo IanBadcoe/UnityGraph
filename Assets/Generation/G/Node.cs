@@ -14,15 +14,13 @@ namespace Assets.Generation.G
 
         private static readonly System.Random s_rand = new System.Random(1);
 
+        public string Name { get; }
+        public float Radius { get; }
+
         public Vector2 Pos { get; set; }
-
-        public string Name { get; private set; }
-
-        public int Colour { get; set; }
+        public uint Colour { get; set; }
         public Vector2 Position { get; set; }
         public Vector2 Force { get; set; }
-
-        public float Radius { get; }
 
         public Node(string name, string codes, string template,
              /*GeomLayout.IGeomLayoutCreateFromNode gl_creator, */float rad)

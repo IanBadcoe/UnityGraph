@@ -17,19 +17,19 @@ namespace Assets.Generation.Templates
         }
 
         public readonly NodeType Type;
-        public readonly String Name;
+        public readonly string Name;
         public readonly bool Nudge;
         public readonly NodeRecord PositionOn;       // required
         public readonly NodeRecord PositionTowards;  // null for none
         public readonly NodeRecord PositionAwayFrom; // null for none
-        public readonly String Codes;                // copied onto node
+        public readonly string Codes;                // copied onto node
         public readonly float Radius;
-        public readonly int Colour;
+        public readonly uint Colour;
         //public readonly GeomLayout.IGeomLayoutCreateFromNode GeomCreator;
 
-        NodeRecord(NodeType type, String name,
+        public NodeRecord(NodeType type, string name,
               bool nudge, NodeRecord positionOn, NodeRecord positionTowards, NodeRecord positionAwayFrom,
-              String codes, float radius, int colour/*,
+              string codes, float radius, uint colour/*,
               GeomLayout.IGeomLayoutCreateFromNode geomCreator*/)
         {
             Type = type;

@@ -13,12 +13,12 @@ namespace Assets.Generation.Templates
         public readonly float MinLength;
         public readonly float MaxLength;
         public readonly float HalfWidth;
-        public readonly int Colour;
+        public readonly uint Colour;
 
-        ConnectionRecord(NodeRecord from, NodeRecord to,
+        public ConnectionRecord(NodeRecord from, NodeRecord to,
                          float min_length, float max_length,
                          float half_width,
-                         int colour)
+                         uint colour)
         {
             From = from;
             To = to;

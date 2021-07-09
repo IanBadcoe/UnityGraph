@@ -7,7 +7,7 @@ namespace Assets.Generation.G
     {
         Vector2 Pos { get; set; }
         string Name { get; }
-        int Colour { get; set; }
+        uint Colour { get; set; }
         Vector2 Position { get; set; }
         Vector2 Force { get; set; }
         float Radius { get; }
