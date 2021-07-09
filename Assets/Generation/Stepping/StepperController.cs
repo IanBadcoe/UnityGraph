@@ -12,6 +12,18 @@
 
         public class StatusReportInner
         {
+            public readonly StepperController.Status Status;
+            public readonly IStepper ChildStepper;
+            public readonly string Log;
+
+            public StatusReportInner(StepperController.Status status,
+                                     IStepper childStepper,
+                                     string log)
+            {
+                Status = status;
+                ChildStepper = childStepper;
+                Log = log;
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Generation.G;
 using Generation.IoC;
 using Generation.Stepping;
+using UnityEngine;
 
 namespace Generation
 {
@@ -29,7 +30,48 @@ namespace Generation
 
         public StepperController.StatusReportInner step(StepperController.Status status)
         {
-            throw new System.NotImplementedException();
+            switch (status)
+            {
+                case StepperController.Status.StepIn:
+                    SplitEdge();
+
+                    IStepper child = m_ioc_container.RelaxerFactory.MakeRelaxer(m_ioc_container, m_graph, m_config);
+
+                    return new StepperController.StatusReportInner(StepperController.Status.StepIn,
+                          child, "Relaxing split edge.");
+
+                case StepperController.Status.StepOutSuccess:
+                    return new StepperController.StatusReportInner(StepperController.Status.StepOutSuccess,
+                          null, "Successfully relaxed split edge.");
+
+                case StepperController.Status.StepOutFailure:
+                    return new StepperController.StatusReportInner(StepperController.Status.StepOutFailure,
+                          null, "Failed to relax split edge.");
+            }
+
+            // shouldn't get here, crash horribly
+
+            throw new System.NotSupportedException();
+        }
+
+        private void SplitEdge()
+        {
+            INode c = m_graph.AddNode("c", "", "EdgeExtend",
+                  m_edge.HalfWidth * 2 /*,
+                  m_geom_maker */);
+
+            Vector2 mid = (m_edge.Start.Pos + m_edge.End.Pos) / 2;
+
+            c.Pos = mid;
+
+            m_graph.Disconnect(m_edge.Start, m_edge.End);
+            // idea of lengths is to force no more length but allow
+            // a longer corridor if required
+            DirectedEdge de1 = m_graph.Connect(m_edge.Start, c, m_edge.MinLength / 2, m_edge.MaxLength, m_edge.HalfWidth);
+            DirectedEdge de2 = m_graph.Connect(c, m_edge.End, m_edge.MinLength / 2, m_edge.MaxLength, m_edge.HalfWidth);
+
+            de1.Colour = m_edge.Colour;
+            de2.Colour = m_edge.Colour;
         }
     }
 }
