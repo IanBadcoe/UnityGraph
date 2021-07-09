@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Generation.G
 {
@@ -49,6 +51,11 @@ namespace Generation.G
             }
 
             return ConnectInner(temp);
+        }
+
+        internal List<INode> GetAllNodes()
+        {
+            return m_nodes.ToList<INode>();
         }
 
         private DirectedEdge ConnectInner(DirectedEdge e)

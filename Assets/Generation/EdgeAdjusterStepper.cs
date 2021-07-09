@@ -28,7 +28,7 @@ namespace Generation
             m_ioc_container = ioc_container;
         }
 
-        public StepperController.StatusReportInner step(StepperController.Status status)
+        public StepperController.StatusReportInner Step(StepperController.Status status)
         {
             switch (status)
             {

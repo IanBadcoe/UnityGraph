@@ -15,11 +15,6 @@ namespace Generation
 
     internal class TryTemplateExpandStepper : IStepper
     {
-        public StepperController.StatusReportInner step(StepperController.Status status)
-        {
-            throw new System.NotImplementedException();
-        }
-
         private readonly Graph m_graph;
         private readonly INode m_node;
         private readonly Template m_template;
@@ -33,6 +28,11 @@ namespace Generation
             m_node = node;
             m_template = template;
             m_config = config;
+        }
+
+        public StepperController.StatusReportInner Step(StepperController.Status status)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

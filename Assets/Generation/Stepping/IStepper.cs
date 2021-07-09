@@ -12,6 +12,6 @@
         //
         // some steps will themselves fail when a child fails
         // others will go on to try other stuff
-        StepperController.StatusReportInner step(StepperController.Status status);
+        StepperController.StatusReportInner Step(StepperController.Status status);
     }
 }

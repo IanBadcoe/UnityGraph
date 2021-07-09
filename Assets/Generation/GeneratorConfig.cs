@@ -32,7 +32,7 @@ namespace Generation
         // --------------------
         // random number source
 
-        private System.Random Rand;
+        public System.Random Rand { get; private set; }
         public int RandomSeed = 38;
 
         // ---------------------------------------------------------
