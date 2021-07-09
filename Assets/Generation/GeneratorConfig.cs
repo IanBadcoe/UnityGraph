@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace Generation
+namespace Assets.Generation
 {
     public class GeneratorConfig : MonoBehaviour
     {
@@ -12,22 +12,22 @@ namespace Generation
 
         // The node sizes and edge widths define the space that rooms and corridors will occupy internally
         // this is added on to give an additional minimum wall thickness between them
-        public double RelaxationMinimumSeparation = 5;
+        public float RelaxationMinimumSeparation = 5;
 
         // these scale the strength of the three fundamental forces
         // current theory is to set EdgeLength force significantly weaker so that edge stretch can be used to detect
         // when they need splitting
-        public double EdgeToNodeForceScale = 1.0;
-        public double EdgeLengthForceScale = 0.01;
-        public double NodeToNodeForceScale = 1.0;
+        public float EdgeToNodeForceScale = 1.0f;
+        public float EdgeLengthForceScale = 0.01f;
+        public float NodeToNodeForceScale = 1.0f;
 
         // time steps are scaled down if they would lead to any node moving further than this
-        public double RelaxationMaxMove = 1.0;
+        public float RelaxationMaxMove = 1.0f;
 
         // relaxation is considered complete when the max force or max move seen on a node
         // drops below both of these
-        public double RelaxationForceTarget = 0.001;
-        public double RelaxationMoveTarget = 0.01;
+        public float RelaxationForceTarget = 0.001f;
+        public float RelaxationMoveTarget = 0.01f;
 
         // --------------------
         // random number source
@@ -44,8 +44,8 @@ namespace Generation
         // ------------------------------
         // settings for the created level
 
-        public double CellSize = 20;
-        public double WallFacetLength = 10;
+        public float CellSize = 20;
+        public float WallFacetLength = 10;
 
         void Start()
         {

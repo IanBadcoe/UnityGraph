@@ -1,8 +1,8 @@
-﻿using Generation.G;
+﻿using Assets.Generation.G;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Generation.G
+namespace Assets.Generation.G
 {
     internal class GraphRestore : IGraphRestore
     {
@@ -33,6 +33,16 @@ namespace Generation.G
                 m_nodes_added.Add(n);
             }
         }
+
+        public void RemoveNode(Node node)
+        {
+            if (!m_nodes_added.Remove(node))
+            {
+                m_nodes_removed.Add(node);
+            }
+        }
+
+
 
         public void Connect(DirectedEdge e)
         {

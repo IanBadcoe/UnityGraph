@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace Generation.Templates
+namespace Assets.Generation.Templates
 {
     public class TemplateStore
     {

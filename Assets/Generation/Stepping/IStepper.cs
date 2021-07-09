@@ -1,4 +1,4 @@
-﻿namespace Generation.Stepping
+﻿namespace Assets.Generation.Stepping
 {
     public interface IStepper
     {

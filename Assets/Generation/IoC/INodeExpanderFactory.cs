@@ -1,10 +1,10 @@
-﻿using Generation.G;
-using Generation.Stepping;
+﻿using Assets.Generation.G;
+using Assets.Generation.Stepping;
 using System.Collections.ObjectModel;
-using Generation.Templates;
+using Assets.Generation.Templates;
 using System.Collections.Generic;
 
-namespace Generation.IoC
+namespace Assets.Generation.IoC
 {
     public interface INodeExpanderFactory
     {

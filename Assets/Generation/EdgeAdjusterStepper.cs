@@ -1,9 +1,9 @@
-﻿using Generation.G;
-using Generation.IoC;
-using Generation.Stepping;
+﻿using Assets.Generation.G;
+using Assets.Generation.IoC;
+using Assets.Generation.Stepping;
 using UnityEngine;
 
-namespace Generation
+namespace Assets.Generation
 {
     internal class EdgeAdjusterStepperFactory : IAdjusterFactory
     {

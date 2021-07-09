@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Generation.G
+namespace Assets.Generation.G
 {
     internal class Node : INode
     {
         private readonly string m_codes;
         private readonly string m_template;
         private readonly int m_num;
-        private readonly double m_rad;
+        private readonly float m_rad;
         private readonly HashSet<DirectedEdge> m_connections = new HashSet<DirectedEdge>();
 
         private static readonly System.Random s_rand = new System.Random(1);
@@ -18,8 +18,11 @@ namespace Generation.G
 
         public string Name { get; private set; }
 
+        public int Colour { get; set; }
+        public Vector2 Position { get; set; }
+
         public Node(string name, string codes, string template,
-             /*GeomLayout.IGeomLayoutCreateFromNode gl_creator, */double rad)
+             /*GeomLayout.IGeomLayoutCreateFromNode gl_creator, */float rad)
         {
             Name = name;
             m_codes = codes;
@@ -52,7 +55,7 @@ namespace Generation.G
             throw new NotImplementedException();
         }
 
-        public DirectedEdge Connect(Node n, double min_distance, double max_distance, double width /*,
+        public DirectedEdge Connect(Node n, float min_distance, float max_distance, float width /*,
               GeomLayout.IGeomLayoutCreateFromDirectedEdge layoutCreator*/)
         {
             // cannot multiply connect the same node, forwards or backwards
@@ -92,6 +95,21 @@ namespace Generation.G
         }
 
         public DirectedEdge GetConnectionFrom(INode from)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<DirectedEdge> GetConnections()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<DirectedEdge> GetInConnections()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<DirectedEdge> GetOutConnections()
         {
             throw new NotImplementedException();
         }

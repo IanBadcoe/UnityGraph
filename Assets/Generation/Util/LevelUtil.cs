@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Util
+namespace Assets.Generation.Util
 {
     public static class LevelUtil
     {
@@ -19,12 +19,12 @@ namespace Util
         //   * is 1.0 (no distortion) if shorter than dmin this is l as a fraction of dmin (< 1.0) and if
         //   * if longer than dmax then this is l as a fraction of dmax )e.g. > 1.0)
         //   * <p>
-        //   * The second double is the force.  The sign of the force is that -ve is repulsive (happens when too close)
+        //   * The second float is the force.  The sign of the force is that -ve is repulsive (happens when too close)
         //   * and vice versa.
         //   */
-        //  static OrderedPair<Double, Double> unitEdgeForce(double l, double dmin, double dmax)
+        //  static OrderedPair<Double, Double> unitEdgeForce(float l, float dmin, float dmax)
         //  {
-        //      double ratio;
+        //      float ratio;
 
         //      // between min and max there is no force and we always return 1.0
         //      if (l < dmin)
@@ -40,7 +40,7 @@ namespace Util
         //          ratio = 1.0;
         //      }
 
-        //      double force = (ratio - 1);
+        //      float force = (ratio - 1);
 
         //      return new OrderedPair<>(ratio, force);
         //  }
@@ -52,12 +52,12 @@ namespace Util
         //   * @return a pair of floats, the first is a fractional measure of how much too close the nodes are,
         //   * zero if they are more than their summed_radii apart.
         //   * <p>
-        //   * The second double is the force.  The sign of the force is that -ve is repulsive (happens when too close)
+        //   * The second float is the force.  The sign of the force is that -ve is repulsive (happens when too close)
         //   * the are no attractive forces for nodes so the force is never > 0.
         //   */
-        //  static OrderedPair<Double, Double> unitNodeForce(double l, double summed_radii)
+        //  static OrderedPair<Double, Double> unitNodeForce(float l, float summed_radii)
         //  {
-        //      double ratio = l / summed_radii;
+        //      float ratio = l / summed_radii;
 
         //      // no attractive forces
         //      if (ratio > 1)
@@ -65,7 +65,7 @@ namespace Util
         //          return new OrderedPair<>(0.0, 0.0);
         //      }
 
-        //      double force = (ratio - 1);
+        //      float force = (ratio - 1);
 
         //      // at the moment the relationship between force and overlap is trivial
         //      // but will keep the two return values in case the force develops a squared term or something...
@@ -74,11 +74,11 @@ namespace Util
 
         //  public static class NEDRet
         //  {
-        //      final double Dist;
+        //      final float Dist;
         //      final Vector2 Target;  // point of closest approach of Node to Edge
         //public final Vector2 Direction;  // direction from Node to Target
 
-        //NEDRet(double dist,
+        //NEDRet(float dist,
         //       Vector2 target,
         //       Vector2 direction)
         //      {
@@ -101,14 +101,14 @@ namespace Util
         //      if (de.isZero())
         //          return null;
 
-        //      double le = de.length();
+        //      float le = de.length();
         //      de = de.divide(le);
 
         //      // line from n to edge start
         //      Vector2 dnes = n.minus(es);
 
         //      // project that line onto the edge direction
-        //      double proj = de.dot(dnes);
+        //      float proj = de.dot(dnes);
 
         //      Vector2 t;
         //      if (proj < 0)
@@ -133,13 +133,13 @@ namespace Util
         //      if (d.isZero())
         //          return null;
 
-        //      double l = d.length();
+        //      float l = d.length();
         //      d = d.divide(l);
 
         //      return new NEDRet(l, t, d);
         //  }
 
-        //  static double nodeEdgeDist(Vector2 n,
+        //  static float nodeEdgeDist(Vector2 n,
         //                             Vector2 es,
         //                             Vector2 ee)
         //  {
@@ -150,14 +150,14 @@ namespace Util
         //      if (de.isZero())
         //          throw new UnsupportedOperationException("zero length edge");
 
-        //      double le = de.length();
+        //      float le = de.length();
         //      de = de.divide(le);
 
         //      // line from n to edge start
         //      Vector2 dnes = n.minus(es);
 
         //      // project that line onto the edge direction
-        //      double proj = de.dot(dnes);
+        //      float proj = de.dot(dnes);
 
         //      Vector2 t;
         //      if (proj < 0)

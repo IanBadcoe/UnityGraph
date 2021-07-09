@@ -1,4 +1,4 @@
-﻿namespace Generation.IoC
+﻿namespace Assets.Generation.IoC
 {
     public class IoCContainer
     {

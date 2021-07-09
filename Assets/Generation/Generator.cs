@@ -1,10 +1,10 @@
-using Generation.IoC;
+using Assets.Generation.IoC;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace Generation
+namespace Assets.Generation
 {
     public class Generator : MonoBehaviour
     {

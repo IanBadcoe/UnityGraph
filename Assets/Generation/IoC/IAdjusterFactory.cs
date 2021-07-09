@@ -1,7 +1,7 @@
-﻿using Generation.G;
-using Generation.Stepping;
+﻿using Assets.Generation.G;
+using Assets.Generation.Stepping;
 
-namespace Generation.IoC
+namespace Assets.Generation.IoC
 {
     public interface IAdjusterFactory
     {

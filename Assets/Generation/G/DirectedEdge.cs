@@ -1,27 +1,27 @@
 ﻿using System.Diagnostics;
 
-namespace Generation.G
+namespace Assets.Generation.G
 {
     public class DirectedEdge
     {
         public readonly INode Start;
         public readonly INode End;
-        public readonly double MinLength;
-        public readonly double MaxLength;
-        public readonly double HalfWidth;
+        public readonly float MinLength;
+        public readonly float MaxLength;
+        public readonly float HalfWidth;
 
 //        public final GeomLayout.IGeomLayoutCreateFromDirectedEdge LayoutCreator;
 
         //public DirectedEdge(INode start, INode end,
-        //      double min_length, double max_length,
-        //      double half_width)
+        //      float min_length, float max_length,
+        //      float half_width)
         //    : this(start, end, min_length, max_length, half_width, null)
         //{
         //}
 
         public DirectedEdge(INode start, INode end,
-              double min_length, double max_length,
-              double half_width/* ,
+              float min_length, float max_length,
+              float half_width/* ,
               GeomLayout.IGeomLayoutCreateFromDirectedEdge layout_creator */)
         {
             Debug.Assert(start != null);
@@ -69,7 +69,7 @@ namespace Generation.G
             return null;
         }
 
-        public double Length()
+        public float Length()
         {
             return (End.Pos - Start.Pos).magnitude;
         }

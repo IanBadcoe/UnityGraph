@@ -1,13 +1,14 @@
-﻿using Util;
-using Generation.G;
-using Generation.IoC;
-using Generation.Stepping;
-using Generation.Templates;
+﻿using Assets.Generation.U;
+using Assets.Generation.G;
+using Assets.Generation.IoC;
+using Assets.Generation.Stepping;
+using Assets.Generation.Templates;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Collections.Generic;
+using Assets.Generation.Util;
 
-namespace Generation
+namespace Assets.Generation
 {
     internal class TryAllNodesExpandStepperFactory : IAllNodesExpanderFactory
     {

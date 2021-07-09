@@ -1,8 +1,8 @@
-﻿using Generation.Stepping;
-using Generation.G;
-using Generation;
+﻿using Assets.Generation.Stepping;
+using Assets.Generation.G;
+using Assets.Generation;
 
-namespace Generation.IoC
+namespace Assets.Generation.IoC
 {
     public interface IRelaxerFactory
     {

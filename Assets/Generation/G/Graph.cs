@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 
-namespace Generation.G
+namespace Assets.Generation.G
 {
     public class Graph
     {
@@ -13,7 +13,7 @@ namespace Generation.G
 
         private GraphRestore m_restore;
 
-        public INode AddNode(string name, string codes, string template, double rad /*,
+        public INode AddNode(string name, string codes, string template, float rad /*,
                              GeomLayout.IGeomLayoutCreateFromNode geomCreator */)
         {
             Node n = new Node(name, codes, template/*, geomCreator*/, rad);
@@ -28,13 +28,38 @@ namespace Generation.G
             return n;
         }
 
+        public bool RemoveNode(INode inode)
+        {
+            if (!Contains(inode))
+                return false;
+
+            if (inode.GetConnections().Count > 0)
+                return false;
+
+            Node node = (Node)inode;
+
+            if (m_restore != null)
+            {
+                m_restore.RemoveNode(node);
+            }
+
+            removeNodeInner(node);
+
+            return true;
+        }
+
         private void addNodeInner(Node n)
         {
             m_nodes.Add(n);
         }
 
+        private void removeNodeInner(Node node)
+        {
+            m_nodes.Remove(node);
+        }
+
         public DirectedEdge Connect(INode from, INode to,
-                                    double min_length, double max_length, double half_width/*,
+                                    float min_length, float max_length, float half_width/*,
                                     GeomLayout.IGeomLayoutCreateFromDirectedEdge layoutCreator */)
         {
             if (from == to
@@ -56,6 +81,11 @@ namespace Generation.G
         internal List<INode> GetAllNodes()
         {
             return m_nodes.ToList<INode>();
+        }
+
+        public List<DirectedEdge> GetAllEdges()
+        {
+            return m_edges.ToList();
         }
 
         private DirectedEdge ConnectInner(DirectedEdge e)

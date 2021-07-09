@@ -1,8 +1,8 @@
-﻿using Generation.G;
-using Generation.Stepping;
-using Generation.Templates;
+﻿using Assets.Generation.G;
+using Assets.Generation.Stepping;
+using Assets.Generation.Templates;
 
-namespace Generation.IoC
+namespace Assets.Generation.IoC
 {
     public interface IAllNodesExpanderFactory
     {
