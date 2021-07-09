@@ -20,6 +20,9 @@ namespace Assets.Generation.G
 
         public int Colour { get; set; }
         public Vector2 Position { get; set; }
+        public Vector2 Force { get; set; }
+
+        public float Radius { get; }
 
         public Node(string name, string codes, string template,
              /*GeomLayout.IGeomLayoutCreateFromNode gl_creator, */float rad)
@@ -112,6 +115,14 @@ namespace Assets.Generation.G
         public List<DirectedEdge> GetOutConnections()
         {
             throw new NotImplementedException();
+        }
+
+        public float Step(float t)
+        {
+            Vector2 d = Force * t;
+            Position += d;
+
+            return d.magnitude;
         }
     }
 }

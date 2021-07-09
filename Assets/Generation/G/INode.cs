@@ -9,10 +9,14 @@ namespace Assets.Generation.G
         string Name { get; }
         int Colour { get; set; }
         Vector2 Position { get; set; }
+        Vector2 Force { get; set; }
+        float Radius { get; }
 
         bool Connects(INode n);
         bool ConnectsForwards(INode to);
         bool ConnectsBackwards(INode from);
+        public float Step(float t);
+
         DirectedEdge GetConnectionTo(INode node);
         DirectedEdge GetConnectionFrom(INode from);
         List<DirectedEdge> GetConnections();

@@ -88,6 +88,16 @@ namespace Assets.Generation.G
             return m_edges.ToList();
         }
 
+        internal int NumNodes()
+        {
+            return m_nodes.Count;
+        }
+
+        internal int NumEdges()
+        {
+            return m_edges.Count;
+        }
+
         private DirectedEdge ConnectInner(DirectedEdge e)
         {
             Debug.Assert(!m_edges.Contains(e));
