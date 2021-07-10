@@ -184,7 +184,7 @@ namespace Assets.Generation.Util
         //      return d.length();
         //  }
 
-        public static T RemoveRandom<T>(System.Random random, List<T> col)
+        public static T RemoveRandom<T>(ClRand random, List<T> col)
         {
             int which = (int)(random.NextDouble() * col.Count);
 

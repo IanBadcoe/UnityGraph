@@ -1,14 +1,53 @@
 ﻿using Assets.Generation.G;
 using System.Collections.Generic;
-using System.Diagnostics;
+using Debug = System.Diagnostics.Debug;
+using UnityEngine;
+using System.Linq;
 
 namespace Assets.Generation.G
 {
     internal class GraphRestore : IGraphRestore
     {
+        private sealed class NodePos
+        {
+            public readonly Vector2 Pos;
+            public readonly INode N;
+
+            public NodePos(INode n, Vector2 pos)
+            {
+                Pos = pos;
+                N = n;
+            }
+        }
+
+        private readonly Graph m_graph;
         private readonly List<Node> m_nodes_added = new List<Node>();
         private readonly List<Node> m_nodes_removed = new List<Node>();
+        private readonly List<NodePos> m_positions = new List<NodePos>();
         private readonly Dictionary<DirectedEdge, RestoreAction> m_connections = new Dictionary<DirectedEdge, RestoreAction>();
+        private readonly GraphRestore m_chain_from_restore;
+        private GraphRestore m_chain_to_restore;
+
+        public GraphRestore(Graph graph, GraphRestore chain_from_restore)
+        {
+            m_graph = graph;
+            m_chain_from_restore = chain_from_restore;
+
+            Debug.Assert(m_graph == m_chain_from_restore.m_graph);
+
+            // m_chain_from_restore is an older restore than we are, so if it is restored
+            // it needs to know that it needs to restore us first...
+            if (m_chain_from_restore != null)
+            {
+                // anything the chain-from used to be chained-to should be already gone,
+                // e.g. restored, before we are able to make another new chain
+                Debug.Assert(m_chain_from_restore.m_chain_to_restore == null);
+
+                m_chain_from_restore.m_chain_to_restore = this;
+            }
+
+            m_positions = m_graph.GetAllNodes().Select(n => new NodePos(n, n.Position)).ToList();
+        }
 
         public enum RestoreAction
         {

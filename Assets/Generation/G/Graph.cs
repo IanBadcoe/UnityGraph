@@ -150,5 +150,15 @@ namespace Assets.Generation.G
         {
             return m_edges.Contains(edge);
         }
+
+        public IGraphRestore CreateRestorePoint()
+        {
+            GraphRestore gr = new GraphRestore(this, m_restore);
+
+            m_restore = gr;
+
+            return gr;
+        }
+
     }
 }

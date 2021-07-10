@@ -50,7 +50,7 @@ namespace Assets.Generation
                       null, "engine.Node: " + m_node.Name + " failed to expand");
             }
 
-            Template t = LevelUtil.RemoveRandom(m_config.Rand, m_templates);
+            Template t = LevelUtil.RemoveRandom(m_config.Rand(), m_templates);
 
             IStepper child = m_ioc_container.NodeTemplateExpanderFactory.MakeNodeTemplateExpander(
                   m_ioc_container, m_graph, m_node, t, m_config);

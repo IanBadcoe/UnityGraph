@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Generation.Util;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,7 +13,7 @@ namespace Assets.Generation.G
         private readonly float m_rad;
         private readonly HashSet<DirectedEdge> m_connections = new HashSet<DirectedEdge>();
 
-        private static readonly System.Random s_rand = new System.Random(1);
+        private static readonly ClRand s_rand = new ClRand(1);
 
         public string Name { get; }
         public float Radius { get; }

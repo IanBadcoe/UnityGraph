@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Collections.ObjectModel;
+using Assets.Generation.Util;
 
 namespace Assets.Generation.Templates
 {
@@ -43,7 +44,7 @@ namespace Assets.Generation.Templates
             return m_nodes[name];
         }
 
-        public bool Expand(Graph graph, INode target, System.Random random)
+        public bool Expand(Graph graph, INode target, ClRand random)
         {
             List<DirectedEdge> target_in_connections = target.GetInConnections();
             List<DirectedEdge> target_out_connections = target.GetOutConnections();
@@ -154,7 +155,7 @@ namespace Assets.Generation.Templates
 
         private bool TryPositions(Graph graph,
                              Dictionary<NodeRecord, INode> template_to_graph,
-                             System.Random rand)
+                             ClRand rand)
         {
             // position new nodes relative to known nodes
             foreach (NodeRecord nr in m_nodes.Values)

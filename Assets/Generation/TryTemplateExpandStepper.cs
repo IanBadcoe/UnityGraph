@@ -44,7 +44,7 @@ namespace Assets.Generation
         {
             if (status == StepperController.Status.StepIn)
             {
-                if (m_template.Expand(m_graph, m_node, m_config.Rand))
+                if (m_template.Expand(m_graph, m_node, m_config.Rand()))
                 {
                     IStepper child = m_ioc_container.RelaxerFactory.MakeRelaxer(m_ioc_container, m_graph, m_config);
 

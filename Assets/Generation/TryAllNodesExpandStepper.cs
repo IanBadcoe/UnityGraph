@@ -53,7 +53,7 @@ namespace Assets.Generation
                       null, "All nodes failed to expand");
             }
 
-            INode node = LevelUtil.RemoveRandom<INode>(m_config.Rand, m_all_nodes);
+            INode node = LevelUtil.RemoveRandom<INode>(m_config.Rand(), m_all_nodes);
 
             List<Template> templates = m_templates.GetTemplatesCopy();
 

@@ -1,3 +1,4 @@
+using Assets.Generation.Util;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,7 +6,8 @@ using UnityEngine;
 
 namespace Assets.Generation
 {
-    public class GeneratorConfig : MonoBehaviour
+    [System.Serializable]
+    public class GeneratorConfig
     {
         // ---------------------
         // relaxation parameters
@@ -32,7 +34,7 @@ namespace Assets.Generation
         // --------------------
         // random number source
 
-        public System.Random Rand { get; private set; }
+        private ClRand RandObj;
         public int RandomSeed = 38;
 
         // ---------------------------------------------------------
@@ -47,9 +49,40 @@ namespace Assets.Generation
         public float CellSize = 20;
         public float WallFacetLength = 10;
 
-        void Start()
+        public ClRand Rand()
         {
-            Rand = new System.Random(RandomSeed);
+            if (RandObj == null)
+            {
+                RandObj = new ClRand(RandomSeed);
+            }
+
+            return RandObj;
         }
+
+        public static GeneratorConfig ShallowCopy(GeneratorConfig old)
+        {
+            // does Unity even allow this?
+            GeneratorConfig lcg = new GeneratorConfig();
+
+            lcg.RandomSeed = old.RandomSeed;
+            lcg.RandObj = new ClRand(old.RandObj);
+
+            lcg.RelaxationMinimumSeparation = old.RelaxationMinimumSeparation;
+
+            lcg.EdgeToNodeForceScale = old.EdgeToNodeForceScale;
+            lcg.EdgeLengthForceScale = old.EdgeLengthForceScale;
+            lcg.NodeToNodeForceScale = old.NodeToNodeForceScale;
+
+            lcg.RelaxationMaxMove = old.RelaxationMaxMove;
+
+            lcg.RelaxationForceTarget = old.RelaxationForceTarget;
+            lcg.RelaxationMoveTarget = old.RelaxationMoveTarget;
+
+            lcg.CellSize = old.CellSize;
+            lcg.WallFacetLength = old.WallFacetLength;
+
+            return lcg;
+        }
+
     }
 }

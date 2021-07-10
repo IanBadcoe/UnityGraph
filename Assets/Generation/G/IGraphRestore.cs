@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Assets.Generation.G
 {
-    interface IGraphRestore
+    public interface IGraphRestore
     {
         bool Restore();
         bool CanBeRestored();
