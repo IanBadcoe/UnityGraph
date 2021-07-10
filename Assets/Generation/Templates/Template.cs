@@ -17,6 +17,7 @@ namespace Assets.Generation.Templates
         private readonly ReadOnlyDictionary<string, ConnectionRecord> m_connections;
 
         public string Name { get; private set; }
+
         public string Codes { get; private set; }
 
         public Template(TemplateBuilder builder)
