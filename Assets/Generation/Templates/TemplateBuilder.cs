@@ -170,7 +170,12 @@ namespace Assets.Generation.Templates
 
         private NodeRecord FindNodeRecord(string name)
         {
-            return m_nodes[name];
+            NodeRecord ret;
+            if (m_nodes.TryGetValue("name", out ret)) {
+                return ret;
+            }
+
+            return null;
         }
 
 

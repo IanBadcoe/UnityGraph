@@ -19,8 +19,8 @@ namespace Assets.Generation.G
 
         DirectedEdge GetConnectionTo(INode node);
         DirectedEdge GetConnectionFrom(INode from);
-        List<DirectedEdge> GetConnections();
-        List<DirectedEdge> GetInConnections();
-        List<DirectedEdge> GetOutConnections();
+        IReadOnlyList<DirectedEdge> GetConnections();
+        IReadOnlyList<DirectedEdge> GetInConnections();
+        IReadOnlyList<DirectedEdge> GetOutConnections();
     }
 }

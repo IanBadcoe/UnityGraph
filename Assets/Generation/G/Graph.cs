@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using UnityEngine;
+using Debug = System.Diagnostics.Debug;
 
 namespace Assets.Generation.G
 {
@@ -11,19 +13,19 @@ namespace Assets.Generation.G
         private readonly HashSet<Node> m_nodes = new HashSet<Node>();
         private readonly HashSet<DirectedEdge> m_edges = new HashSet<DirectedEdge>();
 
-        private GraphRestore m_restore;
+        private GraphRestore Restore { get; set; }
 
         public INode AddNode(string name, string codes, string template, float rad /*,
                              GeomLayout.IGeomLayoutCreateFromNode geomCreator */)
         {
             Node n = new Node(name, codes, template/*, geomCreator*/, rad);
 
-            if (m_restore != null)
+            if (Restore != null)
             {
-                m_restore.AddNode(n);
+                Restore.AddNode(n);
             }
 
-            addNodeInner(n);
+            AddNodeInner(n);
 
             return n;
         }
@@ -38,22 +40,22 @@ namespace Assets.Generation.G
 
             Node node = (Node)inode;
 
-            if (m_restore != null)
+            if (Restore != null)
             {
-                m_restore.RemoveNode(node);
+                Restore.RemoveNode(node);
             }
 
-            removeNodeInner(node);
+            RemoveNodeInner(node);
 
             return true;
         }
 
-        private void addNodeInner(Node n)
+        private void AddNodeInner(Node n)
         {
             m_nodes.Add(n);
         }
 
-        private void removeNodeInner(Node node)
+        private void RemoveNodeInner(Node node)
         {
             m_nodes.Remove(node);
         }
@@ -70,9 +72,9 @@ namespace Assets.Generation.G
 
             DirectedEdge temp = new DirectedEdge(from, to, min_length, max_length, half_width/*, layoutCreator*/);
 
-            if (m_restore != null)
+            if (Restore != null)
             {
-                m_restore.Connect(temp);
+                Restore.Connect(temp);
             }
 
             return ConnectInner(temp);
@@ -120,9 +122,9 @@ namespace Assets.Generation.G
             if (e == null)
                 return false;
 
-            if (m_restore != null)
+            if (Restore != null)
             {
-                m_restore.Disconnect(e);
+                Restore.Disconnect(e);
             }
 
             DisconnectInner(e);
@@ -153,12 +155,198 @@ namespace Assets.Generation.G
 
         public IGraphRestore CreateRestorePoint()
         {
-            GraphRestore gr = new GraphRestore(this, m_restore);
+            GraphRestore gr = new GraphRestore(this, Restore);
 
-            m_restore = gr;
+            Restore = gr;
 
             return gr;
         }
 
+        internal class GraphRestore : IGraphRestore
+        {
+            private sealed class NodePos
+            {
+                public readonly Vector2 Pos;
+                public readonly INode N;
+
+                public NodePos(INode n, Vector2 pos)
+                {
+                    Pos = pos;
+                    N = n;
+                }
+            }
+
+            private readonly Graph m_graph;
+            private readonly List<Node> m_nodes_added = new List<Node>();
+            private readonly List<Node> m_nodes_removed = new List<Node>();
+            private readonly List<NodePos> m_positions = new List<NodePos>();
+            private readonly Dictionary<DirectedEdge, RestoreAction> m_connections = new Dictionary<DirectedEdge, RestoreAction>();
+            private readonly GraphRestore m_chain_from_restore;
+            private GraphRestore m_chain_to_restore;
+            private bool m_can_be_restored;
+
+            public GraphRestore(Graph graph, GraphRestore chain_from_restore)
+            {
+                m_graph = graph;
+                m_chain_from_restore = chain_from_restore;
+
+                // m_chain_from_restore is an older restore than we are, so if it is restored
+                // it needs to know that it needs to restore us first...
+                if (m_chain_from_restore != null)
+                {
+                    // check we're talking about the same graph as the chain we were passed
+                    Debug.Assert(m_graph == m_chain_from_restore.m_graph);
+
+                    // anything the chain-from used to be chained-to should be already gone,
+                    // e.g. restored, before we are able to make another new chain
+                    Debug.Assert(m_chain_from_restore.m_chain_to_restore == null);
+
+                    m_chain_from_restore.m_chain_to_restore = this;
+                }
+
+                m_positions = m_graph.GetAllNodes().Select(n => new NodePos(n, n.Position)).ToList();
+            }
+
+            public enum RestoreAction
+            {
+                Make,
+                Break
+            }
+
+            public bool CanBeRestored()
+            {
+                return m_can_be_restored;
+            }
+
+            public bool Restore()
+            {
+                if (!m_can_be_restored)
+                    return false;
+
+                if (m_chain_to_restore != null)
+                {
+                    // first undo any newer restore points
+                    m_chain_to_restore.Restore();
+                }
+
+                // disconnect anything we connected
+                foreach (var e in m_connections.Keys)
+                {
+                    RestoreAction ra = m_connections[e];
+
+                    if (ra == RestoreAction.Break)
+                    {
+                        Debug.Assert(e.Start.Connects(e.End));
+
+                        m_graph.DisconnectInner(e);
+                    }
+                }
+
+                // which means we must be able to remove anything we added
+                m_nodes_added.ForEach(n => m_graph.RemoveNodeInner(n));
+
+                // put back anything we removed
+                m_nodes_removed.ForEach(n => m_graph.AddNodeInner(n));
+
+                // which means we must be able to restore the original connections
+                foreach (var e in m_connections.Keys)
+                {
+                    var ra = m_connections[e];
+
+                    if (ra == RestoreAction.Make)
+                    {
+                        Debug.Assert(!e.Start.Connects(e.End));
+
+                        m_graph.ConnectInner(e);
+                    }
+                }
+
+                int restored_size = m_graph.NumNodes();
+                int prev_size = m_positions.Count;
+
+                // putting connections back should leave us the same size as before...
+                Debug.Assert(restored_size == prev_size);
+
+                // and finally put all the positions back
+                foreach (NodePos np in m_positions)
+                {
+                    np.N.Position = np.Pos;
+                }
+
+                CleanUp();
+
+                return true;
+            }
+
+            void CleanUp()
+            {
+                if (m_chain_to_restore != null)
+                    m_chain_to_restore.CleanUp();
+
+                // once we are undone or committed, the user goes back to whatever their previous restore level was
+                m_graph.Restore = m_chain_from_restore;
+
+                // we're restored, so whoever might have wanted to chain us mustn't any more
+                if (m_chain_from_restore != null)
+                    m_chain_from_restore.m_chain_to_restore = null;
+
+                m_can_be_restored = false;
+            }
+
+            public void AddNode(Node n)
+            {
+                if (!m_nodes_removed.Remove(n))
+                {
+                    m_nodes_added.Add(n);
+                }
+            }
+
+            public void RemoveNode(Node node)
+            {
+                if (!m_nodes_added.Remove(node))
+                {
+                    m_nodes_removed.Add(node);
+                }
+            }
+
+
+
+            public void Connect(DirectedEdge e)
+            {
+                RestoreAction ra = m_connections[e];
+
+                if (m_connections.ContainsKey(e))
+                {
+                    // only way we can already know about an edge we are adding is if it was already removed once in the
+                    // context of this restore point, so the only restore-action it can already have is "break"
+
+                    // in which case the net effect of an edge added and removed is nothing
+                    Debug.Assert(m_connections[e] == RestoreAction.Break);
+                    m_connections.Remove(e);
+                }
+                else
+                {
+                    m_connections.Add(e, RestoreAction.Break);
+                }
+            }
+
+            public void Disconnect(DirectedEdge e)
+            {
+                if (m_connections.ContainsKey(e))
+                {
+                    // only way we can already know about an edge we are removing is if it was added in the context of this
+                    // restore point, so the only restore-action it can already have is "break"
+
+                    // in which case the net effect of an edge added and removed is nothing
+                    Debug.Assert(m_connections[e] == RestoreAction.Break);
+                    m_connections.Remove(e);
+                }
+                else
+                {
+                    m_connections.Add(e, RestoreAction.Make);
+                }
+            }
+
+        }
     }
 }

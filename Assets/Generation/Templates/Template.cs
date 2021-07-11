@@ -46,8 +46,8 @@ namespace Assets.Generation.Templates
 
         public bool Expand(Graph graph, INode target, ClRand random)
         {
-            List<DirectedEdge> target_in_connections = target.GetInConnections();
-            List<DirectedEdge> target_out_connections = target.GetOutConnections();
+            IReadOnlyList<DirectedEdge> target_in_connections = target.GetInConnections();
+            IReadOnlyList<DirectedEdge> target_out_connections = target.GetOutConnections();
 
             if (m_num_in_nodes != target_in_connections.Count)
             {

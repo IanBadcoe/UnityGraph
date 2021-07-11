@@ -18,7 +18,6 @@ namespace Assets.Generation
 
         private IoCContainer m_ioc_container;
 
-
         public enum Phase
         {
             Init,
@@ -37,6 +36,7 @@ namespace Assets.Generation
         private StepperController m_final_relaxer;
 
         private int m_reqSize;
+        private bool m_complete = false;
 
         private void Start()
         {
@@ -49,6 +49,29 @@ namespace Assets.Generation
             );
 
             m_reqSize = 10;
+        }
+
+        private void Update()
+        {
+            if (!m_complete)
+            {
+                StepperController.StatusReport ret;
+
+                ret = Step();
+
+                // take before complete so we can draw it...
+                //m_level = m_generator.getLevel();
+
+                if (ret.Complete)
+                {
+                    //if (ret.Status != StepperController.Status.StepOutSuccess)
+                    //{
+                    //    exit();
+                    //}
+
+                    m_complete = true;
+                }
+            }
         }
 
         public StepperController.StatusReport Step()

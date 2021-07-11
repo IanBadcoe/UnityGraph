@@ -1,6 +1,8 @@
 ﻿using Assets.Generation.Util;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using UnityEngine;
 
 namespace Assets.Generation.G
@@ -37,24 +39,19 @@ namespace Assets.Generation.G
             // m_gl_creator = gl_creator;
         }
 
-        public UnityEngine.Vector2 GetPos()
-        {
-            throw new NotImplementedException();
-        }
-
         public bool Connects(INode n)
         {
-            throw new NotImplementedException();
+            return ConnectsForwards(n) || ConnectsBackwards(n);
         }
 
         public bool ConnectsForwards(INode to)
         {
-            throw new NotImplementedException();
+            return m_connections.Contains(new DirectedEdge(this, to, 0, 0, 0/*, null*/));
         }
 
         public bool ConnectsBackwards(INode from)
         {
-            throw new NotImplementedException();
+            return m_connections.Contains(new DirectedEdge(from, this, 0, 0, 0/*, null*/));
         }
 
         public DirectedEdge Connect(Node n, float min_distance, float max_distance, float width /*,
@@ -91,29 +88,41 @@ namespace Assets.Generation.G
             n.Disconnect(this);
         }
 
-        public DirectedEdge GetConnectionTo(INode node)
+        public DirectedEdge GetConnectionTo(INode to)
         {
-            throw new NotImplementedException();
+            foreach (DirectedEdge e in m_connections)
+            {
+                if (e.End == to)
+                    return e;
+            }
+
+            return null;
         }
 
         public DirectedEdge GetConnectionFrom(INode from)
         {
-            throw new NotImplementedException();
+            foreach (DirectedEdge e in m_connections)
+            {
+                if (e.Start == from)
+                    return e;
+            }
+
+            return null;
         }
 
-        public List<DirectedEdge> GetConnections()
+        public IReadOnlyList<DirectedEdge> GetConnections()
         {
-            throw new NotImplementedException();
+            return m_connections.ToList();
         }
 
-        public List<DirectedEdge> GetInConnections()
+        public IReadOnlyList<DirectedEdge> GetInConnections()
         {
-            throw new NotImplementedException();
+            return m_connections.Where(c => c.End == this).ToList();
         }
 
-        public List<DirectedEdge> GetOutConnections()
+        public IReadOnlyList<DirectedEdge> GetOutConnections()
         {
-            throw new NotImplementedException();
+            return m_connections.Where(c => c.Start == this).ToList();
         }
 
         public float Step(float t)

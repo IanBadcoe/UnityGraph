@@ -65,7 +65,7 @@ namespace Assets.Generation
             GeneratorConfig lcg = new GeneratorConfig();
 
             lcg.RandomSeed = old.RandomSeed;
-            lcg.RandObj = new ClRand(old.RandObj);
+            lcg.RandObj = old.RandObj != null ? new ClRand(old.RandObj) : null;
 
             lcg.RelaxationMinimumSeparation = old.RelaxationMinimumSeparation;
 
