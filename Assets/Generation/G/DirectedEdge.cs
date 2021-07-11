@@ -56,7 +56,7 @@ namespace Assets.Generation.G
             return Start == e.Start && End == e.End;
         }
 
-        INode OtherNode(INode n)
+        public INode OtherNode(INode n)
         {
             if (n == Start)
             {
@@ -72,7 +72,7 @@ namespace Assets.Generation.G
 
         public float Length()
         {
-            return (End.Pos - Start.Pos).magnitude;
+            return (End.Position - Start.Position).magnitude;
         }
 
         public bool Connects(INode n)

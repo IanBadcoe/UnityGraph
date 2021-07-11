@@ -78,7 +78,7 @@ namespace Assets.Generation.G
             return ConnectInner(temp);
         }
 
-        internal List<INode> GetAllNodes()
+        public List<INode> GetAllNodes()
         {
             return m_nodes.ToList<INode>();
         }
@@ -88,12 +88,12 @@ namespace Assets.Generation.G
             return m_edges.ToList();
         }
 
-        internal int NumNodes()
+        public int NumNodes()
         {
             return m_nodes.Count;
         }
 
-        internal int NumEdges()
+        public int NumEdges()
         {
             return m_edges.Count;
         }

@@ -60,9 +60,9 @@ namespace Assets.Generation
                   m_edge.HalfWidth * 2 /*,
                   m_geom_maker */);
 
-            Vector2 mid = (m_edge.Start.Pos + m_edge.End.Pos) / 2;
+            Vector2 mid = (m_edge.Start.Position + m_edge.End.Position) / 2;
 
-            c.Pos = mid;
+            c.Position = mid;
 
             m_graph.Disconnect(m_edge.Start, m_edge.End);
             // idea of lengths is to force no more length but allow

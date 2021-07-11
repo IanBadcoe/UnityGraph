@@ -7,16 +7,16 @@ using UnityEngine;
 
 namespace Assets.Generation.G
 {
-    internal class Node : INode
+    public class Node : INode
     {
-        private readonly string m_codes;
-        private readonly string m_template;
         private readonly int m_num;
         private readonly HashSet<DirectedEdge> m_connections = new HashSet<DirectedEdge>();
 
         private static readonly ClRand s_rand = new ClRand(1);
 
         public string Name { get; }
+        public string Codes { get; }
+        public string Template { get; }
         public float Radius { get; }
 
         public Vector2 Pos { get; set; }
@@ -28,8 +28,8 @@ namespace Assets.Generation.G
              /*GeomLayout.IGeomLayoutCreateFromNode gl_creator, */float rad)
         {
             Name = name;
-            m_codes = codes;
-            m_template = template;
+            Codes = codes;
+            Template = template;
 
             m_num = s_rand.Next();
 

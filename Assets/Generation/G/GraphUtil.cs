@@ -13,9 +13,9 @@ namespace Assets.Generation.G
 {
     public class GraphUtil
     {
-        public static HashSet<Tuple<DirectedEdge, DirectedEdge>> FindCrossingEdges(List<DirectedEdge> edges)
+        public static HashSet<DirectedEdgePair> FindCrossingEdges(List<DirectedEdge> edges)
         {
-            HashSet<Tuple<DirectedEdge, DirectedEdge>> ret = new HashSet<Tuple<DirectedEdge, DirectedEdge>>();
+            HashSet<DirectedEdgePair> ret = new HashSet<DirectedEdgePair>();
 
             foreach (DirectedEdge e1 in edges)
             {
@@ -36,7 +36,7 @@ namespace Assets.Generation.G
             return ret;
         }
 
-        public static Tuple<DirectedEdge, DirectedEdge> EdgeIntersect(DirectedEdge edge1, DirectedEdge edge2)
+        public static DirectedEdgePair EdgeIntersect(DirectedEdge edge1, DirectedEdge edge2)
         {
             Assertion.Assert(edge1 != null);
             Assertion.Assert(edge2 != null);
@@ -46,7 +46,7 @@ namespace Assets.Generation.G
             if (p == null)
                 return null;
 
-            return new Tuple<DirectedEdge, DirectedEdge>(edge1, edge2);
+            return new DirectedEdgePair(edge1, edge2);
         }
 
         public static Tuple<float, float> EdgeIntersect(INode edge1Start, INode edge1End,
