@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4349abe48b189fd4e82d099da369191e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_config:
+  Config:
     RelaxationMinimumSeparation: 5
     EdgeToNodeForceScale: 1
     EdgeLengthForceScale: 0.01
@@ -56,7 +56,7 @@ MonoBehaviour:
     ExpandStepsToRun: 1000
     CellSize: 20
     WallFacetLength: 10
-  m_templates: {fileID: 4977305617343730500}
+  Templates: {fileID: 4977305617343730500}
 --- !u!114 &4977305617343730500
 MonoBehaviour:
   m_ObjectHideFlags: 0

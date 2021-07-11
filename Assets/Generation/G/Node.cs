@@ -12,7 +12,6 @@ namespace Assets.Generation.G
         private readonly string m_codes;
         private readonly string m_template;
         private readonly int m_num;
-        private readonly float m_rad;
         private readonly HashSet<DirectedEdge> m_connections = new HashSet<DirectedEdge>();
 
         private static readonly ClRand s_rand = new ClRand(1);
@@ -34,7 +33,7 @@ namespace Assets.Generation.G
 
             m_num = s_rand.Next();
 
-            m_rad = rad;
+            Radius = rad;
 
             // m_gl_creator = gl_creator;
         }

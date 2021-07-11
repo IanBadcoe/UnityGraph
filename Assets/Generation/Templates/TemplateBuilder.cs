@@ -20,9 +20,6 @@ namespace Assets.Generation.Templates
         private int m_num_out_nodes = 0;
         private int m_num_internal_nodes = 0;
 
-
-        private bool m_cleared = false;
-
         // private final Template.IPostExpand m_post_expand;
 
         //public TemplateBuilder(string name, string codes)
@@ -46,7 +43,7 @@ namespace Assets.Generation.Templates
         // don't want people recovering from these as just bad programming
         public abstract class TemplateException : Exception
         {
-            protected TemplateException(String message)
+            protected TemplateException(string message)
                 : base(message)
             {
             }
@@ -54,7 +51,7 @@ namespace Assets.Generation.Templates
 
         public class UnknownNodeException : TemplateException
         {
-            public UnknownNodeException(String name, String argument)
+            public UnknownNodeException(string name, string argument)
                 : base("Attempt to reference a node: '" + name + "' which does not exist.")
             {
                 NodeName = name;
@@ -67,7 +64,7 @@ namespace Assets.Generation.Templates
 
         public class DuplicateNodeException : TemplateException
         {
-            public DuplicateNodeException(String name)
+            public DuplicateNodeException(string name)
                 : base("Attempt to add a node: '" + name + "' to a template when a node of name is already present.")
             {
                 NodeName = name;
@@ -76,7 +73,7 @@ namespace Assets.Generation.Templates
             readonly string NodeName;
         }
 
-        public void AddNode(NodeRecord.NodeType type, String name)
+        public void AddNode(NodeRecord.NodeType type, string name)
         {
             AddNode(type, name, false,
                     "<target>", null, null,
@@ -171,15 +168,25 @@ namespace Assets.Generation.Templates
         private NodeRecord FindNodeRecord(string name)
         {
             NodeRecord ret;
-            if (m_nodes.TryGetValue("name", out ret)) {
+            if (m_nodes.TryGetValue(name, out ret)) {
                 return ret;
             }
 
             return null;
         }
 
+        public ConnectionRecord FindConnectionRecord(string from, string to)
+        {
+            ConnectionRecord ret;
+            if (m_connections.TryGetValue(Template.MakeConnectionName(from, to), out ret))
+            {
+                return ret;
+            }
 
-        public void Connect(String from, String to,
+            return null;
+        }
+
+        public void Connect(string from, string to,
                             float min_length, float max_length,
                             float half_width)
         {
@@ -189,7 +196,7 @@ namespace Assets.Generation.Templates
                     0xffb4b4b4);
         }
 
-       public void Connect(String from, String to,
+       public void Connect(string from, string to,
                            float min_length, float max_length,
                            float half_width,
                            uint colour)
@@ -227,11 +234,6 @@ namespace Assets.Generation.Templates
                   Template.MakeConnectionName(from, to),
                   new ConnectionRecord(nrf, nrt, min_length, max_length, half_width, colour));
        }
-
-        public ConnectionRecord FindConnectionRecord(String from, String to)
-        {
-            return m_connections[Template.MakeConnectionName(from, to)];
-        }
 
         public ReadOnlyDictionary<string, NodeRecord> GetUnmodifiableNodes()
         {

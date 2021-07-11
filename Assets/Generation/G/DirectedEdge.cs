@@ -1,8 +1,9 @@
-﻿using System.Diagnostics;
+﻿using Assets.Generation.Util;
+using UnityEngine;
 
 namespace Assets.Generation.G
 {
-    public class DirectedEdge
+    public class DirectedEdge : EqualityBase
     {
         public readonly INode Start;
         public readonly INode End;
@@ -24,8 +25,8 @@ namespace Assets.Generation.G
               float half_width/* ,
               GeomLayout.IGeomLayoutCreateFromDirectedEdge layout_creator */)
         {
-            Debug.Assert(start != null);
-            Debug.Assert(end != null);
+            Assertion.Assert(start != null);
+            Assertion.Assert(end != null);
 
             Start = start;
             End = end;
@@ -35,25 +36,25 @@ namespace Assets.Generation.G
             // LayoutCreator = layout_creator;
         }
 
-        //public int hashCode()
-        //{
-        //    int x = Start.hashCode();
-        //    int y = End.hashCode();
+        public override int GetHashCode()
+        {
+            int x = Start.GetHashCode();
+            int y = End.GetHashCode();
 
-        //    // we don't intend to ever have two edges between the same
-        //    // pair of nodes, so no need to look at lengths
-        //    return x * 31 + y;
-        //}
+            // we don't intend to ever have two edges between the same
+            // pair of nodes, so no need to look at lengths
+            return x * 31 + y;
+        }
 
-        //public boolean equals(Object o)
-        //{
-        //    if (!(o instanceof DirectedEdge))
-        // return false;
+        public override bool Equals(object o)
+        {
+            if (o == null || GetType() != o.GetType())
+                return false;
 
-        //    DirectedEdge e = (DirectedEdge)o;
+            DirectedEdge e = o as DirectedEdge;
 
-        //    return (Start == e.Start && End == e.End);
-        //}
+            return Start == e.Start && End == e.End;
+        }
 
         INode OtherNode(INode n)
         {

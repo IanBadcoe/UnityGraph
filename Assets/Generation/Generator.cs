@@ -2,6 +2,7 @@ using Assets.Generation.G;
 using Assets.Generation.IoC;
 using Assets.Generation.Stepping;
 using Assets.Generation.Templates;
+using Assets.Generation.Util;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,10 +12,8 @@ namespace Assets.Generation
 {
     public class Generator : MonoBehaviour
     {
-        [SerializeField]
-        private GeneratorConfig m_config;
-        [SerializeField]
-        private TemplateStore m_templates;
+        public GeneratorConfig Config;
+        public TemplateStore Templates;
 
         private IoCContainer m_ioc_container;
 
@@ -40,6 +39,8 @@ namespace Assets.Generation
 
         private void Start()
         {
+            //UnityEngine.Assertions.Assert.raiseExceptions = true;
+
             m_ioc_container = new IoCContainer(
                 new RelaxerStepperFactory(),
                 new TryAllNodesExpandStepperFactory(),
@@ -62,7 +63,7 @@ namespace Assets.Generation
                 // take before complete so we can draw it...
                 //m_level = m_generator.getLevel();
 
-                if (ret.Complete)
+                if (ret == null || ret.Complete)
                 {
                     //if (ret.Status != StepperController.Status.StepOutSuccess)
                     //{
@@ -108,10 +109,10 @@ namespace Assets.Generation
             m_graph = MakeSeed();
 
             m_expander = new StepperController(m_graph,
-                  new ExpandToSizeStepper(m_ioc_container, m_graph, m_reqSize, m_templates,
-                        m_config));
+                  new ExpandToSizeStepper(m_ioc_container, m_graph, m_reqSize, Templates,
+                        Config));
 
-            GeneratorConfig temp = GeneratorConfig.ShallowCopy(m_config);
+            GeneratorConfig temp = GeneratorConfig.ShallowCopy(Config);
             temp.RelaxationForceTarget /= 5;
             temp.RelaxationMoveTarget /= 5;
 
@@ -130,7 +131,7 @@ namespace Assets.Generation
         {
             StepperController.StatusReport ret = null;
 
-            for (int i = 0; i < m_config.ExpandStepsToRun; i++)
+            for (int i = 0; i < Config.ExpandStepsToRun; i++)
             {
                 ret = m_expander.Step();
 
@@ -152,7 +153,7 @@ namespace Assets.Generation
         {
             StepperController.StatusReport ret = null;
 
-            for (int i = 0; i < m_config.ExpandStepsToRun; i++)
+            for (int i = 0; i < Config.ExpandStepsToRun; i++)
             {
                 ret = m_final_relaxer.Step();
 

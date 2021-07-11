@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -187,7 +186,7 @@ namespace Assets.Generation.Util
             {
                 throw new ArgumentOutOfRangeException("minValue", /*Environment.GetResourceString(*/"Argument_MinMaxValue"/*, "minValue", "maxValue")*/);
             }
-            Contract.EndContractBlock();
+            //Contract.EndContractBlock();
 
             long range = (long)maxValue - minValue;
             if (range <= (long)Int32.MaxValue)
@@ -212,7 +211,7 @@ namespace Assets.Generation.Util
             {
                 throw new ArgumentOutOfRangeException("maxValue", /*Environment.GetResourceString(*/"ArgumentOutOfRange_MustBePositive"/*, "maxValue")*/);
             }
-            Contract.EndContractBlock();
+            //Contract.EndContractBlock();
             return (int)(Sample() * maxValue);
         }
 
@@ -237,7 +236,7 @@ namespace Assets.Generation.Util
         public virtual void NextBytes(byte[] buffer)
         {
             if (buffer == null) throw new ArgumentNullException("buffer");
-            Contract.EndContractBlock();
+            //Contract.EndContractBlock();
             for (int i = 0; i < buffer.Length; i++)
             {
                 buffer[i] = (byte)(InternalSample() % (Byte.MaxValue + 1));

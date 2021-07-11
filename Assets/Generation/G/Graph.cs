@@ -1,10 +1,8 @@
-﻿using System;
+﻿using Assets.Generation.Util;
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
-using Debug = System.Diagnostics.Debug;
 
 namespace Assets.Generation.G
 {
@@ -102,7 +100,7 @@ namespace Assets.Generation.G
 
         private DirectedEdge ConnectInner(DirectedEdge e)
         {
-            Debug.Assert(!m_edges.Contains(e));
+            Assertion.Assert(!m_edges.Contains(e));
 
             DirectedEdge real_edge = ((Node)e.Start).Connect((Node)e.End, e.MinLength, e.MaxLength, e.HalfWidth/*,
                   e.LayoutCreator*/);
@@ -139,7 +137,7 @@ namespace Assets.Generation.G
 
             n_from.Disconnect(n_to);
 
-            Debug.Assert(m_edges.Contains(e));
+            Assertion.Assert(m_edges.Contains(e));
             m_edges.Remove(e);
         }
 
@@ -195,11 +193,11 @@ namespace Assets.Generation.G
                 if (m_chain_from_restore != null)
                 {
                     // check we're talking about the same graph as the chain we were passed
-                    Debug.Assert(m_graph == m_chain_from_restore.m_graph);
+                    Assertion.Assert(m_graph == m_chain_from_restore.m_graph);
 
                     // anything the chain-from used to be chained-to should be already gone,
                     // e.g. restored, before we are able to make another new chain
-                    Debug.Assert(m_chain_from_restore.m_chain_to_restore == null);
+                    Assertion.Assert(m_chain_from_restore.m_chain_to_restore == null);
 
                     m_chain_from_restore.m_chain_to_restore = this;
                 }
@@ -236,7 +234,7 @@ namespace Assets.Generation.G
 
                     if (ra == RestoreAction.Break)
                     {
-                        Debug.Assert(e.Start.Connects(e.End));
+                        Assertion.Assert(e.Start.Connects(e.End));
 
                         m_graph.DisconnectInner(e);
                     }
@@ -255,7 +253,7 @@ namespace Assets.Generation.G
 
                     if (ra == RestoreAction.Make)
                     {
-                        Debug.Assert(!e.Start.Connects(e.End));
+                        Assertion.Assert(!e.Start.Connects(e.End));
 
                         m_graph.ConnectInner(e);
                     }
@@ -265,7 +263,7 @@ namespace Assets.Generation.G
                 int prev_size = m_positions.Count;
 
                 // putting connections back should leave us the same size as before...
-                Debug.Assert(restored_size == prev_size);
+                Assertion.Assert(restored_size == prev_size);
 
                 // and finally put all the positions back
                 foreach (NodePos np in m_positions)
@@ -313,15 +311,13 @@ namespace Assets.Generation.G
 
             public void Connect(DirectedEdge e)
             {
-                RestoreAction ra = m_connections[e];
-
                 if (m_connections.ContainsKey(e))
                 {
                     // only way we can already know about an edge we are adding is if it was already removed once in the
                     // context of this restore point, so the only restore-action it can already have is "break"
 
                     // in which case the net effect of an edge added and removed is nothing
-                    Debug.Assert(m_connections[e] == RestoreAction.Break);
+                    Assertion.Assert(m_connections[e] == RestoreAction.Break);
                     m_connections.Remove(e);
                 }
                 else
@@ -335,10 +331,10 @@ namespace Assets.Generation.G
                 if (m_connections.ContainsKey(e))
                 {
                     // only way we can already know about an edge we are removing is if it was added in the context of this
-                    // restore point, so the only restore-action it can already have is "break"
+                    // restore point, so the only restore-action it can already have is "Make"
 
-                    // in which case the net effect of an edge added and removed is nothing
-                    Debug.Assert(m_connections[e] == RestoreAction.Break);
+                    // in which case the net effect of an edge removed and added is nothing
+                    Assertion.Assert(m_connections[e] == RestoreAction.Make);
                     m_connections.Remove(e);
                 }
                 else

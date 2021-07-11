@@ -42,7 +42,7 @@ namespace Assets.Generation
             this.m_config = c;
         }
 
-        private void setUp()
+        private void SetUp()
         {
             m_nodes = m_graph.GetAllNodes();
             m_edges = m_graph.GetAllEdges();
@@ -66,7 +66,7 @@ namespace Assets.Generation
         {
             if (!m_setup_done)
             {
-                setUp();
+                SetUp();
             }
 
             return RelaxStep();
@@ -99,7 +99,7 @@ namespace Assets.Generation
                     if (!e.Connects(n))
                     {
                         float ratio = AddNodeEdgeForces(e, n);
-                        max_edge_side_squeeze = Mathf.Min(ratio, max_edge_side_squeeze);
+                        max_edge_side_squeeze = Mathf.Max(ratio, max_edge_side_squeeze);
                     }
                 }
             }
@@ -172,7 +172,7 @@ namespace Assets.Generation
         // returns the edge length as a fraction of d0
         private float AddEdgeForces(DirectedEdge e, float dmin, float dmax)
         {
-            Debug.Assert(dmin <= dmax);
+            Assertion.Assert(dmin <= dmax);
 
             INode nStart = e.Start;
             INode nEnd = e.End;
