@@ -202,7 +202,7 @@ public class GraphTest
         readonly HashSet<DirectedEdge> m_edges = new HashSet<DirectedEdge>();
         readonly Dictionary<INode, Vector2> m_positions = new Dictionary<INode, Vector2>();
 
-        GraphRecord(Graph g)
+        public GraphRecord(Graph g)
         {
             m_nodes = new HashSet<INode>(g.GetAllNodes());
             m_edges = new HashSet<DirectedEdge>(g.GetAllEdges());
@@ -213,18 +213,18 @@ public class GraphTest
             }
         }
 
-        bool Compare(Graph g)
+        public bool Compare(Graph g)
         {
             if (m_nodes.Count != g.NumNodes())
                 return false;
 
-            if (m_nodes != new HashSet<INode>(g.GetAllNodes()))
+            if (!m_nodes.SetEquals(new HashSet<INode>(g.GetAllNodes())))
                 return false;
 
             if (m_edges.Count != g.NumEdges())
                 return false;
 
-            if (m_edges != new HashSet<DirectedEdge>(g.GetAllEdges()))
+            if (!m_edges.SetEquals(new HashSet<DirectedEdge>(g.GetAllEdges())))
                 return false;
 
             foreach (INode n in g.GetAllNodes())
@@ -256,439 +256,448 @@ public class GraphTest
         }
     }
 
-    //@Test
-    //   public void testGraphRecord() throws Exception
-    //{
-    //      // same if empty
-    //      {
-    //        Graph g = new Graph();
+    [Test]
+    public void TestGraphRecord()
+    {
+        // same if empty
+        {
+            Graph g = new Graph();
 
-    //        GraphRecord gr = new GraphRecord(g);
+            GraphRecord gr = new GraphRecord(g);
 
-    //        assertTrue(gr.Compare(g));
-    //    }
+            Assert.IsTrue(gr.Compare(g));
+        }
 
-    //      // same if one node
-    //    {
-    //        Graph g = new Graph();
+        // same if one node
+        {
+            Graph g = new Graph();
 
-    //        g.addNode("", "", "", 0);
+            g.AddNode("", "", "", 0);
 
-    //        GraphRecord gr = new GraphRecord(g);
+            GraphRecord gr = new GraphRecord(g);
 
-    //        assertTrue(gr.Compare(g));
-    //    }
+            Assert.IsTrue(gr.Compare(g));
+        }
 
-    //      // same if two nodes and an edge
-    //    {
-    //        Graph g = new Graph();
+        // different if one node but different graphs
+        // (because node-identity is based on object-identity
+        //  we could move to node property comparison of some sort if we ever need cross-graph comparisons...)
+        {
+            Graph g = new Graph();
+            g.AddNode("", "", "", 0);
 
-    //        INode n1 = g.addNode("", "", "", 0);
+            GraphRecord gr = new GraphRecord(g);
 
-    //        INode n2 = g.addNode("", "", "", 0);
+            Graph g1 = new Graph();
+            g1.AddNode("", "", "", 0);
 
-    //        g.connect(n1, n2, 0, 0, 0);
+            Assert.IsFalse(gr.Compare(g1));
+        }
 
-    //        GraphRecord gr = new GraphRecord(g);
+        // same if two nodes and an edge
+        {
+            Graph g = new Graph();
 
-    //        assertTrue(gr.Compare(g));
-    //    }
+            INode n1 = g.AddNode("", "", "", 0);
 
-    //      // same if node added and removed
-    //    {
-    //        Graph g = new Graph();
+            INode n2 = g.AddNode("", "", "", 0);
 
-    //        GraphRecord gr = new GraphRecord(g);
+            g.Connect(n1, n2, 0, 0, 0);
 
-    //        INode n1 = g.addNode("", "", "", 0);
-    //        g.removeNode(n1);
+            GraphRecord gr = new GraphRecord(g);
 
-    //        assertTrue(gr.Compare(g));
-    //    }
+            Assert.IsTrue(gr.Compare(g));
+        }
 
-    //      // same if edge added and removed
-    //    {
-    //        Graph g = new Graph();
+        // same if node added and removed
+        {
+            Graph g = new Graph();
 
-    //        INode n1 = g.addNode("", "", "", 0);
+            GraphRecord gr = new GraphRecord(g);
 
-    //        INode n2 = g.addNode("", "", "", 0);
+            INode n1 = g.AddNode("", "", "", 0);
+            g.RemoveNode(n1);
 
-    //        GraphRecord gr = new GraphRecord(g);
+            Assert.IsTrue(gr.Compare(g));
+        }
 
-    //        g.connect(n1, n2, 0, 0, 0);
+        // same if edge added and removed
+        {
+            Graph g = new Graph();
+            INode n1 = g.AddNode("", "", "", 0);
+            INode n2 = g.AddNode("", "", "", 0);
 
-    //        g.disconnect(n1, n2);
+            GraphRecord gr = new GraphRecord(g);
 
-    //        assertTrue(gr.Compare(g));
-    //    }
+            g.Connect(n1, n2, 0, 0, 0);
+            g.Disconnect(n1, n2);
 
-    //      // different if node added
-    //    {
-    //        Graph g = new Graph();
+            Assert.IsTrue(gr.Compare(g));
+        }
 
-    //        GraphRecord gr = new GraphRecord(g);
+        // different if node added
+        {
+            Graph g = new Graph();
 
-    //        g.addNode("", "", "", 0);
+            GraphRecord gr = new GraphRecord(g);
 
-    //        assertFalse(gr.Compare(g));
-    //    }
+            g.AddNode("", "", "", 0);
 
-    //      // different if edge added
-    //    {
-    //        Graph g = new Graph();
+            Assert.IsFalse(gr.Compare(g));
+        }
 
-    //        INode n1 = g.addNode("", "", "", 0);
+        // different if edge added
+        {
+            Graph g = new Graph();
+            INode n1 = g.AddNode("", "", "", 0);
+            INode n2 = g.AddNode("", "", "", 0);
 
-    //        INode n2 = g.addNode("", "", "", 0);
+            GraphRecord gr = new GraphRecord(g);
 
-    //        GraphRecord gr = new GraphRecord(g);
+            g.Connect(n1, n2, 0, 0, 0);
 
-    //        g.connect(n1, n2, 0, 0, 0);
+            Assert.IsFalse(gr.Compare(g));
+        }
 
-    //        assertFalse(gr.Compare(g));
-    //    }
+        // different if node moved
+        {
+            Graph g = new Graph();
+            INode n1 = g.AddNode("", "", "", 0);
 
-    //      // different if node moved
-    //    {
-    //        Graph g = new Graph();
+            GraphRecord gr = new GraphRecord(g);
 
-    //        INode n1 = g.addNode("", "", "", 0);
+            n1.Position = new Vector2(1, 0);
 
-    //        GraphRecord gr = new GraphRecord(g);
+            Assert.IsFalse(gr.Compare(g));
+        }
+    }
 
-    //        n1.setPos(new Vector2(1, 0));
+    [Test]
+    public void TestCreateRestorePoint()
+    {
+        // nop
+        {
+            Graph g = new Graph();
 
-    //        assertFalse(gr.Compare(g));
-    //    }
-    //}
+            GraphRecord gr = new GraphRecord(g);
 
-    //@Test
-    //   public void testCreateRestorePoint() throws Exception
-    //{
-    //      // nop
-    //      {
-    //        Graph g = new Graph();
+            IGraphRestore igr = g.CreateRestorePoint();
 
-    //        GraphRecord gr = new GraphRecord(g);
+            Assert.IsTrue(igr.Restore());
+            // restores only work once...
+            Assert.IsFalse(igr.Restore());
 
-    //        IGraphRestore igr = g.createRestorePoint();
+            Assert.IsTrue(gr.Compare(g));
+        }
 
-    //        assertTrue(igr.Restore());
-    //        // restores only work once...
-    //        assertFalse(igr.Restore());
+        // add node to empty
+        {
+            Graph g = new Graph();
 
-    //        assertTrue(gr.Compare(g));
-    //    }
+            GraphRecord gr = new GraphRecord(g);
 
-    //      // add node to empty
-    //    {
-    //        Graph g = new Graph();
+            IGraphRestore igr = g.CreateRestorePoint();
 
-    //        GraphRecord gr = new GraphRecord(g);
+            g.AddNode("", "", "", 0);
 
-    //        IGraphRestore igr = g.createRestorePoint();
+            igr.Restore();
 
-    //        g.addNode("", "", "", 0);
+            Assert.IsTrue(gr.Compare(g));
+        }
 
-    //        igr.Restore();
+        // add nodes and edge to empty
+        {
+            Graph g = new Graph();
 
-    //        assertTrue(gr.Compare(g));
-    //    }
+            GraphRecord gr = new GraphRecord(g);
 
-    //      // add nodes and edge to empty
-    //    {
-    //        Graph g = new Graph();
+            IGraphRestore igr = g.CreateRestorePoint();
 
-    //        GraphRecord gr = new GraphRecord(g);
+            INode n1 = g.AddNode("", "", "", 0);
+            INode n2 = g.AddNode("", "", "", 0);
 
-    //        IGraphRestore igr = g.createRestorePoint();
+            g.Connect(n1, n2, 0, 0, 0);
 
-    //        INode n1 = g.addNode("", "", "", 0);
-    //        INode n2 = g.addNode("", "", "", 0);
+            igr.Restore();
 
-    //        g.connect(n1, n2, 0, 0, 0);
+            Assert.IsTrue(gr.Compare(g));
+        }
 
-    //        igr.Restore();
+        // get back removed nodes and edges
+        {
+            Graph g = new Graph();
 
-    //        assertTrue(gr.Compare(g));
-    //    }
+            INode n1 = g.AddNode("", "", "", 0);
+            INode n2 = g.AddNode("", "", "", 0);
 
-    //      // get back removed nodes and edges
-    //    {
-    //        Graph g = new Graph();
+            g.Connect(n1, n2, 0, 0, 0);
 
-    //        INode n1 = g.addNode("", "", "", 0);
-    //        INode n2 = g.addNode("", "", "", 0);
+            GraphRecord gr = new GraphRecord(g);
 
-    //        g.connect(n1, n2, 0, 0, 0);
+            IGraphRestore igr = g.CreateRestorePoint();
 
-    //        GraphRecord gr = new GraphRecord(g);
+            g.Disconnect(n1, n2);
 
-    //        IGraphRestore igr = g.createRestorePoint();
+            g.RemoveNode(n1);
+            g.RemoveNode(n2);
 
-    //        g.disconnect(n1, n2);
+            igr.Restore();
 
-    //        g.removeNode(n1);
-    //        g.removeNode(n2);
+            Assert.IsTrue(gr.Compare(g));
+        }
 
-    //        igr.Restore();
+        // add and remove a node shouldn't break anything
+        {
+            Graph g = new Graph();
 
-    //        assertTrue(gr.Compare(g));
-    //    }
+            GraphRecord gr = new GraphRecord(g);
 
-    //      // add and remove a node shouldn't break anything
-    //    {
-    //        Graph g = new Graph();
+            IGraphRestore igr = g.CreateRestorePoint();
 
-    //        GraphRecord gr = new GraphRecord(g);
+            INode n1 = g.AddNode("", "", "", 0);
 
-    //        IGraphRestore igr = g.createRestorePoint();
+            g.RemoveNode(n1);
 
-    //        INode n1 = g.addNode("", "", "", 0);
+            igr.Restore();
 
-    //        g.removeNode(n1);
+            Assert.IsTrue(gr.Compare(g));
+        }
 
-    //        igr.Restore();
+        // add and remove an edge shouldn't break anything
+        {
+            Graph g = new Graph();
 
-    //        assertTrue(gr.Compare(g));
-    //    }
+            INode n1 = g.AddNode("", "", "", 0);
+            INode n2 = g.AddNode("", "", "", 0);
 
-    //      // add and remove an edge shouldn't break anything
-    //    {
-    //        Graph g = new Graph();
+            GraphRecord gr = new GraphRecord(g);
 
-    //        INode n1 = g.addNode("", "", "", 0);
-    //        INode n2 = g.addNode("", "", "", 0);
+            IGraphRestore igr = g.CreateRestorePoint();
 
-    //        GraphRecord gr = new GraphRecord(g);
+            g.Connect(n1, n2, 0, 0, 0);
+            g.Disconnect(n1, n2);
 
-    //        IGraphRestore igr = g.createRestorePoint();
+            igr.Restore();
 
-    //        g.connect(n1, n2, 0, 0, 0);
-    //        g.disconnect(n1, n2);
+            Assert.IsTrue(gr.Compare(g));
+        }
 
-    //        igr.Restore();
+        // add and remove and re-add an edge shouldn't break anything
+        {
+            Graph g = new Graph();
 
-    //        assertTrue(gr.Compare(g));
-    //    }
+            INode n1 = g.AddNode("", "", "", 0);
+            INode n2 = g.AddNode("", "", "", 0);
 
-    //      // add and remove and re-add an edge shouldn't break anything
-    //    {
-    //        Graph g = new Graph();
+            GraphRecord gr = new GraphRecord(g);
 
-    //        INode n1 = g.addNode("", "", "", 0);
-    //        INode n2 = g.addNode("", "", "", 0);
+            IGraphRestore igr = g.CreateRestorePoint();
 
-    //        GraphRecord gr = new GraphRecord(g);
+            g.Connect(n1, n2, 0, 0, 0);
+            g.Disconnect(n1, n2);
+            g.Connect(n1, n2, 0, 0, 0);
 
-    //        IGraphRestore igr = g.createRestorePoint();
+            igr.Restore();
 
-    //        g.connect(n1, n2, 0, 0, 0);
-    //        g.disconnect(n1, n2);
-    //        g.connect(n1, n2, 0, 0, 0);
+            Assert.IsTrue(gr.Compare(g));
+        }
 
-    //        igr.Restore();
+        // remove and add an edge shouldn't break anything
+        {
+            Graph g = new Graph();
 
-    //        assertTrue(gr.Compare(g));
-    //    }
+            INode n1 = g.AddNode("", "", "", 0);
+            INode n2 = g.AddNode("", "", "", 0);
+            g.Connect(n1, n2, 0, 0, 0);
 
-    //      // remove and add an edge shouldn't break anything
-    //    {
-    //        Graph g = new Graph();
+            GraphRecord gr = new GraphRecord(g);
 
-    //        INode n1 = g.addNode("", "", "", 0);
-    //        INode n2 = g.addNode("", "", "", 0);
-    //        g.connect(n1, n2, 0, 0, 0);
+            IGraphRestore igr = g.CreateRestorePoint();
 
-    //        GraphRecord gr = new GraphRecord(g);
+            g.Disconnect(n1, n2);
+            g.Connect(n1, n2, 0, 0, 0);
 
-    //        IGraphRestore igr = g.createRestorePoint();
+            igr.Restore();
 
-    //        g.disconnect(n1, n2);
-    //        g.connect(n1, n2, 0, 0, 0);
+            Assert.IsTrue(gr.Compare(g));
+        }
 
-    //        igr.Restore();
+        // remove and add and re-remove an edge shouldn't break anything
+        {
+            Graph g = new Graph();
 
-    //        assertTrue(gr.Compare(g));
-    //    }
+            INode n1 = g.AddNode("", "", "", 0);
+            INode n2 = g.AddNode("", "", "", 0);
+            g.Connect(n1, n2, 0, 0, 0);
 
-    //      // remove and add and re-remove an edge shouldn't break anything
-    //    {
-    //        Graph g = new Graph();
+            GraphRecord gr = new GraphRecord(g);
 
-    //        INode n1 = g.addNode("", "", "", 0);
-    //        INode n2 = g.addNode("", "", "", 0);
-    //        g.connect(n1, n2, 0, 0, 0);
+            IGraphRestore igr = g.CreateRestorePoint();
 
-    //        GraphRecord gr = new GraphRecord(g);
+            g.Disconnect(n1, n2);
+            g.Connect(n1, n2, 0, 0, 0);
+            g.Disconnect(n1, n2);
 
-    //        IGraphRestore igr = g.createRestorePoint();
+            igr.Restore();
 
-    //        g.disconnect(n1, n2);
-    //        g.connect(n1, n2, 0, 0, 0);
-    //        g.disconnect(n1, n2);
+            Assert.IsTrue(gr.Compare(g));
+        }
 
-    //        igr.Restore();
+        // multiple restore, unchained
+        {
+            Graph g = new Graph();
 
-    //        assertTrue(gr.Compare(g));
-    //    }
+            GraphRecord gr1 = new GraphRecord(g);
 
-    //      // multiple restore, unchained
-    //    {
-    //        Graph g = new Graph();
+            IGraphRestore igr1 = g.CreateRestorePoint();
 
-    //        GraphRecord gr1 = new GraphRecord(g);
+            INode n1 = g.AddNode("", "", "", 0);
+            INode n2 = g.AddNode("", "", "", 0);
 
-    //        IGraphRestore igr1 = g.createRestorePoint();
+            g.Connect(n1, n2, 0, 0, 0);
 
-    //        INode n1 = g.addNode("", "", "", 0);
-    //        INode n2 = g.addNode("", "", "", 0);
+            GraphRecord gr2 = new GraphRecord(g);
 
-    //        g.connect(n1, n2, 0, 0, 0);
+            IGraphRestore igr2 = g.CreateRestorePoint();
 
-    //        GraphRecord gr2 = new GraphRecord(g);
+            INode n3 = g.AddNode("", "", "", 0);
+            INode n4 = g.AddNode("", "", "", 0);
 
-    //        IGraphRestore igr2 = g.createRestorePoint();
+            g.Connect(n3, n4, 0, 0, 0);
 
-    //        INode n3 = g.addNode("", "", "", 0);
-    //        INode n4 = g.addNode("", "", "", 0);
+            Assert.AreEqual(igr2, g.Restore);
 
-    //        g.connect(n3, n4, 0, 0, 0);
+            igr2.Restore();
 
-    //        assertEquals(igr2, g.currentRestore());
+            Assert.IsFalse(igr2.CanBeRestored());
+            Assert.IsTrue(igr1.CanBeRestored());
+            Assert.AreEqual(igr1, g.Restore);
 
-    //        igr2.Restore();
+            Assert.IsTrue(gr2.Compare(g));
 
-    //        assertFalse(igr2.CanBeRestored());
-    //        assertTrue(igr1.CanBeRestored());
-    //        assertEquals(igr1, g.currentRestore());
+            igr1.Restore();
+            Assert.IsFalse(igr1.CanBeRestored());
 
-    //        assertTrue(gr2.Compare(g));
+            Assert.IsTrue(gr1.Compare(g));
+        }
 
-    //        igr1.Restore();
-    //        assertFalse(igr1.CanBeRestored());
+        // chained restore
+        {
+            Graph g = new Graph();
 
-    //        assertTrue(gr1.Compare(g));
-    //    }
+            GraphRecord gr1 = new GraphRecord(g);
 
-    //      // chained restore
-    //    {
-    //        Graph g = new Graph();
+            IGraphRestore igr1 = g.CreateRestorePoint();
 
-    //        GraphRecord gr1 = new GraphRecord(g);
+            INode n1 = g.AddNode("", "", "", 0);
+            INode n2 = g.AddNode("", "", "", 0);
 
-    //        IGraphRestore igr1 = g.createRestorePoint();
+            g.Connect(n1, n2, 0, 0, 0);
 
-    //        INode n1 = g.addNode("", "", "", 0);
-    //        INode n2 = g.addNode("", "", "", 0);
+            IGraphRestore igr2 = g.CreateRestorePoint();
 
-    //        g.connect(n1, n2, 0, 0, 0);
+            INode n3 = g.AddNode("", "", "", 0);
+            INode n4 = g.AddNode("", "", "", 0);
 
-    //        IGraphRestore igr2 = g.createRestorePoint();
+            g.Connect(n3, n4, 0, 0, 0);
 
-    //        INode n3 = g.addNode("", "", "", 0);
-    //        INode n4 = g.addNode("", "", "", 0);
+            igr1.Restore();
+            Assert.IsFalse(igr2.CanBeRestored());
+            Assert.AreEqual(null, g.Restore);
 
-    //        g.connect(n3, n4, 0, 0, 0);
+            Assert.IsTrue(gr1.Compare(g));
+        }
 
-    //        igr1.Restore();
-    //        assertFalse(igr2.CanBeRestored());
-    //        assertEquals(null, g.currentRestore());
+        // restore to intermediate point then start a new restore
+        {
+            Graph g = new Graph();
 
-    //        assertTrue(gr1.Compare(g));
-    //    }
+            GraphRecord gr1 = new GraphRecord(g);
 
-    //      // restore to intermediate point then start a new restore
-    //    {
-    //        Graph g = new Graph();
+            IGraphRestore igr1 = g.CreateRestorePoint();
 
-    //        GraphRecord gr1 = new GraphRecord(g);
+            g.AddNode("", "", "", 0);
 
-    //        IGraphRestore igr1 = g.createRestorePoint();
+            GraphRecord gr2 = new GraphRecord(g);
 
-    //        g.addNode("", "", "", 0);
+            IGraphRestore igr2 = g.CreateRestorePoint();
 
-    //        GraphRecord gr2 = new GraphRecord(g);
+            g.AddNode("", "", "", 0);
 
-    //        IGraphRestore igr2 = g.createRestorePoint();
+            igr2.Restore();
 
-    //        g.addNode("", "", "", 0);
+            Assert.AreEqual(igr1, g.Restore);
+            Assert.IsFalse(igr2.CanBeRestored());
+            Assert.IsTrue(igr1.CanBeRestored());
 
-    //        igr2.Restore();
+            Assert.IsTrue(gr2.Compare(g));
 
-    //        assertEquals(igr1, g.currentRestore());
-    //        assertFalse(igr2.CanBeRestored());
-    //        assertTrue(igr1.CanBeRestored());
+            IGraphRestore igr3 = g.CreateRestorePoint();
 
-    //        assertTrue(gr2.Compare(g));
+            g.AddNode("", "", "", 0);
 
-    //        IGraphRestore igr3 = g.createRestorePoint();
+            igr1.Restore();
 
-    //        g.addNode("", "", "", 0);
+            Assert.IsTrue(gr1.Compare(g));
 
-    //        igr1.Restore();
+            Assert.IsFalse(igr1.CanBeRestored());
+            Assert.IsFalse(igr3.CanBeRestored());
+            Assert.AreEqual(null, g.Restore);
+        }
 
-    //        assertTrue(gr1.Compare(g));
+        // keep a restore but then abandon it, committing to all our changes
 
-    //        assertFalse(igr1.CanBeRestored());
-    //        assertFalse(igr3.CanBeRestored());
-    //        assertEquals(null, g.currentRestore());
-    //    }
+        // restore to intermediate point then start a new restore
+        {
+            Graph g = new Graph();
 
-    //      // keep a restore but then abandon it, committing to all our changes
+            IGraphRestore igr1 = g.CreateRestorePoint();
 
-    //    // restore to intermediate point then start a new restore
-    //    {
-    //        Graph g = new Graph();
+            g.AddNode("", "", "", 0);
 
-    //        IGraphRestore igr1 = g.createRestorePoint();
+            IGraphRestore igr2 = g.CreateRestorePoint();
 
-    //        g.addNode("", "", "", 0);
+            g.AddNode("", "", "", 0);
 
-    //        IGraphRestore igr2 = g.createRestorePoint();
+            IGraphRestore igr3 = g.CreateRestorePoint();
 
-    //        g.addNode("", "", "", 0);
+            g.AddNode("", "", "", 0);
 
-    //        IGraphRestore igr3 = g.createRestorePoint();
+            GraphRecord gr1 = new GraphRecord(g);
 
-    //        g.addNode("", "", "", 0);
+            g.ClearRestore();
 
-    //        GraphRecord gr1 = new GraphRecord(g);
-
-    //        g.clearRestore();
-
-    //        // should still have all our changes
-    //        assertTrue(gr1.Compare(g));
-    //        // and all the restores shoudl know they are now invalid
-    //        assertFalse(igr1.CanBeRestored());
-    //        assertFalse(igr2.CanBeRestored());
-    //        assertFalse(igr3.CanBeRestored());
-    //    }
-    //}
+            // should still have all our changes
+            Assert.IsTrue(gr1.Compare(g));
+            // and all the restores shoudl know they are now invalid
+            Assert.IsFalse(igr1.CanBeRestored());
+            Assert.IsFalse(igr2.CanBeRestored());
+            Assert.IsFalse(igr3.CanBeRestored());
+        }
+    }
 
     //@Test
     //   public void testXYBounds() throws Exception
     //{
     //    Graph g = new Graph();
 
-    //assertTrue(g.bounds().equals(new Box()));
+    //Assert.IsTrue(g.bounds().equals(new Box()));
 
-    //INode n1 = g.addNode("", "", "", 1.0);
+    //INode n1 = g.AddNode("", "", "", 1.0);
 
-    //assertTrue(g.bounds().equals(new Box(new Vector2(-1, -1), new Vector2(1, 1))));
+    //Assert.IsTrue(g.bounds().equals(new Box(new Vector2(-1, -1), new Vector2(1, 1))));
 
-    //INode n2 = g.addNode("", "", "", 2.0);
+    //INode n2 = g.AddNode("", "", "", 2.0);
 
-    //assertTrue(g.bounds().equals(new Box(new Vector2(-2, -2), new Vector2(2, 2))));
+    //Assert.IsTrue(g.bounds().equals(new Box(new Vector2(-2, -2), new Vector2(2, 2))));
 
     //n1.setPos(new Vector2(-2, 0));
 
-    //assertTrue(g.bounds().equals(new Box(new Vector2(-3, -2), new Vector2(2, 2))));
+    //Assert.IsTrue(g.bounds().equals(new Box(new Vector2(-3, -2), new Vector2(2, 2))));
 
     //n2.setPos(new Vector2(10, 10));
 
-    //assertTrue(g.bounds().equals(new Box(new Vector2(-3, -1), new Vector2(12, 12))));
+    //Assert.IsTrue(g.bounds().equals(new Box(new Vector2(-3, -1), new Vector2(12, 12))));
     //   }
 
     //   @Test
@@ -697,27 +706,27 @@ public class GraphTest
     //    {
     //        Graph g = new Graph();
 
-    //        g.addNode("xx", "yy", "zz", 1.0);
-    //        g.addNode("aa", "bb", "cc", 1.0);
+    //        g.AddNode("xx", "yy", "zz", 1.0);
+    //        g.AddNode("aa", "bb", "cc", 1.0);
 
     //        String s = g.print();
 
-    //        assertTrue(s.contains("xx"));
-    //        assertTrue(s.contains("yy"));
-    //        assertTrue(s.contains("zz"));
-    //        assertTrue(s.contains("aa"));
-    //        assertTrue(s.contains("bb"));
-    //        assertTrue(s.contains("cc"));
-    //        assertTrue(s.contains("{"));
-    //        assertTrue(s.contains("}"));
+    //        Assert.IsTrue(s.contains("xx"));
+    //        Assert.IsTrue(s.contains("yy"));
+    //        Assert.IsTrue(s.contains("zz"));
+    //        Assert.IsTrue(s.contains("aa"));
+    //        Assert.IsTrue(s.contains("bb"));
+    //        Assert.IsTrue(s.contains("cc"));
+    //        Assert.IsTrue(s.contains("{"));
+    //        Assert.IsTrue(s.contains("}"));
     //    }
 
     //    {
     //        Graph g = new Graph();
 
-    //        INode n1 = g.addNode("xx", "yy", "zz", 1.0);
-    //        INode n2 = g.addNode("aa", "bb", "cc", 1.0);
-    //        g.connect(n1, n2, 0, 0, 0);
+    //        INode n1 = g.AddNode("xx", "yy", "zz", 1.0);
+    //        INode n2 = g.AddNode("aa", "bb", "cc", 1.0);
+    //        g.Connect(n1, n2, 0, 0, 0);
 
     //        String s = g.print();
 
@@ -732,12 +741,12 @@ public class GraphTest
     //        int first = splits[0].contains("aa") ? 0 : 2;
     //        int second = 2 - first;
 
-    //        assertTrue(splits[first].contains("aa"));
-    //        assertTrue(splits[second].contains("xx"));
+    //        Assert.IsTrue(splits[first].contains("aa"));
+    //        Assert.IsTrue(splits[second].contains("xx"));
 
     //        // each node should be followed by a connects block that mentions the other
-    //        assertTrue(splits[first + 1].contains("xx"));
-    //        assertTrue(splits[second + 1].contains("aa"));
+    //        Assert.IsTrue(splits[first + 1].contains("xx"));
+    //        Assert.IsTrue(splits[second + 1].contains("aa"));
     //    }
     //}
 
@@ -754,7 +763,7 @@ public class GraphTest
     //        thrown = true;
     //    }
 
-    //    assertTrue(thrown);
+    //    Assert.IsTrue(thrown);
     //}
 
     //@Test
@@ -762,13 +771,13 @@ public class GraphTest
     //{
     //    Graph g = new Graph();
 
-    //    // cannot connect two nodes we never neard of
-    //    testCatchUnsupported(()->g.connect(new Node("", "", "", 0),
+    //    // cannot Connect two nodes we never neard of
+    //    testCatchUnsupported(()->g.Connect(new Node("", "", "", 0),
     //          new Node("", "", "", 0), 0, 0, 0));
 
-    //    INode n = g.addNode("n", "x", "y", 10);
+    //    INode n = g.AddNode("n", "x", "y", 10);
 
-    //    // cannot connect a node we know and one we don't
-    //    testCatchUnsupported(()->g.connect(n, new Node("", "", "", 0), 0, 0, 0));
+    //    // cannot Connect a node we know and one we don't
+    //    testCatchUnsupported(()->g.Connect(n, new Node("", "", "", 0), 0, 0, 0));
     //}
 }

@@ -11,7 +11,7 @@ namespace Assets.Generation.G
         private readonly HashSet<Node> m_nodes = new HashSet<Node>();
         private readonly HashSet<DirectedEdge> m_edges = new HashSet<DirectedEdge>();
 
-        private GraphRestore Restore { get; set; }
+        public GraphRestore Restore { get; private set; }
 
         public INode AddNode(string name, string codes, string template, float rad /*,
                              GeomLayout.IGeomLayoutCreateFromNode geomCreator */)
@@ -160,7 +160,19 @@ namespace Assets.Generation.G
             return gr;
         }
 
-        internal class GraphRestore : IGraphRestore
+        public void ClearRestore()
+        {
+            GraphRestore root = Restore;
+
+            while (root.ChainFrom != null)
+            {
+                root = root.ChainFrom;
+            }
+
+            root.CleanUp();
+        }
+
+        public class GraphRestore : IGraphRestore
         {
             private sealed class NodePos
             {
@@ -179,27 +191,27 @@ namespace Assets.Generation.G
             private readonly List<Node> m_nodes_removed = new List<Node>();
             private readonly List<NodePos> m_positions = new List<NodePos>();
             private readonly Dictionary<DirectedEdge, RestoreAction> m_connections = new Dictionary<DirectedEdge, RestoreAction>();
-            private readonly GraphRestore m_chain_from_restore;
-            private GraphRestore m_chain_to_restore;
-            private bool m_can_be_restored;
+            public GraphRestore ChainFrom { get; }
+            public GraphRestore ChainTo { get; private set; }
+            private bool m_can_be_restored = true;
 
             public GraphRestore(Graph graph, GraphRestore chain_from_restore)
             {
                 m_graph = graph;
-                m_chain_from_restore = chain_from_restore;
+                ChainFrom = chain_from_restore;
 
-                // m_chain_from_restore is an older restore than we are, so if it is restored
+                // ChainFrom is an older restore than we are, so if it is restored
                 // it needs to know that it needs to restore us first...
-                if (m_chain_from_restore != null)
+                if (ChainFrom != null)
                 {
                     // check we're talking about the same graph as the chain we were passed
-                    Assertion.Assert(m_graph == m_chain_from_restore.m_graph);
+                    Assertion.Assert(m_graph == ChainFrom.m_graph);
 
                     // anything the chain-from used to be chained-to should be already gone,
                     // e.g. restored, before we are able to make another new chain
-                    Assertion.Assert(m_chain_from_restore.m_chain_to_restore == null);
+                    Assertion.Assert(ChainFrom.ChainTo == null);
 
-                    m_chain_from_restore.m_chain_to_restore = this;
+                    ChainFrom.ChainTo = this;
                 }
 
                 m_positions = m_graph.GetAllNodes().Select(n => new NodePos(n, n.Position)).ToList();
@@ -221,10 +233,10 @@ namespace Assets.Generation.G
                 if (!m_can_be_restored)
                     return false;
 
-                if (m_chain_to_restore != null)
+                if (ChainTo != null)
                 {
                     // first undo any newer restore points
-                    m_chain_to_restore.Restore();
+                    ChainTo.Restore();
                 }
 
                 // disconnect anything we connected
@@ -276,17 +288,17 @@ namespace Assets.Generation.G
                 return true;
             }
 
-            void CleanUp()
+            public void CleanUp()
             {
-                if (m_chain_to_restore != null)
-                    m_chain_to_restore.CleanUp();
+                if (ChainTo != null)
+                    ChainTo.CleanUp();
 
                 // once we are undone or committed, the user goes back to whatever their previous restore level was
-                m_graph.Restore = m_chain_from_restore;
+                m_graph.Restore = ChainFrom;
 
                 // we're restored, so whoever might have wanted to chain us mustn't any more
-                if (m_chain_from_restore != null)
-                    m_chain_from_restore.m_chain_to_restore = null;
+                if (ChainFrom != null)
+                    ChainFrom.ChainTo = null;
 
                 m_can_be_restored = false;
             }
@@ -314,10 +326,10 @@ namespace Assets.Generation.G
                 if (m_connections.ContainsKey(e))
                 {
                     // only way we can already know about an edge we are adding is if it was already removed once in the
-                    // context of this restore point, so the only restore-action it can already have is "break"
+                    // context of this restore point, so the only restore-action it can already have is "Make"
 
                     // in which case the net effect of an edge added and removed is nothing
-                    Assertion.Assert(m_connections[e] == RestoreAction.Break);
+                    Assertion.Assert(m_connections[e] == RestoreAction.Make);
                     m_connections.Remove(e);
                 }
                 else
@@ -331,10 +343,10 @@ namespace Assets.Generation.G
                 if (m_connections.ContainsKey(e))
                 {
                     // only way we can already know about an edge we are removing is if it was added in the context of this
-                    // restore point, so the only restore-action it can already have is "Make"
+                    // restore point, so the only restore-action it can already have is "Break"
 
                     // in which case the net effect of an edge removed and added is nothing
-                    Assertion.Assert(m_connections[e] == RestoreAction.Make);
+                    Assertion.Assert(m_connections[e] == RestoreAction.Break);
                     m_connections.Remove(e);
                 }
                 else
