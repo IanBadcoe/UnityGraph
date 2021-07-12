@@ -39,6 +39,13 @@ namespace Assets.Generation.Templates
             builder.Clear();
         }
 
+        public int NodesAdded()
+        {
+            // we add a node for each internal node but we
+            // remove the one we are replacing
+            return m_num_internal_nodes - 1;
+        }
+
         private NodeRecord FindNodeRecord(string name)
         {
             return m_nodes[name];

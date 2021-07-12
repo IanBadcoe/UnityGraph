@@ -14,9 +14,36 @@ namespace Assets.Generation.Templates
             return new List<Template>(m_templates.Values.ToList());
         }
 
-        protected void AddTemplate(Template t)
+        public int NumTemplates()
         {
-            m_templates[t.Name] = t;
+            return m_templates.Count;
+        }
+
+        public bool AddTemplate(Template t)
+        {
+            if (Contains(t.Name))
+                return false;
+
+            m_templates.Add(t.Name, t);
+
+            return true;
+        }
+
+        public Template FindByName(string name)
+        {
+            Template ret;
+
+            if (m_templates.TryGetValue(name, out ret))
+            {
+                return ret;
+            }
+
+            return null;
+        }
+
+        public bool Contains(string name)
+        {
+            return m_templates.ContainsKey(name);
         }
     }
 }
