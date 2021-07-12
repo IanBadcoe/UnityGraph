@@ -1,4 +1,4 @@
-﻿using Assets.Util;
+﻿using Assets.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Assets.Generation.Util
+namespace Assets.Generation.U
 {
     public static class LevelUtil
     {
@@ -186,7 +186,7 @@ namespace Assets.Generation.Util
 
         public static T RemoveRandom<T>(ClRand random, List<T> col)
         {
-            int which = (int)(random.NextDouble() * col.Count);
+            int which = (int)(random.Nextfloat() * col.Count);
 
             var ret = col[which];
             col.RemoveAt(which);

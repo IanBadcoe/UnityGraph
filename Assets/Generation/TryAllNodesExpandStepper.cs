@@ -6,7 +6,6 @@ using Assets.Generation.Templates;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Collections.Generic;
-using Assets.Generation.Util;
 
 namespace Assets.Generation
 {

@@ -3,7 +3,7 @@ using Assets.Generation.GeomRep;
 using Assets.Generation.IoC;
 using Assets.Generation.Stepping;
 using Assets.Generation.Templates;
-using Assets.Generation.Util;
+using Assets.Generation.U;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -189,7 +189,7 @@ namespace Assets.Generation
 
         //private StepperController.StatusReport UnionStep()
         //{
-        //    boolean done = m_union_helper.unionOne(m_config.Rand);
+        //    bool done = m_union_helper.unionOne(m_config.Rand);
 
         //    if (done)
         //    {
@@ -221,7 +221,8 @@ namespace Assets.Generation
 
         private Graph MakeSeed()
         {
-            Graph ret = new Graph();
+            Graph ret = new Graph(m_ioc_container.LayoutFactory);
+
             INode start = ret.AddNode("Start", "<", "Seed", 55f);
             INode expander = ret.AddNode("engine.StepperController", "e", "Seed", 55f);
             INode end = ret.AddNode("End", ">", "Seed", 55f);

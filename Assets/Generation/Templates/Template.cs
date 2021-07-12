@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Collections.ObjectModel;
-using Assets.Generation.Util;
+using Assets.Generation.U;
 
 namespace Assets.Generation.Templates
 {
@@ -198,7 +198,7 @@ namespace Assets.Generation.Templates
                         // we make the typical scale of edges and node radii on the order of
                         // 100, so a displacement of 5 should be enough to separate things enough to avoid
                         // stupid forces, while being nothing like as far as the nearest existing neighbours
-                        float angle = (float)(rand.NextDouble() * (2 * Math.PI));
+                        float angle = (float)(rand.Nextfloat() * (2 * Mathf.PI));
                         pos = pos + new Vector2(Mathf.Sin(angle) * 5, Mathf.Cos(angle) * 5);
                     }
 

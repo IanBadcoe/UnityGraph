@@ -17,7 +17,18 @@ namespace Assets.Generation.GeomRep
 
         public IGeomLayout Create(DirectedEdge de)
         {
-            throw new NotImplementedException();
+            return MakeDefaultCorridor(de);
         }
+
+        public static GeomLayout MakeDefaultCorridor(DirectedEdge de)
+        {
+            // scale the corridor rectangle's width down slightly
+            // so that it doesn't precisely hit at a tangent to any adjoining junction-node's circle
+            // -- that causes awkward numerical precision problems in the curve-curve intersection routines
+            // which can throw out the union operation
+            return new RectangularGeomLayout(de.Start.Position,
+                  de.End.Position, de.HalfWidth * 0.99f);
+        }
+
     }
 }

@@ -8,7 +8,6 @@ using System;
 using Assets.Generation.U;
 using Assets.Generation.G.GLInterfaces;
 using Assets.Generation.Templates;
-using Assets.Generation.Util;
 
 public class TemplateTest
 {
@@ -24,7 +23,7 @@ public class TemplateTest
 
             Template t = tb.Build();
 
-            Graph g = new Graph();
+            Graph g = new Graph(null);
 
             INode a = g.AddNode("x", "", "", 0);
             a.Position = new Vector2(-4, 3);
@@ -47,7 +46,7 @@ public class TemplateTest
 
             Template t = tb.Build();
 
-            Graph g = new Graph();
+            Graph g = new Graph(null);
 
             INode n = g.AddNode("x", "", "", 0);
             n.Position = new Vector2(-4, 3);
@@ -58,7 +57,7 @@ public class TemplateTest
             Assert.AreEqual("a", new_n.Name);
 
             // we offset by 5 in a ClRand direction
-            double dist = (new Vector2(-4, 3) - new_n.Position).magnitude;
+            float dist = (new Vector2(-4, 3) - new_n.Position).magnitude;
             Assert.AreEqual(5, dist, 1e-6);
         }
 
@@ -76,7 +75,7 @@ public class TemplateTest
 
             Template t = tb.Build();
 
-            Graph g = new Graph();
+            Graph g = new Graph(null);
 
             INode a = g.AddNode("x", "", "", 0);
             a.Position = new Vector2(-4, 3);
@@ -106,7 +105,7 @@ public class TemplateTest
 
             Template t = tb.Build();
 
-            Graph g = new Graph();
+            Graph g = new Graph(null);
 
             INode a = g.AddNode("x", "", "", 0);
             a.Position = new Vector2(-4, 3);
@@ -122,7 +121,7 @@ public class TemplateTest
             Assert.IsNotNull(new_n != null);
 
             // we offset by 5 in a ClRand direction
-            double dist = (new Vector2(10, 9) - new_n.Position).magnitude;
+            float dist = (new Vector2(10, 9) - new_n.Position).magnitude;
             Assert.AreEqual(5, dist, 1e-6);
         }
 
@@ -139,7 +138,7 @@ public class TemplateTest
 
             Template t = tb.Build();
 
-            Graph g = new Graph();
+            Graph g = new Graph(null);
 
             INode a = g.AddNode("x", "", "", 0);
             a.Position = new Vector2(-4, 3);
@@ -171,7 +170,7 @@ public class TemplateTest
 
             Template t = tb.Build();
 
-            Graph g = new Graph();
+            Graph g = new Graph(null);
 
             INode a = g.AddNode("x", "", "", 0);
             a.Position = new Vector2(-4, 3);
@@ -205,7 +204,7 @@ public class TemplateTest
 
             Template t = tb.Build();
 
-            Graph g = new Graph();
+            Graph g = new Graph(null);
 
             INode a = g.AddNode("x", "", "", 0);
             a.Position = new Vector2(10, 10);
@@ -247,8 +246,8 @@ public class TemplateTest
 
     //    int AfterExpandCount = 0;
     //    int DoneCount = 0;
-    //    boolean DoneAfterAfterExpand = false;
-    //    boolean AfterExpandAfterDone = false;
+    //    bool DoneAfterAfterExpand = false;
+    //    bool AfterExpandAfterDone = false;
     //}
 
     //[Test]
@@ -263,7 +262,7 @@ public class TemplateTest
 
     //        Template t = tb.Build();
 
-    //        Graph g = new Graph();
+    //        Graph g = new Graph(null);
 
     //        INode a = g.AddNode("x", "", "", 0);
 
@@ -292,7 +291,7 @@ public class TemplateTest
 
             Template t = tb.Build();
 
-            Graph g = new Graph();
+            Graph g = new Graph(null);
 
             INode a = g.AddNode("a", "", "", 0);
             INode b = g.AddNode("b", "", "", 0);
@@ -334,7 +333,7 @@ public class TemplateTest
 
             Template t = tb.Build();
 
-            Graph g = new Graph();
+            Graph g = new Graph(null);
 
             INode a = g.AddNode("a", "", "", 0);
             INode b = g.AddNode("b", "", "", 0);

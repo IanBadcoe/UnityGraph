@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
-namespace Assets.Generation.Util
+namespace Assets.Generation.U
 {
     // taken from MS sample code and only changed in name and
     // making it clonable
@@ -64,7 +65,7 @@ namespace Assets.Generation.Util
 
             //Initialize our Seed array.
             //This algorithm comes from Numerical Recipes in C (2nd Ed.)
-            int subtraction = (Seed == Int32.MinValue) ? Int32.MaxValue : Math.Abs(Seed);
+            int subtraction = (Seed == Int32.MinValue) ? Int32.MaxValue : Mathf.Abs(Seed);
             mj = MSEED - subtraction;
             SeedArray[55] = mj;
             mk = 1;
@@ -105,15 +106,15 @@ namespace Assets.Generation.Util
 
         /*====================================Sample====================================
         **Action: Return a new random number [0..1) and reSeed the Seed array.
-        **Returns: A double [0..1)
+        **Returns: A float [0..1)
         **Arguments: None
         **Exceptions: None
         ==============================================================================*/
-        protected virtual double Sample()
+        protected virtual float Sample()
         {
             //Including this division at the end gives us significantly improved
             //random number distribution.
-            return (InternalSample() * (1.0 / MBIG));
+            return (InternalSample() * (1.0f / MBIG));
         }
 
         private int InternalSample()
@@ -153,9 +154,9 @@ namespace Assets.Generation.Util
             return InternalSample();
         }
 
-        private double GetSampleForLargeRange()
+        private float GetSampleForLargeRange()
         {
-            // The distribution of double value returned by Sample 
+            // The distribution of float value returned by Sample 
             // is not distributed well enough for a large range.
             // If we use Sample for a range [Int32.MinValue..Int32.MaxValue)
             // We will end up getting even numbers only.
@@ -167,7 +168,7 @@ namespace Assets.Generation.Util
             {
                 result = -result;
             }
-            double d = result;
+            float d = result;
             d += (Int32.MaxValue - 1); // get a number in range [0 .. 2 * Int32MaxValue - 1)
             d /= 2 * (uint)Int32.MaxValue - 1;
             return d;
@@ -217,11 +218,11 @@ namespace Assets.Generation.Util
 
 
         /*=====================================Next=====================================
-        **Returns: A double [0..1)
+        **Returns: A float [0..1)
         **Arguments: None
         **Exceptions: None
         ==============================================================================*/
-        public virtual double NextDouble()
+        public virtual float Nextfloat()
         {
             return Sample();
         }

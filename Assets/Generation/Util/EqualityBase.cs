@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Assets.Generation.Util
+namespace Assets.Generation.U
 {
     public abstract class EqualityBase
     {

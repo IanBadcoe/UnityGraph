@@ -62,7 +62,7 @@ public class GraphUtilTest
         }
 
         // just repeat a couple of the above tests and check we get the same t values
-        double[] values = { 1e-6, 2e-6, 5e-6, 1e-5, 2e-5, 5e-5, 1e-4, 2e-4, 5e-4, 1e-3, 2e-3, 5e-3, 1e-2, 2e-2, 5e-2, 1e-1, 2e-1, 5e-1 };
+        float[] values = { 1e-6f, 2e-6f, 5e-6f, 1e-5f, 2e-5f, 5e-5f, 1e-4f, 2e-4f, 5e-4f, 1e-3f, 2e-3f, 5e-3f, 1e-2f, 2e-2f, 5e-2f, 1e-1f, 2e-1f, 5e-1f };
 
         Node n1 = MakeNodeAt(0, 0);
         Node n2 = MakeNodeAt(1, 0);

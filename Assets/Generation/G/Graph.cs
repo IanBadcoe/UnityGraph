@@ -1,5 +1,6 @@
 ﻿using Assets.Generation.G.GLInterfaces;
-using Assets.Generation.Util;
+using Assets.Generation.GeomRep;
+using Assets.Generation.U;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,12 @@ namespace Assets.Generation.G
     {
         private readonly HashSet<Node> m_nodes = new HashSet<Node>();
         private readonly HashSet<DirectedEdge> m_edges = new HashSet<DirectedEdge>();
-        private IGeomLayoutFactory LayoutFactory { get; }
+        private readonly IGeomLayoutFactory LayoutFactory;
+
+        public Graph(IGeomLayoutFactory layoutFactory)
+        {
+            LayoutFactory = layoutFactory;
+        }
 
         public GraphRestore Restore { get; private set; }
 
@@ -165,10 +171,10 @@ namespace Assets.Generation.G
             return m_edges.Contains(edge);
         }
 
-        public Rect Bounds()
+        public Area Bounds()
         {
             if (m_nodes.Count == 0)
-                return Rect.zero;
+                return Area.Empty;
 
             List<INode> nodes = GetAllNodes();
             Vector2 min = nodes[0].Position;
@@ -183,7 +189,7 @@ namespace Assets.Generation.G
                 max = Vector2.Max(max, n.Position + rad_box);
             }
 
-            return new Rect(min, max - min);
+            return new Area(min, max - min);
         }
 
         public IGraphRestore CreateRestorePoint()

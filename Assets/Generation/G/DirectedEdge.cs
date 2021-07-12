@@ -1,5 +1,5 @@
 ﻿using Assets.Generation.G.GLInterfaces;
-using Assets.Generation.Util;
+using Assets.Generation.U;
 using UnityEngine;
 
 namespace Assets.Generation.G

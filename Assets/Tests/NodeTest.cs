@@ -175,7 +175,7 @@ public class NodeTest
     //    {
     //        n1.setName(null);
     //    }
-    //    catch (NullPointerException npe)
+    //    catch (NullReferenceException npe)
     //    {
     //        thrown = true;
     //    }

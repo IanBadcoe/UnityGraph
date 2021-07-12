@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Assets.Generation.Util
+namespace Assets.Generation.U
 {
     //
     // uses the Floyd-Warshall algorithm to find all shortest path lengths in a graph
