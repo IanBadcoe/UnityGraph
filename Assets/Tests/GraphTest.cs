@@ -4,6 +4,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Assets.Generation.G;
+using System;
 
 public class GraphTest
 {
@@ -373,7 +374,7 @@ public class GraphTest
     }
 
     [Test]
-    public void TestCreateRestorePoint()
+    public void TestRestore()
     {
         // nop
         {
@@ -676,29 +677,29 @@ public class GraphTest
         }
     }
 
-    //@Test
-    //   public void testXYBounds() throws Exception
-    //{
-    //    Graph g = new Graph();
+    [Test]
+    public void TestBounds()
+    {
+        Graph g = new Graph();
 
-    //Assert.IsTrue(g.bounds().equals(new Box()));
+        Assert.IsTrue(g.Bounds().Equals(new Rect()));
 
-    //INode n1 = g.AddNode("", "", "", 1.0);
+        INode n1 = g.AddNode("", "", "", 1.0f);
 
-    //Assert.IsTrue(g.bounds().equals(new Box(new Vector2(-1, -1), new Vector2(1, 1))));
+        Assert.IsTrue(g.Bounds().Equals(new Rect(new Vector2(-1, -1), new Vector2(2, 2))));
 
-    //INode n2 = g.AddNode("", "", "", 2.0);
+        INode n2 = g.AddNode("", "", "", 2.0f);
 
-    //Assert.IsTrue(g.bounds().equals(new Box(new Vector2(-2, -2), new Vector2(2, 2))));
+        Assert.IsTrue(g.Bounds().Equals(new Rect(new Vector2(-2, -2), new Vector2(4, 4))));
 
-    //n1.setPos(new Vector2(-2, 0));
+        n1.Position = new Vector2(-2, 0);
 
-    //Assert.IsTrue(g.bounds().equals(new Box(new Vector2(-3, -2), new Vector2(2, 2))));
+        Assert.IsTrue(g.Bounds().Equals(new Rect(new Vector2(-3, -2), new Vector2(5, 4))));
 
-    //n2.setPos(new Vector2(10, 10));
+        n2.Position = new Vector2(10, 10);
 
-    //Assert.IsTrue(g.bounds().equals(new Box(new Vector2(-3, -1), new Vector2(12, 12))));
-    //   }
+        Assert.IsTrue(g.Bounds().Equals(new Rect(new Vector2(-3, -1), new Vector2(15, 13))));
+    }
 
     //   @Test
     //   public void testPrint()
@@ -750,34 +751,34 @@ public class GraphTest
     //    }
     //}
 
-    //private void testCatchUnsupported(Runnable action)
-    //{
-    //    boolean thrown = false;
+    private void TestCatchArgument(Action action)
+    {
+        bool thrown = false;
 
-    //    try
-    //    {
-    //        action.run();
-    //    }
-    //    catch (UnsupportedOperationException uoe)
-    //    {
-    //        thrown = true;
-    //    }
+        try
+        {
+            action.Invoke();
+        }
+        catch (ArgumentException)
+        {
+            thrown = true;
+        }
 
-    //    Assert.IsTrue(thrown);
-    //}
+        Assert.IsTrue(thrown);
+    }
 
-    //@Test
-    //   public void testConnect_Exceptions()
-    //{
-    //    Graph g = new Graph();
+    [Test]
+    public void TestConnect_Exceptions()
+    {
+        Graph g = new Graph();
 
-    //    // cannot Connect two nodes we never neard of
-    //    testCatchUnsupported(()->g.Connect(new Node("", "", "", 0),
-    //          new Node("", "", "", 0), 0, 0, 0));
+        // cannot Connect two nodes we never neard of
+        TestCatchArgument(() => g.Connect(new Node("", "", "", 0),
+              new Node("", "", "", 0), 0, 0, 0));
 
-    //    INode n = g.AddNode("n", "x", "y", 10);
+        INode n = g.AddNode("n", "x", "y", 10);
 
-    //    // cannot Connect a node we know and one we don't
-    //    testCatchUnsupported(()->g.Connect(n, new Node("", "", "", 0), 0, 0, 0));
-    //}
+        // cannot Connect a node we know and one we don't
+        TestCatchArgument(() => g.Connect(n, new Node("", "", "", 0), 0, 0, 0));
+    }
 }

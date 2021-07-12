@@ -1,4 +1,5 @@
-﻿using Assets.Generation.Util;
+﻿using Assets.Generation.G.GLInterfaces;
+using Assets.Generation.Util;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,18 +15,25 @@ namespace Assets.Generation.G
 
         private static readonly ClRand s_rand = new ClRand(1);
 
+        public IGeomLayoutFactory LayoutCreator { get; }
+
         public string Name { get; }
         public string Codes { get; }
         public string Template { get; }
         public float Radius { get; }
 
         public Vector2 Pos { get; set; }
-        public uint Colour { get; set; }
+        public uint Colour { get; set; } = 0xff8c8c8c;
         public Vector2 Position { get; set; }
         public Vector2 Force { get; set; }
 
-        public Node(string name, string codes, string template,
-             /*GeomLayout.IGeomLayoutCreateFromNode gl_creator, */float rad)
+        public Node(string name, string codes, string template, float rad)
+            : this(name, codes, template, rad, null)
+        {
+        }
+
+        public Node(string name, string codes, string template, float rad,
+            IGeomLayoutFactory layoutCreator)
         {
             Name = name;
             Codes = codes;
@@ -35,7 +43,7 @@ namespace Assets.Generation.G
 
             Radius = rad;
 
-            // m_gl_creator = gl_creator;
+            LayoutCreator = layoutCreator;
         }
 
         public bool Connects(INode n)
@@ -45,23 +53,28 @@ namespace Assets.Generation.G
 
         public bool ConnectsForwards(INode to)
         {
-            return m_connections.Contains(new DirectedEdge(this, to, 0, 0, 0/*, null*/));
+            return m_connections.Contains(new DirectedEdge(this, to, 0, 0, 0, null));
         }
 
         public bool ConnectsBackwards(INode from)
         {
-            return m_connections.Contains(new DirectedEdge(from, this, 0, 0, 0/*, null*/));
+            return m_connections.Contains(new DirectedEdge(from, this, 0, 0, 0, null));
         }
 
-        public DirectedEdge Connect(Node n, float min_distance, float max_distance, float width /*,
-              GeomLayout.IGeomLayoutCreateFromDirectedEdge layoutCreator*/)
+        public DirectedEdge Connect(Node n, float min_distance, float max_distance, float width)
+        {
+            return Connect(n, min_distance, max_distance, width, null);
+        }
+
+        public DirectedEdge Connect(Node n, float min_distance, float max_distance, float width,
+              IGeomLayoutFactory layoutCreator)
         {
             // cannot multiply connect the same node, forwards or backwards
             if (Connects(n))
                 throw new ArgumentException("Cannot multiply connect from '" + Name +
                       "' to '" + n.Name + "'");
 
-            DirectedEdge e = new DirectedEdge(this, n, min_distance, max_distance, width/*, layoutCreator*/);
+            DirectedEdge e = new DirectedEdge(this, n, min_distance, max_distance, width, layoutCreator);
 
             Connect(e);
             n.Connect(e);
@@ -81,8 +94,8 @@ namespace Assets.Generation.G
 
             // simplest just to try removing the forward and reverse edges
             // only the nodes are part of the edge identity
-            m_connections.Remove(new DirectedEdge(this, n, 0, 0, 0/*, null*/));
-            m_connections.Remove(new DirectedEdge(n, this, 0, 0, 0/*, null*/));
+            m_connections.Remove(new DirectedEdge(this, n, 0, 0, 0, null));
+            m_connections.Remove(new DirectedEdge(n, this, 0, 0, 0, null));
 
             n.Disconnect(this);
         }
@@ -130,6 +143,11 @@ namespace Assets.Generation.G
             Position += d;
 
             return d.magnitude;
+        }
+
+        public int NumConnections()
+        {
+            return m_connections.Count;
         }
     }
 }

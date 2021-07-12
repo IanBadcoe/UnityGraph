@@ -1,4 +1,5 @@
-﻿using Assets.Generation.Util;
+﻿using Assets.Generation.G.GLInterfaces;
+using Assets.Generation.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,13 +11,19 @@ namespace Assets.Generation.G
     {
         private readonly HashSet<Node> m_nodes = new HashSet<Node>();
         private readonly HashSet<DirectedEdge> m_edges = new HashSet<DirectedEdge>();
+        private IGeomLayoutFactory LayoutFactory { get; }
 
         public GraphRestore Restore { get; private set; }
 
-        public INode AddNode(string name, string codes, string template, float rad /*,
-                             GeomLayout.IGeomLayoutCreateFromNode geomCreator */)
+        public INode AddNode(string name, string codes, string template, float rad)
         {
-            Node n = new Node(name, codes, template/*, geomCreator*/, rad);
+            return AddNode(name, codes, template, rad, LayoutFactory);
+        }
+
+        public INode AddNode(string name, string codes, string template, float rad,
+                             IGeomLayoutFactory layoutCreator)
+        {
+            Node n = new Node(name, codes, template, rad, layoutCreator);
 
             if (Restore != null)
             {
@@ -59,8 +66,15 @@ namespace Assets.Generation.G
         }
 
         public DirectedEdge Connect(INode from, INode to,
-                                    float min_length, float max_length, float half_width/*,
-                                    GeomLayout.IGeomLayoutCreateFromDirectedEdge layoutCreator */)
+                                    float min_length, float max_length, float half_width) 
+        {
+            return Connect(from, to, min_length, max_length, half_width,
+                LayoutFactory);
+        }
+
+        public DirectedEdge Connect(INode from, INode to,
+                                    float min_length, float max_length, float half_width,
+                                    IGeomLayoutFactory layoutCreator)
         {
             if (from == to
                   || !Contains(from)
@@ -68,7 +82,7 @@ namespace Assets.Generation.G
                   || from.Connects(to))
                 throw new ArgumentException();
 
-            DirectedEdge temp = new DirectedEdge(from, to, min_length, max_length, half_width/*, layoutCreator*/);
+            DirectedEdge temp = new DirectedEdge(from, to, min_length, max_length, half_width, layoutCreator);
 
             if (Restore != null)
             {
@@ -102,8 +116,8 @@ namespace Assets.Generation.G
         {
             Assertion.Assert(!m_edges.Contains(e));
 
-            DirectedEdge real_edge = ((Node)e.Start).Connect((Node)e.End, e.MinLength, e.MaxLength, e.HalfWidth/*,
-                  e.LayoutCreator*/);
+            DirectedEdge real_edge = ((Node)e.Start).Connect((Node)e.End, e.MinLength, e.MaxLength, e.HalfWidth,
+                  e.LayoutCreator);
 
             m_edges.Add(real_edge);
 
@@ -149,6 +163,27 @@ namespace Assets.Generation.G
         public bool Contains(DirectedEdge edge)
         {
             return m_edges.Contains(edge);
+        }
+
+        public Rect Bounds()
+        {
+            if (m_nodes.Count == 0)
+                return Rect.zero;
+
+            List<INode> nodes = GetAllNodes();
+            Vector2 min = nodes[0].Position;
+            Vector2 max = nodes[0].Position;
+
+            foreach (INode n in nodes)
+            {
+                Vector2 rad_box = new Vector2(n.Radius, n.Radius);
+
+                // extend by node radius
+                min = Vector2.Min(min, n.Position - rad_box);
+                max = Vector2.Max(max, n.Position + rad_box);
+            }
+
+            return new Rect(min, max - min);
         }
 
         public IGraphRestore CreateRestorePoint()

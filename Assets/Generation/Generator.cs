@@ -1,4 +1,5 @@
 using Assets.Generation.G;
+using Assets.Generation.GeomRep;
 using Assets.Generation.IoC;
 using Assets.Generation.Stepping;
 using Assets.Generation.Templates;
@@ -46,7 +47,8 @@ namespace Assets.Generation
                 new TryAllNodesExpandStepperFactory(),
                 new TryAllTemplatesOnOneNodeStepperFactory(),
                 new TryTemplateExpandStepperFactory(),
-                new EdgeAdjusterStepperFactory()
+                new EdgeAdjusterStepperFactory(),
+                new DefaultLayoutsFactory()
             );
 
             m_reqSize = 10;

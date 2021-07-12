@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Generation.G.GLInterfaces;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -20,6 +21,8 @@ namespace Assets.Generation.Templates
         private int m_num_out_nodes = 0;
         private int m_num_internal_nodes = 0;
 
+        public IGeomLayoutFactory LayoutCreator { get; }
+
         // private final Template.IPostExpand m_post_expand;
 
         //public TemplateBuilder(string name, string codes)
@@ -35,7 +38,7 @@ namespace Assets.Generation.Templates
             // a dummy entry used to represent the node we are replacing in positioning rules
             m_nodes.Add("<target>", new NodeRecord(NodeRecord.NodeType.Target, "<target>",
                   false, null, null, null,
-                  null, 0, 0/*, null*/));
+                  null, 0, 0, null));
 
             // m_post_expand = post_expand;
         }
@@ -58,8 +61,8 @@ namespace Assets.Generation.Templates
                 Argument = argument;
             }
 
-            readonly string NodeName;
-            readonly string Argument;
+            public readonly string NodeName;
+            public readonly string Argument;
         }
 
         public class DuplicateNodeException : TemplateException
@@ -70,7 +73,7 @@ namespace Assets.Generation.Templates
                 NodeName = name;
             }
 
-            readonly string NodeName;
+            public readonly string NodeName;
         }
 
         public void AddNode(NodeRecord.NodeType type, string name)
@@ -89,16 +92,29 @@ namespace Assets.Generation.Templates
             AddNode(type, name, nudge,
                     positionOnName, positionTowardsName, positionAwayFromName,
                     codes, radius,
-                    0xff8c8c8c/*,
-                    CircularGeomLayout::createFromNode*/);
+                    0xff8c8c8c,
+                    LayoutCreator);
+        }
+
+        public void AddNode(NodeRecord.NodeType type, string name, bool nudge,
+              string positionOnName, string positionTowardsName,
+              string positionAwayFromName,
+              string codes, float radius,
+                uint colour)
+        {
+            AddNode(type, name, nudge,
+                    positionOnName, positionTowardsName, positionAwayFromName,
+                    codes, radius,
+                    colour,
+                    LayoutCreator);
         }
 
         public void AddNode(NodeRecord.NodeType type, string name, bool nudge,
              string positionOnName, string positionTowardsName,
              string positionAwayFromName,
              string codes, float radius,
-             uint colour/*,
-             GeomLayout.IGeomLayoutCreateFromNode geomCreator*/)
+             uint colour,
+             IGeomLayoutFactory layoutCreator)
         {
             if (name.Contains("->"))
                 throw new ArgumentException("engine.Node name: '" + name + "' cannot contain '->'.");
@@ -148,8 +164,8 @@ namespace Assets.Generation.Templates
             m_nodes.Add(name, new NodeRecord(type, name, nudge,
                   positionOn, positionTowards, positionAwayFrom,
                   codes, radius,
-                  colour/*,
-                  geomCreator*/));
+                  colour,
+                  layoutCreator));
 
             switch (type)
             {
@@ -165,7 +181,7 @@ namespace Assets.Generation.Templates
             }
         }
 
-        private NodeRecord FindNodeRecord(string name)
+        public NodeRecord FindNodeRecord(string name)
         {
             NodeRecord ret;
             if (m_nodes.TryGetValue(name, out ret)) {

@@ -71,7 +71,7 @@ namespace Assets.Generation.Templates
             {
                 if (nr.Type == NodeRecord.NodeType.Internal)
                 {
-                    INode n = graph.AddNode(nr.Name, nr.Codes, Name, nr.Radius/*, nr.GeomCreator*/);
+                    INode n = graph.AddNode(nr.Name, nr.Codes, Name, nr.Radius, nr.LayoutCreator);
                     template_to_graph.Add(nr, n);
                     n.Colour = nr.Colour;
                 }
@@ -81,7 +81,6 @@ namespace Assets.Generation.Templates
             {
                 IEnumerator<DirectedEdge> g_it = target_in_connections.GetEnumerator();
 
-                //noinspection Convert2streamapi
                 foreach (NodeRecord nr in m_nodes.Values)
                 {
                     if (nr.Type == NodeRecord.NodeType.In)
@@ -99,7 +98,6 @@ namespace Assets.Generation.Templates
             {
                 IEnumerator<DirectedEdge> g_it = target_out_connections.GetEnumerator();
 
-                //noinspection Convert2streamapi
                 foreach (NodeRecord nr in m_nodes.Values)
                 {
                     if (nr.Type == NodeRecord.NodeType.Out)

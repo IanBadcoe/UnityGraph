@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Generation.G.GLInterfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,12 +26,12 @@ namespace Assets.Generation.Templates
         public readonly string Codes;                // copied onto node
         public readonly float Radius;
         public readonly uint Colour;
-        //public readonly GeomLayout.IGeomLayoutCreateFromNode GeomCreator;
+        public readonly IGeomLayoutFactory LayoutCreator;
 
         public NodeRecord(NodeType type, string name,
               bool nudge, NodeRecord positionOn, NodeRecord positionTowards, NodeRecord positionAwayFrom,
-              string codes, float radius, uint colour/*,
-              GeomLayout.IGeomLayoutCreateFromNode geomCreator*/)
+              string codes, float radius, uint colour,
+              IGeomLayoutFactory layoutCreator)
         {
             Type = type;
             Name = name;
@@ -41,8 +42,7 @@ namespace Assets.Generation.Templates
             Codes = codes;
             Radius = radius;
             Colour = colour;
-            // GeomCreator = geomCreator;
+            LayoutCreator = layoutCreator;
         }
     }
-
 }

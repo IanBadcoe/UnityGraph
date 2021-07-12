@@ -9,19 +9,19 @@ namespace Assets.Generation.G
 {
     public class DirectedEdgePair : EqualityBase
     {
-        readonly DirectedEdge m_e1;
-        readonly DirectedEdge m_e2;
+        public readonly DirectedEdge Edge1;
+        public readonly DirectedEdge Edge2;
 
         public DirectedEdgePair(DirectedEdge e1, DirectedEdge e2)
         {
-            m_e1 = e1;
-            m_e2 = e2;
+            Edge1 = e1;
+            Edge2 = e2;
         }
 
         public override int GetHashCode()
         {
-            int x = m_e1.GetHashCode();
-            int y = m_e2.GetHashCode();
+            int x = Edge1.GetHashCode();
+            int y = Edge2.GetHashCode();
 
             // we want this symmetric as in this case which edge is which is irrelevant
             return x ^ y;
@@ -34,8 +34,8 @@ namespace Assets.Generation.G
 
             DirectedEdgePair dep = o as DirectedEdgePair;
 
-            return (m_e1 == dep.m_e1 && m_e2 == dep.m_e2)
-                || (m_e1 == dep.m_e2 && m_e2 == dep.m_e1);
+            return (Edge1 == dep.Edge1 && Edge2 == dep.Edge2)
+                || (Edge1 == dep.Edge2 && Edge2 == dep.Edge1);
         }
     }
 }
