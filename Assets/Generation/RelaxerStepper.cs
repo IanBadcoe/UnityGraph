@@ -16,7 +16,7 @@ namespace Assets.Generation
         }
     }
 
-    internal class RelaxerStepper : IStepper
+    public class RelaxerStepper : IStepper
     {
         private readonly IoCContainer ioc_container;
         private readonly Graph m_graph;
@@ -78,7 +78,7 @@ namespace Assets.Generation
         {
             float maxf = 0.0f;
 
-            m_nodes.ForEach(n => n.Force.Set(0, 0));
+            m_nodes.ForEach(n => n.Force = new Vector2(0, 0));
 
             float max_edge_stretch = 1.0f;
             float max_edge_squeeze = 1.0f;
