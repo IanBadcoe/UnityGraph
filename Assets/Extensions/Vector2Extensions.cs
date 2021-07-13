@@ -40,6 +40,11 @@ namespace Assets.Extensions
             return lhs.sqrMagnitude == 1.0f;
         }
 
+        public static bool IsUnit(this Vector2 lhs, float tolerance)
+        {
+            return Mathf.Abs(lhs.magnitude - 1) < tolerance;
+        }
+
         public static bool Equals(this Vector2 lhs, Vector2 rhs, float tolerance)
         {
             return (lhs - rhs).sqrMagnitude < tolerance * tolerance;

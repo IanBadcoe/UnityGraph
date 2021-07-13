@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Assets.Generation.GeomRep;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -6,10 +7,12 @@ namespace Assets.Generation.Templates
 {
     public class TemplateStore1 : TemplateStore
     {
+        DefaultLayoutFactory DefaultLayoutFactory = new DefaultLayoutFactory();
+
         public TemplateStore1()
         {
             {
-                TemplateBuilder tb = new TemplateBuilder("Extend", "e");
+                TemplateBuilder tb = new TemplateBuilder("Extend", "e", DefaultLayoutFactory);
                 tb.AddNode(NodeRecord.NodeType.In, "i");
                 tb.AddNode(NodeRecord.NodeType.Out, "o");
                 tb.AddNode(NodeRecord.NodeType.Internal, "e1", false, "<target>", "i", null, "e", 55f);
@@ -23,7 +26,7 @@ namespace Assets.Generation.Templates
             }
 
             {
-                TemplateBuilder tb = new TemplateBuilder("Tee", "e");
+                TemplateBuilder tb = new TemplateBuilder("Tee", "e", DefaultLayoutFactory);
                 tb.AddNode(NodeRecord.NodeType.In, "i");
                 tb.AddNode(NodeRecord.NodeType.Out, "o");
                 tb.AddNode(NodeRecord.NodeType.Internal, "j", false, "<target>", null, null, "", 20f,
@@ -97,7 +100,7 @@ namespace Assets.Generation.Templates
             {
                 // DoorPostExpand dh = new DoorPostExpand();
 
-                TemplateBuilder tb = new TemplateBuilder("Door", "e"/*, dh*/);
+                TemplateBuilder tb = new TemplateBuilder("Door", "e"/*, dh*/, DefaultLayoutFactory);
                 tb.AddNode(NodeRecord.NodeType.In, "i");
                 tb.AddNode(NodeRecord.NodeType.Out, "o");
                 tb.AddNode(NodeRecord.NodeType.Internal, "j", false, "<target>", null, null, "e", 20f,
@@ -154,7 +157,7 @@ namespace Assets.Generation.Templates
             {
                 //DoorPostExpand dh = new DoorPostExpand();
 
-                TemplateBuilder tb = new TemplateBuilder("Rotunda", ""/*, dh*/);
+                TemplateBuilder tb = new TemplateBuilder("Rotunda", ""/*, dh*/, DefaultLayoutFactory);
                 tb.AddNode(NodeRecord.NodeType.In, "i");
                 tb.AddNode(NodeRecord.NodeType.Internal, "rotunda", false, "<target>",
                       null, null, "e", 70f, 0xff802080/*,

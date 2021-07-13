@@ -52,10 +52,10 @@ namespace Assets.Generation
                 new TryAllTemplatesOnOneNodeStepperFactory(),
                 new TryTemplateExpandStepperFactory(),
                 new EdgeAdjusterStepperFactory(),
-                new DefaultLayoutsFactory()
+                new DefaultLayoutFactory()
             );
 
-            m_reqSize = 10;
+            m_reqSize = 5;
         }
 
         private void Update()
@@ -98,7 +98,7 @@ namespace Assets.Generation
                     return BaseGeometryStep();
 
                 case Phase.Union:
-//                    return UnionStep();
+                    return UnionStep();
 
                 case Phase.Done:
                     break;
@@ -191,37 +191,37 @@ namespace Assets.Generation
                   false);
         }
 
-        //private StepperController.StatusReport UnionStep()
-        //{
-        //    bool done = m_union_helper.unionOne(m_config.Rand);
+        private StepperController.StatusReport UnionStep()
+        {
+            bool done = m_union_helper.UnionOne(Config.Rand());
 
-        //    if (done)
-        //    {
-        //        m_phase = Phase.Done;
+            if (done)
+            {
+                m_phase = Phase.Done;
 
-        //        return new StepperController.StatusReport(
-        //              new StepperController.StatusReportInner(StepperController.Status.StepOutSuccess,
-        //                    null, "Geometry merged."),
-        //              false);
-        //    }
+                return new StepperController.StatusReport(
+                      new StepperController.StatusReportInner(StepperController.Status.StepOutSuccess,
+                            null, "Geometry merged."),
+                      false);
+            }
 
-        //    return new StepperController.StatusReport(
-        //          new StepperController.StatusReportInner(StepperController.Status.Iterate,
-        //                null, "Merging geometry"),
-        //          false);
-        //}
+            return new StepperController.StatusReport(
+                    new StepperController.StatusReportInner(StepperController.Status.Iterate,
+                        null, "Merging geometry"),
+                    false);
+        }
 
-        //private StepperController.StatusReport DoneStep()
-        //{
-        //    m_level = m_union_helper.makeLevel(m_config.CellSize, m_config.WallFacetLength);
+        private StepperController.StatusReport DoneStep()
+        {
+//            m_level = m_union_helper.makeLevel(m_config.CellSize, m_config.WallFacetLength);
 
-        //    m_union_helper = null;
+            m_union_helper = null;
 
-        //    return new StepperController.StatusReport(
-        //          StepperController.Status.StepOutSuccess,
-        //          "engine.Level complete",
-        //          true);
-        //}
+            return new StepperController.StatusReport(
+                    StepperController.Status.StepOutSuccess,
+                    "engine.Level complete",
+                    true);
+        }
 
         private Graph MakeSeed()
         {

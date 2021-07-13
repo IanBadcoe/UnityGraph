@@ -17,7 +17,7 @@ public class TemplateTest
         // no ins, outs or connections, just swapping one disconnected node for another...
         // place directly on replaced node
         {
-            TemplateBuilder tb = new TemplateBuilder("", "");
+            TemplateBuilder tb = new TemplateBuilder("", "", null);
 
             tb.AddNode(NodeRecord.NodeType.Internal, "a");
 
@@ -38,7 +38,7 @@ public class TemplateTest
         // no ins, outs or connections, just swapping one disconnected node for another...
         // place offset from replaced node
         {
-            TemplateBuilder tb = new TemplateBuilder("", "");
+            TemplateBuilder tb = new TemplateBuilder("", "", null);
 
             tb.AddNode(NodeRecord.NodeType.Internal, "a",
                   true, "<target>", null, null,
@@ -65,7 +65,7 @@ public class TemplateTest
         // place new node on the "in"
         // (poss not a desirable scenario but should work...)
         {
-            TemplateBuilder tb = new TemplateBuilder("", "");
+            TemplateBuilder tb = new TemplateBuilder("", "", null);
 
             tb.AddNode(NodeRecord.NodeType.In, "in");
             tb.AddNode(NodeRecord.NodeType.Internal, "a",
@@ -95,7 +95,7 @@ public class TemplateTest
       // an "in" and a replaced node,
       // place new node offset from the "in"
         {
-            TemplateBuilder tb = new TemplateBuilder("", "");
+            TemplateBuilder tb = new TemplateBuilder("", "", null);
 
             tb.AddNode(NodeRecord.NodeType.In, "in");
             tb.AddNode(NodeRecord.NodeType.Internal, "a",
@@ -128,7 +128,7 @@ public class TemplateTest
       // an "in" and a replaced node,
       // place new node on replaced node but moved towards "in"
         {
-            TemplateBuilder tb = new TemplateBuilder("", "");
+            TemplateBuilder tb = new TemplateBuilder("", "", null);
 
             tb.AddNode(NodeRecord.NodeType.In, "in");
             tb.AddNode(NodeRecord.NodeType.Internal, "a",
@@ -160,7 +160,7 @@ public class TemplateTest
       // an "in" and a replaced node,
       // place new node on replaced node but moved away from  "in"
         {
-            TemplateBuilder tb = new TemplateBuilder("", "");
+            TemplateBuilder tb = new TemplateBuilder("", "", null);
 
             tb.AddNode(NodeRecord.NodeType.In, "in");
             tb.AddNode(NodeRecord.NodeType.Internal, "a",
@@ -193,7 +193,7 @@ public class TemplateTest
       // place new node on replaced node but moved away from "in"
       // and towards "out"
         {
-            TemplateBuilder tb = new TemplateBuilder("", "");
+            TemplateBuilder tb = new TemplateBuilder("", "", null);
 
             tb.AddNode(NodeRecord.NodeType.In, "in");
             tb.AddNode(NodeRecord.NodeType.Out, "out");
@@ -280,7 +280,7 @@ public class TemplateTest
     {
         // cannot expand with unavoidable crossing edges
         {
-            TemplateBuilder tb = new TemplateBuilder("", "");
+            TemplateBuilder tb = new TemplateBuilder("", "", null);
 
             tb.AddNode(NodeRecord.NodeType.In, "in");
             tb.AddNode(NodeRecord.NodeType.Internal, "x",
@@ -323,7 +323,7 @@ public class TemplateTest
 
         // fail with various wrong numbers of ins/outs
         {
-            TemplateBuilder tb = new TemplateBuilder("", "");
+            TemplateBuilder tb = new TemplateBuilder("", "", null);
 
             tb.AddNode(NodeRecord.NodeType.In, "in");
             tb.AddNode(NodeRecord.NodeType.Out, "out");
@@ -428,7 +428,7 @@ public class TemplateTest
     [Test]
     public void TestCodes()
     {
-        TemplateBuilder tb = new TemplateBuilder("a", "xyz");
+        TemplateBuilder tb = new TemplateBuilder("a", "xyz", null);
         Template t = tb.Build();
 
         Assert.AreEqual("xyz", t.Codes);
@@ -438,14 +438,14 @@ public class TemplateTest
     public void TestNodesAdded()
     {
         {
-            TemplateBuilder tb = new TemplateBuilder("", "");
+            TemplateBuilder tb = new TemplateBuilder("", "", null);
             Template t = tb.Build();
 
             Assert.AreEqual(-1, t.NodesAdded());
         }
 
         {
-            TemplateBuilder tb = new TemplateBuilder("", "");
+            TemplateBuilder tb = new TemplateBuilder("", "", null);
             tb.AddNode(NodeRecord.NodeType.In, "in1");
             tb.AddNode(NodeRecord.NodeType.Out, "out1");
             Template t = tb.Build();
@@ -455,7 +455,7 @@ public class TemplateTest
         }
 
         {
-            TemplateBuilder tb = new TemplateBuilder("", "");
+            TemplateBuilder tb = new TemplateBuilder("", "", null);
             tb.AddNode(NodeRecord.NodeType.Internal, "internal",
                   false, "<target>", null, null,
                   "", 0);
@@ -467,7 +467,7 @@ public class TemplateTest
         }
 
         {
-            TemplateBuilder tb = new TemplateBuilder("", "");
+            TemplateBuilder tb = new TemplateBuilder("", "", null);
             tb.AddNode(NodeRecord.NodeType.Internal, "internal",
                   false, "<target>", null, null,
                   "", 0);

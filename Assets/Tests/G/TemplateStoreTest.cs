@@ -17,9 +17,9 @@ public class TemplateStoreTest
     {
         TemplateStore ts = new TemplateStore();
 
-        TemplateBuilder tb1 = new TemplateBuilder("a", "");
-        TemplateBuilder tb2 = new TemplateBuilder("b", "");
-        TemplateBuilder tb1a = new TemplateBuilder("a", "");
+        TemplateBuilder tb1 = new TemplateBuilder("a", "", null);
+        TemplateBuilder tb2 = new TemplateBuilder("b", "", null);
+        TemplateBuilder tb1a = new TemplateBuilder("a", "", null);
 
         Template t1 = tb1.Build();
         Template t2 = tb2.Build();
@@ -47,8 +47,8 @@ public class TemplateStoreTest
     {
         TemplateStore ts = new TemplateStore();
 
-        TemplateBuilder tb1 = new TemplateBuilder("a", "");
-        TemplateBuilder tb2 = new TemplateBuilder("b", "");
+        TemplateBuilder tb1 = new TemplateBuilder("a", "", null);
+        TemplateBuilder tb2 = new TemplateBuilder("b", "", null);
 
         Template t1 = tb1.Build();
         Template t2 = tb2.Build();
@@ -72,8 +72,8 @@ public class TemplateStoreTest
     {
         TemplateStore ts = new TemplateStore();
 
-        TemplateBuilder tb1 = new TemplateBuilder("a", "");
-        TemplateBuilder tb2 = new TemplateBuilder("b", "");
+        TemplateBuilder tb1 = new TemplateBuilder("a", "", null);
+        TemplateBuilder tb2 = new TemplateBuilder("b", "", null);
 
         Template t1 = tb1.Build();
         Template t2 = tb2.Build();
@@ -91,8 +91,8 @@ public class TemplateStoreTest
     {
         TemplateStore ts = new TemplateStore();
 
-        TemplateBuilder tb1 = new TemplateBuilder("a", "");
-        TemplateBuilder tb2 = new TemplateBuilder("b", "");
+        TemplateBuilder tb1 = new TemplateBuilder("a", "", null);
+        TemplateBuilder tb2 = new TemplateBuilder("b", "", null);
 
         Template t1 = tb1.Build();
         Template t2 = tb2.Build();

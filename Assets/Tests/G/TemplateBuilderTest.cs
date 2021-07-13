@@ -15,7 +15,7 @@ public class TemplateBuilderTest
     public void TestAddNode()
     {
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             Assert.IsNull(t.FindNodeRecord("n1"));
 
@@ -36,7 +36,7 @@ public class TemplateBuilderTest
         }
 
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             Assert.IsNull(t.FindNodeRecord("n1"));
 
@@ -57,7 +57,7 @@ public class TemplateBuilderTest
         }
 
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             Assert.IsNull(t.FindNodeRecord("n1"));
 
@@ -78,7 +78,7 @@ public class TemplateBuilderTest
         }
 
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             t.AddNode(NodeRecord.NodeType.In, "n1");
 
@@ -89,7 +89,7 @@ public class TemplateBuilderTest
         }
 
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             t.AddNode(NodeRecord.NodeType.Out, "n1");
 
@@ -100,7 +100,7 @@ public class TemplateBuilderTest
         }
 
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             t.AddNode(NodeRecord.NodeType.In, "In");
             t.AddNode(NodeRecord.NodeType.Out, "Out");
@@ -125,7 +125,7 @@ public class TemplateBuilderTest
         }
 
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             t.AddNode(NodeRecord.NodeType.In, "In");
             t.AddNode(NodeRecord.NodeType.Out, "Out");
@@ -154,7 +154,7 @@ public class TemplateBuilderTest
     public void TestAddNode_Exceptions()
     {
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             bool thrown = false;
 
@@ -171,7 +171,7 @@ public class TemplateBuilderTest
         }
 
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             bool thrown = false;
 
@@ -190,7 +190,7 @@ public class TemplateBuilderTest
         }
 
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             bool thrown = false;
 
@@ -209,7 +209,7 @@ public class TemplateBuilderTest
         }
 
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             bool thrown = false;
 
@@ -228,7 +228,7 @@ public class TemplateBuilderTest
         }
 
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             t.AddNode(NodeRecord.NodeType.Internal, "n1");
 
@@ -248,7 +248,7 @@ public class TemplateBuilderTest
         }
 
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             bool thrown = false;
 
@@ -269,7 +269,7 @@ public class TemplateBuilderTest
         }
 
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             bool thrown = false;
 
@@ -290,7 +290,7 @@ public class TemplateBuilderTest
         }
 
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             bool thrown = false;
 
@@ -311,7 +311,7 @@ public class TemplateBuilderTest
         }
 
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             bool thrown = false;
 
@@ -334,7 +334,7 @@ public class TemplateBuilderTest
     public void TestConnect_Exceptions()
     {
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             bool thrown = false;
 
@@ -351,7 +351,7 @@ public class TemplateBuilderTest
         }
 
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             bool thrown = false;
 
@@ -368,7 +368,7 @@ public class TemplateBuilderTest
         }
 
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             bool thrown = false;
 
@@ -388,7 +388,7 @@ public class TemplateBuilderTest
         }
 
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             bool thrown = false;
 
@@ -408,7 +408,7 @@ public class TemplateBuilderTest
         }
 
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             bool thrown = false;
 
@@ -427,7 +427,7 @@ public class TemplateBuilderTest
         }
 
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             bool thrown = false;
 
@@ -446,7 +446,7 @@ public class TemplateBuilderTest
         }
 
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             t.AddNode(NodeRecord.NodeType.In, "a");
             t.AddNode(NodeRecord.NodeType.In, "b");
@@ -488,7 +488,7 @@ public class TemplateBuilderTest
     public void TestConnect()
     {
         {
-            TemplateBuilder t = new TemplateBuilder("", "");
+            TemplateBuilder t = new TemplateBuilder("", "", null);
 
             Assert.IsNull(t.FindConnectionRecord("a", "b"));
 

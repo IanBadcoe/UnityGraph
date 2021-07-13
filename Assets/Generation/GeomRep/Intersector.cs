@@ -114,9 +114,9 @@ namespace Assets.Generation.GeomRep
             RemoveEasyLoops(working_loops2, ret, bound_map1.Values, bound_map2);
 
             // split all curves that intersect
-            foreach (List<Curve> alc1 in working_loops1.Values)
+            foreach (var alc1 in working_loops1.Values)
             {
-                foreach (List<Curve> alc2 in working_loops2.Values)
+                foreach (var alc2 in working_loops2.Values)
                 {
                     SplitCurvesAtIntersections(alc1, alc2, tol);
 
@@ -276,7 +276,9 @@ namespace Assets.Generation.GeomRep
                              ICollection<Area> other_bounds,
                              Dictionary<IList<Curve>, Area> bound_map)
         {
-            foreach (int i in working_loops.Keys)
+            List<int> keys = working_loops.Keys.ToList();
+
+            foreach (int i in keys)
             {
                 IList<Curve> alc1 = working_loops[i];
 
@@ -558,7 +560,7 @@ namespace Assets.Generation.GeomRep
         }
 
         // non-private only for unit-tests
-        void SplitCurvesAtIntersections(List<Curve> working_loop1, List<Curve> working_loop2, float tol)
+        void SplitCurvesAtIntersections(IList<Curve> working_loop1, IList<Curve> working_loop2, float tol)
         {
             for (int i = 0; i < working_loop1.Count; i++)
             {

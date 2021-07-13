@@ -21,7 +21,7 @@ namespace Assets.Generation.Templates
         private int m_num_out_nodes = 0;
         private int m_num_internal_nodes = 0;
 
-        public IGeomLayoutFactory LayoutCreator { get; }
+        public readonly IGeomLayoutFactory DefaultLayoutCreator;
 
         // private final Template.IPostExpand m_post_expand;
 
@@ -30,10 +30,12 @@ namespace Assets.Generation.Templates
         //{
         //}
 
-        public TemplateBuilder(string name, string codes/*, Template.IPostExpand post_expand*/)
+        public TemplateBuilder(string name, string codes,
+            IGeomLayoutFactory defaultLayoutCreator/*, Template.IPostExpand post_expand*/)
         {
             Name = name;
             Codes = codes;
+            DefaultLayoutCreator = defaultLayoutCreator;
 
             // a dummy entry used to represent the node we are replacing in positioning rules
             m_nodes.Add("<target>", new NodeRecord(NodeRecord.NodeType.Target, "<target>",
@@ -93,7 +95,7 @@ namespace Assets.Generation.Templates
                     positionOnName, positionTowardsName, positionAwayFromName,
                     codes, radius,
                     0xff8c8c8c,
-                    LayoutCreator);
+                    DefaultLayoutCreator);
         }
 
         public void AddNode(NodeRecord.NodeType type, string name, bool nudge,
@@ -106,7 +108,7 @@ namespace Assets.Generation.Templates
                     positionOnName, positionTowardsName, positionAwayFromName,
                     codes, radius,
                     colour,
-                    LayoutCreator);
+                    DefaultLayoutCreator);
         }
 
         public void AddNode(NodeRecord.NodeType type, string name, bool nudge,

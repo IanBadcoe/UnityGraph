@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Assets.Generation.GeomRep
 {
-    class DefaultLayoutsFactory : IGeomLayoutFactory
+    class DefaultLayoutFactory : IGeomLayoutFactory
     {
         public IGeomLayout Create(INode n)
         {
-            throw new NotImplementedException();
+            return new CircularGeomLayout(n.Position, n.Radius);
         }
 
         public IGeomLayout Create(DirectedEdge de)

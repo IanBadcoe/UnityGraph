@@ -26,7 +26,7 @@ namespace Assets.Generation.GeomRep
             Position = position;
             Direction = directionCosines;
 
-            if (!Direction.IsUnit())
+            if (!Direction.IsUnit(1.0e-6f))
                 throw new ArgumentException();
         }
 

@@ -29,7 +29,7 @@ namespace Assets.Generation.GeomRep
             Vector2 s = c.StartPos();
             Vector2 e = c.EndPos();
 
-            if (!s.Equals(e, 1e-6f))
+            if (!s.Equals(e, 1e-4f))
                 throw new ArgumentException("Curves do not form a closed loop");
         }
 
@@ -48,7 +48,7 @@ namespace Assets.Generation.GeomRep
                 Vector2 c_start = curr.StartPos();
                 Vector2 p_end = prev.EndPos();
 
-                if (!c_start.Equals(p_end, 1e-6f))
+                if (!c_start.Equals(p_end, 1e-4f))
                     throw new ArgumentException("Curves do not form a closed loop");
 
                 prev = curr;
