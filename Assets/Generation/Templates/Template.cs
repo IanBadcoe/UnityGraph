@@ -73,7 +73,6 @@ namespace Assets.Generation.Templates
             template_to_graph.Add(FindNodeRecord("<target>"), target);
 
             // create nodes for each we are adding and map to their NodeRecords
-            //noinspection Convert2streamapi
             foreach (NodeRecord nr in m_nodes.Values)
             {
                 if (nr.Type == NodeRecord.NodeType.Internal)
@@ -221,7 +220,6 @@ namespace Assets.Generation.Templates
         //    if (m_post_expand == null)
         //        return;
 
-        //    //noinspection Convert2streamapi
         //    foreach (NodeRecord nr in m_nodes.Values)
         //    {
         //        // could have chance to modify existing (e.g. In/Out nodes?)

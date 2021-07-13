@@ -66,7 +66,6 @@ namespace Assets.Generation
             IStepper child = m_ioc_container.NodeExpanderFactory.MakeNodeExpander(
                   m_ioc_container, m_graph, node, templates, m_config);
 
-            //noinspection ConstantConditions
             return new StepperController.StatusReportInner(StepperController.Status.StepIn,
                   child, "Trying to expand node: " + node.Name);
         }

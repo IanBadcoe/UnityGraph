@@ -75,9 +75,7 @@ public class DirectedEdgeTest
         DirectedEdge e1 = new DirectedEdge(n1, n2, 0, 0, 0);
 
         // only the node identities affect edge identity
-        //noinspection objectEqualsNull
         Assert.IsFalse(e1.Equals(null));
-        //noinspection EqualsBetweenInconvertibleTypes
         Assert.IsFalse(e1.Equals(1));
         Assert.IsTrue(e1.Equals(new DirectedEdge(n1, n2, 0, 0, 0)));
         Assert.IsTrue(e1.Equals(new DirectedEdge(n1, n2, 1, 1, 1)));

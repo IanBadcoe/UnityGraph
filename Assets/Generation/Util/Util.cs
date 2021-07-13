@@ -43,69 +43,68 @@ namespace Assets.Generation.U
             return new Tuple<float,float>(t1, t2);
         }
 
-        //    public static OrderedPair<Vector2, Vector2> circleCircleIntersect(Vector2 c1, float r1, Vector2 c2, float r2)
-        //    {
-        //        float dist_2 = c1.minus(c2).length2();
-        //        float dist = Mathf.sqrt(dist_2);
+        public static Tuple<Vector2, Vector2?> CircleCircleIntersect(Vector2 c1, float r1, Vector2 c2, float r2)
+        {
+            float dist_2 = (c1 - c2).sqrMagnitude;
+            float dist = Mathf.Sqrt(dist_2);
 
-        //        // too far apart
-        //        if (dist > r1 + r2)
-        //            return null;
+            // too far apart
+            if (dist > r1 + r2)
+                return null;
 
-        //        // too close together
-        //        if (dist < Mathf.abs(r1 - r2))
-        //            return null;
+            // too close together
+            if (dist < Mathf.Abs(r1 - r2))
+                return null;
 
-        //        float a = c1.X;
-        //        float b = c1.Y;
-        //        float c = c2.X;
-        //        float d = c2.Y;
+            float a = c1.y;
+            float b = c1.y;
+            float c = c2.x;
+            float d = c2.x;
 
-        //        float delta_2 = (dist + r1 + r2)
-        //              * (dist + r1 - r2)
-        //              * (dist - r1 + r2)
-        //              * (-dist + r1 + r2);
+            float delta_2 = (dist + r1 + r2)
+                  * (dist + r1 - r2)
+                  * (dist - r1 + r2)
+                  * (-dist + r1 + r2);
 
-        //        // should have assured delta_2 +ve with the ifs above...
-        //        // but rounding can give v. small negative numbers
-        //        Debug.Assert( delta_2 > -1e-6;
+            // should have assured delta_2 +ve with the ifs above...
+            // but rounding can give v. small negative numbers
+            Debug.Assert(delta_2 > -1e-6f);
 
-        //        if (delta_2 < 0)
-        //            delta_2 = 0;
+            if (delta_2 < 0)
+                delta_2 = 0;
 
-        //        float delta = 0.25 * Mathf.sqrt(delta_2);
+            float delta = 0.25f * Mathf.Sqrt(delta_2);
 
-        //        float xi1 = (a + c) / 2
-        //              + (c - a) * (r1 * r1 - r2 * r2) / (2 * dist_2)
-        //              + 2 * (b - d) * delta / dist_2;
-        //        float xi2 = (a + c) / 2
-        //              + (c - a) * (r1 * r1 - r2 * r2) / (2 * dist_2)
-        //              - 2 * (b - d) * delta / dist_2;
+            float xi1 = (a + c) / 2
+                  + (c - a) * (r1 * r1 - r2 * r2) / (2 * dist_2)
+                  + 2 * (b - d) * delta / dist_2;
+            float xi2 = (a + c) / 2
+                  + (c - a) * (r1 * r1 - r2 * r2) / (2 * dist_2)
+                  - 2 * (b - d) * delta / dist_2;
 
-        //        float yi1 = (b + d) / 2
-        //              + (d - b) * (r1 * r1 - r2 * r2) / (2 * dist_2)
-        //              - 2 * (a - c) * delta / dist_2;
-        //        float yi2 = (b + d) / 2
-        //              + (d - b) * (r1 * r1 - r2 * r2) / (2 * dist_2)
-        //              + 2 * (a - c) * delta / dist_2;
+            float yi1 = (b + d) / 2
+                  + (d - b) * (r1 * r1 - r2 * r2) / (2 * dist_2)
+                  - 2 * (a - c) * delta / dist_2;
+            float yi2 = (b + d) / 2
+                  + (d - b) * (r1 * r1 - r2 * r2) / (2 * dist_2)
+                  + 2 * (a - c) * delta / dist_2;
 
-        //        Vector2 p1 = new Vector2(xi1, yi1);
+            Vector2 p1 = new Vector2(xi1, yi1);
 
-        //        Vector2 p2 = null;
+            Vector2? p2 = null;
 
-        //        if (delta > 1e-6)
-        //        {
-        //            p2 = new Vector2(xi2, yi2);
-        //        }
+            if (delta > 1e-6)
+            {
+                p2 = new Vector2(xi2, yi2);
+            }
 
-        //        return new OrderedPair<>(p1, p2);
-        //    }
+            return new Tuple<Vector2, Vector2?>(p1, p2);
+        }
 
-        //    public static float atan2(Vector2 vec)
-        //    {
-        //        //noinspection SuspiciousNameCombination
-        //        return Mathf.atan2(vec.X, vec.Y);
-        //    }
+        public static float atan2(Vector2 vec)
+        {
+            return Mathf.Atan2(vec.x, vec.y);
+        }
 
         // removes any positive or negative whole turns to leave a number
         // between 0.0 and 2 PI
@@ -134,7 +133,6 @@ namespace Assets.Generation.U
         //        float rel_y = d1.dot(d2);
         //        float rel_x = d1.rot90().dot(d2);
 
-        //        //noinspection SuspiciousNameCombination
         //        return fixupAngle(Mathf.atan2(rel_x, rel_y));
         //    }
     }

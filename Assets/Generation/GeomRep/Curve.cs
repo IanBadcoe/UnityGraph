@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Assets.Generation.GeomRep
 {
-    public abstract class Curve
+    public abstract class Curve : EqualityBase
     {
         public readonly float StartParam;
         public readonly float EndParam;
@@ -30,7 +30,7 @@ namespace Assets.Generation.GeomRep
 
         public abstract Curve CloneWithChangedParams(float start, float end);
 
-        public abstract Area BoundingBox();
+        public abstract Area BoundingArea();
 
         public abstract Vector2 Tangent(float param);
 
@@ -60,7 +60,7 @@ namespace Assets.Generation.GeomRep
         {
             // need caller to have checked these
             Assertion.Assert(o is Curve);
-            Assertion.Assert(o != this);
+            Assertion.Assert(!ReferenceEquals(o, this));
 
             Curve co = (Curve)o;
 

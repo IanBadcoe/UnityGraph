@@ -11,28 +11,30 @@ namespace Assets.Generation.GeomRep
 {
     public class Area : EqualityBase
     {
-        public readonly Vector2 BL;
-        public readonly Vector2 TR;
+        public readonly Vector2 Min;
+        public readonly Vector2 Max;
+
+        public Vector2 Diagonal { get => Max - Min; }
 
         static public Area Empty { get; } = new Area();
 
         public Area()
         {
-            BL = new Vector2(0, 0);
-            TR = new Vector2(-1, -1);
+            Min = new Vector2(0, 0);
+            Max = new Vector2(-1, -1);
         }
 
         public Area(Vector2 bl, Vector2 tr)
         {
-            BL = bl;
-            TR = tr;
+            Min = bl;
+            Max = tr;
         }
 
         public bool IsEmpty()
         {
             // if either high edge is on the wrong side of the low edge, we are empty
             // (empty is different from zero-sized, edges are in the same place for that)
-            return BL.x > TR.x || BL.y > TR.y;
+            return Min.x > Max.x || Min.y > Max.y;
         }
 
         public Area Union(Area rhs)
@@ -47,7 +49,15 @@ namespace Assets.Generation.GeomRep
                 return this;
             }
 
-            return new Area(BL.Min(rhs.BL), TR.Max(rhs.TR));
+            return new Area(Min.Min(rhs.Min), Max.Max(rhs.Max));
+        }
+
+        public bool Disjoint(Area rhs)
+        {
+            return Min.x > rhs.Max.x
+                || Min.y > rhs.Max.y
+                || Max.x < rhs.Min.x
+                || Max.y < rhs.Min.y;
         }
 
         public override int GetHashCode()
@@ -55,7 +65,7 @@ namespace Assets.Generation.GeomRep
             if (IsEmpty())
                 return 0x48e5083f;
 
-            return BL.GetHashCode() ^ TR.GetHashCode();
+            return Min.GetHashCode() ^ Max.GetHashCode();
         }
 
         public override bool Equals(object obj)
@@ -65,7 +75,7 @@ namespace Assets.Generation.GeomRep
 
             Area a_obj = obj as Area;
 
-            return BL == a_obj.BL && TR == a_obj.TR;
+            return Min == a_obj.Min && Max == a_obj.Max;
         }
     }
 }

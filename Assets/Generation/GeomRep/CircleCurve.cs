@@ -85,7 +85,7 @@ namespace Assets.Generation.GeomRep
 
     public override bool Equals(object o)
     {
-        if (o == this)
+        if (ReferenceEquals(o, this))
             return true;
 
         if (!(o is CircleCurve))
@@ -131,7 +131,7 @@ namespace Assets.Generation.GeomRep
         return new CircleCurve(Position, Radius, start, end, Rotation);
     }
 
-    public override Area BoundingBox()
+    public override Area BoundingArea()
     {
         // use whole circle here as the use I have for the moment doesn't need anything
         // tighter

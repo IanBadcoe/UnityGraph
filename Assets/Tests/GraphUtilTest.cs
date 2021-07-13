@@ -86,7 +86,6 @@ public class GraphUtilTest
             {
                 IntersectionResult ret = GraphUtil.EdgeIntersect(e2, e1);
 
-                //noinspection ConstantConditions
                 Assert.AreEqual(e1, ret.Edge2);
                 Assert.AreEqual(e2, ret.Edge1);
                 Assert.AreEqual(0.5f, ret.T1, 1e-8);

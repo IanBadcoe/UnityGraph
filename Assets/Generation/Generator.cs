@@ -14,9 +14,13 @@ namespace Assets.Generation
     public class Generator : MonoBehaviour
     {
         public GeneratorConfig Config;
-        public TemplateStore Templates;
+
+        // need a better way of making and setting these, but while we only have one...
+        private TemplateStore Templates = new TemplateStore1();
 
         private IoCContainer m_ioc_container;
+
+        private UnionHelper m_union_helper;
 
         public enum Phase
         {
@@ -91,7 +95,7 @@ namespace Assets.Generation
                     return FinalRelaxStep();
 
                 case Phase.BaseGeometry:
-//                    return BaseGeometryStep();
+                    return BaseGeometryStep();
 
                 case Phase.Union:
 //                    return UnionStep();
@@ -173,19 +177,19 @@ namespace Assets.Generation
             return ret;
         }
 
-        //private StepperController.StatusReport BaseGeometryStep()
-        //{
-        //    m_union_helper = new UnionHelper();
+        private StepperController.StatusReport BaseGeometryStep()
+        {
+            m_union_helper = new UnionHelper();
 
-        //    m_union_helper.generateGeometry(m_graph);
+            m_union_helper.GenerateGeometry(m_graph);
 
-        //    m_phase = Phase.Union;
+            m_phase = Phase.Union;
 
-        //    return new StepperController.StatusReport(
-        //          new StepperController.StatusReportInner(StepperController.Status.Iterate,
-        //                null, "engine.Level base geometry generated"),
-        //          false);
-        //}
+            return new StepperController.StatusReport(
+                  new StepperController.StatusReportInner(StepperController.Status.Iterate,
+                        null, "engine.Level base geometry generated"),
+                  false);
+        }
 
         //private StepperController.StatusReport UnionStep()
         //{

@@ -63,7 +63,7 @@ namespace Assets.Generation.GeomRep
             return new LineCurve(Position, Direction, start, end);
         }
 
-        public override Area BoundingBox()
+        public override Area BoundingArea()
         {
             return new Area(StartPos().Min(EndPos()), StartPos().Max(EndPos()));
         }
@@ -114,11 +114,11 @@ namespace Assets.Generation.GeomRep
 
         public override bool Equals(object o)
         {
-            if (o == this)
+            if (ReferenceEquals(o, this))
                 return true;
 
             if (!(o is LineCurve))
-             return false;
+                return false;
 
             if (!base.Equals_Inner(o))
                 return false;

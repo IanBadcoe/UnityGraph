@@ -33,7 +33,7 @@ namespace Assets.Generation.GeomRep
                 throw new ArgumentException("Curves do not form a closed loop");
         }
 
-        public Loop(List<Curve> curves)
+        public Loop(IList<Curve> curves)
         {
             m_curves.AddRange(curves);
 
@@ -208,7 +208,7 @@ namespace Assets.Generation.GeomRep
 
             foreach(var c in m_curves)
             {
-                ret = ret.Union(c.BoundingBox());
+                ret = ret.Union(c.BoundingArea());
             }
 
             return ret;

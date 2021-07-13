@@ -13,7 +13,7 @@ namespace Assets.Generation.GeomRep
         }
 
         // convenience ctor
-        LoopSet(Loop loop)
+        public LoopSet(Loop loop)
         {
             Add(loop);
         }

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Assets.Generation.Templates
 {
-    public class TemplateStore : MonoBehaviour
+    public class TemplateStore
     {
         protected readonly Dictionary<string, Template> m_templates = new Dictionary<string, Template>();
 

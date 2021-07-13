@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Assets.Generation.G.GLInterfaces;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Generation.G
@@ -12,6 +13,8 @@ namespace Assets.Generation.G
         Vector2 Position { get; set; }
         Vector2 Force { get; set; }
         float Radius { get; }
+
+        public IGeomLayoutFactory LayoutCreator { get; }
 
         bool Connects(INode n);
         bool ConnectsForwards(INode to);
