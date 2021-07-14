@@ -38,12 +38,12 @@ namespace Assets.Generation.GeomRep
             Direction = directionCosines;
         }
 
-        protected override Vector2 ComputePosInner(float param)
+        protected override Vector2 ComputePos_Inner(float param)
         {
             return Position + Direction * param;
         }
 
-        public override float? FindParamForPoint(Vector2 pnt, float tol)
+        protected override float? FindParamForPoint_Inner(Vector2 pnt, float tol)
         {
             Vector2 relative = pnt - Position;
 

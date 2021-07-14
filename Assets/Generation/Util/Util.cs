@@ -56,10 +56,10 @@ namespace Assets.Generation.U
             if (dist < Mathf.Abs(r1 - r2))
                 return null;
 
-            float a = c1.y;
+            float a = c1.x;
             float b = c1.y;
             float c = c2.x;
-            float d = c2.x;
+            float d = c2.y;
 
             float delta_2 = (dist + r1 + r2)
                   * (dist + r1 - r2)
@@ -68,7 +68,7 @@ namespace Assets.Generation.U
 
             // should have assured delta_2 +ve with the ifs above...
             // but rounding can give v. small negative numbers
-            Debug.Assert(delta_2 > -1e-6f);
+            Assertion.Assert(delta_2 > -1e-6f);
 
             if (delta_2 < 0)
                 delta_2 = 0;

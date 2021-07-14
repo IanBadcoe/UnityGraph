@@ -55,7 +55,7 @@ namespace Assets.Generation.GeomRep
 
                 m_merged_loops = m_intersector.Union(m_merged_loops, ls, 1e-6f, r);
 
-                Debug.Assert(m_merged_loops != null);
+                Assertion.Assert(m_merged_loops != null);
 
                 m_base_loops.RemoveAt(0);
 
@@ -68,7 +68,7 @@ namespace Assets.Generation.GeomRep
 
                 m_merged_loops = m_intersector.Union(m_merged_loops, ls, 1e-6f, r);
 
-                Debug.Assert(m_merged_loops != null);
+                Assertion.Assert(m_merged_loops != null);
 
                 m_detail_loop_sets.RemoveAt(0);
 
@@ -135,7 +135,7 @@ namespace Assets.Generation.GeomRep
             m_bounds = m_merged_loops.Select(l => l.GetBounds()).Aggregate(new Area(), (a, b) => a.Union(b));
         }
 
-        //public Level makeLevel(double cell_size, double wall_facet_length)
+        //public Level makeLevel(floatcell_size, floatwall_facet_length)
         //{
         //    calculateBounds();
 

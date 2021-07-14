@@ -1,4 +1,5 @@
 ﻿using Assets.Extensions;
+using Assets.Generation.U;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,10 +42,10 @@ namespace Assets.Generation.GeomRep
             curves.Add(new LineCurve(end_right, -dir, length));
             curves.Add(new LineCurve(start_right, width_dir, m_half_width * 2));
 
-            Debug.Assert(curves[0].EndPos().Equals(curves[1].StartPos(), 1e-4f));
-            Debug.Assert(curves[1].EndPos().Equals(curves[2].StartPos(), 1e-4f));
-            Debug.Assert(curves[2].EndPos().Equals(curves[3].StartPos(), 1e-4f));
-            Debug.Assert(curves[3].EndPos().Equals(curves[0].StartPos(), 1e-4f));
+            Assertion.Assert(curves[0].EndPos().Equals(curves[1].StartPos(), 1e-4f));
+            Assertion.Assert(curves[1].EndPos().Equals(curves[2].StartPos(), 1e-4f));
+            Assertion.Assert(curves[2].EndPos().Equals(curves[3].StartPos(), 1e-4f));
+            Assertion.Assert(curves[3].EndPos().Equals(curves[0].StartPos(), 1e-4f));
 
             return new Loop(curves);
         }

@@ -12,11 +12,14 @@ namespace Assets.Generation.GeomRep
     {
         public readonly float StartParam;
         public readonly float EndParam;
+        public readonly int Id;
+        private static int IdCounter = 0;
 
         protected Curve(float start_param, float end_param)
         {
             StartParam = start_param;
             EndParam = end_param;
+            Id = IdCounter++;
 
             if (EndParam - StartParam < 1e-12)
                 throw new NotSupportedException("StartParam must be < EndParam");
@@ -24,9 +27,18 @@ namespace Assets.Generation.GeomRep
 
         // exquisite abstractions
 
-        protected abstract Vector2 ComputePosInner(float param);
+        protected abstract Vector2 ComputePos_Inner(float param);
 
-        public abstract float? FindParamForPoint(Vector2 pnt, float tol);
+        public float? FindParamForPoint(Vector2 pnt, float tol)
+        {
+            float? ret = FindParamForPoint_Inner(pnt, tol);
+
+            Assertion.Assert(!ret.HasValue || (ComputePos(ret.Value) - pnt).magnitude < tol);
+
+            return ret;
+        }
+
+        protected abstract float? FindParamForPoint_Inner(Vector2 pnt, float tol);
 
         public abstract Curve CloneWithChangedParams(float start, float end);
 
@@ -93,7 +105,7 @@ namespace Assets.Generation.GeomRep
         {
             p = ClampToParamRange(p);
 
-            return ComputePosInner(p);
+            return ComputePos_Inner(p);
         }
 
         private float ClampToParamRange(float p)

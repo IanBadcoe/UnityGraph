@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Assets.Extensions
 {
-    static class Vector2Extensions
+    public static class Vector2Extensions
     {
         public static float Dot(this Vector2 lhs, Vector2 rhs)
         {

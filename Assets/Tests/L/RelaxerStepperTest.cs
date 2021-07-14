@@ -195,9 +195,9 @@ public class RelaxerStepperTest
         // shouldn't take many cycles to bring them close to the target separation
         Assert.IsTrue(count < 100);
 
-        double dist = (n2.Position - n1.Position).magnitude;
+        float dist = (n2.Position - n1.Position).magnitude;
 
-        Assert.AreEqual(20.0, dist, 0.1);
+        Assert.AreEqual(20.0f, dist, 0.1f);
     }
 
     [Test]
@@ -577,10 +577,10 @@ public class RelaxerStepperTest
             // shouldn't take many cycle to bring them close to the target separation
             Assert.IsTrue(count < 100);
 
-            double dist = (n2.Position - n1.Position).magnitude;
+            float dist = (n2.Position - n1.Position).magnitude;
 
             // should get rad+rad+separation
-            Assert.AreEqual(21.0, dist, 0.1);
+            Assert.AreEqual(21.0f, dist, 0.1f);
         }
 
         {

@@ -44,7 +44,7 @@ namespace Assets.Generation
 
         private void Start()
         {
-            //UnityEngine.Assertions.Assert.raiseExceptions = true;
+            //UnityEngine.Assertion.Assert.raiseExceptions = true;
 
             m_ioc_container = new IoCContainer(
                 new RelaxerStepperFactory(),

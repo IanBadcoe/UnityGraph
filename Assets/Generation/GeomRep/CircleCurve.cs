@@ -65,7 +65,7 @@ namespace Assets.Generation.GeomRep
             throw new ArgumentException("-ve or zero radius");
     }
 
-    protected override Vector2 ComputePosInner(float param)
+    protected override Vector2 ComputePos_Inner(float param)
     {
         if (Rotation == RotationDirection.Forwards)
         {
@@ -101,14 +101,15 @@ namespace Assets.Generation.GeomRep
               && Rotation == cc_o.Rotation;
     }
 
-    public override float? FindParamForPoint(Vector2 pnt, float tol)
+    protected override float? FindParamForPoint_Inner(Vector2 pnt, float tol)
     {
         Vector2 relative = pnt - Position;
 
         if (Mathf.Abs(relative.magnitude - Radius) > tol)
             return null;
 
-        float ang = Mathf.Atan2(relative.y, relative.x);
+        // Unity call these y and x, in tat order, but they have zero at 3 o'clock where I have it at 12 0'clock
+        float ang = Mathf.Atan2(relative.x, relative.y);
 
         if (Rotation == RotationDirection.Reverse)
         {

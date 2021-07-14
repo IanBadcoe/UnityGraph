@@ -1,4 +1,5 @@
 ﻿using Assets.Generation.GeomRep;
+using Assets.Generation.GeomRep.Layouts;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace Assets.Generation.Templates
                 tb.AddNode(NodeRecord.NodeType.In, "i");
                 tb.AddNode(NodeRecord.NodeType.Out, "o");
                 tb.AddNode(NodeRecord.NodeType.Internal, "j", false, "<target>", null, null, "", 20f,
-                      0xff808040/*, a-> new CircularGeomLayout(a.getPos(), 10)*/);
+                      0xff808040, new CircularPillarLayoutFactory());
                 tb.AddNode(NodeRecord.NodeType.Internal, "side", true, "<target>", null, null, "e", 55f);
 
                 tb.Connect("i", "j", 120, 120, 10);

@@ -702,7 +702,7 @@ public class GraphTest
         Assert.IsTrue(g.Bounds().Equals(new Area(new Vector2(-3, -1), new Vector2(15, 13))));
     }
 
-    //   @Test
+    //   [Test]
     //   public void testPrint()
     //{
     //    {

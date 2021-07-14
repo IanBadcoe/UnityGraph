@@ -37,8 +37,8 @@ namespace Assets.Generation.GeomRep
             List<Tuple<float, float>> ret = new List<Tuple<float, float>>();
 
             {
-                float? pc1 = c1.FindParamForPoint(pts.Item1, 1e-6f);
-                float? pc2 = c2.FindParamForPoint(pts.Item1, 1e-6f);
+                float? pc1 = c1.FindParamForPoint(pts.Item1, 1e-5f);
+                float? pc2 = c2.FindParamForPoint(pts.Item1, 1e-5f);
 
                 if (pc1 != null && pc2 != null)
                 {
@@ -48,8 +48,8 @@ namespace Assets.Generation.GeomRep
 
             if (pts.Item2 != null)
             {
-                float? pc1 = c1.FindParamForPoint(pts.Item2.Value, 1e-6f);
-                float? pc2 = c2.FindParamForPoint(pts.Item2.Value, 1e-6f);
+                float? pc1 = c1.FindParamForPoint(pts.Item2.Value, 1e-5f);
+                float? pc2 = c2.FindParamForPoint(pts.Item2.Value, 1e-5f);
 
                 if (pc1 != null && pc2 != null)
                 {

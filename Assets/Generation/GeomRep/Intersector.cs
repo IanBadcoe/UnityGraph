@@ -10,19 +10,21 @@ using UnityEngine;
 
 namespace Assets.Generation.GeomRep
 {
-    class Intersector
+    public class Intersector
     {
         // only non-private for unit-testing
-        class AnnotatedCurve : EqualityBase
+        public class AnnotatedCurve : EqualityBase
         {
             public readonly Curve Curve;
             public AnnotatedCurve Next;
             public readonly int LoopNumber;
+            public readonly int Id;
 
             public AnnotatedCurve(Curve curve, int loop_number)
             {
                 Curve = curve;
                 LoopNumber = loop_number;
+                Id = curve.Id;
             }
 
             public override bool Equals(object o)
@@ -71,7 +73,7 @@ namespace Assets.Generation.GeomRep
 
             foreach (Loop l in ls1)
             {
-                working_loops1.Add(loop_count, l.GetCurves());
+                working_loops1.Add(loop_count, new List<Curve>(l.GetCurves()));
                 loop_count++;
             }
 
@@ -79,7 +81,7 @@ namespace Assets.Generation.GeomRep
 
             foreach (Loop l in ls2)
             {
-                working_loops2.Add(loop_count, l.GetCurves());
+                working_loops2.Add(loop_count, new List<Curve>(l.GetCurves()));
                 loop_count++;
             }
 
@@ -315,14 +317,15 @@ namespace Assets.Generation.GeomRep
 
             while (true)
             {
-                Debug.Assert(open.Contains(curr_ac));
+                Assertion.Assert(open.Contains(curr_ac));
 
                 Curve c = curr_ac.Curve;
                 found_curves.Add(c);
                 open.Remove(curr_ac);
 
                 // look for a splice that ends this curve
-                Splice splice = endSpliceMap[c];
+                Splice splice;
+                endSpliceMap.TryGetValue(c, out splice);
 
                 // if no splice we just follow the chain of ACs
                 if (splice == null)
@@ -339,7 +342,7 @@ namespace Assets.Generation.GeomRep
                         break;
 
                     // at every splice, at least one of the two possible exits should be still open
-                    Debug.Assert(open.Contains(splice.Loop1Out) || open.Contains(splice.Loop2Out));
+                    Assertion.Assert(open.Contains(splice.Loop1Out) || open.Contains(splice.Loop2Out));
 
                     if (!open.Contains(splice.Loop1Out))
                     {
@@ -530,14 +533,14 @@ namespace Assets.Generation.GeomRep
             foreach (Curve l1curr in working_loop1)
             {
                 Vector2 l1_cur_start_pos = l1curr.StartPos();
-                Debug.Assert(l1prev.EndPos().Equals(l1_cur_start_pos, 1e-6f));
+                Assertion.Assert(l1prev.EndPos().Equals(l1_cur_start_pos, 1e-5f));
 
                 Curve l2prev = working_loop2.Last();
 
                 foreach (Curve l2curr in working_loop2)
                 {
                     Vector2 l2_cur_start_pos = l2curr.StartPos();
-                    Debug.Assert(l2prev.EndPos().Equals(l2_cur_start_pos, 1e-6f));
+                    Assertion.Assert(l2prev.EndPos().Equals(l2_cur_start_pos, 1e-5f));
 
                     if (l1_cur_start_pos.Equals(l2_cur_start_pos, tol))
                     {
@@ -545,8 +548,8 @@ namespace Assets.Generation.GeomRep
                             forward_annotations_map[l1curr],
                             forward_annotations_map[l2curr]);
 
-                        Debug.Assert(!endSpliceMap.ContainsKey(l1prev));
-                        Debug.Assert(!endSpliceMap.ContainsKey(l2prev));
+                        Assertion.Assert(!endSpliceMap.ContainsKey(l1prev));
+                        Assertion.Assert(!endSpliceMap.ContainsKey(l2prev));
 
                         endSpliceMap.Add(l1prev, s);
                         endSpliceMap.Add(l2prev, s);
@@ -560,7 +563,7 @@ namespace Assets.Generation.GeomRep
         }
 
         // non-private only for unit-tests
-        void SplitCurvesAtIntersections(IList<Curve> working_loop1, IList<Curve> working_loop2, float tol)
+        public void SplitCurvesAtIntersections(IList<Curve> working_loop1, IList<Curve> working_loop2, float tol)
         {
             for (int i = 0; i < working_loop1.Count; i++)
             {
@@ -638,8 +641,8 @@ namespace Assets.Generation.GeomRep
         }
 
         // only non-private for unit-testing
-        void BuildAnnotationChains(IList<Curve> curves, int loop_number,
-                                   Dictionary<Curve, AnnotatedCurve> forward_annotations_map)
+        public void BuildAnnotationChains(IList<Curve> curves, int loop_number,
+                                          Dictionary<Curve, AnnotatedCurve> forward_annotations_map)
         {
             Curve prev = null;
 
