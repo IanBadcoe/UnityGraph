@@ -11,6 +11,7 @@ using Assets.Generation.Templates;
 using Assets.Generation;
 using Assets.Generation.GeomRep;
 using Assets.Extensions;
+using System.Linq;
 
 public class IntersectorTest
 {
@@ -149,649 +150,648 @@ public class IntersectorTest
         Assert.IsTrue(Util.ClockAwareAngleCompare(curves2[2].EndParam, curves2[0].StartParam, 1e-5f));
     }
 
-    //[Test]
-    //   public void testSplitCurvesAtIntersections_TwoCirclesOnePoint()
-    //{
-    //    // circles meet at one point
-    //    Curve cc1 = new CircleCurve(new Vector2(), 1);
-    //    Curve cc2 = new CircleCurve(new Vector2(2, 0), 1);
+    [Test]
+    public void TestSplitCurvesAtIntersections_TwoCirclesOnePoint()
+    {
+        // circles meet at one point
+        Curve cc1 = new CircleCurve(new Vector2(), 1);
+        Curve cc2 = new CircleCurve(new Vector2(2, 0), 1);
 
-    //    List<Curve> curves1 = new List<>();
-    //    curves1.add(cc1);
+        List<Curve> curves1 = new List<Curve>();
+        curves1.Add(cc1);
 
-    //    List<Curve> curves2 = new List<>();
-    //    curves2.add(cc2);
+        List<Curve> curves2 = new List<Curve>();
+        curves2.Add(cc2);
 
-    //    m_intersector.splitCurvesAtIntersections(curves1, curves2, 1e-6);
+        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
 
-    //    Assert.AreEqual(2, curves1.size());
-    //    Assert.AreEqual(2, curves2.size());
+        Assert.AreEqual(2, curves1.Count);
+        Assert.AreEqual(2, curves2.Count);
 
-    //    Assert.IsTrue(curves1.get(0).endPos().equals(curves1.get(1).startPos(), 1e-6));
-    //    Assert.IsTrue(curves1.get(1).endPos().equals(curves1.get(0).startPos(), 1e-6));
-    //    Assert.IsTrue(curves2.get(0).endPos().equals(curves2.get(1).startPos(), 1e-6));
-    //    Assert.IsTrue(curves2.get(1).endPos().equals(curves2.get(0).startPos(), 1e-6));
+        Assert.IsTrue(curves1[0].EndPos().Equals(curves1[1].StartPos(), 1e-5f));
+        Assert.IsTrue(curves1[1].EndPos().Equals(curves1[0].StartPos(), 1e-5f));
+        Assert.IsTrue(curves2[0].EndPos().Equals(curves2[1].StartPos(), 1e-5f));
+        Assert.IsTrue(curves2[1].EndPos().Equals(curves2[0].StartPos(), 1e-5f));
 
-    //    Assert.IsTrue(Util.clockAwareAngleCompare(curves1.get(0).EndParam, curves1.get(1).StartParam, 1e-6));
-    //    Assert.IsTrue(Util.clockAwareAngleCompare(curves1.get(1).EndParam, curves1.get(0).StartParam, 1e-6));
-    //    Assert.IsTrue(Util.clockAwareAngleCompare(curves2.get(0).EndParam, curves2.get(1).StartParam, 1e-6));
-    //    Assert.IsTrue(Util.clockAwareAngleCompare(curves2.get(1).EndParam, curves2.get(0).StartParam, 1e-6));
-    //}
+        Assert.IsTrue(Util.ClockAwareAngleCompare(curves1[0].EndParam, curves1[1].StartParam, 1e-5f));
+        Assert.IsTrue(Util.ClockAwareAngleCompare(curves1[1].EndParam, curves1[0].StartParam, 1e-5f));
+        Assert.IsTrue(Util.ClockAwareAngleCompare(curves2[0].EndParam, curves2[1].StartParam, 1e-5f));
+        Assert.IsTrue(Util.ClockAwareAngleCompare(curves2[1].EndParam, curves2[0].StartParam, 1e-5f));
+    }
 
-    //[Test]
-    //   public void testSplitCurvesAtIntersections_SameCircleTwice()
-    //{
-    //    // same circle twice
-    //    Curve cc1 = new CircleCurve(new Vector2(), 1);
-    //    Curve cc2 = new CircleCurve(new Vector2(), 1);
+    [Test]
+    public void TestSplitCurvesAtIntersections_SameCircleTwice()
+    {
+        // same circle twice
+        Curve cc1 = new CircleCurve(new Vector2(), 1);
+        Curve cc2 = new CircleCurve(new Vector2(), 1);
 
-    //    List<Curve> curves1 = new List<>();
-    //    curves1.add(cc1);
+        List<Curve> curves1 = new List<Curve>();
+        curves1.Add(cc1);
 
-    //    List<Curve> curves2 = new List<>();
-    //    curves2.add(cc2);
+        List<Curve> curves2 = new List<Curve>();
+        curves2.Add(cc2);
 
-    //    m_intersector.splitCurvesAtIntersections(curves1, curves2, 1e-6);
+        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
 
-    //    Assert.AreEqual(1, curves1.size());
-    //    Assert.AreEqual(1, curves2.size());
+        Assert.AreEqual(1, curves1.Count);
+        Assert.AreEqual(1, curves2.Count);
 
-    //    Assert.IsTrue(curves1.get(0).endPos().equals(curves1.get(0).startPos(), 1e-6));
-    //    Assert.IsTrue(curves2.get(0).endPos().equals(curves2.get(0).startPos(), 1e-6));
+        Assert.IsTrue(curves1[0].EndPos().Equals(curves1[0].StartPos(), 1e-5f));
+        Assert.IsTrue(curves2[0].EndPos().Equals(curves2[0].StartPos(), 1e-5f));
 
-    //    Assert.IsTrue(Util.clockAwareAngleCompare(curves1.get(0).EndParam, curves1.get(0).StartParam, 1e-6));
-    //    Assert.IsTrue(Util.clockAwareAngleCompare(curves2.get(0).EndParam, curves2.get(0).StartParam, 1e-6));
-    //}
+        Assert.IsTrue(Util.ClockAwareAngleCompare(curves1[0].EndParam, curves1[0].StartParam, 1e-5f));
+        Assert.IsTrue(Util.ClockAwareAngleCompare(curves2[0].EndParam, curves2[0].StartParam, 1e-5f));
+    }
 
-    //[Test]
-    //   public void testSplitCurvesAtIntersections_OneCircleHitsBreakInOther()
-    //{
-    //    // one circle hits existing break in other
-    //    Curve cc1 = new CircleCurve(new Vector2(), 1);
+    [Test]
+    public void TestSplitCurvesAtIntersections_OneCircleHitsBreakInOther()
+    {
+        // one circle hits existing break in other
+        Curve cc1 = new CircleCurve(new Vector2(), 1);
 
-    //    List<Curve> curves1 = new List<>();
-    //    curves1.add(cc1);
+        List<Curve> curves1 = new List<Curve>();
+        curves1.Add(cc1);
 
-    //    List<Curve> curves2 = new List<>();
+        List<Curve> curves2 = new List<Curve>();
 
-    //    for (floata = 0; a < Math.PI * 2; a += 0.1)
-    //    {
-    //        Curve cc2 = new CircleCurve(new Vector2(Math.sin(a), Math.cos(a)), 1);
+        for (float a = 0; a < Math.PI * 2; a += 0.1f)
+        {
+            Curve cc2 = new CircleCurve(new Vector2(Mathf.Sin(a), Mathf.Cos(a)), 1);
 
-    //        curves2.add(cc2);
-    //    }
+            curves2.Add(cc2);
+        }
 
-    //    m_intersector.splitCurvesAtIntersections(curves1, curves2, 1e-6);
+        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
 
-    //    for (int i = 0; i < curves1.size(); i++)
-    //    {
-    //        int next_i = (i + 1) % curves1.size();
-    //        Assert.IsTrue(Util.clockAwareAngleCompare(curves1.get(i).EndParam, curves1.get(next_i).StartParam, 1e-6));
-    //        Assert.IsTrue(curves1.get(i).endPos().equals(curves1.get(next_i).startPos(), 1e-6));
-    //    }
-    //}
-
-    //[Test]
-    //   public void testFindSplices()
-    //{
-    //    Curve cc1 = new CircleCurve(new Vector2(), 1);
-    //    Curve cc2 = new CircleCurve(new Vector2(1, 0), 1);
+        for (int i = 0; i < curves1.Count; i++)
+        {
+            int next_i = (i + 1) % curves1.Count;
+            Assert.IsTrue(Util.ClockAwareAngleCompare(curves1[i].EndParam, curves1[next_i].StartParam, 1e-5f));
+            Assert.IsTrue(curves1[i].EndPos().Equals(curves1[next_i].StartPos(), 1e-5f));
+        }
+    }
+
+    [Test]
+    public void TestFindSplices()
+    {
+        Curve cc1 = new CircleCurve(new Vector2(), 1);
+        Curve cc2 = new CircleCurve(new Vector2(1, 0), 1);
 
-    //    List<Curve> curves1 = new List<>();
-    //    curves1.add(cc1);
-
-    //    List<Curve> curves2 = new List<>();
-    //    curves2.add(cc2);
-
-    //    m_intersector.splitCurvesAtIntersections(curves1, curves2, 1e-6);
+        List<Curve> curves1 = new List<Curve>();
+        curves1.Add(cc1);
+
+        List<Curve> curves2 = new List<Curve>();
+        curves2.Add(cc2);
+
+        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
 
-    //    HashMap<Curve, Intersector.AnnotatedCurve> forward_annotations_map = new HashMap<>();
-
-    //    m_intersector.buildAnnotationChains(curves1, 1,
-    //          forward_annotations_map);
-
-    //    m_intersector.buildAnnotationChains(curves2, 2,
-    //          forward_annotations_map);
-
-    //    HashMap<Curve, Intersector.Splice> endSpliceMap = new HashMap<>();
-
-    //    m_intersector.findSplices(curves1, curves2,
-    //          forward_annotations_map,
-    //          endSpliceMap,
-    //          1e-6);
-
-    //    // two splices, with two in and two out curves each
-    //    Assert.AreEqual(4, endSpliceMap.size());
-
-    //    HashSet<Intersector.Splice> unique = new HashSet<>();
-    //    unique.addAll(endSpliceMap.values());
-
-    //    Assert.AreEqual(2, unique.size());
-
-    //    for (Intersector.Splice s : unique)
-    //      {
-    //    HashSet<Intersector.AnnotatedCurve> l1fset = new HashSet<>();
-    //    HashSet<Intersector.AnnotatedCurve> l2fset = new HashSet<>();
-
-    //    Intersector.AnnotatedCurve acl1f = s.Loop1Out;
-    //    Intersector.AnnotatedCurve acl2f = s.Loop2Out;
-
-    //    for (int i = 0; i < 4; i++)
-    //    {
-    //        l1fset.add(acl1f);
-    //        l2fset.add(acl2f);
-
-    //        acl1f = acl1f.Next;
-    //        acl2f = acl2f.Next;
-    //    }
-
-    //    // although we stepped four times, the loops are of length 3 and we
-    //    // shouldn't have found any more AnnotationCurves
-    //    Assert.AreEqual(3, l1fset.size());
-    //    Assert.AreEqual(3, l2fset.size());
-
-    //    // loops of AnnotationCurves should be unique
-    //    Assert.IsTrue(Collections.disjoint(l1fset, l2fset));
-
-    //    HashSet<Curve> l1fcset = l1fset.stream().map(x->x.Curve).collect(Collectors.toCollection(HashSet::new));
-    //    HashSet<Curve> l2fcset = l2fset.stream().map(x->x.Curve).collect(Collectors.toCollection(HashSet::new));
-
-    //    // and l1 and l2 don't contain any of the same curves
-    //    Assert.IsTrue(Collections.disjoint(l1fcset, l2fcset));
-    //}
-    //   }
-
-    //   [Test]
-    //   public void testTryFindIntersections()
-    //{
-    //    // one circle, expect 1, 0
-    //    {
-    //        CircleCurve cc = new CircleCurve(new Vector2(), 5);
-
-    //        HashSet<Curve> all_curves = new HashSet<>();
-    //        all_curves.add(cc);
-
-    //        HashSet<Vector2> curve_joints = new HashSet<>();
-    //        curve_joints.add(cc.startPos());
-
-    //        List<OrderedPair<Curve, Integer>> ret =
-    //              m_intersector.tryFindIntersections(
-    //                    new Vector2(0, -5),
-    //                    all_curves,
-    //                    curve_joints,
-    //                    10, 1e-6,
-    //                    new Random(1)
-    //              );
-
-    //        Assert.IsNotNull(ret);
-    //        Assert.AreEqual(2, ret.size());
-    //        Assert.AreEqual(cc, ret.get(0).First);
-    //        Assert.AreEqual(1, (int)ret.get(0).Second);
-    //        Assert.AreEqual(cc, ret.get(1).First);
-    //        Assert.AreEqual(0, (int)ret.get(1).Second);
-    //    }
-
-    //    // two concentric circles, expect 1, 2, 1, 0
-    //    {
-    //        CircleCurve cc1 = new CircleCurve(new Vector2(), 5);
-    //        CircleCurve cc2 = new CircleCurve(new Vector2(), 3);
-
-    //        HashSet<Curve> all_curves = new HashSet<>();
-    //        all_curves.add(cc1);
-    //        all_curves.add(cc2);
-
-    //        HashSet<Vector2> curve_joints = new HashSet<>();
-    //        curve_joints.add(cc1.startPos());
-    //        curve_joints.add(cc2.startPos());
-
-    //        List<OrderedPair<Curve, Integer>> ret =
-    //              m_intersector.tryFindIntersections(
-    //                    new Vector2(0, 0),  // use centre to force hitting both circles
-    //                    all_curves,
-    //                    curve_joints,
-    //                    10, 1e-6,
-    //                    new Random(1)
-    //              );
-
-    //        Assert.IsNotNull(ret);
-    //        Assert.AreEqual(4, ret.size());
-    //        Assert.AreEqual(cc1, ret.get(0).First);
-    //        Assert.AreEqual(1, (int)ret.get(0).Second);
-    //        Assert.AreEqual(cc2, ret.get(1).First);
-    //        Assert.AreEqual(2, (int)ret.get(1).Second);
-    //        Assert.AreEqual(cc2, ret.get(2).First);
-    //        Assert.AreEqual(1, (int)ret.get(2).Second);
-    //        Assert.AreEqual(cc1, ret.get(3).First);
-    //        Assert.AreEqual(0, (int)ret.get(3).Second);
-    //    }
-
-    //    // two concentric circles, inner one -ve, expect 1, 0, 1, 0
-    //    {
-    //        CircleCurve cc1 = new CircleCurve(new Vector2(), 5);
-    //        CircleCurve cc2 = new CircleCurve(new Vector2(), 3, CircleCurve.RotationDirection.Reverse);
-
-    //        HashSet<Curve> all_curves = new HashSet<>();
-    //        all_curves.add(cc1);
-    //        all_curves.add(cc2);
-
-    //        HashSet<Vector2> curve_joints = new HashSet<>();
-    //        curve_joints.add(cc1.startPos());
-    //        curve_joints.add(cc2.startPos());
-
-    //        List<OrderedPair<Curve, Integer>> ret =
-    //              m_intersector.tryFindIntersections(
-    //                    new Vector2(0, 0),  // use centre to force hitting both circles
-    //                    all_curves,
-    //                    curve_joints,
-    //                    10, 1e-6,
-    //                    new Random(1)
-    //              );
-
-    //        Assert.IsNotNull(ret);
-    //        Assert.AreEqual(4, ret.size());
-    //        Assert.AreEqual(cc1, ret.get(0).First);
-    //        Assert.AreEqual(1, (int)ret.get(0).Second);
-    //        Assert.AreEqual(cc2, ret.get(1).First);
-    //        Assert.AreEqual(0, (int)ret.get(1).Second);
-    //        Assert.AreEqual(cc2, ret.get(2).First);
-    //        Assert.AreEqual(1, (int)ret.get(2).Second);
-    //        Assert.AreEqual(cc1, ret.get(3).First);
-    //        Assert.AreEqual(0, (int)ret.get(3).Second);
-    //    }
-    //}
-
-    //[Test]
-    //   public void testTryFindCurveIntersections()
-    //{
-    //    // this was in the above, no idea why I went to the lower level routine in there
-    //    // but I need to do that now anyway...
-
-    //    // one circle, built from two half-circles, should still work
-    //    // expect 1, 0
-    //    {
-    //        CircleCurve cc1 = new CircleCurve(new Vector2(), 5, 0, Math.PI);
-    //        CircleCurve cc2 = new CircleCurve(new Vector2(), 5, Math.PI, 2 * Math.PI);
-
-    //        HashSet<Curve> all_curves = new HashSet<>();
-    //        all_curves.add(cc1);
-    //        all_curves.add(cc2);
-
-    //        LineCurve lc = new LineCurve(new Vector2(-10, 0), new Vector2(1, 0), 20);
-
-    //        List<OrderedPair<Curve, Integer>> ret =
-    //              m_intersector.tryFindCurveIntersections(
-    //                    lc,
-    //                    all_curves);
-
-    //        Assert.IsNotNull(ret);
-    //        Assert.AreEqual(2, ret.size());
-    //        Assert.AreEqual(cc2, ret.get(0).First);
-    //        Assert.AreEqual(1, (int)ret.get(0).Second);
-    //        Assert.AreEqual(cc1, ret.get(1).First);
-    //        Assert.AreEqual(0, (int)ret.get(1).Second);
-    //    }
-
-    //    // miss the circle, expect null
-    //    {
-    //        CircleCurve cc1 = new CircleCurve(new Vector2(), 5);
-
-    //        HashSet<Curve> all_curves = new HashSet<>();
-    //        all_curves.add(cc1);
-
-    //        LineCurve lc = new LineCurve(new Vector2(-10, 0), new Vector2(0, 1), 20);
-
-    //        List<OrderedPair<Curve, Integer>> ret =
-    //              m_intersector.tryFindCurveIntersections(
-    //                    lc,
-    //                    all_curves);
-
-    //        assertNull(ret);
-    //    }
-
-    //    // clip the circle, to simplify the analysis we disregard these, expect null
-    //    {
-    //        CircleCurve cc1 = new CircleCurve(new Vector2(), 5);
-
-    //        HashSet<Curve> all_curves = new HashSet<>();
-    //        all_curves.add(cc1);
-
-    //        LineCurve lc = new LineCurve(new Vector2(-5, -5), new Vector2(0, 1), 20);
-
-    //        List<OrderedPair<Curve, Integer>> ret =
-    //              m_intersector.tryFindCurveIntersections(
-    //                    lc,
-    //                    all_curves);
-
-    //        assertNull(ret);
-    //    }
-    //}
-
-    //private static void checkLoop(Loop l, @SuppressWarnings("SameParameterValue") int exp_size)
-    //   {
-    //    Assert.AreEqual(exp_size, l.numCurves());
-
-    //    Vector2 prev_end = l.getCurves().get(l.numCurves() - 1).endPos();
-
-    //    for (Curve c : l.getCurves())
-    //    {
-    //        Assert.IsTrue(prev_end.equals(c.startPos(), 1e-6));
-    //        prev_end = c.endPos();
-
-    //        Assert.IsTrue(c instanceof CircleCurve);
-    //    }
-    //}
-
-    //[Test]
-    //   public void testUnion() throws Exception
-    //{
-    //      // nothing union nothing should equal nothing
-    //      {
-    //        LoopSet ls1 = new LoopSet();
-    //        LoopSet ls2 = new LoopSet();
-
-    //        LoopSet ret = m_intersector.union(ls1, ls2, 1e-6, new Random(1));
-
-    //        assertNull(ret);
-    //    }
-
-    //      // something union nothing should equal something
-    //    {
-    //        LoopSet ls1 = new LoopSet();
-    //        LoopSet ls2 = new LoopSet();
-
-    //        Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
-    //        ls1.add(l1);
-
-    //        LoopSet ret = m_intersector.union(ls1, ls2, 1e-6, new Random(1));
-
-    //        Assert.IsNotNull(ret);
-    //        Assert.AreEqual(1, ret.size());
-    //        Assert.AreEqual(ls1, ret);
-    //    }
-
-    //      // nothing union something should equal something
-    //    {
-    //        LoopSet ls1 = new LoopSet();
-    //        LoopSet ls2 = new LoopSet();
-
-    //        Loop l2 = new Loop(new CircleCurve(new Vector2(), 1));
-    //        ls2.add(l2);
-
-    //        LoopSet ret = m_intersector.union(ls1, ls2, 1e-6, new Random(1));
-
-    //        Assert.IsNotNull(ret);
-    //        Assert.AreEqual(1, ret.size());
-    //        Assert.AreEqual(ls2, ret);
-    //    }
-
-    //      // union of two identical things should equal either one of them
-    //    {
-    //        LoopSet ls1 = new LoopSet();
-    //        LoopSet ls2 = new LoopSet();
-
-    //        Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
-    //        ls1.add(l1);
-
-    //        Loop l2 = new Loop(new CircleCurve(new Vector2(), 1));
-    //        ls2.add(l2);
-
-    //        // paranoia
-    //        Assert.AreEqual(ls1, ls2);
-
-    //        LoopSet ret = m_intersector.union(ls1, ls2, 1e-6, new Random(1));
-
-    //        Assert.IsNotNull(ret);
-    //        Assert.AreEqual(1, ret.size());
-    //        Assert.AreEqual(ls1, ret);
-    //    }
-
-    //      // union of two overlapping circles should be one two-part curve
-    //    {
-    //        LoopSet ls1 = new LoopSet();
-    //        LoopSet ls2 = new LoopSet();
-
-    //        Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
-    //        ls1.add(l1);
-
-    //        Loop l2 = new Loop(new CircleCurve(new Vector2(1, 0), 1));
-    //        ls2.add(l2);
-
-    //        LoopSet ret = m_intersector.union(ls1, ls2, 1e-6, new Random(1));
-
-    //        Assert.IsNotNull(ret);
-    //        Assert.AreEqual(1, ret.size());
-    //        Assert.AreEqual(2, ret.get(0).numCurves());
-    //        Curve c1 = ret.get(0).getCurves().get(0);
-    //        Curve c2 = ret.get(0).getCurves().get(1);
-    //        Assert.IsTrue(c1 instanceof CircleCurve);
-    //        Assert.IsTrue(c2 instanceof CircleCurve);
-
-    //        CircleCurve cc1 = (CircleCurve)c1;
-    //        CircleCurve cc2 = (CircleCurve)c2;
-
-    //        // same radii
-    //        Assert.AreEqual(1, cc1.Radius, 1e-6);
-    //        Assert.AreEqual(1, cc2.Radius, 1e-6);
-
-    //        // same direction
-    //        Assert.AreEqual(CircleCurve.RotationDirection.Forwards, cc1.Rotation);
-    //        Assert.AreEqual(CircleCurve.RotationDirection.Forwards, cc2.Rotation);
-
-    //        // joined end-to-end
-    //        Assert.IsTrue(cc1.startPos().equals(cc2.endPos(), 1e-6));
-    //        Assert.IsTrue(cc2.startPos().equals(cc1.endPos(), 1e-6));
-
-    //        CircleCurve left = cc1.Position.X < cc2.Position.X ? cc1 : cc2;
-    //        CircleCurve right = cc1.Position.X > cc2.Position.X ? cc1 : cc2;
-
-    //        Assert.AreEqual(new Vector2(0, 0), left.Position);
-    //        Assert.AreEqual(new Vector2(1, 0), right.Position);
-
-    //        Assert.AreEqual(Math.PI * 2 * 5 / 12, left.StartParam, 1e-6);
-    //        Assert.AreEqual(Math.PI * 2 * 13 / 12, left.EndParam, 1e-6);
-
-    //        Assert.AreEqual(Math.PI * 2 * 11 / 12, right.StartParam, 1e-6);
-    //        Assert.AreEqual(Math.PI * 2 * 19 / 12, right.EndParam, 1e-6);
-    //    }
-
-    //      // union of two overlapping circles with holes in
-    //      // should be one two-part curve around outside and two two-part curves in the interior
-    //    {
-    //        LoopSet ls1 = new LoopSet();
-    //        LoopSet ls2 = new LoopSet();
-
-    //        Loop l1a = new Loop(new CircleCurve(new Vector2(), 1));
-    //        Loop l1b = new Loop(new CircleCurve(new Vector2(), 0.3, CircleCurve.RotationDirection.Reverse));
-    //        ls1.add(l1a);
-    //        ls1.add(l1b);
-
-    //        Loop l2a = new Loop(new CircleCurve(new Vector2(1, 0), 1));
-    //        Loop l2b = new Loop(new CircleCurve(new Vector2(1, 0), 0.3, CircleCurve.RotationDirection.Reverse));
-    //        ls2.add(l2a);
-    //        ls2.add(l2b);
-
-    //        LoopSet ret = m_intersector.union(ls1, ls2, 1e-6, new Random(1));
-
-    //        Assert.IsNotNull(ret);
-    //        Assert.AreEqual(3, ret.size());
-
-    //        checkLoop(ret.get(0), 2);
-    //        checkLoop(ret.get(1), 2);
-    //        checkLoop(ret.get(2), 2);
-    //    }
-
-    //      // osculating circles, outside each other
-    //    {
-    //        LoopSet ls1 = new LoopSet();
-    //        LoopSet ls2 = new LoopSet();
-
-    //        Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
-    //        ls1.add(l1);
-
-    //        Loop l2 = new Loop(new CircleCurve(new Vector2(2, 0), 1));
-    //        ls2.add(l2);
-
-    //        LoopSet ret = m_intersector.union(ls1, ls2, 1e-6, new Random(1));
-
-    //        Assert.IsNotNull(ret);
-    //        Assert.AreEqual(1, ret.size());
-    //        Assert.AreEqual(2, ret.get(0).numCurves());
-    //        Curve c1 = ret.get(0).getCurves().get(0);
-    //        Curve c2 = ret.get(0).getCurves().get(1);
-    //        Assert.IsTrue(c1 instanceof CircleCurve);
-    //        Assert.IsTrue(c2 instanceof CircleCurve);
-
-    //        CircleCurve cc1 = (CircleCurve)c1;
-    //        CircleCurve cc2 = (CircleCurve)c2;
-
-    //        // same radii
-    //        Assert.AreEqual(1, cc1.Radius, 1e-6);
-    //        Assert.AreEqual(1, cc2.Radius, 1e-6);
-
-    //        // same direction
-    //        Assert.AreEqual(CircleCurve.RotationDirection.Forwards, cc1.Rotation);
-    //        Assert.AreEqual(CircleCurve.RotationDirection.Forwards, cc2.Rotation);
-
-    //        // joined end-to-end
-    //        Assert.IsTrue(cc1.startPos().equals(cc2.endPos(), 1e-6));
-    //        Assert.IsTrue(cc2.startPos().equals(cc1.endPos(), 1e-6));
-
-    //        CircleCurve left = cc1.Position.X < cc2.Position.X ? cc1 : cc2;
-    //        CircleCurve right = cc1.Position.X > cc2.Position.X ? cc1 : cc2;
-
-    //        Assert.AreEqual(new Vector2(0, 0), left.Position);
-    //        Assert.AreEqual(new Vector2(2, 0), right.Position);
-
-    //        Assert.AreEqual(Math.PI * 2 * 3 / 12, left.StartParam, 1e-6);
-    //        Assert.AreEqual(Math.PI * 2 * 15 / 12, left.EndParam, 1e-6);
-
-    //        Assert.AreEqual(Math.PI * 2 * 9 / 12, right.StartParam, 1e-6);
-    //        Assert.AreEqual(Math.PI * 2 * 21 / 12, right.EndParam, 1e-6);
-    //    }
-
-    //      // osculating circles, outside each other
-    //      // other way around
-    //    {
-    //        LoopSet ls1 = new LoopSet();
-    //        LoopSet ls2 = new LoopSet();
-
-    //        Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
-    //        ls1.add(l1);
-
-    //        Loop l2 = new Loop(new CircleCurve(new Vector2(2, 0), 1));
-    //        ls2.add(l2);
-
-    //        LoopSet ret = m_intersector.union(ls2, ls1, 1e-6, new Random(1));
-
-    //        Assert.IsNotNull(ret);
-    //        Assert.AreEqual(1, ret.size());
-    //        Assert.AreEqual(2, ret.get(0).numCurves());
-    //        Curve c1 = ret.get(0).getCurves().get(0);
-    //        Curve c2 = ret.get(0).getCurves().get(1);
-    //        Assert.IsTrue(c1 instanceof CircleCurve);
-    //        Assert.IsTrue(c2 instanceof CircleCurve);
-
-    //        CircleCurve cc1 = (CircleCurve)c1;
-    //        CircleCurve cc2 = (CircleCurve)c2;
-
-    //        // same radii
-    //        Assert.AreEqual(1, cc1.Radius, 1e-6);
-    //        Assert.AreEqual(1, cc2.Radius, 1e-6);
-
-    //        // same direction
-    //        Assert.AreEqual(CircleCurve.RotationDirection.Forwards, cc1.Rotation);
-    //        Assert.AreEqual(CircleCurve.RotationDirection.Forwards, cc2.Rotation);
-
-    //        // joined end-to-end
-    //        Assert.IsTrue(cc1.startPos().equals(cc2.endPos(), 1e-6));
-    //        Assert.IsTrue(cc2.startPos().equals(cc1.endPos(), 1e-6));
-
-    //        CircleCurve left = cc1.Position.X < cc2.Position.X ? cc1 : cc2;
-    //        CircleCurve right = cc1.Position.X > cc2.Position.X ? cc1 : cc2;
-
-    //        Assert.AreEqual(new Vector2(0, 0), left.Position);
-    //        Assert.AreEqual(new Vector2(2, 0), right.Position);
-
-    //        Assert.AreEqual(Math.PI * 2 * 3 / 12, left.StartParam, 1e-6);
-    //        Assert.AreEqual(Math.PI * 2 * 15 / 12, left.EndParam, 1e-6);
-
-    //        Assert.AreEqual(Math.PI * 2 * 9 / 12, right.StartParam, 1e-6);
-    //        Assert.AreEqual(Math.PI * 2 * 21 / 12, right.EndParam, 1e-6);
-    //    }
-
-    //      // osculating circles, one smaller, reversed and inside the other
-    //    {
-    //        LoopSet ls1 = new LoopSet();
-    //        LoopSet ls2 = new LoopSet();
-
-    //        Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
-    //        ls1.add(l1);
-
-    //        Loop l2 = new Loop(new CircleCurve(new Vector2(0.5, 0), 0.5, CircleCurve.RotationDirection.Reverse));
-    //        ls2.add(l2);
-
-    //        LoopSet ret = m_intersector.union(ls1, ls2, 1e-6, new Random(1));
-
-    //        Assert.IsNotNull(ret);
-    //        Assert.AreEqual(1, ret.size());
-    //        Assert.AreEqual(2, ret.get(0).numCurves());
-    //        Curve c1 = ret.get(0).getCurves().get(0);
-    //        Curve c2 = ret.get(0).getCurves().get(1);
-    //        Assert.IsTrue(c1 instanceof CircleCurve);
-    //        Assert.IsTrue(c2 instanceof CircleCurve);
-
-    //        CircleCurve cc1 = (CircleCurve)c1;
-    //        CircleCurve cc2 = (CircleCurve)c2;
-
-    //        // joined end-to-end
-    //        Assert.IsTrue(cc1.startPos().equals(cc2.endPos(), 1e-6));
-    //        Assert.IsTrue(cc2.startPos().equals(cc1.endPos(), 1e-6));
-
-    //        CircleCurve left = cc1.Position.X < cc2.Position.X ? cc1 : cc2;
-    //        CircleCurve right = cc1.Position.X > cc2.Position.X ? cc1 : cc2;
-
-    //        // same radii
-    //        Assert.AreEqual(1, left.Radius, 1e-6);
-    //        Assert.AreEqual(0.5, right.Radius, 1e-6);
-
-    //        // same direction
-    //        Assert.AreEqual(CircleCurve.RotationDirection.Forwards, left.Rotation);
-    //        Assert.AreEqual(CircleCurve.RotationDirection.Reverse, right.Rotation);
-
-    //        Assert.AreEqual(new Vector2(0, 0), left.Position);
-    //        Assert.AreEqual(new Vector2(0.5, 0), right.Position);
-
-    //        Assert.AreEqual(Math.PI * 2 * 3 / 12, left.StartParam, 1e-6);
-    //        Assert.AreEqual(Math.PI * 2 * 15 / 12, left.EndParam, 1e-6);
-
-    //        Assert.AreEqual(Math.PI * 2 * 9 / 12, right.StartParam, 1e-6);
-    //        Assert.AreEqual(Math.PI * 2 * 21 / 12, right.EndParam, 1e-6);
-    //    }
-    //}
-
-    //[Test]
-    //   public void testAnnotatedCurve()
-    //{
-    //    Curve c1 = new CircleCurve(new Vector2(), 1);
-    //    Curve c2 = new CircleCurve(new Vector2(), 1);
-
-    //    Intersector.AnnotatedCurve ac1 = new Intersector.AnnotatedCurve(c1, 1);
-    //    Intersector.AnnotatedCurve ac1b = new Intersector.AnnotatedCurve(c1, 1);
-    //    Intersector.AnnotatedCurve ac2 = new Intersector.AnnotatedCurve(c2, 1);
-
-    //    Assert.AreEqual(c1.hashCode(), ac1.hashCode());
-
-    //    Assert.IsTrue(ac1.equals(ac1b));
-    //    assertFalse(ac1.equals(ac2));
-    //    //noinspection EqualsBetweenInconvertibleTypes
-    //    assertFalse(ac1.equals(0));
-    //}
+        Dictionary<Curve, Intersector.AnnotatedCurve> forward_annotations_map = new Dictionary<Curve, Intersector.AnnotatedCurve>();
+
+        m_intersector.BuildAnnotationChains(curves1, 1,
+              forward_annotations_map);
+
+        m_intersector.BuildAnnotationChains(curves2, 2,
+              forward_annotations_map);
+
+        Dictionary<Curve, Intersector.Splice> endSpliceMap = new Dictionary<Curve, Intersector.Splice>();
+
+        m_intersector.FindSplices(curves1, curves2,
+              forward_annotations_map,
+              endSpliceMap,
+              1e-5f);
+
+        // two splices, with two in and two out curves each
+        Assert.AreEqual(4, endSpliceMap.Count);
+
+        HashSet<Intersector.Splice> unique = new HashSet<Intersector.Splice>();
+        unique.UnionWith(endSpliceMap.Values);
+
+        Assert.AreEqual(2, unique.Count);
+
+        foreach (Intersector.Splice s in unique)
+        {
+            HashSet<Intersector.AnnotatedCurve> l1fset = new HashSet<Intersector.AnnotatedCurve>();
+            HashSet<Intersector.AnnotatedCurve> l2fset = new HashSet<Intersector.AnnotatedCurve>();
+
+            Intersector.AnnotatedCurve acl1f = s.Loop1Out;
+            Intersector.AnnotatedCurve acl2f = s.Loop2Out;
+
+            for (int i = 0; i < 4; i++)
+            {
+                l1fset.Add(acl1f);
+                l2fset.Add(acl2f);
+
+                acl1f = acl1f.Next;
+                acl2f = acl2f.Next;
+            }
+
+            // although we stepped four times, the loops are of length 3 and we
+            // shouldn't have found any more AnnotationCurves
+            Assert.AreEqual(3, l1fset.Count);
+            Assert.AreEqual(3, l2fset.Count);
+
+            // loops of AnnotationCurves should be unique
+            Assert.IsFalse(l1fset.Overlaps(l2fset));
+
+            HashSet<Curve> l1fcset = new HashSet<Curve>(l1fset.Select(x => x.Curve));
+            HashSet<Curve> l2fcset = new HashSet<Curve>(l2fset.Select(x => x.Curve));
+
+            // and l1 and l2 don't contain any of the same curves
+            Assert.IsFalse(l1fcset.Overlaps(l2fcset));
+        }
+    }
+
+    [Test]
+    public void TestTryFindIntersections()
+    {
+        // one circle, expect 1, 0
+        {
+            CircleCurve cc = new CircleCurve(new Vector2(), 5);
+
+            HashSet<Curve> all_curves = new HashSet<Curve>();
+            all_curves.Add(cc);
+
+            HashSet<Vector2> curve_joints = new HashSet<Vector2>();
+            curve_joints.Add(cc.StartPos());
+
+            List<Tuple<Curve, int>> ret =
+                  m_intersector.TryFindIntersections(
+                        new Vector2(0, -5),
+                        all_curves,
+                        curve_joints,
+                        10, 1e-5f,
+                        new ClRand(1)
+                  );
+
+            Assert.IsNotNull(ret);
+            Assert.AreEqual(2, ret.Count);
+            Assert.AreEqual(cc, ret[0].Item1);
+            Assert.AreEqual(cc, ret[1].Item1);
+            Assert.AreEqual(1, ret[0].Item2);
+            Assert.AreEqual(0, ret[1].Item2);
+        }
+
+        // two concentric circles, expect 1, 2, 1, 0
+        {
+            CircleCurve cc1 = new CircleCurve(new Vector2(), 5);
+            CircleCurve cc2 = new CircleCurve(new Vector2(), 3);
+
+            HashSet<Curve> all_curves = new HashSet<Curve>();
+            all_curves.Add(cc1);
+            all_curves.Add(cc2);
+
+            HashSet<Vector2> curve_joints = new HashSet<Vector2>();
+            curve_joints.Add(cc1.StartPos());
+            curve_joints.Add(cc2.StartPos());
+
+            List<Tuple<Curve, int>> ret =
+                  m_intersector.TryFindIntersections(
+                        new Vector2(0, 0),  // use centre to force hitting both circles
+                        all_curves,
+                        curve_joints,
+                        10, 1e-5f,
+                        new ClRand(1)
+                  );
+
+            Assert.IsNotNull(ret);
+            Assert.AreEqual(4, ret.Count);
+            Assert.AreEqual(cc1, ret[0].Item1);
+            Assert.AreEqual(cc2, ret[1].Item1);
+            Assert.AreEqual(cc2, ret[2].Item1);
+            Assert.AreEqual(cc1, ret[3].Item1);
+            Assert.AreEqual(1, ret[0].Item2);
+            Assert.AreEqual(2, ret[1].Item2);
+            Assert.AreEqual(1, ret[2].Item2);
+            Assert.AreEqual(0, ret[3].Item2);
+        }
+
+        // two concentric circles, inner one -ve, expect 1, 0, 1, 0
+        {
+            CircleCurve cc1 = new CircleCurve(new Vector2(), 5);
+            CircleCurve cc2 = new CircleCurve(new Vector2(), 3, CircleCurve.RotationDirection.Reverse);
+
+            HashSet<Curve> all_curves = new HashSet<Curve>();
+            all_curves.Add(cc1);
+            all_curves.Add(cc2);
+
+            HashSet<Vector2> curve_joints = new HashSet<Vector2>();
+            curve_joints.Add(cc1.StartPos());
+            curve_joints.Add(cc2.StartPos());
+
+            List<Tuple<Curve, int>> ret =
+                  m_intersector.TryFindIntersections(
+                        new Vector2(0, 0),  // use centre to force hitting both circles
+                        all_curves,
+                        curve_joints,
+                        10, 1e-5f,
+                        new ClRand(1)
+                  );
+
+            Assert.IsNotNull(ret);
+            Assert.AreEqual(4, ret.Count);
+            Assert.AreEqual(cc1, ret[0].Item1);
+            Assert.AreEqual(cc2, ret[1].Item1);
+            Assert.AreEqual(cc2, ret[2].Item1);
+            Assert.AreEqual(cc1, ret[3].Item1);
+            Assert.AreEqual(1, (int)ret[0].Item2);
+            Assert.AreEqual(0, (int)ret[1].Item2);
+            Assert.AreEqual(1, (int)ret[2].Item2);
+            Assert.AreEqual(0, (int)ret[3].Item2);
+        }
+    }
+
+    [Test]
+    public void TestTryFindCurveIntersections()
+    {
+        // this was in the above, no idea why I went to the lower level routine in there
+        // but I need to do that now anyway...
+
+        // one circle, built from two half-circles, should still work
+        // expect 1, 0
+        {
+            CircleCurve cc1 = new CircleCurve(new Vector2(), 5, 0, Mathf.PI);
+            CircleCurve cc2 = new CircleCurve(new Vector2(), 5, Mathf.PI, 2 * Mathf.PI);
+
+            HashSet<Curve> all_curves = new HashSet<Curve>();
+            all_curves.Add(cc1);
+            all_curves.Add(cc2);
+
+            LineCurve lc = new LineCurve(new Vector2(-10, 0), new Vector2(1, 0), 20);
+
+            List<Tuple<Curve, int>> ret =
+                  m_intersector.TryFindCurveIntersections(
+                        lc,
+                        all_curves);
+
+            Assert.IsNotNull(ret);
+            Assert.AreEqual(2, ret.Count);
+            Assert.AreEqual(cc2, ret[0].Item1);
+            Assert.AreEqual(cc1, ret[1].Item1);
+            Assert.AreEqual(1, (int)ret[0].Item2);
+            Assert.AreEqual(0, (int)ret[1].Item2);
+        }
+
+        // miss the circle, expect null
+        {
+            CircleCurve cc1 = new CircleCurve(new Vector2(), 5);
+
+            HashSet<Curve> all_curves = new HashSet<Curve>();
+            all_curves.Add(cc1);
+
+            LineCurve lc = new LineCurve(new Vector2(-10, 0), new Vector2(0, 1), 20);
+
+            List<Tuple<Curve, int>> ret =
+                  m_intersector.TryFindCurveIntersections(
+                        lc,
+                        all_curves);
+
+            Assert.IsNull(ret);
+        }
+
+        // clip the circle, to simplify the analysis we disregard these, expect null
+        {
+            CircleCurve cc1 = new CircleCurve(new Vector2(), 5);
+
+            HashSet<Curve> all_curves = new HashSet<Curve>();
+            all_curves.Add(cc1);
+
+            LineCurve lc = new LineCurve(new Vector2(-5, -5), new Vector2(0, 1), 20);
+
+            List<Tuple<Curve, int>> ret =
+                  m_intersector.TryFindCurveIntersections(
+                        lc,
+                        all_curves);
+
+            Assert.IsNull(ret);
+        }
+    }
+
+    private static void CheckLoop(Loop l, int exp_size)
+    {
+        Assert.AreEqual(exp_size, l.NumCurves());
+
+        Vector2 prev_end = l.GetCurves()[l.NumCurves() - 1].EndPos();
+
+        foreach (Curve c in l.GetCurves())
+        {
+            Assert.IsTrue(prev_end.Equals(c.StartPos(), 1e-5f));
+            prev_end = c.EndPos();
+
+            Assert.IsTrue(c is CircleCurve);
+        }
+    }
+
+    [Test]
+    public void TestUnion()
+    {
+        // nothing union nothing should equal nothing
+        {
+            LoopSet ls1 = new LoopSet();
+            LoopSet ls2 = new LoopSet();
+
+            LoopSet ret = m_intersector.Union(ls1, ls2, 1e-5f, new ClRand(1));
+
+            Assert.IsNull(ret);
+        }
+
+        // something union nothing should equal something
+        {
+            LoopSet ls1 = new LoopSet();
+            LoopSet ls2 = new LoopSet();
+
+            Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
+            ls1.Add(l1);
+
+            LoopSet ret = m_intersector.Union(ls1, ls2, 1e-5f, new ClRand(1));
+
+            Assert.IsNotNull(ret);
+            Assert.AreEqual(1, ret.Count);
+            Assert.AreEqual(ls1, ret);
+        }
+
+        // nothing union something should equal something
+        {
+            LoopSet ls1 = new LoopSet();
+            LoopSet ls2 = new LoopSet();
+
+            Loop l2 = new Loop(new CircleCurve(new Vector2(), 1));
+            ls2.Add(l2);
+
+            LoopSet ret = m_intersector.Union(ls1, ls2, 1e-5f, new ClRand(1));
+
+            Assert.IsNotNull(ret);
+            Assert.AreEqual(1, ret.Count);
+            Assert.AreEqual(ls2, ret);
+        }
+
+        // union of two identical things should equal either one of them
+        {
+            LoopSet ls1 = new LoopSet();
+            LoopSet ls2 = new LoopSet();
+
+            Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
+            ls1.Add(l1);
+
+            Loop l2 = new Loop(new CircleCurve(new Vector2(), 1));
+            ls2.Add(l2);
+
+            // paranoia
+            Assert.AreEqual(ls1, ls2);
+
+            LoopSet ret = m_intersector.Union(ls1, ls2, 1e-5f, new ClRand(1));
+
+            Assert.IsNotNull(ret);
+            Assert.AreEqual(1, ret.Count);
+            Assert.AreEqual(ls1, ret);
+        }
+
+        // union of two overlapping circles should be one two-part curve
+        {
+            LoopSet ls1 = new LoopSet();
+            LoopSet ls2 = new LoopSet();
+
+            Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
+            ls1.Add(l1);
+
+            Loop l2 = new Loop(new CircleCurve(new Vector2(1, 0), 1));
+            ls2.Add(l2);
+
+            LoopSet ret = m_intersector.Union(ls1, ls2, 1e-5f, new ClRand(1));
+
+            Assert.IsNotNull(ret);
+            Assert.AreEqual(1, ret.Count);
+            Assert.AreEqual(2, ret[0].NumCurves());
+            Curve c1 = ret[0].GetCurves()[0];
+            Curve c2 = ret[0].GetCurves()[1];
+            Assert.IsTrue(c1 is CircleCurve);
+            Assert.IsTrue(c2 is CircleCurve);
+
+            CircleCurve cc1 = (CircleCurve)c1;
+            CircleCurve cc2 = (CircleCurve)c2;
+
+            // same radii
+            Assert.AreEqual(1, cc1.Radius, 1e-5f);
+            Assert.AreEqual(1, cc2.Radius, 1e-5f);
+
+            // same direction
+            Assert.AreEqual(CircleCurve.RotationDirection.Forwards, cc1.Rotation);
+            Assert.AreEqual(CircleCurve.RotationDirection.Forwards, cc2.Rotation);
+
+            // joined end-to-end
+            Assert.IsTrue(cc1.StartPos().Equals(cc2.EndPos(), 1e-5f));
+            Assert.IsTrue(cc2.StartPos().Equals(cc1.EndPos(), 1e-5f));
+
+            CircleCurve left = cc1.Position.x < cc2.Position.x ? cc1 : cc2;
+            CircleCurve right = cc1.Position.x > cc2.Position.x ? cc1 : cc2;
+
+            Assert.AreEqual(new Vector2(0, 0), left.Position);
+            Assert.AreEqual(new Vector2(1, 0), right.Position);
+
+            Assert.AreEqual(Math.PI * 2 * 5 / 12, left.StartParam, 1e-5f);
+            Assert.AreEqual(Math.PI * 2 * 13 / 12, left.EndParam, 1e-5f);
+
+            Assert.AreEqual(Math.PI * 2 * 11 / 12, right.StartParam, 1e-5f);
+            Assert.AreEqual(Math.PI * 2 * 19 / 12, right.EndParam, 1e-5f);
+        }
+
+        // union of two overlapping circles with holes in
+        // should be one two-part curve around outside and two two-part curves in the interior
+        {
+            LoopSet ls1 = new LoopSet();
+            LoopSet ls2 = new LoopSet();
+
+            Loop l1a = new Loop(new CircleCurve(new Vector2(), 1));
+            Loop l1b = new Loop(new CircleCurve(new Vector2(), 0.3f, CircleCurve.RotationDirection.Reverse));
+            ls1.Add(l1a);
+            ls1.Add(l1b);
+
+            Loop l2a = new Loop(new CircleCurve(new Vector2(1, 0), 1));
+            Loop l2b = new Loop(new CircleCurve(new Vector2(1, 0), 0.3f, CircleCurve.RotationDirection.Reverse));
+            ls2.Add(l2a);
+            ls2.Add(l2b);
+
+            LoopSet ret = m_intersector.Union(ls1, ls2, 1e-5f, new ClRand(1));
+
+            Assert.IsNotNull(ret);
+            Assert.AreEqual(3, ret.Count);
+
+            CheckLoop(ret[0], 2);
+            CheckLoop(ret[1], 2);
+            CheckLoop(ret[2], 2);
+        }
+
+        // osculating circles, outside each other
+        {
+            LoopSet ls1 = new LoopSet();
+            LoopSet ls2 = new LoopSet();
+
+            Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
+            ls1.Add(l1);
+
+            Loop l2 = new Loop(new CircleCurve(new Vector2(2, 0), 1));
+            ls2.Add(l2);
+
+            LoopSet ret = m_intersector.Union(ls1, ls2, 1e-5f, new ClRand(1));
+
+            Assert.IsNotNull(ret);
+            Assert.AreEqual(1, ret.Count);
+            Assert.AreEqual(2, ret[0].NumCurves());
+            Curve c1 = ret[0].GetCurves()[0];
+            Curve c2 = ret[0].GetCurves()[1];
+            Assert.IsTrue(c1 is CircleCurve);
+            Assert.IsTrue(c2 is CircleCurve);
+
+            CircleCurve cc1 = (CircleCurve)c1;
+            CircleCurve cc2 = (CircleCurve)c2;
+
+            // same radii
+            Assert.AreEqual(1, cc1.Radius, 1e-5f);
+            Assert.AreEqual(1, cc2.Radius, 1e-5f);
+
+            // same direction
+            Assert.AreEqual(CircleCurve.RotationDirection.Forwards, cc1.Rotation);
+            Assert.AreEqual(CircleCurve.RotationDirection.Forwards, cc2.Rotation);
+
+            // joined end-to-end
+            Assert.IsTrue(cc1.StartPos().Equals(cc2.EndPos(), 1e-5f));
+            Assert.IsTrue(cc2.StartPos().Equals(cc1.EndPos(), 1e-5f));
+
+            CircleCurve left = cc1.Position.x < cc2.Position.x ? cc1 : cc2;
+            CircleCurve right = cc1.Position.x > cc2.Position.x ? cc1 : cc2;
+
+            Assert.AreEqual(new Vector2(0, 0), left.Position);
+            Assert.AreEqual(new Vector2(2, 0), right.Position);
+
+            Assert.AreEqual(Math.PI * 2 * 3 / 12, left.StartParam, 1e-5f);
+            Assert.AreEqual(Math.PI * 2 * 15 / 12, left.EndParam, 1e-5f);
+
+            Assert.AreEqual(Math.PI * 2 * 9 / 12, right.StartParam, 1e-5f);
+            Assert.AreEqual(Math.PI * 2 * 21 / 12, right.EndParam, 1e-5f);
+        }
+
+        // osculating circles, outside each other
+        // other way around
+        {
+            LoopSet ls1 = new LoopSet();
+            LoopSet ls2 = new LoopSet();
+
+            Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
+            ls1.Add(l1);
+
+            Loop l2 = new Loop(new CircleCurve(new Vector2(2, 0), 1));
+            ls2.Add(l2);
+
+            LoopSet ret = m_intersector.Union(ls2, ls1, 1e-5f, new ClRand(1));
+
+            Assert.IsNotNull(ret);
+            Assert.AreEqual(1, ret.Count);
+            Assert.AreEqual(2, ret[0].NumCurves());
+            Curve c1 = ret[0].GetCurves()[0];
+            Curve c2 = ret[0].GetCurves()[1];
+            Assert.IsTrue(c1 is CircleCurve);
+            Assert.IsTrue(c2 is CircleCurve);
+
+            CircleCurve cc1 = (CircleCurve)c1;
+            CircleCurve cc2 = (CircleCurve)c2;
+
+            // same radii
+            Assert.AreEqual(1, cc1.Radius, 1e-5f);
+            Assert.AreEqual(1, cc2.Radius, 1e-5f);
+
+            // same direction
+            Assert.AreEqual(CircleCurve.RotationDirection.Forwards, cc1.Rotation);
+            Assert.AreEqual(CircleCurve.RotationDirection.Forwards, cc2.Rotation);
+
+            // joined end-to-end
+            Assert.IsTrue(cc1.StartPos().Equals(cc2.EndPos(), 1e-5f));
+            Assert.IsTrue(cc2.StartPos().Equals(cc1.EndPos(), 1e-5f));
+
+            CircleCurve left = cc1.Position.x < cc2.Position.x ? cc1 : cc2;
+            CircleCurve right = cc1.Position.x > cc2.Position.x ? cc1 : cc2;
+
+            Assert.AreEqual(new Vector2(0, 0), left.Position);
+            Assert.AreEqual(new Vector2(2, 0), right.Position);
+
+            Assert.AreEqual(Math.PI * 2 * 3 / 12, left.StartParam, 1e-5f);
+            Assert.AreEqual(Math.PI * 2 * 15 / 12, left.EndParam, 1e-5f);
+
+            Assert.AreEqual(Math.PI * 2 * 9 / 12, right.StartParam, 1e-5f);
+            Assert.AreEqual(Math.PI * 2 * 21 / 12, right.EndParam, 1e-5f);
+        }
+
+        // osculating circles, one smaller, reversed and inside the other
+        {
+            LoopSet ls1 = new LoopSet();
+            LoopSet ls2 = new LoopSet();
+
+            Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
+            ls1.Add(l1);
+
+            Loop l2 = new Loop(new CircleCurve(new Vector2(0.5f, 0), 0.5f, CircleCurve.RotationDirection.Reverse));
+            ls2.Add(l2);
+
+            LoopSet ret = m_intersector.Union(ls1, ls2, 1e-5f, new ClRand(1));
+
+            Assert.IsNotNull(ret);
+            Assert.AreEqual(1, ret.Count);
+            Assert.AreEqual(2, ret[0].NumCurves());
+            Curve c1 = ret[0].GetCurves()[0];
+            Curve c2 = ret[0].GetCurves()[1];
+            Assert.IsTrue(c1 is CircleCurve);
+            Assert.IsTrue(c2 is CircleCurve);
+
+            CircleCurve cc1 = (CircleCurve)c1;
+            CircleCurve cc2 = (CircleCurve)c2;
+
+            // joined end-to-end
+            Assert.IsTrue(cc1.StartPos().Equals(cc2.EndPos(), 1e-5f));
+            Assert.IsTrue(cc2.StartPos().Equals(cc1.EndPos(), 1e-5f));
+
+            CircleCurve left = cc1.Position.x < cc2.Position.x ? cc1 : cc2;
+            CircleCurve right = cc1.Position.x > cc2.Position.x ? cc1 : cc2;
+
+            // same radii
+            Assert.AreEqual(1, left.Radius, 1e-5f);
+            Assert.AreEqual(0.5, right.Radius, 1e-5f);
+
+            // same direction
+            Assert.AreEqual(CircleCurve.RotationDirection.Forwards, left.Rotation);
+            Assert.AreEqual(CircleCurve.RotationDirection.Reverse, right.Rotation);
+
+            Assert.AreEqual(new Vector2(0, 0), left.Position);
+            Assert.AreEqual(new Vector2(0.5f, 0), right.Position);
+
+            Assert.AreEqual(Math.PI * 2 * 3 / 12, left.StartParam, 1e-5f);
+            Assert.AreEqual(Math.PI * 2 * 15 / 12, left.EndParam, 1e-5f);
+
+            Assert.AreEqual(Math.PI * 2 * 9 / 12, right.StartParam, 1e-5f);
+            Assert.AreEqual(Math.PI * 2 * 21 / 12, right.EndParam, 1e-5f);
+        }
+    }
+
+    [Test]
+    public void TestAnnotatedCurve()
+    {
+        Curve c1 = new CircleCurve(new Vector2(), 1);
+        Curve c2 = new CircleCurve(new Vector2(), 2);
+
+        Intersector.AnnotatedCurve ac1 = new Intersector.AnnotatedCurve(c1, 1);
+        Intersector.AnnotatedCurve ac1b = new Intersector.AnnotatedCurve(c1, 1);
+        Intersector.AnnotatedCurve ac2 = new Intersector.AnnotatedCurve(c2, 1);
+
+        Assert.AreEqual(c1.GetHashCode(), ac1.GetHashCode());
+
+        Assert.IsTrue(ac1.Equals(ac1b));
+        Assert.IsFalse(ac1.Equals(ac2));
+        Assert.IsFalse(ac1.Equals(0));
+    }
 
     //class IntersectorDummy1 extends Intersector
     //{
     //    @Override
-    //      protected boolean extractInternalCurves(floattol, Random random,
-    //                                              HashMap<Curve, AnnotatedCurve> forward_annotations_map, HashSet<Curve> all_curves,
+    //      protected boolean extractInternalCurves(floattol, ClRand ClRand,
+    //                                              Dictionary<Curve, AnnotatedCurve> forward_annotations_map, HashSet<Curve> all_curves,
     //                                              HashSet<AnnotatedCurve> open, HashSet<Vector2> curve_joints, float diameter)
     //{
     //    return false;
@@ -801,13 +801,13 @@ public class IntersectorTest
     //   class IntersectorDummy2 extends Intersector
     //{
     //    @Override
-    //      List<OrderedPair<Curve, Integer>>
+    //      List<OrderedPair<Curve, int>>
     //      tryFindIntersections(
     //            Vector2 mid_point,
     //            HashSet<Curve> all_curves,
     //            HashSet<Vector2> curve_joints,
     //            floatdiameter, floattol,
-    //            Random random)
+    //            ClRand ClRand)
     //      {
     //        return null;
     //    }
@@ -831,13 +831,13 @@ public class IntersectorTest
     //        LoopSet ls2 = new LoopSet();
 
     //        Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
-    //        ls1.add(l1);
+    //        ls1.Add(l1);
 
     //        Intersector i = new IntersectorDummy1();
 
-    //        LoopSet ret = i.union(ls1, ls2, 1e-6, new Random(1));
+    //        LoopSet ret = i.Union(ls1, ls2, 1e-5f, new ClRand(1));
 
-    //        assertNull(ret);
+    //        Assert.IsNull(ret);
     //    }
 
     //    // if tryFindIntersections fails, we bail
@@ -846,16 +846,16 @@ public class IntersectorTest
     //        LoopSet ls2 = new LoopSet();
 
     //        Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
-    //        ls1.add(l1);
+    //        ls1.Add(l1);
 
     //        Loop l2 = new Loop(new CircleCurve(new Vector2(0.5, 0), 1));
-    //        ls2.add(l2);
+    //        ls2.Add(l2);
 
     //        Intersector i = new IntersectorDummy2();
 
-    //        LoopSet ret = i.union(ls1, ls2, 1e-6, new Random(1));
+    //        LoopSet ret = i.Union(ls1, ls2, 1e-5f, new ClRand(1));
 
-    //        assertNull(ret);
+    //        Assert.IsNull(ret);
     //    }
 
     //    // if tryFindIntersections fails, we bail
@@ -864,16 +864,16 @@ public class IntersectorTest
     //        LoopSet ls2 = new LoopSet();
 
     //        Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
-    //        ls1.add(l1);
+    //        ls1.Add(l1);
 
     //        Loop l2 = new Loop(new CircleCurve(new Vector2(0.5, 0), 1));
-    //        ls2.add(l2);
+    //        ls2.Add(l2);
 
     //        Intersector i = new IntersectorDummy3();
 
-    //        LoopSet ret = i.union(ls1, ls2, 1e-6, new Random(1));
+    //        LoopSet ret = i.Union(ls1, ls2, 1e-5f, new ClRand(1));
 
-    //        assertNull(ret);
+    //        Assert.IsNull(ret);
     //    }
     //}
 
@@ -885,26 +885,26 @@ public class IntersectorTest
 
     //    {
     //        HashSet<Vector2> hs = new HashSet<>();
-    //        hs.add(new Vector2(1, 1));
+    //        hs.Add(new Vector2(1, 1));
 
-    //        Assert.IsTrue(m_intersector.lineClearsPoints(lc1, hs, 1e-6));
-    //        assertFalse(m_intersector.lineClearsPoints(lc2, hs, 1e-6));
+    //        Assert.IsTrue(m_intersector.lineClearsPoints(lc1, hs, 1e-5f));
+    //        assertFalse(m_intersector.lineClearsPoints(lc2, hs, 1e-5f));
     //    }
 
     //    {
     //        HashSet<Vector2> hs = new HashSet<>();
-    //        hs.add(new Vector2(0, 0));
+    //        hs.Add(new Vector2(0, 0));
 
-    //        assertFalse(m_intersector.lineClearsPoints(lc1, hs, 1e-6));
-    //        assertFalse(m_intersector.lineClearsPoints(lc2, hs, 1e-6));
+    //        assertFalse(m_intersector.lineClearsPoints(lc1, hs, 1e-5f));
+    //        assertFalse(m_intersector.lineClearsPoints(lc2, hs, 1e-5f));
     //    }
 
     //    {
     //        HashSet<Vector2> hs = new HashSet<>();
-    //        hs.add(new Vector2(2, 0));
+    //        hs.Add(new Vector2(2, 0));
 
-    //        assertFalse(m_intersector.lineClearsPoints(lc1, hs, 1e-6));
-    //        Assert.IsTrue(m_intersector.lineClearsPoints(lc2, hs, 1e-6));
+    //        assertFalse(m_intersector.lineClearsPoints(lc1, hs, 1e-5f));
+    //        Assert.IsTrue(m_intersector.lineClearsPoints(lc2, hs, 1e-5f));
     //    }
     //}
 
@@ -915,18 +915,18 @@ public class IntersectorTest
     ////   {
     ////      LoopSet ls1 = new LoopSet();
     ////
-    ////      Random r = new Random(1);
+    ////      ClRand r = new ClRand(1);
     ////
     ////      for(int i = 0; i < 1000; i++)
     ////      {
     ////         LoopSet ls2 = new LoopSet();
     ////
     ////         Loop l2 = new Loop(new CircleCurve(new XY(r.nextfloat(), r.nextfloat()), .1));
-    ////         ls2.add(l2);
+    ////         ls2.Add(l2);
     ////
     ////         // try to make sure we have some lines hit some points
     ////         // (to his that return false in lineClearsPoints)
-    ////         ls1 = m_intersector.union(ls1, ls2, 1e-2, r);
+    ////         ls1 = m_intersector.Union(ls1, ls2, 1e-2, r);
     ////
     ////         Assert.IsNotNull(ls1);
     ////      }
@@ -948,8 +948,8 @@ public class IntersectorTest
     ////      engine.brep.Curve circle = new engine.brep.CircleCurve(new engine.XY(340.5690029832473, -103.41524432252388), 10.0,
     ////            0.0, Math.PI * 2, engine.brep.CircleCurve.RotationDirection.Forwards);
     ////
-    ////      List<engine.brep.Curve> alc1 = new List<>();
-    ////      alc1.add(circle);
+    ////      List<engine.brep.Curve> alc1 = new List<Curve>();
+    ////      alc1.Add(circle);
     ////
     ////      engine.brep.Curve l1 = new engine.brep.LineCurve(new engine.XY(345.5653898846735, -112.07758337910997),
     ////            new engine.XY(-0.8662339056586087, -0.49963869014261947),
@@ -965,11 +965,11 @@ public class IntersectorTest
     ////            0, 20);
     ////
     ////      List alc2 = new List();
-    ////      alc2.add(l1);
-    ////      alc2.add(l2);
-    ////      alc2.add(l3);
-    ////      alc2.add(l4);
+    ////      alc2.Add(l1);
+    ////      alc2.Add(l2);
+    ////      alc2.Add(l3);
+    ////      alc2.Add(l4);
     ////
-    ////      engine.brep.Intersector.splitCurvesAtIntersections(alc1, alc2, 1e-6);
+    ////      engine.brep.Intersector.splitCurvesAtIntersections(alc1, alc2, 1e-5f);
     ////   }
 }

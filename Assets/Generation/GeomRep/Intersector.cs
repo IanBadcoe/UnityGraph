@@ -44,7 +44,7 @@ namespace Assets.Generation.GeomRep
         }
 
         // only non-private for unit-testing
-        class Splice
+        public class Splice
         {
             public readonly AnnotatedCurve Loop1Out;
             public readonly AnnotatedCurve Loop2Out;
@@ -241,7 +241,7 @@ namespace Assets.Generation.GeomRep
                 List<Tuple<Curve, int>> intervals = TryFindIntersections(mid_point, all_curves, curve_joints,
                                                                          diameter, tol, random);
 
-                // failure, don't really expect this has have had multiple tries and it
+                // failure, don't really expect this as have had multiple tries and it
                 // shouldn't be so hard to find a good cutting line
                 if (intervals == null)
                     return false;
@@ -411,12 +411,12 @@ namespace Assets.Generation.GeomRep
         }
 
         // non-private for unit-testing only
-        List<Tuple<Curve, int>>
-        TryFindIntersections(Vector2 mid_point,
-                             HashSet<Curve> all_curves,
-                             HashSet<Vector2> curve_joints,
-                             float diameter, float tol,
-                             ClRand random)
+        public List<Tuple<Curve, int>> TryFindIntersections(
+            Vector2 mid_point,
+            HashSet<Curve> all_curves,
+            HashSet<Vector2> curve_joints,
+            float diameter, float tol,
+            ClRand random)
         {
             for (int i = 0; i < 25; i++)
             {
@@ -469,9 +469,9 @@ namespace Assets.Generation.GeomRep
         // the crossing number is implicitly zero before the first intersection
         //
         // non-private only for unit-testing
-        List<Tuple<Curve, int>>
-        TryFindCurveIntersections(LineCurve lc,
-                                  HashSet<Curve> all_curves)
+        public List<Tuple<Curve, int>> TryFindCurveIntersections(
+            LineCurve lc,
+            HashSet<Curve> all_curves)
         {
             HashSet<Tuple<Curve, float, float>> intersecting_curves = new HashSet<Tuple<Curve, float, float>>();
 
@@ -523,7 +523,7 @@ namespace Assets.Generation.GeomRep
             return ret;
         }
 
-        void FindSplices(IList<Curve> working_loop1, IList<Curve> working_loop2,
+        public void FindSplices(IList<Curve> working_loop1, IList<Curve> working_loop2,
                          Dictionary<Curve, AnnotatedCurve> forward_annotations_map,
                          Dictionary<Curve, Splice> endSpliceMap,
                          float tol)
