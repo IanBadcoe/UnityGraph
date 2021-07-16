@@ -3,7 +3,7 @@ using Assets.Generation.IoC;
 using Assets.Generation.Stepping;
 using UnityEngine;
 
-namespace Assets.Generation
+namespace Assets.Generation.Gen
 {
     internal class EdgeAdjusterStepperFactory : IAdjusterFactory
     {

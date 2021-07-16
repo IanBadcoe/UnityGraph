@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace Assets.Generation
+namespace Assets.Generation.Gen
 {
     [System.Serializable]
     public class GeneratorConfig

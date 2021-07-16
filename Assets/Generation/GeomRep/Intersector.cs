@@ -225,9 +225,11 @@ namespace Assets.Generation.GeomRep
             return ret;
         }
 
-        bool ExtractInternalCurves(float tol, ClRand random,
-                                   Dictionary<Curve, AnnotatedCurve> forward_annotations_map, HashSet<Curve> all_curves,
-                                   HashSet<AnnotatedCurve> open, HashSet<Vector2> curve_joints, float diameter)
+        // public and virtual only for unit-tests
+        virtual public bool ExtractInternalCurves(
+            float tol, ClRand random,
+            Dictionary<Curve, AnnotatedCurve> forward_annotations_map, HashSet<Curve> all_curves,
+            HashSet<AnnotatedCurve> open, HashSet<Vector2> curve_joints, float diameter)
         {
             foreach (Curve c in all_curves)
             {
@@ -410,8 +412,8 @@ namespace Assets.Generation.GeomRep
             }
         }
 
-        // non-private for unit-testing only
-        public List<Tuple<Curve, int>> TryFindIntersections(
+        // virtual and non-private for unit-testing only
+        virtual public List<Tuple<Curve, int>> TryFindIntersections(
             Vector2 mid_point,
             HashSet<Curve> all_curves,
             HashSet<Vector2> curve_joints,
@@ -448,8 +450,8 @@ namespace Assets.Generation.GeomRep
             return null;
         }
 
-        // public for testing
-        public bool LineClearsPoints(LineCurve lc, HashSet<Vector2> curve_joints, float tol)
+        // virtual and public for testing
+        virtual public bool LineClearsPoints(LineCurve lc, HashSet<Vector2> curve_joints, float tol)
         {
             foreach (Vector2 pnt in curve_joints)
             {

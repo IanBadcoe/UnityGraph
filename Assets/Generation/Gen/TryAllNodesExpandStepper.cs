@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Assets.Generation
+namespace Assets.Generation.Gen
 {
     internal class TryAllNodesExpandStepperFactory : IAllNodesExpanderFactory
     {

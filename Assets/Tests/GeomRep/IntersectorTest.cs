@@ -17,11 +17,11 @@ public class IntersectorTest
 {
     private readonly Intersector m_intersector = new Intersector();
     
-    class Fake : Curve
+    class FakeCurve : Curve
     {
         public readonly String Name;
         
-        public Fake(String name)
+        public FakeCurve(String name)
             : base(0, 1)
         {
             Name = name;
@@ -85,11 +85,11 @@ public class IntersectorTest
     {
         List<Curve> curves = new List<Curve>();
 
-        Curve ca = new Fake("a");
-        Curve cb = new Fake("b");
-        Curve cc = new Fake("c");
-        Curve cd = new Fake("d");
-        Curve ce = new Fake("e");
+        Curve ca = new FakeCurve("a");
+        Curve cb = new FakeCurve("b");
+        Curve cc = new FakeCurve("c");
+        Curve cd = new FakeCurve("d");
+        Curve ce = new FakeCurve("e");
 
         curves.Add(ca);
         curves.Add(cb);
@@ -787,126 +787,123 @@ public class IntersectorTest
         Assert.IsFalse(ac1.Equals(0));
     }
 
-    //class IntersectorDummy1 extends Intersector
-    //{
-    //    @Override
-    //      protected boolean extractInternalCurves(floattol, ClRand ClRand,
-    //                                              Dictionary<Curve, AnnotatedCurve> forward_annotations_map, HashSet<Curve> all_curves,
-    //                                              HashSet<AnnotatedCurve> open, HashSet<Vector2> curve_joints, float diameter)
-    //{
-    //    return false;
-    //}
-    //   }
+    class IntersectorDummy1 : Intersector
+    {
+        public override bool ExtractInternalCurves(
+            float tol, ClRand ClRand,
+            Dictionary<Curve, AnnotatedCurve> forward_annotations_map, HashSet<Curve> all_curves,
+            HashSet<AnnotatedCurve> open, HashSet<Vector2> curve_joints, float diameter)
+        {
+            return false;
+        }
+    }
 
-    //   class IntersectorDummy2 extends Intersector
-    //{
-    //    @Override
-    //      List<OrderedPair<Curve, int>>
-    //      tryFindIntersections(
-    //            Vector2 mid_point,
-    //            HashSet<Curve> all_curves,
-    //            HashSet<Vector2> curve_joints,
-    //            floatdiameter, floattol,
-    //            ClRand ClRand)
-    //      {
-    //        return null;
-    //    }
-    //}
+    class IntersectorDummy2 : Intersector
+    {
+        public override List<Tuple<Curve, int>> TryFindIntersections(
+            Vector2 mid_point,
+            HashSet<Curve> all_curves,
+            HashSet<Vector2> curve_joints,
+            float diameter, float tol,
+            ClRand ClRand)
+        {
+            return null;
+        }
+    }
 
-    //class IntersectorDummy3 extends Intersector
-    //{
-    //    @Override
-    //      public boolean lineClearsPoints(LineCurve lc, HashSet<Vector2> curve_joints, floattol)
-    //{
-    //    return false;
-    //}
-    //   }
+    class IntersectorDummy3 : Intersector
+    {
+        public override bool LineClearsPoints(LineCurve lc, HashSet<Vector2> curve_joints, float tol)
+        {
+            return false;
+        }
+    }
 
-    //   [Test]
-    //   public void testUnion_Errors()
-    //{
-    //    // if extractInternalCurves fails, we bail...
-    //    {
-    //        LoopSet ls1 = new LoopSet();
-    //        LoopSet ls2 = new LoopSet();
+    [Test]
+    public void TestUnion_Errors()
+    {
+        // if extractInternalCurves fails, we bail...
+        {
+            LoopSet ls1 = new LoopSet();
+            LoopSet ls2 = new LoopSet();
 
-    //        Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
-    //        ls1.Add(l1);
+            Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
+            ls1.Add(l1);
 
-    //        Intersector i = new IntersectorDummy1();
+            Intersector i = new IntersectorDummy1();
 
-    //        LoopSet ret = i.Union(ls1, ls2, 1e-5f, new ClRand(1));
+            LoopSet ret = i.Union(ls1, ls2, 1e-5f, new ClRand(1));
 
-    //        Assert.IsNull(ret);
-    //    }
+            Assert.IsNull(ret);
+        }
 
-    //    // if tryFindIntersections fails, we bail
-    //    {
-    //        LoopSet ls1 = new LoopSet();
-    //        LoopSet ls2 = new LoopSet();
+        // if tryFindIntersections fails, we bail
+        {
+            LoopSet ls1 = new LoopSet();
+            LoopSet ls2 = new LoopSet();
 
-    //        Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
-    //        ls1.Add(l1);
+            Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
+            ls1.Add(l1);
 
-    //        Loop l2 = new Loop(new CircleCurve(new Vector2(0.5, 0), 1));
-    //        ls2.Add(l2);
+            Loop l2 = new Loop(new CircleCurve(new Vector2(0.5f, 0), 1));
+            ls2.Add(l2);
 
-    //        Intersector i = new IntersectorDummy2();
+            Intersector i = new IntersectorDummy2();
 
-    //        LoopSet ret = i.Union(ls1, ls2, 1e-5f, new ClRand(1));
+            LoopSet ret = i.Union(ls1, ls2, 1e-5f, new ClRand(1));
 
-    //        Assert.IsNull(ret);
-    //    }
+            Assert.IsNull(ret);
+        }
 
-    //    // if tryFindIntersections fails, we bail
-    //    {
-    //        LoopSet ls1 = new LoopSet();
-    //        LoopSet ls2 = new LoopSet();
+        // if tryFindIntersections fails, we bail
+        {
+            LoopSet ls1 = new LoopSet();
+            LoopSet ls2 = new LoopSet();
 
-    //        Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
-    //        ls1.Add(l1);
+            Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
+            ls1.Add(l1);
 
-    //        Loop l2 = new Loop(new CircleCurve(new Vector2(0.5, 0), 1));
-    //        ls2.Add(l2);
+            Loop l2 = new Loop(new CircleCurve(new Vector2(0.5f, 0), 1));
+            ls2.Add(l2);
 
-    //        Intersector i = new IntersectorDummy3();
+            Intersector i = new IntersectorDummy3();
 
-    //        LoopSet ret = i.Union(ls1, ls2, 1e-5f, new ClRand(1));
+            LoopSet ret = i.Union(ls1, ls2, 1e-5f, new ClRand(1));
 
-    //        Assert.IsNull(ret);
-    //    }
-    //}
+            Assert.IsNull(ret);
+        }
+    }
 
-    //[Test]
-    //   public void testLineClearsPoints()
-    //{
-    //    LineCurve lc1 = new LineCurve(new Vector2(), new Vector2(1, 0), 10);
-    //    LineCurve lc2 = new LineCurve(new Vector2(), new Vector2(1 / Math.sqrt(2), 1 / Math.sqrt(2)), 10);
+    [Test]
+    public void TestLineClearsPoints()
+    {
+        LineCurve lc1 = new LineCurve(new Vector2(), new Vector2(1, 0), 10);
+        LineCurve lc2 = new LineCurve(new Vector2(), new Vector2(1 / Mathf.Sqrt(2), 1 / Mathf.Sqrt(2)), 10);
 
-    //    {
-    //        HashSet<Vector2> hs = new HashSet<>();
-    //        hs.Add(new Vector2(1, 1));
+        {
+            HashSet<Vector2> hs = new HashSet<Vector2>();
+            hs.Add(new Vector2(1, 1));
 
-    //        Assert.IsTrue(m_intersector.lineClearsPoints(lc1, hs, 1e-5f));
-    //        assertFalse(m_intersector.lineClearsPoints(lc2, hs, 1e-5f));
-    //    }
+            Assert.IsTrue(m_intersector.LineClearsPoints(lc1, hs, 1e-5f));
+            Assert.IsFalse(m_intersector.LineClearsPoints(lc2, hs, 1e-5f));
+        }
 
-    //    {
-    //        HashSet<Vector2> hs = new HashSet<>();
-    //        hs.Add(new Vector2(0, 0));
+        {
+            HashSet<Vector2> hs = new HashSet<Vector2>();
+            hs.Add(new Vector2(0, 0));
 
-    //        assertFalse(m_intersector.lineClearsPoints(lc1, hs, 1e-5f));
-    //        assertFalse(m_intersector.lineClearsPoints(lc2, hs, 1e-5f));
-    //    }
+            Assert.IsFalse(m_intersector.LineClearsPoints(lc1, hs, 1e-5f));
+            Assert.IsFalse(m_intersector.LineClearsPoints(lc2, hs, 1e-5f));
+        }
 
-    //    {
-    //        HashSet<Vector2> hs = new HashSet<>();
-    //        hs.Add(new Vector2(2, 0));
+        {
+            HashSet<Vector2> hs = new HashSet<Vector2>();
+            hs.Add(new Vector2(2, 0));
 
-    //        assertFalse(m_intersector.lineClearsPoints(lc1, hs, 1e-5f));
-    //        Assert.IsTrue(m_intersector.lineClearsPoints(lc2, hs, 1e-5f));
-    //    }
-    //}
+            Assert.IsFalse(m_intersector.LineClearsPoints(lc1, hs, 1e-5f));
+            Assert.IsTrue(m_intersector.LineClearsPoints(lc2, hs, 1e-5f));
+        }
+    }
 
     //// This one asserts because it somehow tries to make a discontinuous loop
     //// but, pragmatically, I don't need this test yet
@@ -925,7 +922,7 @@ public class IntersectorTest
     ////         ls2.Add(l2);
     ////
     ////         // try to make sure we have some lines hit some points
-    ////         // (to his that return false in lineClearsPoints)
+    ////         // (to his that return false in LineClearsPoints)
     ////         ls1 = m_intersector.Union(ls1, ls2, 1e-2, r);
     ////
     ////         Assert.IsNotNull(ls1);

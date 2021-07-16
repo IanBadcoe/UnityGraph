@@ -5,7 +5,7 @@ using Assets.Generation.Templates;
 using System;
 using System.Collections.Generic;
 
-namespace Assets.Generation
+namespace Assets.Generation.Gen
 {
     internal class TryTemplateExpandStepperFactory : INodeTemplateExpanderFactory
     {

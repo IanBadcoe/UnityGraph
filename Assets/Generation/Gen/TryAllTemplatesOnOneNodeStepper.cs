@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Assets.Generation.U;
 
-namespace Assets.Generation
+namespace Assets.Generation.Gen
 {
     internal class TryAllTemplatesOnOneNodeStepperFactory : INodeExpanderFactory
     {

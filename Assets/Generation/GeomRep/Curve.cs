@@ -29,11 +29,11 @@ namespace Assets.Generation.GeomRep
 
         protected abstract Vector2 ComputePos_Inner(float param);
 
-        public float? FindParamForPoint(Vector2 pnt, float tol)
+        public float? FindParamForPoint(Vector2 pnt, float param_tol, float coord_tol)
         {
-            float? ret = FindParamForPoint_Inner(pnt, tol);
+            float? ret = FindParamForPoint_Inner(pnt, param_tol);
 
-            Assertion.Assert(!ret.HasValue || (ComputePos(ret.Value) - pnt).magnitude < tol);
+            Assertion.Assert(!ret.HasValue || (ComputePos(ret.Value) - pnt).magnitude < coord_tol);
 
             return ret;
         }

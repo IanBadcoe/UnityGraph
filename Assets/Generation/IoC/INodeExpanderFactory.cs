@@ -3,6 +3,7 @@ using Assets.Generation.Stepping;
 using System.Collections.ObjectModel;
 using Assets.Generation.Templates;
 using System.Collections.Generic;
+using Assets.Generation.Gen;
 
 namespace Assets.Generation.IoC
 {

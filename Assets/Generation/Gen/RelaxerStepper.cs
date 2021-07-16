@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.Generation
+namespace Assets.Generation.Gen
 {
     internal class RelaxerStepperFactory : IRelaxerFactory
     {

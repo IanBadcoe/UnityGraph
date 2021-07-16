@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace Assets.Generation
+namespace Assets.Generation.Gen
 {
     public class Generator : MonoBehaviour
     {
@@ -21,6 +21,8 @@ namespace Assets.Generation
         private IoCContainer m_ioc_container;
 
         private UnionHelper m_union_helper;
+
+//        private Level Level;
 
         public enum Phase
         {
