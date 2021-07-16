@@ -1,4 +1,5 @@
 using Assets.Generation.G;
+using Assets.Generation.Gen.Drawing;
 using Assets.Generation.GeomRep;
 using Assets.Generation.IoC;
 using Assets.Generation.Stepping;
@@ -14,6 +15,7 @@ namespace Assets.Generation.Gen
     public class Generator : MonoBehaviour
     {
         public GeneratorConfig Config;
+        public InProgressDrawerUpdater IPDrawer;
 
         // need a better way of making and setting these, but while we only have one...
         private TemplateStore Templates = new TemplateStore1();
@@ -22,7 +24,6 @@ namespace Assets.Generation.Gen
 
         private UnionHelper m_union_helper;
 
-//        private Level Level;
 
         public enum Phase
         {
@@ -36,7 +37,7 @@ namespace Assets.Generation.Gen
 
         private Phase m_phase = Phase.Init;
 
-        private Graph m_graph;
+        public Graph Graph { get; private set; }
 
         private StepperController m_expander;
         private StepperController m_final_relaxer;
@@ -69,7 +70,7 @@ namespace Assets.Generation.Gen
                 ret = Step();
 
                 // take before complete so we can draw it...
-                //m_level = m_generator.getLevel();
+                IPDrawer.UpdateGeometry(this);
 
                 if (ret == null || ret.Complete)
                 {
@@ -114,18 +115,18 @@ namespace Assets.Generation.Gen
 
         private StepperController.StatusReport InitStep()
         {
-            m_graph = MakeSeed();
+            Graph = MakeSeed();
 
-            m_expander = new StepperController(m_graph,
-                  new ExpandToSizeStepper(m_ioc_container, m_graph, m_reqSize, Templates,
+            m_expander = new StepperController(Graph,
+                  new ExpandToSizeStepper(m_ioc_container, Graph, m_reqSize, Templates,
                         Config));
 
             GeneratorConfig temp = GeneratorConfig.ShallowCopy(Config);
             temp.RelaxationForceTarget /= 5;
             temp.RelaxationMoveTarget /= 5;
 
-            m_final_relaxer = new StepperController(m_graph,
-                  new RelaxerStepper(m_ioc_container, m_graph, temp));
+            m_final_relaxer = new StepperController(Graph,
+                  new RelaxerStepper(m_ioc_container, Graph, temp));
 
             m_phase = Phase.GraphExpand;
 
@@ -183,7 +184,7 @@ namespace Assets.Generation.Gen
         {
             m_union_helper = new UnionHelper();
 
-            m_union_helper.GenerateGeometry(m_graph);
+            m_union_helper.GenerateGeometry(Graph);
 
             m_phase = Phase.Union;
 
