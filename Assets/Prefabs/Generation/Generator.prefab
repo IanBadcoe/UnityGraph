@@ -56,7 +56,6 @@ MonoBehaviour:
     ExpandStepsToRun: 1000
     CellSize: 20
     WallFacetLength: 10
-  IPDrawer: {fileID: 5915779746768243298}
 --- !u!114 &5915779746768243298
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71,3 +70,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CircleDrawerTemplate: {fileID: 3984474223022568685, guid: 17c8f939b1f40e549b66005bf96c9a6d, type: 3}
   RectangleDrawerTemplate: {fileID: 3984474223022568685, guid: 7297d11495d5a9d45af61fbb8b7e53b3, type: 3}
+  Generator: {fileID: 8874595389178911298}
