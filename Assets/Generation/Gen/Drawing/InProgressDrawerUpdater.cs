@@ -17,10 +17,23 @@ namespace Assets.Generation.Gen.Drawing
         Dictionary<object, GameObject> AllDrawers = new Dictionary<object, GameObject>();
 
         Camera Camera;
+        // ideally we would abstract drawing away into some base class that Generator would implement
+        // but all the nodes and edges would need to be appropriately based-classed as well (nodes have INode but that
+        // is for the reverse purpose, of abstracting the non-positional properties, and probably has drifted away from that
+        // by now, anyway...)
+        public Generator Generator;
 
         private void Awake()
         {
             Camera = Transform.FindObjectOfType<Camera>();
+        }
+
+        private void Update()
+        {
+            if (Generator)
+            {
+                UpdateGeometry(Generator);
+            }
         }
 
         internal void UpdateGeometry(Generator generator)

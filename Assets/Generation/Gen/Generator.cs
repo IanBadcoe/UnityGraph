@@ -15,7 +15,6 @@ namespace Assets.Generation.Gen
     public class Generator : MonoBehaviour
     {
         public GeneratorConfig Config;
-        public InProgressDrawerUpdater IPDrawer;
 
         // need a better way of making and setting these, but while we only have one...
         private TemplateStore Templates = new TemplateStore1();
@@ -68,9 +67,6 @@ namespace Assets.Generation.Gen
                 StepperController.StatusReport ret;
 
                 ret = Step();
-
-                // take before complete so we can draw it...
-                IPDrawer.UpdateGeometry(this);
 
                 if (ret == null || ret.Complete)
                 {
