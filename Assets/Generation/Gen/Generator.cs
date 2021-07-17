@@ -57,7 +57,7 @@ namespace Assets.Generation.Gen
                 new DefaultLayoutFactory()
             );
 
-            m_reqSize = 5;
+            m_reqSize = 20;
         }
 
         private void Update()
@@ -230,9 +230,9 @@ namespace Assets.Generation.Gen
             INode expander = ret.AddNode("engine.StepperController", "e", "Seed", 55f);
             INode end = ret.AddNode("End", ">", "Seed", 55f);
 
-            start.Position = new Vector2(-100, 0);
+            start.Position = new Vector2(0, -100);
             expander.Position = new Vector2(0, 0);
-            end.Position = new Vector2(0, 100);
+            end.Position = new Vector2(100, 0);
 
             ret.Connect(start, expander, 90, 110, 10);
             ret.Connect(expander, end, 90, 110, 10);

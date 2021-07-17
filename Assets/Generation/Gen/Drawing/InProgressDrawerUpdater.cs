@@ -81,7 +81,12 @@ namespace Assets.Generation.Gen.Drawing
             }
 
             Area bounds = generator.Graph.Bounds();
-            Camera.transform.position = bounds.Centre() + new Vector3(0, 0, -200);
+            Camera.transform.position = bounds.Centre() + new Vector3(0, 0, -300);
+
+            float aspect_ratio = (float)Screen.width / (float)Screen.height;
+            float req_size = Mathf.Max(bounds.Diagonal.y, bounds.Diagonal.x / aspect_ratio);
+
+            Camera.orthographicSize = req_size / 2;
 
             AllDrawers = n_dict;
         }

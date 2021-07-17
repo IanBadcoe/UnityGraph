@@ -173,23 +173,16 @@ namespace Assets.Generation.G
 
         public Area Bounds()
         {
-            if (m_nodes.Count == 0)
-                return Area.Empty;
+            Area ret = Area.Empty;
 
-            List<INode> nodes = GetAllNodes();
-            Vector2 min = nodes[0].Position;
-            Vector2 max = nodes[0].Position;
-
-            foreach (INode n in nodes)
+            foreach (INode n in m_nodes)
             {
                 Vector2 rad_box = new Vector2(n.Radius, n.Radius);
 
-                // extend by node radius
-                min = Vector2.Min(min, n.Position - rad_box);
-                max = Vector2.Max(max, n.Position + rad_box);
+                ret = ret.Union(new Area(n.Position - rad_box, n.Position + rad_box));
             }
 
-            return new Area(min, max - min);
+            return ret;
         }
 
         public IGraphRestore CreateRestorePoint()
