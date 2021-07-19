@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -101,8 +102,9 @@ namespace Assets.Generation.U
             return new Tuple<Vector2, Vector2?>(p1, p2);
         }
 
-        public static float atan2(Vector2 vec)
+        public static float Atan2(Vector2 vec)
         {
+            // Unity call these y and x, in tat order, but they have zero at 3 o'clock where I have it at 12 0'clock
             return Mathf.Atan2(vec.x, vec.y);
         }
 
@@ -126,14 +128,82 @@ namespace Assets.Generation.U
             return diff <= tol || diff >= Mathf.PI * 2 - tol;
         }
 
-        //    // d1 is the unit direction vector for the reference line
-        //    // d2 is the unit direction vector for the line whose angle we're measuring
-        //    static float relativeAngle(Vector2 d1, Vector2 d2)
-        //    {
-        //        float rel_y = d1.dot(d2);
-        //        float rel_x = d1.rot90().dot(d2);
+        public static T RemoveRandom<T>(ClRand random, List<T> col)
+        {
+            int which = (int)(random.Nextfloat() * col.Count);
 
-        //        return fixupAngle(Mathf.atan2(rel_x, rel_y));
-        //    }
+            var ret = col[which];
+            col.RemoveAt(which);
+
+            return ret;
+        }
+
+        public class NEDRet
+        {
+            public readonly float Dist;
+            public readonly Vector2 Target;  // point of closest approach of Node to Edge
+            public readonly Vector2 Direction;  // direction from Node to Target
+
+            public NEDRet(float dist,
+                   Vector2 target,
+                   Vector2 direction)
+            {
+                Dist = dist;
+                Target = target;
+                Direction = direction;
+            }
+        }
+
+        // specialised version returning extra data for use in force calculations
+        // force calculation cannot  handle zero distances so returns null for that
+        public static NEDRet NodeEdgeDistDetailed(Vector2 n,
+                                                  Vector2 es,
+                                                  Vector2 ee)
+        {
+            // direction and length of edge
+            Vector2 de = ee - es;
+
+            float le = de.magnitude;
+            // don't expect to see and hope other forces will pull the ends apart
+            if (le == 0.0f)
+                return null;
+
+            de = de / le;
+
+            // line from n to edge start
+            Vector2 dnes = n - es;
+
+            // project that line onto the edge direction
+            float proj = de.Dot(dnes);
+
+            Vector2 t;
+            if (proj < 0)
+            {
+                // closest approach before edge start
+                t = es;
+            }
+            else if (proj < le)
+            {
+                // closest approach between edges
+                t = es + de * proj;
+            }
+            else
+            {
+                // closest approach beyond edge end
+                t = ee;
+            }
+
+            Vector2 d = t - n;
+
+            float l = d.magnitude;
+
+            // don't expect to see and hope other forces will pull the edge and node apart
+            if (l == 0)
+                return null;
+
+            d = d / l;
+
+            return new NEDRet(l, t, d);
+        }
     }
 }

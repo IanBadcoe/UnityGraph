@@ -108,8 +108,7 @@ namespace Assets.Generation.GeomRep
         if (Mathf.Abs(relative.magnitude - Radius) > tol)
             return null;
 
-        // Unity call these y and x, in tat order, but they have zero at 3 o'clock where I have it at 12 0'clock
-        float ang = Mathf.Atan2(relative.x, relative.y);
+        float ang = Util.Atan2(relative);
 
         if (Rotation == RotationDirection.Reverse)
         {

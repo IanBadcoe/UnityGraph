@@ -188,10 +188,10 @@ namespace Assets.Generation.Gen
 
             d = d / l;
 
-            Vector2 fd = LevelUtil.UnitEdgeForce(l, dmin, dmax);
+            ForceReturn fd = UnitEdgeForce(l, dmin, dmax);
 
-            float ratio = fd.x;
-            float force = fd.y * m_config.EdgeLengthForceScale;
+            float ratio = fd.Ratio;
+            float force = fd.Force * m_config.EdgeLengthForceScale;
 
             Vector2 f = d * force;
             nStart.Force += f;
@@ -223,13 +223,13 @@ namespace Assets.Generation.Gen
 
             d = d / l;
 
-            Vector2 fd = LevelUtil.UnitNodeForce(l, adjusted_radius);
+            ForceReturn fd = UnitNodeForce(l, adjusted_radius);
 
-            float ratio = fd.x;
+            float ratio = fd.Ratio;
 
             if (ratio != 0)
             {
-                float force = fd.y * m_config.NodeToNodeForceScale;
+                float force = fd.Force * m_config.NodeToNodeForceScale;
 
                 Vector2 f = d * force;
                 node1.Force += f;
@@ -247,7 +247,7 @@ namespace Assets.Generation.Gen
 
         private float AddNodeEdgeForces(DirectedEdge e, INode n)
         {
-            LevelUtil.NEDRet vals = LevelUtil.nodeEdgeDistDetailed(n.Position, e.Start.Position, e.End.Position);
+            Util.NEDRet vals = Util.NodeEdgeDistDetailed(n.Position, e.Start.Position, e.End.Position);
 
             if (vals == null)
                 return 1.0f;
@@ -275,6 +275,81 @@ namespace Assets.Generation.Gen
             e.End.Force += f;
 
             return ratio;
+        }
+
+        struct ForceReturn
+        {
+            public ForceReturn(float ratio, float force)
+            {
+                Ratio = ratio;
+                Force = force;
+            }
+
+            public readonly float Force;
+            public readonly float Ratio;
+        }
+
+        /**
+         * Calculate the force and distortion of an edge constrained to be between dmin and dmax in length.
+         *
+         * @param l    the current length of the edge
+         * @param dmin the minimum permitted length of the edge
+         * @param dmax the maximum permitted length of the edge
+         * @return a pair of floats, the first is the fractional distortion of the edge.  If between dmin and dmax this
+         * is 1.0 (no distortion) if shorter than dmin this is l as a fraction of dmin (< 1.0) and if
+         * if longer than dmax then this is l as a fraction of dmax )e.g. > 1.0)
+         * <p>
+         * The second float is the force.  The sign of the force is that -ve is repulsive (happens when too close)
+         * and vice versa.
+         */
+        ForceReturn UnitEdgeForce(float l, float dmin, float dmax)
+        {
+            float ratio;
+
+            // between min and max there is no force and we always return 1.0
+            if (l < dmin)
+            {
+                ratio = l / dmin;
+            }
+            else if (l > dmax)
+            {
+                ratio = l / dmax;
+            }
+            else
+            {
+                ratio = 1.0f;
+            }
+
+            float force = (ratio - 1);
+
+            return new ForceReturn(ratio, force);
+        }
+
+        /**
+         * Calculate force and distance ratio of two circular nodes
+         * @param l node separation
+         * @param summed_radii ideal minimum separation
+         * @return a pair of floats, the first is a fractional measure of how much too close the nodes are,
+         * zero if they are more than their summed_radii apart.
+         * <p>
+         * The second float is the force.  The sign of the force is that -ve is repulsive (happens when too close)
+         * the are no attractive forces for nodes so the force is never > 0.
+         */
+        ForceReturn UnitNodeForce(float l, float summed_radii)
+        {
+            float ratio = l / summed_radii;
+
+            // no attractive forces
+            if (ratio > 1)
+            {
+                return new ForceReturn(0.0f, 0.0f);
+            }
+
+            float force = (ratio - 1);
+
+            // at the moment the relationship between force and overlap is trivial
+            // but will keep the two return values in case the force develops a squared term or something...
+            return new ForceReturn(-force, force);
         }
     }
 }
