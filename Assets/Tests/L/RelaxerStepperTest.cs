@@ -1,16 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
+using Assets.Generation.G;
+using Assets.Generation.Gen;
+using Assets.Generation.Stepping;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.TestTools;
-using Assets.Generation.G;
-using System;
-using Assets.Generation.U;
-using Assets.Generation.G.GLInterfaces;
-using Assets.Generation.Templates;
-using Assets.Generation;
-using Assets.Generation.Stepping;
-using Assets.Generation.Gen;
 
 public class RelaxerStepperTest
 {

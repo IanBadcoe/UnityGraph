@@ -49,7 +49,7 @@ namespace Assets.Generation.Gen
             //UnityEngine.Assertion.Assert.raiseExceptions = true;
 
             m_ioc_container = new IoCContainer(
-                new RelaxerStepperFactory(),
+                new RelaxerStepper_CGFactory(),
                 new TryAllNodesExpandStepperFactory(),
                 new TryAllTemplatesOnOneNodeStepperFactory(),
                 new TryTemplateExpandStepperFactory(),
@@ -122,7 +122,7 @@ namespace Assets.Generation.Gen
             temp.RelaxationMoveTarget /= 5;
 
             m_final_relaxer = new StepperController(Graph,
-                  new RelaxerStepper(m_ioc_container, Graph, temp));
+                  new RelaxerStepper_CG(m_ioc_container, Graph, temp));
 
             m_phase = Phase.GraphExpand;
 
