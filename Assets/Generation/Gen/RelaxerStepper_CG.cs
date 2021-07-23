@@ -4,6 +4,7 @@ using Assets.Generation.Stepping;
 using Assets.Generation.U;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 //using UnityEngine;
 
@@ -27,7 +28,8 @@ namespace Assets.Generation.Gen
 
         private List<INode> m_nodes;
         private List<DirectedEdge> m_edges;
-        private double[] pars;
+        private double[] m_pars;
+        private Dictionary<INode, int> m_node2pars_idx = new Dictionary<INode, int>();
 
         // whichever is smaller out of the summed-radii and the
         // shortest path through the graph between two nodes
@@ -38,6 +40,22 @@ namespace Assets.Generation.Gen
         private ShortestPathFinder m_node_dists;
 
         private int m_energy_count = 0;
+
+        public enum TerminationCondition
+        {
+            InfOrNanError,
+            GradientVerificationError,
+            FunctionLimitReached,
+            ParameterStepLimitReached,
+            GradientLimitReached,
+            MaxIterationsReached,
+            StoppingConditionsTooStringent,         // not clear what this means, *reduce* limits?
+            Cancelled,
+
+            ERROR_UNKNOWN_CODE
+        }
+
+        public TerminationCondition Status { get; private set; }
 
         public RelaxerStepper_CG(IoCContainer ioc_container, Graph g, GeneratorConfig c)
         {
@@ -65,20 +83,24 @@ namespace Assets.Generation.Gen
 
             int num_pars = m_nodes.Count * 2;
 
-            pars = new double[num_pars];
+            m_pars = new double[num_pars];
 
             int p_num = 0;
 
             foreach(var n in m_nodes)
             {
-                pars[p_num + 0] = n.Position.x;
-                pars[p_num + 1] = n.Position.y;
+                m_node2pars_idx[n] = p_num;
+
+                m_pars[p_num + 0] = n.Position.x;
+                m_pars[p_num + 1] = n.Position.y;
 
                 p_num += 2;
             }
 
-            alglib.mincgcreatef(pars, 1e-6, out opt_state);
-            alglib.mincgsetcond(opt_state, 0.001, 0, 0.01, 0);
+            alglib.mincgcreatef(m_pars, 1e-4, out opt_state);
+            alglib.mincgsuggeststep(opt_state, 1);
+            alglib.mincgsetcond(opt_state, 0, 0, 1e-12, 0);
+            alglib.mincgsetxrep(opt_state, true);
 
 #if DEBUG
             alglib.mincgoptguardsmoothness(opt_state);
@@ -89,17 +111,51 @@ namespace Assets.Generation.Gen
         {
             SetUp();
 
-            m_energy_count = 0;
+            int crossings = GraphUtil.FindCrossingEdges(m_edges).Count;
 
-            alglib.mincgoptimize(opt_state, EnergyFunc, null, null);
+            if (crossings > 0)
+            {
+                return new StepperController.StatusReportInner(StepperController.Status.StepOutFailure,
+                      null, "Generated crossing edges during relaxation.");
+            }
+
+            alglib.mincgoptimize(opt_state, EnergyFunc, ReportFunc, null);
+
+            alglib.mincgreport report;
+            alglib.mincgresults(opt_state, out m_pars, out report);
+
+            Status = IntToTC(report.terminationtype); 
+            Assertion.Assert(Status != TerminationCondition.InfOrNanError);
+            Assertion.Assert(Status != TerminationCondition.GradientVerificationError);
+            // the problem with this one is I have no idea what it means
+            Assertion.Assert(Status != TerminationCondition.StoppingConditionsTooStringent);
+            // we did not set them
+            Assertion.Assert(Status != TerminationCondition.MaxIterationsReached);
+
+            m_energy_count = report.nfev;
+
+#if DEBUG
+            alglib.optguardreport ogrep;
+            alglib.mincgoptguardresults(opt_state, out ogrep);
+
+            System.Diagnostics.Debug.WriteLine($"c0: {!ogrep.nonc0suspected} c1: {!ogrep.nonc1suspected}");
+#endif
 
             int p_num = 0;
 
             foreach (var n in m_nodes)
             {
-                n.Position = new Vector2((float)pars[p_num + 0], (float)pars[p_num + 1]);
+                n.Position = new Vector2((float)m_pars[p_num + 0], (float)m_pars[p_num + 1]);
 
                 p_num += 2;
+            }
+
+            crossings = GraphUtil.FindCrossingEdges(m_edges).Count;
+
+            if (crossings > 0)
+            {
+                return new StepperController.StatusReportInner(StepperController.Status.StepOutFailure,
+                      null, "Generated crossing edges during relaxation.");
             }
 
             return new StepperController.StatusReportInner(StepperController.Status.StepOutSuccess,
@@ -115,11 +171,32 @@ namespace Assets.Generation.Gen
                   );
         }
 
+        static double prev = 0;
+        static double[] prev_pars;
+        void ReportFunc(double[] pars, double func, object o)
+        {
+            double diff = func - prev;
+            prev = func;
+
+            double dist = 0;
+            if (prev_pars != null)
+            {
+                dist = pars.Zip(prev_pars, ValueTuple.Create).Aggregate(0.0, (x, y) => x + (y.Item1 - y.Item2) * (y.Item1 - y.Item2));
+                dist = Math.Sqrt(dist);
+            }
+
+            prev_pars = pars.ToArray();
+
+            System.Diagnostics.Debug.WriteLine($"F: {func} delta: {diff} dist: {dist}");
+        }
+
         void EnergyFunc(double[] pars, ref double func, object o)
         {
-            m_energy_count++;
-
             func = 0;
+
+            double nn_func = 0;
+            double e_func = 0;
+            double ne_func = 0;
 
             for (int i = 0; i < m_nodes.Count - 1; i++)
             {
@@ -131,37 +208,155 @@ namespace Assets.Generation.Gen
                     var n2 = m_nodes[j];
                     Vector2D n2pos = new Vector2D(pars[j * 2], pars[j * 2 + 1]);
 
-                    double dist2 = (n1pos - n2pos).SqrMagnitude;
+                    double dist = (n1pos - n2pos).Magnitude;
 
-                    func += NodeNodeEnergy(dist2, m_node_dists.GetDist(n1, n2));
+                    float adjusted_radius =
+                        Mathf.Min(
+                            m_node_dists.GetDist(n1, n2),
+                            n1.Radius + n2.Radius + m_config.RelaxationMinimumSeparation);
+
+                    nn_func += NodeNodeEnergy(dist, adjusted_radius);
                 }
             }
+
+            foreach(var edge in m_edges)
+            {
+                int start_p_idx = m_node2pars_idx[edge.Start];
+                int end_p_idx = m_node2pars_idx[edge.End];
+
+                Vector2D start_pos = new Vector2D(pars[start_p_idx], pars[start_p_idx + 1]);
+                Vector2D end_pos = new Vector2D(pars[end_p_idx], pars[end_p_idx + 1]);
+
+                double dist = (start_pos - end_pos).Magnitude;
+
+                e_func += EdgeEnergy(dist, edge.MinLength, edge.MaxLength);
+            }
+
+            foreach (var edge in m_edges)
+            {
+                int start_p_idx = m_node2pars_idx[edge.Start];
+                int end_p_idx = m_node2pars_idx[edge.End];
+
+                Vector2D start_pos = new Vector2D(pars[start_p_idx], pars[start_p_idx + 1]);
+                Vector2D end_pos = new Vector2D(pars[end_p_idx], pars[end_p_idx + 1]);
+
+                for (int i = 0; i < m_nodes.Count; i++)
+                {
+                    var n1 = m_nodes[i];
+                    Vector2D n1pos = new Vector2D(pars[i * 2], pars[i * 2 + 1]);
+
+                    if (!edge.Connects(n1))
+                    {
+                        double dist = Util.NodeEdgeDist(n1pos, start_pos, end_pos);
+
+                        double summed_radii =
+                            Math.Min(m_node_dists.GetDist(edge.Start, n1),
+                                     m_node_dists.GetDist(edge.End, n1));
+
+                        double effective_radius =
+                            Math.Min(summed_radii,
+                                     n1.Radius + edge.HalfWidth) + m_config.RelaxationMinimumSeparation;
+
+                        ne_func += NodeEdgeEnergy(dist, effective_radius);
+                    }
+                }
+            }
+            
+            func =
+                nn_func * m_config.NodeToNodeForceScale
+                + e_func * m_config.EdgeLengthForceScale
+                + ne_func * m_config.EdgeToNodeForceScale;
         }
 
-        static double NodeNodeEnergy(double d2, double d0)
+        double NodeNodeEnergy(double d, double d_min)
         {
+            // outside the minimum is zero penulty
+            // zero d_min implies anything goes
+            if (d_min == 0 || d >= d_min)
+            {
+                return 0;
+            }
             // dividing by d0 scales this to the desired radius
+            // (the alternative, of using (d0 - d)^2 also works, but pulls flatter and flatter bits of curve into the area around
+            // d = 0 as r increases, which might make highly-compressed nodes to stable)
+            //double ratio = d / d0;
 
-            double ratio = d2 / (d0 * d0);
-
-            // going to try an equation 1 / (1 + N.Ratio^P)
-            // this gives a curve which is a sigmoid
-            // the higher P, the steeper the rise
-            // the value at 1 (e.g. at D0) is 1/N
-            //
-            // so, for example, with N = 1 and P = 16, we have a very steep rise
-            // centred on d0 (e.g. = 0.5 at D0)
-            //
-            // or with N = 9 and P = 8 we have a somewhat shallower rise, which is down to 1.0
-            // by the time we hit D0
-            //
-            // both of these are trying for my objective which is having little force outside
-            // D0, e.g. as much a step as possible...
-
-            const int N = 9;
-            const int P = 8;
-
-            return 1 / (1 + N * Math.Pow(ratio, P / 2)); 
+            // the 2's here scale the maximum (at d == 0) to 1, because we are only using half the curve
+            // (-ve d being impossible) and at zero it would have only reached 0.5 w/o these
+            return (d_min - d) * (d_min - d);
+            //return 2 - 2 / (1 + (1 - ratio) * (1 - ratio)); 
         }
-   }
+
+        double EdgeEnergy(double d, double d_min, double d_max)
+        {
+            Assertion.Assert(d_min <= d_max);
+
+            // very similar to node-node energy except the equation is
+            // piecewise to allow for the allowed length range
+
+            if (d >= d_min && d <= d_max)
+                return 0;
+
+            // below min we are the left of a squared rectangular hyperbola
+            // the 5 here just pull more of the curve above x = 0, because obvs. we'll never see d < 0
+            if (d < d_min)
+                return (d_min - d) * (d_min - d);
+            //return 1 - 1 / (1 + 5 * Math.Pow(d_min - d, 2));
+
+            // below min we are the right of one
+            return (d_max - d) * (d_max - d);
+            //return 1 - 1 / (1 + Math.Pow(d_max - d, 2));
+        }
+
+        double NodeEdgeEnergy(double d, double d_min)
+        {
+            // outside the minimum attracts no penulty
+            // d_min of zero turns this off completely (at least in unit-tests, may never happen elsewhere)
+            if (d >= d_min)
+            {
+                return 0;
+            }
+
+            // for the moment same form as node<->node energy
+
+            // see comments on NodeNodeEnergy above for explanation
+
+            //return 2 - 2 / (1 + (1 - ratio) * (1 - ratio));
+            return (d_min - d) * (d_min - d);
+        }
+
+        TerminationCondition IntToTC(int code)
+        {
+            switch(code)
+            {
+                case -8:
+                    return TerminationCondition.InfOrNanError;
+
+                case -7:
+                    return TerminationCondition.GradientVerificationError;
+
+                case 1:
+                    return TerminationCondition.FunctionLimitReached;
+
+                case 2:
+                    return TerminationCondition.ParameterStepLimitReached;
+
+                case 4:
+                    return TerminationCondition.GradientLimitReached;
+
+                case 5:
+                    return TerminationCondition.MaxIterationsReached;
+
+                case 7:
+                    return TerminationCondition.StoppingConditionsTooStringent;
+
+                case 8:
+                    return TerminationCondition.Cancelled;
+            }
+
+            Assertion.Assert(false);
+
+            return TerminationCondition.ERROR_UNKNOWN_CODE;
+        } 
+    }
 }

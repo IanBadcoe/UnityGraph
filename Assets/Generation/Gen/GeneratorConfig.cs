@@ -40,8 +40,8 @@ namespace Assets.Generation.Gen
         // ---------------------------------------------------------
         // steps to run at once during expansion or final relaxation
         // (just makes fewer calls to engine.LevelGenerator.step as relaxation takes thousands of steps to complete)
-
-        public int ExpandStepsToRun = 1000;
+        // CG relaxation uses far fewer steps
+        //public int ExpandStepsToRun = 1;
 
         // ------------------------------
         // settings for the created level

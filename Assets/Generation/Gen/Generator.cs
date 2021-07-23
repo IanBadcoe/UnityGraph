@@ -36,7 +36,10 @@ namespace Assets.Generation.Gen
 
         private Phase m_phase = Phase.Init;
 
-        public Graph Graph { get; private set; }
+        public Graph Graph {
+            get;
+            private set;
+        }
 
         private StepperController m_expander;
         private StepperController m_final_relaxer;
@@ -136,19 +139,16 @@ namespace Assets.Generation.Gen
         {
             StepperController.StatusReport ret = null;
 
-            for (int i = 0; i < Config.ExpandStepsToRun; i++)
+            ret = m_expander.Step();
+
+            if (ret.Complete)
             {
-                ret = m_expander.Step();
+                m_phase = Phase.FinalRelax;
 
-                if (ret.Complete)
-                {
-                    m_phase = Phase.FinalRelax;
-
-                    return new StepperController.StatusReport(
-                          StepperController.Status.Iterate,
-                          ret.Log,
-                          false);
-                }
+                return new StepperController.StatusReport(
+                        StepperController.Status.Iterate,
+                        ret.Log,
+                        false);
             }
 
             return ret;
@@ -158,19 +158,16 @@ namespace Assets.Generation.Gen
         {
             StepperController.StatusReport ret = null;
 
-            for (int i = 0; i < Config.ExpandStepsToRun; i++)
+            ret = m_final_relaxer.Step();
+
+            if (ret.Complete)
             {
-                ret = m_final_relaxer.Step();
+                m_phase = Phase.BaseGeometry;
 
-                if (ret.Complete)
-                {
-                    m_phase = Phase.BaseGeometry;
-
-                    return new StepperController.StatusReport(
-                          StepperController.Status.Iterate,
-                          ret.Log,
-                          false);
-                }
+                return new StepperController.StatusReport(
+                        StepperController.Status.Iterate,
+                        ret.Log,
+                        false);
             }
 
             return ret;

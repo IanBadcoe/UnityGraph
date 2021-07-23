@@ -158,7 +158,8 @@ namespace Assets.Generation.U
         // force calculation cannot  handle zero distances so returns null for that
         public static NEDRet NodeEdgeDistDetailed(Vector2 n,
                                                   Vector2 es,
-                                                  Vector2 ee)
+                                                  Vector2 ee,
+                                                  bool allow_zero_dist = false)
         {
             // direction and length of edge
             Vector2 de = ee - es;
@@ -198,12 +199,58 @@ namespace Assets.Generation.U
             float l = d.magnitude;
 
             // don't expect to see and hope other forces will pull the edge and node apart
-            if (l == 0)
+            if (!allow_zero_dist && l == 0)
                 return null;
 
             d = d / l;
 
             return new NEDRet(l, t, d);
+        }
+
+        // this version for RelaxerStepper_CG
+        // we can return 0 dist as it handles that
+        public static double NodeEdgeDist(Vector2D n,
+                                          Vector2D es,
+                                          Vector2D ee)
+        {
+            // direction and length of edge
+            Vector2D de = ee - es;
+
+            double le = de.Magnitude;
+
+            // if the edge is zero length, then the distance
+            // is just the distance from either end
+            if (le == 0.0f)
+                return (es - n).Magnitude;
+
+            de = de / le;
+
+            // line from n to edge start
+            Vector2D dnes = n - es;
+
+            // project that line onto the edge direction
+            double proj = de.Dot(dnes);
+
+            Vector2D t;
+            if (proj < 0)
+            {
+                // closest approach before edge start
+                t = es;
+            }
+            else if (proj < le)
+            {
+                // closest approach between edges
+                t = es + de * proj;
+            }
+            else
+            {
+                // closest approach beyond edge end
+                t = ee;
+            }
+
+            Vector2D d = t - n;
+
+            return d.Magnitude;
         }
     }
 }

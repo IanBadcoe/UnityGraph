@@ -42,6 +42,10 @@ namespace Assets.Generation.U
         {
             dists = new Dictionary<Tuple<INode, INode>, float>();
             
+            // could fill the whole matrix with summed radii (or zero for the diagonal)
+            // except that we'd need to add in the minimum separation and if we ever get >1 value for that
+            // it would be a pain, so ATM easier to consider only paths here and min those with radii + minimum separation
+            // at point of use
             foreach (INode n in g.GetAllNodes())
             {
                 SetDist(n, n, 0);

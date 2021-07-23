@@ -210,9 +210,10 @@ namespace Assets.Generation.Gen
         private float AddNodeForces(INode node1, INode node2)
         {
             Vector2 d = node2.Position - node1.Position;
-            float adjusted_radius = Mathf.Min(m_node_dists.GetDist(node1, node2),
-                  node1.Radius + node2.Radius + m_config.RelaxationMinimumSeparation);
-
+            float adjusted_radius =
+                Mathf.Min(
+                    m_node_dists.GetDist(node1, node2),
+                    node1.Radius + node2.Radius + m_config.RelaxationMinimumSeparation);
 
             float l = d.magnitude;
 
@@ -252,17 +253,19 @@ namespace Assets.Generation.Gen
             if (vals == null)
                 return 1.0f;
 
-            float summed_radii =
+            // our minimum separation is radius1 + radius2 + minimum_separation
+            // except where there is a shorter path through the edges
+            float effective_summed_radii =
                 Mathf.Min(m_node_dists.GetDist(e.Start, n),
                           Mathf.Min(m_node_dists.GetDist(e.End, n),
-                                    n.Radius + e.HalfWidth) + m_config.RelaxationMinimumSeparation);
+                                    n.Radius + e.HalfWidth + m_config.RelaxationMinimumSeparation));
 
-            if (vals.Dist > summed_radii)
+            if (vals.Dist > effective_summed_radii)
             {
                 return 1.0f;
             }
 
-            float ratio = vals.Dist / summed_radii;
+            float ratio = vals.Dist / effective_summed_radii;
 
             float force = (ratio - 1) * m_config.EdgeToNodeForceScale;
 

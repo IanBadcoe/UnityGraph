@@ -38,6 +38,9 @@ namespace Assets.Generation.Gen.Drawing
 
         internal void UpdateGeometry(Generator generator)
         {
+            if (generator.Graph == null)
+                return;
+
             Dictionary<object, GameObject> n_dict = new Dictionary<object, GameObject>();
 
             foreach(INode node in generator.Graph.GetAllNodes())
