@@ -44,9 +44,9 @@ public class IntersectorTest
             return ReferenceEquals(this, o);
         }
 
-        protected override float? FindParamForPoint_Inner(Vector2 first, float tol)
+        protected override float FindParamForPoint_Inner(Vector2 first)
         {
-            return null;
+            return -100;
         }
 
         public override Curve CloneWithChangedParams(float start, float end)
@@ -258,8 +258,7 @@ public class IntersectorTest
 
         m_intersector.FindSplices(curves1, curves2,
               forward_annotations_map,
-              endSpliceMap,
-              1e-5f);
+              endSpliceMap);
 
         // two splices, with two in and two out curves each
         Assert.AreEqual(4, endSpliceMap.Count);

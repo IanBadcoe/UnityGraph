@@ -23,7 +23,7 @@ namespace Assets.Generation.Gen
         private readonly IoCContainer ioc_container;
         private readonly Graph m_graph;
         private readonly GeneratorConfig m_config;
-
+        private readonly int MaxIterationsPerStep = 10;
         alglib.mincgstate opt_state;
 
         private List<INode> m_nodes;
@@ -40,6 +40,7 @@ namespace Assets.Generation.Gen
         private ShortestPathFinder m_node_dists;
 
         private int m_energy_count = 0;
+        private int m_iterations = 0;
 
         public enum TerminationCondition
         {
@@ -99,7 +100,7 @@ namespace Assets.Generation.Gen
 
             alglib.mincgcreatef(m_pars, 1e-4, out opt_state);
             alglib.mincgsuggeststep(opt_state, 1);
-            alglib.mincgsetcond(opt_state, 0, 0, 1e-12, 0);
+            alglib.mincgsetcond(opt_state, 0, 0, 1e-12, MaxIterationsPerStep);
             alglib.mincgsetxrep(opt_state, true);
 
 #if DEBUG
@@ -109,14 +110,17 @@ namespace Assets.Generation.Gen
 
         public StepperController.StatusReportInner Step(StepperController.Status status)
         {
-            SetUp();
-
-            int crossings = GraphUtil.FindCrossingEdges(m_edges).Count;
-
-            if (crossings > 0)
+            if (!m_IsSetup)
             {
-                return new StepperController.StatusReportInner(StepperController.Status.StepOutFailure,
-                      null, "Generated crossing edges during relaxation.");
+                SetUp();
+
+                m_IsSetup = true;
+
+                if (GraphUtil.AnyCrossingEdges(m_edges))
+                {
+                    return new StepperController.StatusReportInner(StepperController.Status.StepOutFailure,
+                          null, "Generated crossing edges during relaxation.");
+                }
             }
 
             alglib.mincgoptimize(opt_state, EnergyFunc, ReportFunc, null);
@@ -129,19 +133,61 @@ namespace Assets.Generation.Gen
             Assertion.Assert(Status != TerminationCondition.GradientVerificationError);
             // the problem with this one is I have no idea what it means
             Assertion.Assert(Status != TerminationCondition.StoppingConditionsTooStringent);
-            // we did not set them
-            Assertion.Assert(Status != TerminationCondition.MaxIterationsReached);
 
-            m_energy_count = report.nfev;
+            m_energy_count += report.nfev;
+            m_iterations += report.iterationscount;
 
 #if DEBUG
             alglib.optguardreport ogrep;
             alglib.mincgoptguardresults(opt_state, out ogrep);
 
+            // I *believe* my energies are c1 continuous (they are piecewise functions of the form
+            // d > d0 : 0
+            //        : (d - d0)^2
+            //
+            // (as at the joint d - d0 = 0 and has a slope of zero, which should match happily???
+            //
+            // but I occasionally see "c1: false" from this, possibly a false alarm...?
+            //
+            // ? possibly only in unit-tests though?
+            //
+            // oh, wait...  it is discontinuous as we pass a separation of zero
+            // well that is probably OK as practically, we never want to be anywhere near that
             System.Diagnostics.Debug.WriteLine($"c0: {!ogrep.nonc0suspected} c1: {!ogrep.nonc1suspected}");
 #endif
 
             int p_num = 0;
+
+            if (GraphUtil.AnyCrossingEdges(m_edges))
+            {
+                return new StepperController.StatusReportInner(StepperController.Status.StepOutFailure,
+                      null, "Generated crossing edges during relaxation.");
+            }
+
+            TerminationCondition[] convergence_conditions =
+                new TerminationCondition[] {
+                    TerminationCondition.FunctionLimitReached,
+                    TerminationCondition.GradientLimitReached,
+                    TerminationCondition.ParameterStepLimitReached
+                };
+
+            if (Status == TerminationCondition.MaxIterationsReached)
+            {
+                return new StepperController.StatusReportInner(StepperController.Status.Iterate,
+                  null,
+                  "Not yet converged");
+            }
+            else if (!convergence_conditions.Contains(Status))
+            {
+                // we only expect max-iter or one of the limits (dF, gradient, dX) as termination conditions
+                
+                // not yet clear whether we ever expect this, let's try to bring them to my attention for the moment...
+                Assertion.Assert(false);
+
+                return new StepperController.StatusReportInner(StepperController.Status.StepOutFailure,
+                  null,
+                  $"CG-optimiser unexpected status: {Status}");
+            }
 
             foreach (var n in m_nodes)
             {
@@ -150,17 +196,9 @@ namespace Assets.Generation.Gen
                 p_num += 2;
             }
 
-            crossings = GraphUtil.FindCrossingEdges(m_edges).Count;
-
-            if (crossings > 0)
-            {
-                return new StepperController.StatusReportInner(StepperController.Status.StepOutFailure,
-                      null, "Generated crossing edges during relaxation.");
-            }
-
             return new StepperController.StatusReportInner(StepperController.Status.StepOutSuccess,
                   null,
-                  ""
+                  $"Relaxation converged in {m_iterations} ({m_energy_count} function evaluations)"
                   //" move:" + maxd +
                   //" time step:" + step +
                   //" force:" + maxf +
@@ -173,6 +211,8 @@ namespace Assets.Generation.Gen
 
         static double prev = 0;
         static double[] prev_pars;
+        private bool m_IsSetup = false;
+
         void ReportFunc(double[] pars, double func, object o)
         {
             double diff = func - prev;

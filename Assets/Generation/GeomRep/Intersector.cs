@@ -115,12 +115,20 @@ namespace Assets.Generation.GeomRep
             RemoveEasyLoops(working_loops1, ret, bound_map2.Values, bound_map1);
             RemoveEasyLoops(working_loops2, ret, bound_map1.Values, bound_map2);
 
+            HashSet<Tuple<int, int>> splittings = new HashSet<Tuple<int, int>>();
+
             // split all curves that intersect
-            foreach (var alc1 in working_loops1.Values)
+            foreach (int i in working_loops1.Keys)
             {
-                foreach (var alc2 in working_loops2.Values)
+                var alc1 = working_loops1[i];
+                foreach (int j in working_loops2.Keys)
                 {
-                    SplitCurvesAtIntersections(alc1, alc2, tol);
+                    var alc2 = working_loops2[j];
+
+                    if (SplitCurvesAtIntersections(alc1, alc2, tol))
+                    {
+                        splittings.Add(new Tuple<int, int>(i, j));
+                    }
 
                     // has a side effect of checking that the loops are still loops
                     //            new engine.brep.Loop(alc1);
@@ -151,15 +159,21 @@ namespace Assets.Generation.GeomRep
 
             Dictionary<Curve, Splice> endSpliceMap = new Dictionary<Curve, Splice>();
 
-            foreach (IList<Curve> alc1 in working_loops1.Values)
+            if (splittings.Count > 0)
             {
-                foreach (IList<Curve> alc2 in working_loops2.Values)
+                foreach (IList<Curve> alc1 in working_loops1.Values)
                 {
-                    FindSplices(alc1, alc2,
-                          forward_annotations_map,
-                          endSpliceMap,
-                          tol);
+                    foreach (IList<Curve> alc2 in working_loops2.Values)
+                    {
+                        FindSplices(alc1, alc2,
+                              forward_annotations_map,
+                              endSpliceMap);
+                    }
                 }
+
+                // these two processes should touch the same set of loop-pairs
+                HashSet<Tuple<int, int>> splicings = new HashSet<Tuple<int, int>>(endSpliceMap.Values.Select(x => new Tuple<int, int>(x.Loop1Out.LoopNumber, x.Loop2Out.LoopNumber)));
+                Assertion.Assert(splittings.Union(splicings).Count() == splittings.Count);
             }
 
             // build a set of all curves and another of all AnnotatedCurves (Open)
@@ -522,13 +536,22 @@ namespace Assets.Generation.GeomRep
                 ret.Add(new Tuple<Curve, int>(entry.Item1, crossings));
             }
 
+            if (ret.Count % 2 != 0)
+            {
+                // topologically, (e.g. if we have eliminated brushing-contacts and any weirdness with a line stabbing the
+                // joint between two curves) we should only get even numbers of intersections
+
+                // we try to avoid this happening, but if it does it's just an invalid stab and we can abort it
+                // but put a breakpoint here if we're getting too many failed stabs
+                return null;
+            }
+
             return ret;
         }
 
         public void FindSplices(IList<Curve> working_loop1, IList<Curve> working_loop2,
                          Dictionary<Curve, AnnotatedCurve> forward_annotations_map,
-                         Dictionary<Curve, Splice> endSpliceMap,
-                         float tol)
+                         Dictionary<Curve, Splice> endSpliceMap)
         {
             Curve l1prev = working_loop1.Last();
 
@@ -544,7 +567,9 @@ namespace Assets.Generation.GeomRep
                     Vector2 l2_cur_start_pos = l2curr.StartPos();
                     Assertion.Assert(l2prev.EndPos().Equals(l2_cur_start_pos, 1e-5f));
 
-                    if (l1_cur_start_pos.Equals(l2_cur_start_pos, tol))
+                    Vector2 dist = l1_cur_start_pos - l2_cur_start_pos;
+
+                    if (dist.sqrMagnitude < 1e-6f)
                     {
                         Splice s = new Splice(
                             forward_annotations_map[l1curr],
@@ -565,8 +590,12 @@ namespace Assets.Generation.GeomRep
         }
 
         // non-private only for unit-tests
-        public void SplitCurvesAtIntersections(IList<Curve> working_loop1, IList<Curve> working_loop2, float tol)
+        public bool SplitCurvesAtIntersections(
+            IList<Curve> working_loop1, IList<Curve> working_loop2,
+            float tol)
         {
+            int split_count = 0;
+
             for (int i = 0; i < working_loop1.Count; i++)
             {
                 Curve c1 = working_loop1[i];
@@ -600,6 +629,7 @@ namespace Assets.Generation.GeomRep
                             if (start_dist > tol && end_dist > tol)
                             {
                                 any_splits = true;
+                                split_count++;
 
                                 Curve c1split1 = c1.CloneWithChangedParams(c1.StartParam, split_points.Item1);
                                 Curve c1split2 = c1.CloneWithChangedParams(split_points.Item1, c1.EndParam);
@@ -626,6 +656,7 @@ namespace Assets.Generation.GeomRep
                             if (start_dist > tol && end_dist > tol)
                             {
                                 any_splits = true;
+                                split_count++;
 
                                 Curve c2split1 = c2.CloneWithChangedParams(c2.StartParam, split_points.Item2);
                                 Curve c2split2 = c2.CloneWithChangedParams(split_points.Item2, c2.EndParam);
@@ -640,6 +671,11 @@ namespace Assets.Generation.GeomRep
                     } while (any_splits);
                 }
             }
+
+            // we expect even numbers of crossings
+            Assertion.Assert(split_count % 2 == 0);
+
+            return split_count > 0;
         }
 
         // only non-private for unit-testing

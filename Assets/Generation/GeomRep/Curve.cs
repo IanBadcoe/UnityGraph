@@ -29,16 +29,22 @@ namespace Assets.Generation.GeomRep
 
         protected abstract Vector2 ComputePos_Inner(float param);
 
-        public float? FindParamForPoint(Vector2 pnt, float param_tol, float coord_tol)
+        public float? FindParamForPoint(Vector2 pnt)
         {
-            float? ret = FindParamForPoint_Inner(pnt, param_tol);
+            float ret = FindParamForPoint_Inner(pnt);
 
-            Assertion.Assert(!ret.HasValue || (ComputePos(ret.Value) - pnt).magnitude < coord_tol);
+            if (!WithinParams(ret, 1e-5f))
+                return null;
+
+            // forget why I put this in, but I was getting way-off positions at some point...
+            // so check quite a loose tolerance...
+            Assertion.Assert((ComputePos(ret) - pnt).magnitude < 1e-3f);
 
             return ret;
         }
 
-        protected abstract float? FindParamForPoint_Inner(Vector2 pnt, float tol);
+        // this can return values off the end of our param range, but the caller checks that
+        protected abstract float FindParamForPoint_Inner(Vector2 pnt);
 
         public abstract Curve CloneWithChangedParams(float start, float end);
 

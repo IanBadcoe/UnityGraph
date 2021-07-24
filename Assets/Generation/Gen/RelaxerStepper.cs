@@ -144,9 +144,7 @@ namespace Assets.Generation.Gen
                 ended = maxd < m_config.RelaxationMoveTarget && maxf < m_config.RelaxationForceTarget;
             }
 
-            int crossings = GraphUtil.FindCrossingEdges(m_edges).Count;
-
-            if (crossings > 0)
+            if (GraphUtil.AnyCrossingEdges(m_edges))
             {
                 return new StepperController.StatusReportInner(StepperController.Status.StepOutFailure,
                       null, "Generated crossing edges during relaxation.");

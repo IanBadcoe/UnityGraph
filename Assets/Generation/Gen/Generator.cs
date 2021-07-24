@@ -23,7 +23,6 @@ namespace Assets.Generation.Gen
 
         private UnionHelper m_union_helper;
 
-
         public enum Phase
         {
             Init,

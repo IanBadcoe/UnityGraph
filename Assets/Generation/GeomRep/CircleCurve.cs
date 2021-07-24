@@ -101,12 +101,13 @@ namespace Assets.Generation.GeomRep
               && Rotation == cc_o.Rotation;
     }
 
-    protected override float? FindParamForPoint_Inner(Vector2 pnt, float tol)
+    protected override float FindParamForPoint_Inner(Vector2 pnt)
     {
         Vector2 relative = pnt - Position;
 
-        if (Mathf.Abs(relative.magnitude - Radius) > tol)
-            return null;
+        // in all known usages we _know_ the point is logically on the curve...
+        //if (Mathf.Abs(relative.magnitude - Radius) > tol)
+        //    return null;
 
         float ang = Util.Atan2(relative);
 
@@ -119,9 +120,6 @@ namespace Assets.Generation.GeomRep
         // we use 0 -> 2pi
         // BUT, we also require EndParam > StartParam
         while (ang < StartParam) ang += 2 * Mathf.PI;
-
-        if (!WithinParams(ang, tol))
-            return null;
 
         return ang;
     }

@@ -43,17 +43,14 @@ namespace Assets.Generation.GeomRep
             return Position + Direction * param;
         }
 
-        protected override float? FindParamForPoint_Inner(Vector2 pnt, float tol)
+        protected override float FindParamForPoint_Inner(Vector2 pnt)
         {
             Vector2 relative = pnt - Position;
 
-            if (Mathf.Abs(relative.Dot(Direction.Rot90())) > tol)
-                return null;
+            //if (Mathf.Abs(relative.Dot(Direction.Rot90())) > tol)
+            //    return null;
 
             float par = relative.Dot(Direction);
-
-            if (!WithinParams(par, tol))
-                return null;
 
             return par;
         }

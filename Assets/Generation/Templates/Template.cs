@@ -207,7 +207,7 @@ namespace Assets.Generation.Templates
                 }
             }
 
-            return GraphUtil.FindCrossingEdges(graph.GetAllEdges()).Count == 0;
+            return GraphUtil.AnyCrossingEdges(graph.GetAllEdges());
         }
 
         public static String MakeConnectionName(String from, String to)

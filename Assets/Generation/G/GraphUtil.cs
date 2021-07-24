@@ -35,6 +35,27 @@ namespace Assets.Generation.G
             return ret;
         }
 
+        public static bool AnyCrossingEdges(List<DirectedEdge> edges)
+        {
+            foreach (DirectedEdge e1 in edges)
+            {
+                foreach (DirectedEdge e2 in edges)
+                {
+                    if (e1 == e2)
+                        break;
+
+                    var dep = EdgeIntersect(e1, e2);
+
+                    if (dep != null)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         public static IntersectionResult EdgeIntersect(DirectedEdge edge1, DirectedEdge edge2)
         {
             Assertion.Assert(edge1 != null);
