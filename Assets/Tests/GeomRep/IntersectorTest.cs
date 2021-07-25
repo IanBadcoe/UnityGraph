@@ -468,11 +468,11 @@ public class IntersectorTest
 
     private static void CheckLoop(Loop l, int exp_size)
     {
-        Assert.AreEqual(exp_size, l.NumCurves());
+        Assert.AreEqual(exp_size, l.NumCurves);
 
-        Vector2 prev_end = l.GetCurves()[l.NumCurves() - 1].EndPos();
+        Vector2 prev_end = l.Curves[l.NumCurves - 1].EndPos();
 
-        foreach (Curve c in l.GetCurves())
+        foreach (Curve c in l.Curves)
         {
             Assert.IsTrue(prev_end.Equals(c.StartPos(), 1e-5f));
             prev_end = c.EndPos();
@@ -560,9 +560,9 @@ public class IntersectorTest
 
             Assert.IsNotNull(ret);
             Assert.AreEqual(1, ret.Count);
-            Assert.AreEqual(2, ret[0].NumCurves());
-            Curve c1 = ret[0].GetCurves()[0];
-            Curve c2 = ret[0].GetCurves()[1];
+            Assert.AreEqual(2, ret[0].NumCurves);
+            Curve c1 = ret[0].Curves[0];
+            Curve c2 = ret[0].Curves[1];
             Assert.IsTrue(c1 is CircleCurve);
             Assert.IsTrue(c2 is CircleCurve);
 
@@ -635,9 +635,9 @@ public class IntersectorTest
 
             Assert.IsNotNull(ret);
             Assert.AreEqual(1, ret.Count);
-            Assert.AreEqual(2, ret[0].NumCurves());
-            Curve c1 = ret[0].GetCurves()[0];
-            Curve c2 = ret[0].GetCurves()[1];
+            Assert.AreEqual(2, ret[0].NumCurves);
+            Curve c1 = ret[0].Curves[0];
+            Curve c2 = ret[0].Curves[1];
             Assert.IsTrue(c1 is CircleCurve);
             Assert.IsTrue(c2 is CircleCurve);
 
@@ -685,9 +685,9 @@ public class IntersectorTest
 
             Assert.IsNotNull(ret);
             Assert.AreEqual(1, ret.Count);
-            Assert.AreEqual(2, ret[0].NumCurves());
-            Curve c1 = ret[0].GetCurves()[0];
-            Curve c2 = ret[0].GetCurves()[1];
+            Assert.AreEqual(2, ret[0].NumCurves);
+            Curve c1 = ret[0].Curves[0];
+            Curve c2 = ret[0].Curves[1];
             Assert.IsTrue(c1 is CircleCurve);
             Assert.IsTrue(c2 is CircleCurve);
 
@@ -734,9 +734,9 @@ public class IntersectorTest
 
             Assert.IsNotNull(ret);
             Assert.AreEqual(1, ret.Count);
-            Assert.AreEqual(2, ret[0].NumCurves());
-            Curve c1 = ret[0].GetCurves()[0];
-            Curve c2 = ret[0].GetCurves()[1];
+            Assert.AreEqual(2, ret[0].NumCurves);
+            Curve c1 = ret[0].Curves[0];
+            Curve c2 = ret[0].Curves[1];
             Assert.IsTrue(c1 is CircleCurve);
             Assert.IsTrue(c2 is CircleCurve);
 

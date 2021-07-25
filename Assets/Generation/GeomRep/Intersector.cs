@@ -73,7 +73,7 @@ namespace Assets.Generation.GeomRep
 
             foreach (Loop l in ls1)
             {
-                working_loops1.Add(loop_count, new List<Curve>(l.GetCurves()));
+                working_loops1.Add(loop_count, new List<Curve>(l.Curves));
                 loop_count++;
             }
 
@@ -81,7 +81,7 @@ namespace Assets.Generation.GeomRep
 
             foreach (Loop l in ls2)
             {
-                working_loops2.Add(loop_count, new List<Curve>(l.GetCurves()));
+                working_loops2.Add(loop_count, new List<Curve>(l.Curves));
                 loop_count++;
             }
 

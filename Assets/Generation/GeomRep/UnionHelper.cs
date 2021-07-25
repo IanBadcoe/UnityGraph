@@ -35,14 +35,14 @@ namespace Assets.Generation.GeomRep
             m_detail_loop_sets.Add(ls);
         }
 
-        public IReadOnlyList<Loop> GetBaseLoops()
+        public IReadOnlyList<Loop> BaseLoops
         {
-            return m_base_loops;
+            get => m_base_loops;
         }
 
-        public IReadOnlyList<LoopSet> GetDetailLoopSets()
+        public IReadOnlyList<LoopSet> DetailLoopSets
         {
-            return m_detail_loop_sets;
+            get => m_detail_loop_sets;
         }
 
         // returns true when all complete
@@ -178,9 +178,9 @@ namespace Assets.Generation.GeomRep
         //    return ret;
         //}
 
-        IReadOnlyList<Loop> GetMergedLoops()
+        public IReadOnlyList<Loop> MergedLoops
         {
-            return m_merged_loops;
+            get => m_merged_loops;
         }
     }
 }

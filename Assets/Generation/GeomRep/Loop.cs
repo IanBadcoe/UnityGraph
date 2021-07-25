@@ -57,9 +57,9 @@ namespace Assets.Generation.GeomRep
             m_param_range = range;
         }
 
-        public float paramRange()
+        public float ParamRange
         {
-            return m_param_range;
+            get => m_param_range;
         }
 
         public Vector2? ComputePos(float p)
@@ -89,14 +89,14 @@ namespace Assets.Generation.GeomRep
             return null;
         }
 
-        public int NumCurves()
+        public int NumCurves
         {
-            return m_curves.Count;
+            get => m_curves.Count;
         }
 
-        public ReadOnlyCollection<Curve> GetCurves()
+        public ReadOnlyCollection<Curve> Curves
         {
-            return new ReadOnlyCollection<Curve>(m_curves);
+            get => new ReadOnlyCollection<Curve>(m_curves);
         }
 
         public override int GetHashCode()
@@ -125,10 +125,10 @@ namespace Assets.Generation.GeomRep
 
             Loop loop_o = (Loop)o;
 
-            if (NumCurves() != loop_o.NumCurves())
+            if (NumCurves != loop_o.NumCurves)
                 return false;
 
-            for (int i = 0; i < NumCurves(); i++)
+            for (int i = 0; i < NumCurves; i++)
             {
                 if (!m_curves[i].Equals(loop_o.m_curves[i]))
                     return false;
@@ -137,9 +137,9 @@ namespace Assets.Generation.GeomRep
             return true;
         }
 
-        List<Vector2> Facet(float max_length)
+        public Vector3[] Facet(float max_length)
         {
-            List<Vector2> ret = new List<Vector2>();
+            List<Vector3> temp = new List<Vector3>();
 
             foreach(Curve c in m_curves)
             {
@@ -152,13 +152,13 @@ namespace Assets.Generation.GeomRep
 
                 while(p < c.ParamRange())
                 {
-                    ret.Add(c.ComputePos(start_p + p));
+                    temp.Add(c.ComputePos(start_p + p));
 
                     p += param_step;
                 }
             }
 
-            return ret;
+            return temp.ToArray();
         }
 
         public List<Tuple<Vector2, Vector2>> FacetWithNormals(float max_length)

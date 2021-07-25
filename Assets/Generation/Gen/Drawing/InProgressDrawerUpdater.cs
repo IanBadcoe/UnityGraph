@@ -11,7 +11,7 @@ namespace Assets.Generation.Gen.Drawing
 {
     public class InProgressDrawerUpdater : MonoBehaviour
     {
-        public GameObject CircleDrawerTemplate;
+        public GameObject CircleDrawerTemplate; 
         public GameObject RectangleDrawerTemplate;
 
         Dictionary<object, GameObject> AllDrawers = new Dictionary<object, GameObject>();
@@ -53,7 +53,7 @@ namespace Assets.Generation.Gen.Drawing
                 }
                 else
                 {
-                    CircleDrawer cd = GameObject.Instantiate(CircleDrawerTemplate).GetComponent<CircleDrawer>();
+                    CircleDrawer cd = GameObject.Instantiate(CircleDrawerTemplate, transform).GetComponent<CircleDrawer>();
                     cd.Node = node;
                     n_dict[node] = cd.gameObject;
                 }
@@ -69,7 +69,7 @@ namespace Assets.Generation.Gen.Drawing
                 }
                 else
                 {
-                    RectangleDrawer rd = GameObject.Instantiate(RectangleDrawerTemplate).GetComponent<RectangleDrawer>();
+                    RectangleDrawer rd = GameObject.Instantiate(RectangleDrawerTemplate, transform).GetComponent<RectangleDrawer>();
                     rd.Edge = de;
                     n_dict[de] = rd.gameObject;
                 }

@@ -16,12 +16,12 @@ namespace Assets.Generation.Gen
     {
         public GeneratorConfig Config;
 
+        public UnionHelper UnionHelper { get; private set; }
+
         // need a better way of making and setting these, but while we only have one...
         private TemplateStore Templates = new TemplateStore1();
 
         private IoCContainer m_ioc_container;
-
-        private UnionHelper m_union_helper;
 
         public enum Phase
         {
@@ -39,6 +39,7 @@ namespace Assets.Generation.Gen
             get;
             private set;
         }
+        public bool Pause { get; set; }
 
         private StepperController m_expander;
         private StepperController m_final_relaxer;
@@ -64,6 +65,11 @@ namespace Assets.Generation.Gen
 
         private void Update()
         {
+            if (Pause)
+            {
+                return;
+            }
+
             if (!m_complete)
             {
                 StepperController.StatusReport ret;
@@ -174,9 +180,9 @@ namespace Assets.Generation.Gen
 
         private StepperController.StatusReport BaseGeometryStep()
         {
-            m_union_helper = new UnionHelper();
+            UnionHelper = new UnionHelper();
 
-            m_union_helper.GenerateGeometry(Graph);
+            UnionHelper.GenerateGeometry(Graph);
 
             m_phase = Phase.Union;
 
@@ -188,7 +194,7 @@ namespace Assets.Generation.Gen
 
         private StepperController.StatusReport UnionStep()
         {
-            bool done = m_union_helper.UnionOne(Config.Rand());
+            bool done = UnionHelper.UnionOne(Config.Rand());
 
             if (done)
             {
@@ -210,7 +216,7 @@ namespace Assets.Generation.Gen
         {
 //            m_level = m_union_helper.makeLevel(m_config.CellSize, m_config.WallFacetLength);
 
-            m_union_helper = null;
+            UnionHelper = null;
 
             return new StepperController.StatusReport(
                     StepperController.Status.StepOutSuccess,
