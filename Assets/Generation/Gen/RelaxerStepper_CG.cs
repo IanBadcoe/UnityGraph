@@ -124,6 +124,9 @@ namespace Assets.Generation.Gen
 
             alglib.mincgreport report;
             alglib.mincgresults(opt_state, out m_pars, out report);
+            // optimiser seems restart from the original pars, unless we explicitly tell it to restart from
+            // it's current end position
+            alglib.mincgrestartfrom(opt_state, m_pars);
 
             Status = IntToTC(report.terminationtype); 
             Assertion.Assert(Status != TerminationCondition.InfOrNanError);
