@@ -116,11 +116,8 @@ namespace Assets.Generation.Gen
 
                 m_IsSetup = true;
 
-                if (GraphUtil.AnyCrossingEdges(m_edges))
-                {
-                    return new StepperController.StatusReportInner(StepperController.Status.StepOutFailure,
-                          null, "Generated crossing edges during relaxation.");
-                }
+                // should not come in with crossing edges
+                Assertion.Assert(!GraphUtil.AnyCrossingEdges(m_edges));
             }
 
             alglib.mincgoptimize(opt_state, EnergyFunc, ReportFunc, null);
@@ -168,19 +165,14 @@ namespace Assets.Generation.Gen
                 new TerminationCondition[] {
                     TerminationCondition.FunctionLimitReached,
                     TerminationCondition.GradientLimitReached,
-                    TerminationCondition.ParameterStepLimitReached
+                    TerminationCondition.ParameterStepLimitReached,
+                    TerminationCondition.MaxIterationsReached
                 };
 
-            if (Status == TerminationCondition.MaxIterationsReached)
-            {
-                return new StepperController.StatusReportInner(StepperController.Status.Iterate,
-                  null,
-                  "Not yet converged");
-            }
-            else if (!convergence_conditions.Contains(Status))
+            if (!convergence_conditions.Contains(Status))
             {
                 // we only expect max-iter or one of the limits (dF, gradient, dX) as termination conditions
-                
+
                 // not yet clear whether we ever expect this, let's try to bring them to my attention for the moment...
                 Assertion.Assert(false);
 
@@ -189,11 +181,19 @@ namespace Assets.Generation.Gen
                   $"CG-optimiser unexpected status: {Status}");
             }
 
+            // do this even for intermediate states, to allow display
             foreach (var n in m_nodes)
             {
                 n.Position = new Vector2((float)m_pars[p_num + 0], (float)m_pars[p_num + 1]);
 
                 p_num += 2;
+            }
+
+            if (Status == TerminationCondition.MaxIterationsReached)
+            {
+                return new StepperController.StatusReportInner(StepperController.Status.Iterate,
+                  null,
+                  "Not yet converged");
             }
 
             return new StepperController.StatusReportInner(StepperController.Status.StepOutSuccess,

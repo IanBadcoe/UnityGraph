@@ -4,6 +4,7 @@ using Assets.Generation.Stepping;
 using Assets.Generation.Templates;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,9 +40,13 @@ namespace Assets.Generation.Gen
                 case StepperController.Status.StepOutSuccess:
                     if (m_graph.NumNodes() >= m_required_size)
                     {
+                        Debug.WriteLine($"Completing expansion steps, current size: {m_graph.NumNodes()}, reached target: {m_required_size}");
+
                         return new StepperController.StatusReportInner(StepperController.Status.StepOutSuccess,
                                 null, "Target size reached");
                     }
+
+                    Debug.WriteLine($"Starting expand step, current size: {m_graph.NumNodes()}, target: {m_required_size}");
 
                     IStepper child = m_ioc_container.AllNodesExpanderFactory.MakeAllNodesExpander(
                             m_ioc_container, m_graph, m_templates, m_config);
