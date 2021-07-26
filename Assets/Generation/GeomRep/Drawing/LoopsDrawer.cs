@@ -40,7 +40,9 @@ namespace Assets.Generation.GeomRep.Drawing
 
             foreach (Loop loop in RendererMap.Keys)
             {
-                if (Generator?.UnionHelper?.MergedLoops == null
+                if (Generator == null
+                    || Generator.UnionHelper == null
+                    || Generator.UnionHelper.MergedLoops == null
                     || !Generator.UnionHelper.MergedLoops.Contains(loop))
                 {
                     GameObject.Destroy(RendererMap[loop]);
