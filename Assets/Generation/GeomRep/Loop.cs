@@ -23,8 +23,8 @@ namespace Assets.Generation.GeomRep
 
             m_param_range = c.EndParam - c.StartParam;
 
-            Vector2 s = c.StartPos();
-            Vector2 e = c.EndPos();
+            Vector2 s = c.StartPos;
+            Vector2 e = c.EndPos;
 
             if (!s.Equals(e, 1e-4f))
             {
@@ -44,8 +44,8 @@ namespace Assets.Generation.GeomRep
             {
                 range += curr.EndParam - curr.StartParam;
 
-                Vector2 c_start = curr.StartPos();
-                Vector2 p_end = prev.EndPos();
+                Vector2 c_start = curr.StartPos;
+                Vector2 p_end = prev.EndPos;
 
                 if (!c_start.Equals(p_end, 1e-4f))
                 {
@@ -78,14 +78,14 @@ namespace Assets.Generation.GeomRep
             // but the loop param range starts from zero
             foreach (Curve c in m_curves)
             {
-                if (c.ParamRange() < p)
+                if (c.ParamRange < p)
                 {
-                    p -= c.ParamRange();
+                    p -= c.ParamRange;
                 }
                 else
                 {
                     // shift the param range where the curve wants it...
-                    return c.ComputePos(p + c.StartParam);
+                    return c.Pos(p + c.StartParam);
                 }
             }
 
@@ -154,16 +154,16 @@ namespace Assets.Generation.GeomRep
 
             foreach (Curve c in m_curves)
             {
-                float param_step = c.ParamRange()
-                    * (max_length / c.Length());
+                float param_step = c.ParamRange
+                    * (max_length / c.Length);
 
                 float p = 0;
 
                 float start_p = c.StartParam;
 
-                while (p < c.ParamRange())
+                while (p < c.ParamRange)
                 {
-                    temp.Add(c.ComputePos(start_p + p));
+                    temp.Add(c.Pos(start_p + p));
 
                     p += param_step;
                 }
@@ -184,9 +184,9 @@ namespace Assets.Generation.GeomRep
                 // it wouldn't keep a tiny little semi-circle
                 // to do that we'd need to do at least two facets and/or take sharpness of curvature
                 // into account
-                int steps = (int)(c.Length() / max_length) + 1;
+                int steps = (int)(c.Length / max_length) + 1;
 
-                float param_step = c.ParamRange() / steps;
+                float param_step = c.ParamRange / steps;
 
                 float p = c.StartParam;
 
@@ -199,8 +199,8 @@ namespace Assets.Generation.GeomRep
                     // (ii) that won't get swung around at the end of this curve where the last point (and it's normal)
                     // is from the next curve
                     ret.Add(new Tuple<Vector2, Vector2>(
-                        c.ComputePos(p),
-                        -c.ComputeNormal(p + param_step / 2))
+                        c.Pos(p),
+                        -c.Normal(p + param_step / 2))
                     );
 
                     p += param_step;
@@ -221,7 +221,7 @@ namespace Assets.Generation.GeomRep
 
             foreach (var c in m_curves)
             {
-                ret = ret.Union(c.BoundingArea());
+                ret = ret.Union(c.BoundingArea);
             }
 
             return ret;

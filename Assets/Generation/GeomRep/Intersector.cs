@@ -15,13 +15,11 @@ namespace Assets.Generation.GeomRep
             public readonly Curve Curve;
             public AnnotatedCurve Next;
             public readonly int LoopNumber;
-            public readonly int Id;
 
             public AnnotatedCurve(Curve curve, int loop_number)
             {
                 Curve = curve;
                 LoopNumber = loop_number;
-                Id = curve.Id;
             }
 
             public override bool Equals(object o)
@@ -99,7 +97,7 @@ namespace Assets.Generation.GeomRep
 
             foreach (IList<Curve> alc1 in working_loops1.Values)
             {
-                Area bound = alc1.Select(l => l.BoundingArea())
+                Area bound = alc1.Select(l => l.BoundingArea)
                     .Aggregate(new Area(), (a, b) => a.Union(b));
 
                 bound_map1.Add(alc1, bound);
@@ -109,7 +107,7 @@ namespace Assets.Generation.GeomRep
 
             foreach (IList<Curve> alc2 in working_loops2.Values)
             {
-                Area bound = alc2.Select(l => l.BoundingArea())
+                Area bound = alc2.Select(l => l.BoundingArea)
                     .Aggregate(new Area(), (a, b) => a.Union(b));
 
                 bound_map2.Add(alc2, bound);
@@ -213,10 +211,10 @@ namespace Assets.Generation.GeomRep
 
             open.UnionWith(forward_annotations_map.Values);
 
-            HashSet<Vector2> curve_joints = new HashSet<Vector2>(all_curves.Select(c => c.StartPos()));
+            HashSet<Vector2> curve_joints = new HashSet<Vector2>(all_curves.Select(c => c.StartPos));
 
             // bounding box allows us to create cutting lines that definitely exceed all loop boundaries
-            Area bounds = all_curves.Select(c => c.BoundingArea()).Aggregate(new Area(), (a, b) => a.Union(b));
+            Area bounds = all_curves.Select(c => c.BoundingArea).Aggregate(new Area(), (a, b) => a.Union(b));
 
             // but all we need from that is the max length in the box
             float diameter = bounds.Diagonal.magnitude;
@@ -259,7 +257,7 @@ namespace Assets.Generation.GeomRep
                     continue;
                 }
 
-                Vector2 mid_point = c.ComputePos((c.StartParam + c.EndParam) / 2);
+                Vector2 mid_point = c.Pos((c.StartParam + c.EndParam) / 2);
 
                 List<Tuple<Curve, int>> intervals = TryFindIntersections(mid_point, all_curves, curve_joints,
                                                                          diameter, tol, random);
@@ -582,15 +580,15 @@ namespace Assets.Generation.GeomRep
 
             foreach (Curve l1curr in working_loop1)
             {
-                Vector2 l1_cur_start_pos = l1curr.StartPos();
-                Assertion.Assert(l1prev.EndPos().Equals(l1_cur_start_pos, 1e-5f));
+                Vector2 l1_cur_start_pos = l1curr.StartPos;
+                Assertion.Assert(l1prev.EndPos.Equals(l1_cur_start_pos, 1e-5f));
 
                 Curve l2prev = working_loop2.Last();
 
                 foreach (Curve l2curr in working_loop2)
                 {
-                    Vector2 l2_cur_start_pos = l2curr.StartPos();
-                    Assertion.Assert(l2prev.EndPos().Equals(l2_cur_start_pos, 1e-5f));
+                    Vector2 l2_cur_start_pos = l2curr.StartPos;
+                    Assertion.Assert(l2prev.EndPos.Equals(l2_cur_start_pos, 1e-5f));
 
                     Vector2 dist = l1_cur_start_pos - l2_cur_start_pos;
 

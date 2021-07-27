@@ -63,9 +63,9 @@ namespace Assets.Generation.GeomRep
             return new LineCurve(Position, Direction, start, end);
         }
 
-        public override Area BoundingArea()
+        public override Area BoundingArea
         {
-            return new Area(StartPos().Min(EndPos()), StartPos().Max(EndPos()));
+            get => new Area(StartPos.Min(EndPos), StartPos.Max(EndPos));
         }
 
         public override Vector2 Tangent(float param)
@@ -107,12 +107,12 @@ namespace Assets.Generation.GeomRep
             return new LineCurve(Position, Direction, StartParam, c_lc.EndParam);
         }
 
-        public override float Length()
+        public override float Length
         {
-            return EndParam - StartParam;
+            get => EndParam - StartParam;
         }
 
-        public override Vector2 ComputeNormal(float v)
+        public override Vector2 Normal(float v)
         {
             return Direction.Rot270();
         }

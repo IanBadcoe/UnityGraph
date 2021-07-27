@@ -54,9 +54,9 @@ public class IntersectorTest
             return null;
         }
 
-        public override Area BoundingArea()
+        public override Area BoundingArea
         {
-            return null;
+            get => null;
         }
 
         public override Vector2 Tangent(float second)
@@ -69,12 +69,12 @@ public class IntersectorTest
             return null;
         }
 
-        public override float Length()
+        public override float Length
         {
-            return 0;
+            get => 0;
         }
 
-        public override Vector2 ComputeNormal(float p)
+        public override Vector2 Normal(float p)
         {
             return Vector2.zero;
         }
@@ -135,12 +135,12 @@ public class IntersectorTest
         Assert.AreEqual(3, curves1.Count);
         Assert.AreEqual(3, curves2.Count);
 
-        Assert.IsTrue(curves1[0].EndPos().Equals(curves1[1].StartPos(), 1e-5f));
-        Assert.IsTrue(curves1[1].EndPos().Equals(curves1[2].StartPos(), 1e-5f));
-        Assert.IsTrue(curves1[2].EndPos().Equals(curves1[0].StartPos(), 1e-5f));
-        Assert.IsTrue(curves2[0].EndPos().Equals(curves2[1].StartPos(), 1e-5f));
-        Assert.IsTrue(curves2[1].EndPos().Equals(curves2[2].StartPos(), 1e-5f));
-        Assert.IsTrue(curves2[2].EndPos().Equals(curves2[0].StartPos(), 1e-5f));
+        Assert.IsTrue(curves1[0].EndPos.Equals(curves1[1].StartPos, 1e-5f));
+        Assert.IsTrue(curves1[1].EndPos.Equals(curves1[2].StartPos, 1e-5f));
+        Assert.IsTrue(curves1[2].EndPos.Equals(curves1[0].StartPos, 1e-5f));
+        Assert.IsTrue(curves2[0].EndPos.Equals(curves2[1].StartPos, 1e-5f));
+        Assert.IsTrue(curves2[1].EndPos.Equals(curves2[2].StartPos, 1e-5f));
+        Assert.IsTrue(curves2[2].EndPos.Equals(curves2[0].StartPos, 1e-5f));
 
         Assert.IsTrue(Util.ClockAwareAngleCompare(curves1[0].EndParam, curves1[1].StartParam, 1e-5f));
         Assert.IsTrue(Util.ClockAwareAngleCompare(curves1[1].EndParam, curves1[2].StartParam, 1e-5f));
@@ -168,10 +168,10 @@ public class IntersectorTest
         Assert.AreEqual(2, curves1.Count);
         Assert.AreEqual(2, curves2.Count);
 
-        Assert.IsTrue(curves1[0].EndPos().Equals(curves1[1].StartPos(), 1e-5f));
-        Assert.IsTrue(curves1[1].EndPos().Equals(curves1[0].StartPos(), 1e-5f));
-        Assert.IsTrue(curves2[0].EndPos().Equals(curves2[1].StartPos(), 1e-5f));
-        Assert.IsTrue(curves2[1].EndPos().Equals(curves2[0].StartPos(), 1e-5f));
+        Assert.IsTrue(curves1[0].EndPos.Equals(curves1[1].StartPos, 1e-5f));
+        Assert.IsTrue(curves1[1].EndPos.Equals(curves1[0].StartPos, 1e-5f));
+        Assert.IsTrue(curves2[0].EndPos.Equals(curves2[1].StartPos, 1e-5f));
+        Assert.IsTrue(curves2[1].EndPos.Equals(curves2[0].StartPos, 1e-5f));
 
         Assert.IsTrue(Util.ClockAwareAngleCompare(curves1[0].EndParam, curves1[1].StartParam, 1e-5f));
         Assert.IsTrue(Util.ClockAwareAngleCompare(curves1[1].EndParam, curves1[0].StartParam, 1e-5f));
@@ -197,8 +197,8 @@ public class IntersectorTest
         Assert.AreEqual(1, curves1.Count);
         Assert.AreEqual(1, curves2.Count);
 
-        Assert.IsTrue(curves1[0].EndPos().Equals(curves1[0].StartPos(), 1e-5f));
-        Assert.IsTrue(curves2[0].EndPos().Equals(curves2[0].StartPos(), 1e-5f));
+        Assert.IsTrue(curves1[0].EndPos.Equals(curves1[0].StartPos, 1e-5f));
+        Assert.IsTrue(curves2[0].EndPos.Equals(curves2[0].StartPos, 1e-5f));
 
         Assert.IsTrue(Util.ClockAwareAngleCompare(curves1[0].EndParam, curves1[0].StartParam, 1e-5f));
         Assert.IsTrue(Util.ClockAwareAngleCompare(curves2[0].EndParam, curves2[0].StartParam, 1e-5f));
@@ -228,7 +228,7 @@ public class IntersectorTest
         {
             int next_i = (i + 1) % curves1.Count;
             Assert.IsTrue(Util.ClockAwareAngleCompare(curves1[i].EndParam, curves1[next_i].StartParam, 1e-5f));
-            Assert.IsTrue(curves1[i].EndPos().Equals(curves1[next_i].StartPos(), 1e-5f));
+            Assert.IsTrue(curves1[i].EndPos.Equals(curves1[next_i].StartPos, 1e-5f));
         }
     }
 
@@ -312,7 +312,7 @@ public class IntersectorTest
             all_curves.Add(cc);
 
             HashSet<Vector2> curve_joints = new HashSet<Vector2>();
-            curve_joints.Add(cc.StartPos());
+            curve_joints.Add(cc.StartPos);
 
             List<Tuple<Curve, int>> ret =
                   m_intersector.TryFindIntersections(
@@ -341,8 +341,8 @@ public class IntersectorTest
             all_curves.Add(cc2);
 
             HashSet<Vector2> curve_joints = new HashSet<Vector2>();
-            curve_joints.Add(cc1.StartPos());
-            curve_joints.Add(cc2.StartPos());
+            curve_joints.Add(cc1.StartPos);
+            curve_joints.Add(cc2.StartPos);
 
             List<Tuple<Curve, int>> ret =
                   m_intersector.TryFindIntersections(
@@ -375,8 +375,8 @@ public class IntersectorTest
             all_curves.Add(cc2);
 
             HashSet<Vector2> curve_joints = new HashSet<Vector2>();
-            curve_joints.Add(cc1.StartPos());
-            curve_joints.Add(cc2.StartPos());
+            curve_joints.Add(cc1.StartPos);
+            curve_joints.Add(cc2.StartPos);
 
             List<Tuple<Curve, int>> ret =
                   m_intersector.TryFindIntersections(
@@ -470,12 +470,12 @@ public class IntersectorTest
     {
         Assert.AreEqual(exp_size, l.NumCurves);
 
-        Vector2 prev_end = l.Curves[l.NumCurves - 1].EndPos();
+        Vector2 prev_end = l.Curves[l.NumCurves - 1].EndPos;
 
         foreach (Curve c in l.Curves)
         {
-            Assert.IsTrue(prev_end.Equals(c.StartPos(), 1e-5f));
-            prev_end = c.EndPos();
+            Assert.IsTrue(prev_end.Equals(c.StartPos, 1e-5f));
+            prev_end = c.EndPos;
 
             Assert.IsTrue(c is CircleCurve);
         }
@@ -578,8 +578,8 @@ public class IntersectorTest
             Assert.AreEqual(CircleCurve.RotationDirection.Forwards, cc2.Rotation);
 
             // joined end-to-end
-            Assert.IsTrue(cc1.StartPos().Equals(cc2.EndPos(), 1e-5f));
-            Assert.IsTrue(cc2.StartPos().Equals(cc1.EndPos(), 1e-5f));
+            Assert.IsTrue(cc1.StartPos.Equals(cc2.EndPos, 1e-5f));
+            Assert.IsTrue(cc2.StartPos.Equals(cc1.EndPos, 1e-5f));
 
             CircleCurve left = cc1.Position.x < cc2.Position.x ? cc1 : cc2;
             CircleCurve right = cc1.Position.x > cc2.Position.x ? cc1 : cc2;
@@ -653,8 +653,8 @@ public class IntersectorTest
             Assert.AreEqual(CircleCurve.RotationDirection.Forwards, cc2.Rotation);
 
             // joined end-to-end
-            Assert.IsTrue(cc1.StartPos().Equals(cc2.EndPos(), 1e-5f));
-            Assert.IsTrue(cc2.StartPos().Equals(cc1.EndPos(), 1e-5f));
+            Assert.IsTrue(cc1.StartPos.Equals(cc2.EndPos, 1e-5f));
+            Assert.IsTrue(cc2.StartPos.Equals(cc1.EndPos, 1e-5f));
 
             CircleCurve left = cc1.Position.x < cc2.Position.x ? cc1 : cc2;
             CircleCurve right = cc1.Position.x > cc2.Position.x ? cc1 : cc2;
@@ -703,8 +703,8 @@ public class IntersectorTest
             Assert.AreEqual(CircleCurve.RotationDirection.Forwards, cc2.Rotation);
 
             // joined end-to-end
-            Assert.IsTrue(cc1.StartPos().Equals(cc2.EndPos(), 1e-5f));
-            Assert.IsTrue(cc2.StartPos().Equals(cc1.EndPos(), 1e-5f));
+            Assert.IsTrue(cc1.StartPos.Equals(cc2.EndPos, 1e-5f));
+            Assert.IsTrue(cc2.StartPos.Equals(cc1.EndPos, 1e-5f));
 
             CircleCurve left = cc1.Position.x < cc2.Position.x ? cc1 : cc2;
             CircleCurve right = cc1.Position.x > cc2.Position.x ? cc1 : cc2;
@@ -744,8 +744,8 @@ public class IntersectorTest
             CircleCurve cc2 = (CircleCurve)c2;
 
             // joined end-to-end
-            Assert.IsTrue(cc1.StartPos().Equals(cc2.EndPos(), 1e-5f));
-            Assert.IsTrue(cc2.StartPos().Equals(cc1.EndPos(), 1e-5f));
+            Assert.IsTrue(cc1.StartPos.Equals(cc2.EndPos, 1e-5f));
+            Assert.IsTrue(cc2.StartPos.Equals(cc1.EndPos, 1e-5f));
 
             CircleCurve left = cc1.Position.x < cc2.Position.x ? cc1 : cc2;
             CircleCurve right = cc1.Position.x > cc2.Position.x ? cc1 : cc2;

@@ -109,8 +109,8 @@ namespace Assets.Generation.GeomRep
         private static Vector2? LineLineIntersect(LineCurve l1, LineCurve l2)
         {
             Tuple<float, float> ret = Util.EdgeIntersect(
-                  l1.StartPos(), l1.EndPos(),
-                  l2.StartPos(), l2.EndPos());
+                  l1.StartPos, l1.EndPos,
+                  l2.StartPos, l2.EndPos);
 
             if (ret == null)
             {
@@ -121,7 +121,7 @@ namespace Assets.Generation.GeomRep
             // back-calculate params from it above, however line-line is the only intersection that gives
             // direct params so it would be a pain to change the approach for this one case
 
-            return l1.ComputePos(l1.StartParam + (l1.EndParam - l1.StartParam) * ret.Item1);
+            return l1.Pos(l1.StartParam + (l1.EndParam - l1.StartParam) * ret.Item1);
         }
 
         private static Tuple<Vector2, Vector2?> LineCircleIntersect(LineCurve l1, CircleCurve c2)
@@ -134,19 +134,19 @@ namespace Assets.Generation.GeomRep
         private static Tuple<Vector2, Vector2?> CircleLineIntersect(CircleCurve c1, LineCurve l2)
         {
             Tuple<float, float?> ret = CircleLineIntersect(c1.Position, c1.Radius,
-                  l2.StartPos(), l2.EndPos());
+                  l2.StartPos, l2.EndPos);
 
             if (ret == null)
             {
                 return null;
             }
 
-            Vector2 hit1 = l2.ComputePos(l2.StartParam + (l2.EndParam - l2.StartParam) * ret.Item1);
+            Vector2 hit1 = l2.Pos(l2.StartParam + (l2.EndParam - l2.StartParam) * ret.Item1);
             Vector2? hit2 = null;
 
             if (ret.Item2 != null)
             {
-                hit2 = l2.ComputePos(l2.StartParam + (l2.EndParam - l2.StartParam) * ret.Item2.Value);
+                hit2 = l2.Pos(l2.StartParam + (l2.EndParam - l2.StartParam) * ret.Item2.Value);
             }
 
             return new Tuple<Vector2, Vector2?>(hit1, hit2);

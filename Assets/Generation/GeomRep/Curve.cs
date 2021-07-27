@@ -8,14 +8,31 @@ namespace Assets.Generation.GeomRep
     {
         public readonly float StartParam;
         public readonly float EndParam;
-        public readonly int Id;
-        private static int IdCounter = 0;
+
+        public abstract Area BoundingArea { get; }
+
+        // geometric length between start and end params
+        public abstract float Length { get; }
+
+        public Vector2 StartPos
+        {
+            get => Pos(StartParam);
+        }
+
+        public Vector2 EndPos
+        {
+            get => Pos(EndParam);
+        }
+
+        public float ParamRange
+        {
+            get => EndParam - StartParam;
+        }
 
         protected Curve(float start_param, float end_param)
         {
             StartParam = start_param;
             EndParam = end_param;
-            Id = IdCounter++;
 
             if (EndParam - StartParam < 1e-12)
             {
@@ -25,7 +42,16 @@ namespace Assets.Generation.GeomRep
 
         // exquisite abstractions
 
-        protected abstract Vector2 ComputePos_Inner(float param);
+        public Vector2 Pos(float p)
+        {
+            p = ClampToParamRange(p);
+
+            return ComputePos_Inner(p);
+        }
+
+        public abstract Vector2 Tangent(float param);
+
+        public abstract Vector2 Normal(float p);
 
         public float? FindParamForPoint(Vector2 pnt)
         {
@@ -36,9 +62,11 @@ namespace Assets.Generation.GeomRep
                 return null;
             }
 
-            // forget why I put this in, but I was getting way-off positions at some point...
-            // so check quite a loose tolerance...
-            Assertion.Assert((ComputePos(ret) - pnt).magnitude < 1e-3f);
+            //// forget why I put this in, but I was getting way-off positions at some point...
+            //// so check quite a loose tolerance...
+            //
+            // we now allow the point to be off the curve
+            //Assertion.Assert((ComputePos(ret) - pnt).magnitude < 1e-3f);
 
             return ret;
         }
@@ -48,15 +76,7 @@ namespace Assets.Generation.GeomRep
 
         public abstract Curve CloneWithChangedParams(float start, float end);
 
-        public abstract Area BoundingArea();
-
-        public abstract Vector2 Tangent(float param);
-
         public abstract Curve Merge(Curve c_after);
-
-        public abstract float Length();
-
-        public abstract Vector2 ComputeNormal(float p);
 
         // overridden for cyclic curves
 
@@ -87,36 +107,16 @@ namespace Assets.Generation.GeomRep
 
         // concrete methods
 
-        public Vector2 StartPos()
-        {
-            return ComputePos(StartParam);
-        }
-
-        public Vector2 EndPos()
-        {
-            return ComputePos(EndParam);
-        }
-
-        public float ParamRange()
-        {
-            return EndParam - StartParam;
-        }
-
         public float ParamCoordinateDist(float p1, float p2)
         {
-            return (ComputePos(p1) - ComputePos(p2)).magnitude;
-        }
-
-        public Vector2 ComputePos(float p)
-        {
-            p = ClampToParamRange(p);
-
-            return ComputePos_Inner(p);
+            return (Pos(p1) - Pos(p2)).magnitude;
         }
 
         private float ClampToParamRange(float p)
         {
             return Mathf.Min(Mathf.Max(p, StartParam), EndParam);
         }
+
+        protected abstract Vector2 ComputePos_Inner(float param);
     }
 }

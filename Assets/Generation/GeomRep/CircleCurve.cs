@@ -140,14 +140,14 @@ namespace Assets.Generation.GeomRep
             return new CircleCurve(Position, Radius, start, end, Rotation);
         }
 
-        public override Area BoundingArea()
+        public override Area BoundingArea
         {
             // use whole circle here as the use I have for the moment doesn't need anything
             // tighter
             //
             // full solution is to union together startPos, EndPos and whichever of
             // 0, pi/2, pi and 3pi/2 points are within param range
-            return new Area(Position - new Vector2(Radius, Radius),
+            get => new Area(Position - new Vector2(Radius, Radius),
                 Position + new Vector2(Radius, Radius));
         }
 
@@ -198,12 +198,12 @@ namespace Assets.Generation.GeomRep
             return new CircleCurve(Position, Radius, StartParam, c_cc.EndParam, Rotation);
         }
 
-        public override float Length()
+        public override float Length
         {
-            return Radius * (EndParam - StartParam);
+            get => Radius * (EndParam - StartParam);
         }
 
-        public override Vector2 ComputeNormal(float p)
+        public override Vector2 Normal(float p)
         {
             Vector2 normal = new Vector2(Mathf.Sin(p), Mathf.Cos(p));
 
@@ -238,7 +238,7 @@ namespace Assets.Generation.GeomRep
 
         public bool IsCyclic()
         {
-            return Util.ClockAwareAngleCompare(StartParam, EndParam, 1e-12f);
+            return Util.ClockAwareAngleCompare(StartParam, EndParam, 1e-6f);
         }
     }
 }
