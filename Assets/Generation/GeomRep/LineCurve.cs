@@ -86,10 +86,10 @@ namespace Assets.Generation.GeomRep
             }
 
             LineCurve c_lc = (LineCurve)c_after;
-            // could loop for coaxial line swith different origins here
-            // but current use is more to re-merge stuff we temporarily split
-            // and that all leaves Position the same in both halves
-            if (Position != c_lc.Position)
+
+            // could also look if they merge the other way around, but current usage knows
+            // the expected order, so no need yet...
+            if ((EndPos - c_lc.StartPos).sqrMagnitude > 1e-6f)
             {
                 return null;
             }
@@ -99,12 +99,7 @@ namespace Assets.Generation.GeomRep
                 return null;
             }
 
-            if (EndParam != c_lc.StartParam)
-            {
-                return null;
-            }
-
-            return new LineCurve(Position, Direction, StartParam, c_lc.EndParam);
+            return new LineCurve(Position, Direction, StartParam, EndParam + c_lc.ParamRange);
         }
 
         public override float Length
@@ -119,7 +114,8 @@ namespace Assets.Generation.GeomRep
 
         public override int GetHashCode()
         {
-            return base.GetHashCode_Inner() * 17 + Position.GetHashCode() * 31 ^ Direction.GetHashCode();
+            // all that matters for line identity is the start and end pos
+            return StartPos.GetHashCode() * 31 ^ EndPos.GetHashCode();
         }
 
         public override bool Equals(object o)
@@ -134,14 +130,11 @@ namespace Assets.Generation.GeomRep
                 return false;
             }
 
-            if (!base.Equals_Inner(o))
-            {
-                return false;
-            }
-
             LineCurve lc_o = (LineCurve)o;
 
-            return Position == lc_o.Position && Direction == lc_o.Direction;
+            // the lines are equal if their begining and end are equal, even if the
+            // params and pos used to achieve that differ
+            return StartPos == lc_o.StartPos && EndPos == lc_o.EndPos;
         }
     }
 }

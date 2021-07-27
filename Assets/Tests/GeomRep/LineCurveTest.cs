@@ -97,6 +97,29 @@ public class LineCurveTest
             Assert.AreEqual(10, lc3.EndParam, 0);
         }
 
+        {
+            // does not work other way around, we need to supply the following curve to the followed
+            // (could easily make that work, however, but current usage always knows the order...
+            Curve c = new LineCurve(new Vector2(0, 0), new Vector2(1, 0), 5, 10);
+            LineCurve lc3 = (LineCurve)c.Merge(lc);
+
+            Assert.IsNull(lc3);
+        }
+
+        {
+            // if the position and params are different, but the direction and
+            // end-point still match up, then should merge
+            Curve c = new LineCurve(new Vector2(5, 0), new Vector2(1, 0), 5);
+            LineCurve lc3 = (LineCurve)lc.Merge(c);
+
+            Assert.IsNotNull(lc3);
+            Assert.AreEqual(new Vector2(), lc3.Position);
+            Assert.AreEqual(new Vector2(1, 0), lc3.Direction);
+            Assert.AreEqual(10, lc3.Length, 0);
+            Assert.AreEqual(0, lc3.StartParam, 0);
+            Assert.AreEqual(10, lc3.EndParam, 0);
+        }
+
         // not with self
         {
             LineCurve lc3 = (LineCurve)lc.Merge(lc);
@@ -186,6 +209,17 @@ public class LineCurveTest
     }
 
     [Test]
+    public void TestSpecialGetHashCode()
+    {
+        // lines with the same StartPos and EndPos are the same line,
+        // even if the params and pos used to achieve that differ
+        LineCurve lc = new LineCurve(new Vector2(), new Vector2(1, 0), 0, 5);
+        LineCurve lc2 = new LineCurve(new Vector2(-2, 0), new Vector2(1, 0), 2, 7);
+
+        Assert.AreEqual(lc.GetHashCode(), lc2.GetHashCode());
+    }
+
+    [Test]
     public void TestEquals()
     {
         LineCurve lc = new LineCurve(new Vector2(), new Vector2(1, 0), 5);
@@ -205,5 +239,17 @@ public class LineCurveTest
         Assert.AreNotEqual(lc, lc3);
         Assert.AreNotEqual(lc, lc4);
         Assert.AreNotEqual(lc, lc5);
+    }
+
+    [Test]
+    public void TestSpecialEquals()
+    {
+        // lines with the same StartPos and EndPos are equal, even if the position and params used to achieve that
+        // are not
+        LineCurve lc = new LineCurve(new Vector2(), new Vector2(1, 0), 0, 4);
+        LineCurve lc2 = new LineCurve(new Vector2(-2, 0), new Vector2(1, 0), 2, 6);
+
+        //noinspection EqualsWithItself
+        Assert.AreEqual(lc, lc2);
     }
 }
