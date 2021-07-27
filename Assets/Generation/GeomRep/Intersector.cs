@@ -67,6 +67,16 @@ namespace Assets.Generation.GeomRep
                 return ls1;
             }
 
+            if (ls1.Count == 0)
+            {
+                return ls2;
+            }
+
+            if (ls2.Count == 0)
+            {
+                return ls1;
+            }
+
             // used later as an id for which loop an AnnotationCurve comes from
             int loop_count = 0;
 
@@ -126,7 +136,7 @@ namespace Assets.Generation.GeomRep
                 {
                     var alc2 = working_loops2[j];
 
-                    if (SplitCurvesAtIntersections(alc1, alc2, tol))
+                    if (SplitCurvesAtIntersections(alc1, alc2, 1e-4f))
                     {
                         splittings.Add(new Tuple<int, int>(i, j));
                     }
@@ -581,18 +591,18 @@ namespace Assets.Generation.GeomRep
             foreach (Curve l1curr in working_loop1)
             {
                 Vector2 l1_cur_start_pos = l1curr.StartPos;
-                Assertion.Assert(l1prev.EndPos.Equals(l1_cur_start_pos, 1e-5f));
+                Assertion.Assert(l1prev.EndPos.Equals(l1_cur_start_pos, 1e-4f));
 
                 Curve l2prev = working_loop2.Last();
 
                 foreach (Curve l2curr in working_loop2)
                 {
                     Vector2 l2_cur_start_pos = l2curr.StartPos;
-                    Assertion.Assert(l2prev.EndPos.Equals(l2_cur_start_pos, 1e-5f));
+                    Assertion.Assert(l2prev.EndPos.Equals(l2_cur_start_pos, 1e-4f));
 
                     Vector2 dist = l1_cur_start_pos - l2_cur_start_pos;
 
-                    if (dist.sqrMagnitude < 1e-6f)
+                    if (dist.magnitude < 1e-4f)
                     {
                         Splice s = new Splice(
                             forward_annotations_map[l1curr],
@@ -617,7 +627,7 @@ namespace Assets.Generation.GeomRep
             IList<Curve> working_loop1, IList<Curve> working_loop2,
             float tol)
         {
-            int split_count = 0;
+            int intersection_count = 0;
 
             for (int i = 0; i < working_loop1.Count; i++)
             {
@@ -650,11 +660,13 @@ namespace Assets.Generation.GeomRep
                             float start_dist = c1.ParamCoordinateDist(c1.StartParam, split_points.Item1);
                             float end_dist = c1.ParamCoordinateDist(c1.EndParam, split_points.Item1);
 
+                            // this is still an intersection, even if we do not have to add a split because it hits an existing one
+                            intersection_count++;
+
                             // if we are far enough from existing splits
                             if (start_dist > tol && end_dist > tol)
                             {
                                 any_splits = true;
-                                split_count++;
 
                                 Curve c1split1 = c1.CloneWithChangedParams(c1.StartParam, split_points.Item1);
                                 Curve c1split2 = c1.CloneWithChangedParams(split_points.Item1, c1.EndParam);
@@ -674,6 +686,9 @@ namespace Assets.Generation.GeomRep
                                 c1 = c1split1;
                             }
 
+                            // this is still an intersection, even if we do not have to add a split because it hits an existing one
+                            intersection_count++;
+
                             start_dist = c2.ParamCoordinateDist(c2.StartParam, split_points.Item2);
                             end_dist = c2.ParamCoordinateDist(c2.EndParam, split_points.Item2);
 
@@ -681,7 +696,6 @@ namespace Assets.Generation.GeomRep
                             if (start_dist > tol && end_dist > tol)
                             {
                                 any_splits = true;
-                                split_count++;
 
                                 Curve c2split1 = c2.CloneWithChangedParams(c2.StartParam, split_points.Item2);
                                 Curve c2split2 = c2.CloneWithChangedParams(split_points.Item2, c2.EndParam);
@@ -698,9 +712,9 @@ namespace Assets.Generation.GeomRep
             }
 
             // we expect even numbers of crossings
-            Assertion.Assert(split_count % 2 == 0);
+            Assertion.Assert(intersection_count % 2 == 0);
 
-            return split_count > 0;
+            return intersection_count > 0;
         }
 
         // only non-private for unit-testing
