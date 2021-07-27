@@ -36,6 +36,7 @@ public class RelaxerStepper_CGTest
         DirectedEdge e12 = g.Connect(n1, n2, 100, 100, 0);
 
         RelaxerStepper_CG rs = new RelaxerStepper_CG(null, g, m_config);
+        rs.MaxIterationsPerStep = 1000;
 
         StepperController.StatusReportInner ret;
 
@@ -82,6 +83,7 @@ public class RelaxerStepper_CGTest
         DirectedEdge e15 = g.Connect(n1, n5, 40, 40, 0);
 
         RelaxerStepper_CG rs = new RelaxerStepper_CG(null, g, m_config);
+        rs.MaxIterationsPerStep = 1000;
 
         StepperController.StatusReportInner ret;
 
@@ -126,6 +128,7 @@ public class RelaxerStepper_CGTest
         DirectedEdge e31 = g.Connect(n3, n1, 40, 40, 0);
 
         RelaxerStepper_CG rs = new RelaxerStepper_CG(null, g, m_config);
+        rs.MaxIterationsPerStep = 1000;
 
         StepperController.StatusReportInner ret;
         // engine.RelaxerStepper_CG doesn't use previous status
@@ -152,6 +155,7 @@ public class RelaxerStepper_CGTest
         n2.Position = new Vector2(-100, 0);
 
         RelaxerStepper_CG rs = new RelaxerStepper_CG(null, g, m_config);
+        rs.MaxIterationsPerStep = 1000;
 
         StepperController.StatusReportInner ret;
         // engine.RelaxerStepper_CG doesn't use previous status
@@ -179,6 +183,7 @@ public class RelaxerStepper_CGTest
         n2.Position = new Vector2(-1, 0);
 
         RelaxerStepper_CG rs = new RelaxerStepper_CG(null, g, m_config);
+        rs.MaxIterationsPerStep = 1000;
 
         StepperController.StatusReportInner ret;
         // engine.RelaxerStepper_CG doesn't use previous status
@@ -211,6 +216,7 @@ public class RelaxerStepper_CGTest
         g.Connect(n3, n4, 20, 20, 10);
 
         RelaxerStepper_CG rs = new RelaxerStepper_CG(null, g, m_config);
+        rs.MaxIterationsPerStep = 1000;
 
         StepperController.StatusReportInner ret;
         // engine.RelaxerStepper_CG doesn't use previous status
@@ -249,6 +255,7 @@ public class RelaxerStepper_CGTest
         g.Connect(n3, n4, 20, 20, 10);
 
         RelaxerStepper_CG rs = new RelaxerStepper_CG(null, g, m_config);
+        rs.MaxIterationsPerStep = 1000;
 
         StepperController.StatusReportInner ret;
         // engine.RelaxerStepper_CG doesn't use previous status
@@ -284,6 +291,7 @@ public class RelaxerStepper_CGTest
         g.Connect(n1, n2, 100, 100, 10);
 
         RelaxerStepper_CG rs = new RelaxerStepper_CG(null, g, m_config);
+        rs.MaxIterationsPerStep = 1000;
 
         StepperController.StatusReportInner ret;
         // engine.RelaxerStepper_CG doesn't use previous status
@@ -320,6 +328,7 @@ public class RelaxerStepper_CGTest
         g.Connect(n3, n4, 100, 100, 10);
 
         RelaxerStepper_CG rs = new RelaxerStepper_CG(null, g, m_config);
+        rs.MaxIterationsPerStep = 1000;
 
         StepperController.StatusReportInner ret;
         // engine.RelaxerStepper_CG doesn't use previous status
@@ -355,6 +364,7 @@ public class RelaxerStepper_CGTest
             g.Connect(n2, n3, 100, 100, 10);
 
             RelaxerStepper_CG rs = new RelaxerStepper_CG(null, g, m_config);
+            rs.MaxIterationsPerStep = 1000;
 
             StepperController.StatusReportInner ret;
             // engine.RelaxerStepper_CG doesn't use previous status
@@ -384,6 +394,7 @@ public class RelaxerStepper_CGTest
             g.Connect(n1, n2, 100, 100, 10);
 
             RelaxerStepper_CG rs = new RelaxerStepper_CG(null, g, m_config);
+            rs.MaxIterationsPerStep = 1000;
 
             StepperController.StatusReportInner ret;
             // engine.RelaxerStepper_CG doesn't use previous status
@@ -413,6 +424,7 @@ public class RelaxerStepper_CGTest
         DirectedEdge e12 = g.Connect(n1, n2, 100, 100, 0);
 
         RelaxerStepper_CG rs = new RelaxerStepper_CG(null, g, m_config);
+        rs.MaxIterationsPerStep = 1000;
 
         StepperController.StatusReportInner ret;
         // engine.RelaxerStepper_CG doesn't use previous status
@@ -449,6 +461,7 @@ public class RelaxerStepper_CGTest
         DirectedEdge e45 = g.Connect(n4, n5, 2, 2, 0);
 
         RelaxerStepper_CG rs = new RelaxerStepper_CG(null, g, m_config);
+        rs.MaxIterationsPerStep = 1000;
 
         StepperController.StatusReportInner ret;
         // engine.RelaxerStepper_CG doesn't use previous status
@@ -482,6 +495,7 @@ public class RelaxerStepper_CGTest
             // add 1 unit of extra separation
             m_config.RelaxationMinimumSeparation = 1;
             RelaxerStepper_CG rs = new RelaxerStepper_CG(null, g, m_config);
+            rs.MaxIterationsPerStep = 1000;
 
             StepperController.StatusReportInner ret;
             // engine.RelaxerStepper_CG doesn't use previous status
@@ -513,6 +527,7 @@ public class RelaxerStepper_CGTest
             // add an extra separation of 1 unit
             m_config.RelaxationMinimumSeparation = 1;
             RelaxerStepper_CG rs = new RelaxerStepper_CG(null, g, m_config);
+            rs.MaxIterationsPerStep = 1000;
 
             StepperController.StatusReportInner ret;
             // engine.RelaxerStepper_CG doesn't use previous status

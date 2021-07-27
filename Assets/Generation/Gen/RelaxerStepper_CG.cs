@@ -20,10 +20,11 @@ namespace Assets.Generation.Gen
 
     public class RelaxerStepper_CG : IStepper
     {
+        public int MaxIterationsPerStep = 10;
+
         private readonly IoCContainer ioc_container;
         private readonly Graph m_graph;
         private readonly GeneratorConfig m_config;
-        private readonly int MaxIterationsPerStep = 10;
         alglib.mincgstate opt_state;
 
         private List<INode> m_nodes;
@@ -117,7 +118,12 @@ namespace Assets.Generation.Gen
                 m_IsSetup = true;
 
                 // should not come in with crossing edges
-                Assertion.Assert(!GraphUtil.AnyCrossingEdges(m_edges));
+                if (GraphUtil.AnyCrossingEdges(m_edges))
+                {
+                    return new StepperController.StatusReportInner(StepperController.Status.StepOutFailure,
+                          null, "Found crossing edges in starting geometry.");
+                }
+
             }
 
             alglib.mincgoptimize(opt_state, EnergyFunc, ReportFunc, null);
