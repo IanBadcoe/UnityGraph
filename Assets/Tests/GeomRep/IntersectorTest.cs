@@ -819,8 +819,24 @@ public class IntersectorTest
     }
 
     [Test]
-    public void TestUnion_Errors()
+    public void TestUnion_CornerCases()
     {
+        // union of two identical objects is one of the objects
+        {
+            LoopSet ls1 = new LoopSet();
+            LoopSet ls2 = new LoopSet();
+
+            Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
+            ls1.Add(l1);
+            ls2.Add(l1);
+
+            Intersector i = new Intersector();
+
+            LoopSet ret = i.Union(ls1, ls2, 1e-5f, new ClRand(1));
+
+            Assert.AreEqual(ret, ls1);
+        }
+
         // if extractInternalCurves fails, we bail...
         {
             LoopSet ls1 = new LoopSet();
@@ -828,6 +844,8 @@ public class IntersectorTest
 
             Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
             ls1.Add(l1);
+            Loop l2 = new Loop(new CircleCurve(new Vector2(1, 0), 1));
+            ls2.Add(l2);
 
             Intersector i = new IntersectorDummy1();
 
