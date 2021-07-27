@@ -57,7 +57,7 @@ namespace Assets.Generation.Gen
                 new DefaultLayoutFactory()
             );
 
-            m_reqSize = 20;
+            m_reqSize = 15;
         }
 
         private void Update()

@@ -10,7 +10,7 @@ namespace Assets.Generation.Templates
         public TemplateStore1()
         {
             {
-                TemplateBuilder tb = new TemplateBuilder("Extend", "e", DefaultLayoutFactory);
+                TemplateBuilder tb = new TemplateBuilder("Extend Corridor", "e", DefaultLayoutFactory);
                 tb.AddNode(NodeRecord.NodeType.In, "i");
                 tb.AddNode(NodeRecord.NodeType.Out, "o");
                 tb.AddNode(NodeRecord.NodeType.Internal, "e1", false, "<target>", "i", null, "e", 55f);
@@ -24,11 +24,23 @@ namespace Assets.Generation.Templates
             }
 
             {
+                TemplateBuilder tb = new TemplateBuilder("Extend Dead-end", "e", DefaultLayoutFactory);
+                tb.AddNode(NodeRecord.NodeType.In, "i");
+                tb.AddNode(NodeRecord.NodeType.Internal, "e1", false, "<target>", "i", null, "e", 30f);
+                tb.AddNode(NodeRecord.NodeType.Internal, "e2", false, "<target>", null, "i", "e", 60f);
+
+                tb.Connect("i", "e1", 120, 120, 10);
+                tb.Connect("e1", "e2", 120, 120, 10);
+
+                AddTemplate(tb.Build());
+            }
+
+            {
                 TemplateBuilder tb = new TemplateBuilder("Tee", "e", DefaultLayoutFactory);
                 tb.AddNode(NodeRecord.NodeType.In, "i");
                 tb.AddNode(NodeRecord.NodeType.Out, "o");
                 tb.AddNode(NodeRecord.NodeType.Internal, "j", false, "<target>", null, null, "", 20f,
-                      0xff808040, new CircularPillarLayoutFactory());
+                      0xff808040);
                 tb.AddNode(NodeRecord.NodeType.Internal, "side", true, "<target>", null, null, "e", 55f);
 
                 tb.Connect("i", "j", 120, 120, 10);
@@ -95,28 +107,28 @@ namespace Assets.Generation.Templates
             //         AddTemplate(tb.Build());
             //      }
 
-            {
-                // DoorPostExpand dh = new DoorPostExpand();
+            //{
+            //    // DoorPostExpand dh = new DoorPostExpand();
 
-                TemplateBuilder tb = new TemplateBuilder("Door", "e"/*, dh*/, DefaultLayoutFactory);
-                tb.AddNode(NodeRecord.NodeType.In, "i");
-                tb.AddNode(NodeRecord.NodeType.Out, "o");
-                tb.AddNode(NodeRecord.NodeType.Internal, "j", false, "<target>", null, null, "e", 20f,
-                      0xff808040/*, a-> new CircularGeomLayout(a.getPos(), 10)*/);
-                tb.AddNode(NodeRecord.NodeType.Internal, "e", true, "<target>", null, null, "e", 55f);
-                tb.AddNode(NodeRecord.NodeType.Internal, "obstacle", true, "e", null, null, "", 55f);
-                tb.AddNode(NodeRecord.NodeType.Internal, "key", true, "obstacle", null, null, "", 30f);
-                tb.AddNode(NodeRecord.NodeType.Internal, "door", false, "<target>", "o", null, "", 30f);
+            //    TemplateBuilder tb = new TemplateBuilder("Door", "e"/*, dh*/, DefaultLayoutFactory);
+            //    tb.AddNode(NodeRecord.NodeType.In, "i");
+            //    tb.AddNode(NodeRecord.NodeType.Out, "o");
+            //    tb.AddNode(NodeRecord.NodeType.Internal, "j", false, "<target>", null, null, "e", 20f,
+            //          0xff808040/*, a-> new CircularGeomLayout(a.getPos(), 10)*/);
+            //    tb.AddNode(NodeRecord.NodeType.Internal, "e", true, "<target>", null, null, "e", 55f);
+            //    tb.AddNode(NodeRecord.NodeType.Internal, "obstacle", true, "e", null, null, "", 55f);
+            //    tb.AddNode(NodeRecord.NodeType.Internal, "key", true, "obstacle", null, null, "", 30f);
+            //    tb.AddNode(NodeRecord.NodeType.Internal, "door", false, "<target>", "o", null, "", 30f);
 
-                tb.Connect("i", "j", 120, 120, 10);
-                tb.Connect("j", "e", 120, 120, 10);
-                tb.Connect("e", "obstacle", 120, 120, 10);
-                tb.Connect("obstacle", "key", 70, 90, 10);
-                tb.Connect("j", "door", 120, 120, 10);
-                tb.Connect("door", "o", 70, 90, 10);
+            //    tb.Connect("i", "j", 120, 120, 10);
+            //    tb.Connect("j", "e", 120, 120, 10);
+            //    tb.Connect("e", "obstacle", 120, 120, 10);
+            //    tb.Connect("obstacle", "key", 70, 90, 10);
+            //    tb.Connect("j", "door", 120, 120, 10);
+            //    tb.Connect("door", "o", 70, 90, 10);
 
-                AddTemplate(tb.Build());
-            }
+            //    AddTemplate(tb.Build());
+            //}
 
             //      {
             //         engine.TemplateBuilder tb = new engine.TemplateBuilder("Cluster", "e");
@@ -158,8 +170,8 @@ namespace Assets.Generation.Templates
                 TemplateBuilder tb = new TemplateBuilder("Rotunda", ""/*, dh*/, DefaultLayoutFactory);
                 tb.AddNode(NodeRecord.NodeType.In, "i");
                 tb.AddNode(NodeRecord.NodeType.Internal, "rotunda", false, "<target>",
-                      null, null, "e", 70f, 0xff802080/*,
-                      CircularPillarGeomLayout::createFromNode*/);
+                      null, null, "e", 70f, 0xff802080,
+                      new FourCircularPillarsLayoutFactory());
 
                 tb.Connect("i", "rotunda", 120, 120, 10);
 
