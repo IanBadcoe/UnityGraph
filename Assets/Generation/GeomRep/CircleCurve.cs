@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Assets.Generation.GeomRep
 {
+    [System.Diagnostics.DebuggerDisplay("Pos = {Position}, From = {StartPos}, To = {EndPos}, Dir = {Rotation}")]
     public class CircleCurve : Curve
     {
         public enum RotationDirection

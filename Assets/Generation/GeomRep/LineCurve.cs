@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace Assets.Generation.GeomRep
 {
+    [System.Diagnostics.DebuggerDisplay("From = {StartPos}, To = {EndPos}")]
     public class LineCurve : Curve
     {
         public readonly Vector2 Position;
@@ -13,17 +14,6 @@ namespace Assets.Generation.GeomRep
         public LineCurve(Vector2 position, Vector2 directionCosines, float length)
             : base(0, length)
         {
-
-            if (position == null)
-            {
-                throw new NullReferenceException("'position' cannot be null");
-            }
-
-            if (directionCosines == null)
-            {
-                throw new NullReferenceException("'directionCosines' cannot be null");
-            }
-
             Position = position;
             Direction = directionCosines;
 
