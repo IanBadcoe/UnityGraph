@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Assets.Generation.GeomRep
 {
@@ -34,20 +30,28 @@ namespace Assets.Generation.GeomRep
         public override bool Equals(object o)
         {
             if (o == this)
+            {
                 return true;
+            }
 
             if (!(o is LoopSet))
-             return false;
+            {
+                return false;
+            }
 
             LoopSet lso = (LoopSet)o;
 
             if (Count != lso.Count)
+            {
                 return false;
+            }
 
             for (int i = 0; i < Count; i++)
             {
                 if (!this[i].Equals(lso[i]))
+                {
                     return false;
+                }
             }
 
             return true;

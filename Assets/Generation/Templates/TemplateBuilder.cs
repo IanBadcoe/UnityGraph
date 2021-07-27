@@ -2,9 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Assets.Generation.Templates
 {
@@ -119,19 +116,29 @@ namespace Assets.Generation.Templates
              IGeomLayoutFactory layoutCreator)
         {
             if (name.Contains("->"))
+            {
                 throw new ArgumentException("engine.Node name: '" + name + "' cannot contain '->'.");
+            }
 
             if (name.Contains("<target>"))
+            {
                 throw new ArgumentException("engine.Node name: '" + name + "' is reserved.");
+            }
 
             if (positionOnName == null)
+            {
                 throw new NullReferenceException("'positionOnName' cannot be null.");
+            }
 
             if (type == NodeRecord.NodeType.Target)
+            {
                 throw new ArgumentException("User cannot add a node of type 'Target'.");
+            }
 
             if (FindNodeRecord(name) != null)
+            {
                 throw new DuplicateNodeException(name);
+            }
 
             // required
             NodeRecord positionOn = null;
@@ -144,14 +151,18 @@ namespace Assets.Generation.Templates
                 positionOn = FindNodeRecord(positionOnName);
 
                 if (positionOn == null)
+                {
                     throw new UnknownNodeException(positionOnName, "positionOnName");
+                }
 
                 if (positionTowardsName != null)
                 {
                     positionTowards = FindNodeRecord(positionTowardsName);
 
                     if (positionTowards == null)
+                    {
                         throw new UnknownNodeException(positionTowardsName, "positionTowardsName");
+                    }
                 }
 
                 if (positionAwayFromName != null)
@@ -159,7 +170,9 @@ namespace Assets.Generation.Templates
                     positionAwayFrom = FindNodeRecord(positionAwayFromName);
 
                     if (positionAwayFrom == null)
+                    {
                         throw new UnknownNodeException(positionAwayFromName, "positionAwayFromName");
+                    }
                 }
             }
 
@@ -186,7 +199,8 @@ namespace Assets.Generation.Templates
         public NodeRecord FindNodeRecord(string name)
         {
             NodeRecord ret;
-            if (m_nodes.TryGetValue(name, out ret)) {
+            if (m_nodes.TryGetValue(name, out ret))
+            {
                 return ret;
             }
 
@@ -214,44 +228,60 @@ namespace Assets.Generation.Templates
                     0xffb4b4b4);
         }
 
-       public void Connect(string from, string to,
-                           float min_length, float max_length,
-                           float half_width,
-                           uint colour)
+        public void Connect(string from, string to,
+                            float min_length, float max_length,
+                            float half_width,
+                            uint colour)
         {
             if (from == null)
+            {
                 throw new NullReferenceException("Null node name: 'from'.");
+            }
 
             if (to == null)
+            {
                 throw new NullReferenceException("Null node name: 'to'.");
+            }
 
             // only one connection between nodes is permitted
             if (FindConnectionRecord(from, to) != null)
+            {
                 throw new ArgumentException("A connection from '" + from + "' to '" + to + "' already exists.");
+            }
 
             // nor are we allowed forwards and backwards connections
             if (FindConnectionRecord(to, from) != null)
+            {
                 throw new ArgumentException("A connection from '" + to + "' from '" + to + "' already exists.");
+            }
 
             NodeRecord nrf = FindNodeRecord(from);
             NodeRecord nrt = FindNodeRecord(to);
 
             if (nrf == null)
+            {
                 throw new UnknownNodeException(from, "from");
+            }
 
             if (nrt == null)
+            {
                 throw new UnknownNodeException(to, "to");
+            }
 
             if (nrf.Type == NodeRecord.NodeType.Target)
+            {
                 throw new ArgumentException("Cannot connect from node 'Target' as it is being replaced.");
+            }
 
             if (nrt.Type == NodeRecord.NodeType.Target)
+            {
                 throw new ArgumentException("Cannot connect to node 'Target' as it is being replaced.");
+            }
 
             m_connections.Add(
                   Template.MakeConnectionName(from, to),
                   new ConnectionRecord(nrf, nrt, min_length, max_length, half_width, colour));
-       }
+        }
 
         public ReadOnlyDictionary<string, NodeRecord> GetUnmodifiableNodes()
         {

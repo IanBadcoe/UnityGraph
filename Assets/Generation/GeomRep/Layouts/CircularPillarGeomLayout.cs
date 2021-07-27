@@ -1,10 +1,6 @@
 ﻿using Assets.Generation.G;
 using Assets.Generation.G.GLInterfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Generation.GeomRep.Layouts
@@ -26,7 +22,7 @@ namespace Assets.Generation.GeomRep.Layouts
     {
         private readonly Vector2 m_position;
         private readonly float m_rad;
-        
+
         public CircularPillarGeomLayout(Vector2 position, float radius)
         {
             m_position = position;

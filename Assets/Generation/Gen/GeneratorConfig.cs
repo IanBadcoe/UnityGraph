@@ -1,7 +1,4 @@
 using Assets.Generation.U;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 
 namespace Assets.Generation.Gen

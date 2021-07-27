@@ -30,7 +30,7 @@ namespace Assets.Generation.Gen
         private List<INode> m_nodes;
         private List<DirectedEdge> m_edges;
         private double[] m_pars;
-        private Dictionary<INode, int> m_node2pars_idx = new Dictionary<INode, int>();
+        private readonly Dictionary<INode, int> m_node2pars_idx = new Dictionary<INode, int>();
 
         // whichever is smaller out of the summed-radii and the
         // shortest path through the graph between two nodes
@@ -89,7 +89,7 @@ namespace Assets.Generation.Gen
 
             int p_num = 0;
 
-            foreach(var n in m_nodes)
+            foreach (var n in m_nodes)
             {
                 m_node2pars_idx[n] = p_num;
 
@@ -134,7 +134,7 @@ namespace Assets.Generation.Gen
             // it's current end position
             alglib.mincgrestartfrom(opt_state, m_pars);
 
-            Status = IntToTC(report.terminationtype); 
+            Status = IntToTC(report.terminationtype);
             Assertion.Assert(Status != TerminationCondition.InfOrNanError);
             Assertion.Assert(Status != TerminationCondition.GradientVerificationError);
             // the problem with this one is I have no idea what it means
@@ -268,7 +268,7 @@ namespace Assets.Generation.Gen
                 }
             }
 
-            foreach(var edge in m_edges)
+            foreach (var edge in m_edges)
             {
                 int start_p_idx = m_node2pars_idx[edge.Start];
                 int end_p_idx = m_node2pars_idx[edge.End];
@@ -310,7 +310,7 @@ namespace Assets.Generation.Gen
                     }
                 }
             }
-            
+
             func =
                 nn_func * m_config.NodeToNodeForceScale
                 + e_func * m_config.EdgeLengthForceScale
@@ -344,12 +344,16 @@ namespace Assets.Generation.Gen
             // piecewise to allow for the allowed length range
 
             if (d >= d_min && d <= d_max)
+            {
                 return 0;
+            }
 
             // below min we are the left of a squared rectangular hyperbola
             // the 5 here just pull more of the curve above x = 0, because obvs. we'll never see d < 0
             if (d < d_min)
+            {
                 return (d_min - d) * (d_min - d);
+            }
             //return 1 - 1 / (1 + 5 * Math.Pow(d_min - d, 2));
 
             // below min we are the right of one
@@ -376,7 +380,7 @@ namespace Assets.Generation.Gen
 
         TerminationCondition IntToTC(int code)
         {
-            switch(code)
+            switch (code)
             {
                 case -8:
                     return TerminationCondition.InfOrNanError;
@@ -406,6 +410,6 @@ namespace Assets.Generation.Gen
             Assertion.Assert(false);
 
             return TerminationCondition.ERROR_UNKNOWN_CODE;
-        } 
+        }
     }
 }

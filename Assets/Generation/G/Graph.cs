@@ -44,10 +44,14 @@ namespace Assets.Generation.G
         public bool RemoveNode(INode inode)
         {
             if (!Contains(inode))
+            {
                 return false;
+            }
 
             if (inode.GetConnections().Count > 0)
+            {
                 return false;
+            }
 
             Node node = (Node)inode;
 
@@ -72,7 +76,7 @@ namespace Assets.Generation.G
         }
 
         public DirectedEdge Connect(INode from, INode to,
-                                    float min_length, float max_length, float half_width) 
+                                    float min_length, float max_length, float half_width)
         {
             return Connect(from, to, min_length, max_length, half_width,
                 LayoutFactory);
@@ -86,7 +90,9 @@ namespace Assets.Generation.G
                   || !Contains(from)
                   || !Contains(to)
                   || from.Connects(to))
+            {
                 throw new ArgumentException();
+            }
 
             DirectedEdge temp = new DirectedEdge(from, to, min_length, max_length, half_width, layoutCreator);
 
@@ -133,12 +139,16 @@ namespace Assets.Generation.G
         public bool Disconnect(INode from, INode to)
         {
             if (!Contains(from) || !Contains(to))
+            {
                 return false;
+            }
 
             DirectedEdge e = from.GetConnectionTo(to);
 
             if (e == null)
+            {
                 return false;
+            }
 
             if (Restore != null)
             {
@@ -265,7 +275,9 @@ namespace Assets.Generation.G
             public bool Restore()
             {
                 if (!m_can_be_restored)
+                {
                     return false;
+                }
 
                 if (ChainTo != null)
                 {
@@ -325,14 +337,18 @@ namespace Assets.Generation.G
             public void CleanUp()
             {
                 if (ChainTo != null)
+                {
                     ChainTo.CleanUp();
+                }
 
                 // once we are undone or committed, the user goes back to whatever their previous restore level was
                 m_graph.Restore = ChainFrom;
 
                 // we're restored, so whoever might have wanted to chain us mustn't any more
                 if (ChainFrom != null)
+                {
                     ChainFrom.ChainTo = null;
+                }
 
                 m_can_be_restored = false;
             }

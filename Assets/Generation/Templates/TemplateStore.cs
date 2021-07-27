@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using UnityEngine;
 
 namespace Assets.Generation.Templates
 {
@@ -22,7 +20,9 @@ namespace Assets.Generation.Templates
         public bool AddTemplate(Template t)
         {
             if (Contains(t.Name))
+            {
                 return false;
+            }
 
             m_templates.Add(t.Name, t);
 

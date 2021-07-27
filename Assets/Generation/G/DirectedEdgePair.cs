@@ -1,9 +1,4 @@
 ﻿using Assets.Generation.U;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Assets.Generation.G
 {
@@ -30,7 +25,9 @@ namespace Assets.Generation.G
         public override bool Equals(object o)
         {
             if (o == null || GetType() != o.GetType())
+            {
                 return false;
+            }
 
             DirectedEdgePair dep = o as DirectedEdgePair;
 

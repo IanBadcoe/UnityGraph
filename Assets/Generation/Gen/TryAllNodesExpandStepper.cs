@@ -1,11 +1,10 @@
-﻿using Assets.Generation.U;
-using Assets.Generation.G;
+﻿using Assets.Generation.G;
 using Assets.Generation.IoC;
 using Assets.Generation.Stepping;
 using Assets.Generation.Templates;
-using System.Collections.ObjectModel;
-using System.Linq;
+using Assets.Generation.U;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Assets.Generation.Gen
 {
@@ -59,7 +58,8 @@ namespace Assets.Generation.Gen
             // if this was our last chance at a node, take only templates that expand further
             // (could also allow those that expand enough, but that would involve copying the
             // required size down here...
-            if (m_all_nodes.Count == 0) {
+            if (m_all_nodes.Count == 0)
+            {
                 templates = templates.Where(t => t.Codes.Contains("e")).ToList();
             }
 

@@ -75,7 +75,9 @@ namespace Assets.Generation.Stepping
             IStepper stepper = CurrentStepper();
 
             if (stepper == null)
+            {
                 throw new NullReferenceException("Attempt to step without an initial stepper.  Either you failed to supply one, or this engine.StepperController has completed.");
+            }
 
             StatusReportInner eri = stepper.Step(m_last_step_status);
 
@@ -108,7 +110,9 @@ namespace Assets.Generation.Stepping
         private IStepper CurrentStepper()
         {
             if (m_stack.Count == 0)
+            {
                 return null;
+            }
 
             return m_stack.Peek().Item1;
         }

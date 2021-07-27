@@ -2,7 +2,6 @@
 using Assets.Generation.IoC;
 using Assets.Generation.Stepping;
 using Assets.Generation.U;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -111,7 +110,9 @@ namespace Assets.Generation.Gen
                 foreach (INode m in m_nodes)
                 {
                     if (n == m)
+                    {
                         break;
+                    }
 
                     if (!n.Connects(m))
                     {
@@ -136,7 +137,7 @@ namespace Assets.Generation.Gen
             {
                 step = Mathf.Min(m_config.RelaxationMaxMove / maxf, m_config.RelaxationMaxMove);
 
-                foreach (INode n in m_nodes) 
+                foreach (INode n in m_nodes)
                 {
                     maxd = Mathf.Max(n.Step(step), maxd);
                 }
@@ -182,7 +183,9 @@ namespace Assets.Generation.Gen
             // in this case can just ignore these as we hope (i) won't happen and (ii) there will be other non-zero
             // forces to pull them apart
             if (l == 0.0f)
+            {
                 return 1.0f;
+            }
 
             d = d / l;
 
@@ -218,7 +221,9 @@ namespace Assets.Generation.Gen
             // in this case can just ignore these as we hope (i) won't happen and (ii) there will be other non-zero
             // forces to pull them apart
             if (l == 0.0f)
+            {
                 return 0.0f;
+            }
 
             d = d / l;
 
@@ -249,7 +254,9 @@ namespace Assets.Generation.Gen
             Util.NEDRet vals = Util.NodeEdgeDistDetailed(n.Position, e.Start.Position, e.End.Position);
 
             if (vals == null)
+            {
                 return 1.0f;
+            }
 
             // our minimum separation is radius1 + radius2 + minimum_separation
             // except where there is a shorter path through the edges

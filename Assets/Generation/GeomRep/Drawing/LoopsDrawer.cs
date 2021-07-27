@@ -1,9 +1,6 @@
 ﻿using Assets.Generation.Gen;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Generation.GeomRep.Drawing
@@ -12,8 +9,7 @@ namespace Assets.Generation.GeomRep.Drawing
     {
         public Generator Generator;
         public GameObject LoopDrawTemplate;
-
-        Dictionary<Loop, LineRenderer> RendererMap = new Dictionary<Loop, LineRenderer>();
+        readonly Dictionary<Loop, LineRenderer> RendererMap = new Dictionary<Loop, LineRenderer>();
 
         private void Update()
         {
@@ -32,7 +28,7 @@ namespace Assets.Generation.GeomRep.Drawing
 
                         lr.positionCount = points.Length;
                         lr.SetPositions(points);
-                    } 
+                    }
                 }
             }
 

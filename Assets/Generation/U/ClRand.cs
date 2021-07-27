@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Generation.U
@@ -39,7 +35,7 @@ namespace Assets.Generation.U
         //
         private int inext;
         private int inextp;
-        private int[] SeedArray = new int[56];
+        private readonly int[] SeedArray = new int[56];
 
         //
         // Public Constants
@@ -74,7 +70,11 @@ namespace Assets.Generation.U
                 ii = (21 * i) % 55;
                 SeedArray[ii] = mk;
                 mk = mj - mk;
-                if (mk < 0) mk += MBIG;
+                if (mk < 0)
+                {
+                    mk += MBIG;
+                }
+
                 mj = SeedArray[ii];
             }
             for (int k = 1; k < 5; k++)
@@ -82,7 +82,10 @@ namespace Assets.Generation.U
                 for (int i = 1; i < 56; i++)
                 {
                     SeedArray[i] -= SeedArray[1 + (i + 30) % 55];
-                    if (SeedArray[i] < 0) SeedArray[i] += MBIG;
+                    if (SeedArray[i] < 0)
+                    {
+                        SeedArray[i] += MBIG;
+                    }
                 }
             }
             inext = 0;
@@ -94,7 +97,7 @@ namespace Assets.Generation.U
         {
             inext = old.inext;
             inextp = old.inextp;
-            for(int i = 0; i < 56; i++)
+            for (int i = 0; i < 56; i++)
             {
                 SeedArray[i] = old.SeedArray[i];
             }
@@ -123,13 +126,27 @@ namespace Assets.Generation.U
             int locINext = inext;
             int locINextp = inextp;
 
-            if (++locINext >= 56) locINext = 1;
-            if (++locINextp >= 56) locINextp = 1;
+            if (++locINext >= 56)
+            {
+                locINext = 1;
+            }
+
+            if (++locINextp >= 56)
+            {
+                locINextp = 1;
+            }
 
             retVal = SeedArray[locINext] - SeedArray[locINextp];
 
-            if (retVal == MBIG) retVal--;
-            if (retVal < 0) retVal += MBIG;
+            if (retVal == MBIG)
+            {
+                retVal--;
+            }
+
+            if (retVal < 0)
+            {
+                retVal += MBIG;
+            }
 
             SeedArray[locINext] = retVal;
 
@@ -236,7 +253,10 @@ namespace Assets.Generation.U
         ==============================================================================*/
         public virtual void NextBytes(byte[] buffer)
         {
-            if (buffer == null) throw new ArgumentNullException("buffer");
+            if (buffer == null)
+            {
+                throw new ArgumentNullException("buffer");
+            }
             //Contract.EndContractBlock();
             for (int i = 0; i < buffer.Length; i++)
             {

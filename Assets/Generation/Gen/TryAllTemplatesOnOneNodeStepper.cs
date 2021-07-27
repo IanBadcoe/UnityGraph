@@ -2,9 +2,8 @@
 using Assets.Generation.IoC;
 using Assets.Generation.Stepping;
 using Assets.Generation.Templates;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Assets.Generation.U;
+using System.Collections.Generic;
 
 namespace Assets.Generation.Gen
 {

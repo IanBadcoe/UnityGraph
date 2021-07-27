@@ -2,10 +2,7 @@
 using Assets.Generation.U;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Generation.GeomRep
@@ -30,7 +27,9 @@ namespace Assets.Generation.GeomRep
             public override bool Equals(object o)
             {
                 if (!(o is AnnotatedCurve))
+                {
                     return false;
+                }
 
                 AnnotatedCurve aco = (AnnotatedCurve)o;
 
@@ -60,11 +59,15 @@ namespace Assets.Generation.GeomRep
                              ClRand random)
         {
             if (ls1.Count == 0 && ls2.Count == 0)
+            {
                 return null;
+            }
 
             // simple case, also covers us being handed the same instance twice
             if (ls1.Equals(ls2))
+            {
                 return ls1;
+            }
 
             // used later as an id for which loop an AnnotationCurve comes from
             int loop_count = 0;
@@ -219,7 +222,9 @@ namespace Assets.Generation.GeomRep
             float diameter = bounds.Diagonal.magnitude;
 
             if (!ExtractInternalCurves(tol, random, forward_annotations_map, all_curves, open, curve_joints, diameter))
+            {
                 return null;
+            }
 
             while (open.Count > 0)
             {
@@ -250,7 +255,9 @@ namespace Assets.Generation.GeomRep
                 AnnotatedCurve ac_c = forward_annotations_map[c];
 
                 if (!open.Contains(ac_c))
+                {
                     continue;
+                }
 
                 Vector2 mid_point = c.ComputePos((c.StartParam + c.EndParam) / 2);
 
@@ -260,7 +267,9 @@ namespace Assets.Generation.GeomRep
                 // failure, don't really expect this as have had multiple tries and it
                 // shouldn't be so hard to find a good cutting line
                 if (intervals == null)
+                {
                     return false;
+                }
 
                 // now use the intervals to decide what to do with the AnnotationEdges
                 int prev_crossings = 0;
@@ -347,7 +356,9 @@ namespace Assets.Generation.GeomRep
                 if (splice == null)
                 {
                     if (curr_ac.Next == start_ac)
+                    {
                         break;
+                    }
 
                     curr_ac = curr_ac.Next;
                 }
@@ -355,7 +366,9 @@ namespace Assets.Generation.GeomRep
                 {
                     if (splice.Loop1Out == start_ac
                           || splice.Loop2Out == start_ac)
+                    {
                         break;
+                    }
 
                     // at every splice, at least one of the two possible exits should be still open
                     Assertion.Assert(open.Contains(splice.Loop1Out) || open.Contains(splice.Loop2Out));
@@ -403,7 +416,9 @@ namespace Assets.Generation.GeomRep
 
                 // if we get down to (or start with) only one curve, don't try to merge it with itself
                 if (c_here == c_prev)
+                {
                     break;
+                }
 
                 Curve merged = c_prev.Merge(c_here);
 
@@ -450,7 +465,9 @@ namespace Assets.Generation.GeomRep
                 // give us curves < 2 * tol long, and if we are on the midpoint of one of those
                 // we can't clear both ends by tol...
                 if (!LineClearsPoints(lc, curve_joints, tol / 10))
+                {
                     continue;
+                }
 
                 List<Tuple<Curve, int>> ret =
                       TryFindCurveIntersections(lc, all_curves);
@@ -469,8 +486,10 @@ namespace Assets.Generation.GeomRep
         {
             foreach (Vector2 pnt in curve_joints)
             {
-            if (Mathf.Abs((pnt - lc.Position).Dot(lc.Direction.Rot90())) < tol)
-                return false;
+                if (Mathf.Abs((pnt - lc.Position).Dot(lc.Direction.Rot90())) < tol)
+                {
+                    return false;
+                }
             }
 
             return true;
@@ -496,7 +515,9 @@ namespace Assets.Generation.GeomRep
                 List<Tuple<float, float>> intersections = GeomRepUtil.CurveCurveIntersect(lc, c);
 
                 if (intersections == null)
+                {
                     continue;
+                }
 
                 foreach (Tuple<float, float> intersection in intersections)
                 {
@@ -505,14 +526,18 @@ namespace Assets.Generation.GeomRep
                     // chicken out and scrap any line that has a glancing contact with a curve
                     // a bit more than .1 degrees
                     if (Mathf.Abs(dot) < 0.001)
+                    {
                         return null;
+                    }
 
                     intersecting_curves.Add(new Tuple<Curve, float, float>(c, intersection.Item1, dot));
                 }
             }
 
             if (intersecting_curves.Count == 0)
+            {
                 return null;
+            }
 
             // sort by distance down the line
             IEnumerable<Tuple<Curve, float, float>> ordered =
@@ -612,7 +637,9 @@ namespace Assets.Generation.GeomRep
                         List<Tuple<float, float>> ret = GeomRepUtil.CurveCurveIntersect(c1, c2);
 
                         if (ret == null)
+                        {
                             break;
+                        }
 
                         // we only count up in case the earlier entries fall close to existing splits and
                         // are ignored, otherwise if the first intersection causes a split
@@ -709,69 +736,69 @@ namespace Assets.Generation.GeomRep
         }
     }
 
-//      if (visualise)
-//      {
-//         Random r = new Random(1);
-//
-//         Main.clear(255);
-//         XY pnt = working_loops1.get(0).get(2).startPos();
-//         Area size = new Area(pnt.minus(new XY(.001, .001)),
-//               pnt.plus(new XY(.001, .001)));
-////         engine.Area size = bounds;
-//         Main.scaleTo(size);
-//
-//         Main.fill(r.nextInt(256), r.nextInt(256), 256);
-//         for(Splice s : endSpliceMap.values())
-//         {
-//            Main.circle(s.Loop1Out.Curve.startPos().X,
-//                  s.Loop1Out.Curve.startPos().Y,
-//                  size.DX() * 0.004);
-//         }
-//
-//         for(List<Curve> alc1 : working_loops1.values())
-//         {
-//            Main.strokeWidth(size.DX() * 0.001);
-//            Main.stroke(256, r.nextInt(128), r.nextInt(128));
-//            Loop l = new Loop(alc1);
-//            Main.drawLoopPoints(l.facet(.3));
-//
-//            for(Curve c : l.getCurves())
-//            {
-//               XY end = c.endPos();
-//               Main.circle(end.X, end.Y, size.DX() * 0.002);
-//            }
-//         }
-//
-//         for (List<Curve> alc2 : working_loops2.values())
-//         {
-//            Main.stroke(r.nextInt(128), 256, r.nextInt(128));
-//            Loop l = new Loop(alc2);
-//            Main.drawLoopPoints(l.facet(.3));
-//
-//            for(Curve c : l.getCurves())
-//            {
-//               XY end = c.endPos();
-//               Main.circle(end.X, end.Y, size.DX() * 0.002);
-//            }
-//         }
-//      }
+    //      if (visualise)
+    //      {
+    //         Random r = new Random(1);
+    //
+    //         Main.clear(255);
+    //         XY pnt = working_loops1.get(0).get(2).startPos();
+    //         Area size = new Area(pnt.minus(new XY(.001, .001)),
+    //               pnt.plus(new XY(.001, .001)));
+    ////         engine.Area size = bounds;
+    //         Main.scaleTo(size);
+    //
+    //         Main.fill(r.nextInt(256), r.nextInt(256), 256);
+    //         for(Splice s : endSpliceMap.values())
+    //         {
+    //            Main.circle(s.Loop1Out.Curve.startPos().X,
+    //                  s.Loop1Out.Curve.startPos().Y,
+    //                  size.DX() * 0.004);
+    //         }
+    //
+    //         for(List<Curve> alc1 : working_loops1.values())
+    //         {
+    //            Main.strokeWidth(size.DX() * 0.001);
+    //            Main.stroke(256, r.nextInt(128), r.nextInt(128));
+    //            Loop l = new Loop(alc1);
+    //            Main.drawLoopPoints(l.facet(.3));
+    //
+    //            for(Curve c : l.getCurves())
+    //            {
+    //               XY end = c.endPos();
+    //               Main.circle(end.X, end.Y, size.DX() * 0.002);
+    //            }
+    //         }
+    //
+    //         for (List<Curve> alc2 : working_loops2.values())
+    //         {
+    //            Main.stroke(r.nextInt(128), 256, r.nextInt(128));
+    //            Loop l = new Loop(alc2);
+    //            Main.drawLoopPoints(l.facet(.3));
+    //
+    //            for(Curve c : l.getCurves())
+    //            {
+    //               XY end = c.endPos();
+    //               Main.circle(end.X, end.Y, size.DX() * 0.002);
+    //            }
+    //         }
+    //      }
 
-//      // don't keep eating random numbers if we're visualising the same frame over and over
-//      if (visualise && m_visualisation_line != null)
-//      {
-//         Main.stroke(0, 0, 0);
-//         Main.line(m_visualisation_line.startPos(), m_visualisation_line.endPos());
-//
-//         return null;
-//      }
+    //      // don't keep eating random numbers if we're visualising the same frame over and over
+    //      if (visualise && m_visualisation_line != null)
+    //      {
+    //         Main.stroke(0, 0, 0);
+    //         Main.line(m_visualisation_line.startPos(), m_visualisation_line.endPos());
+    //
+    //         return null;
+    //      }
 
-//            if (visualise)
-//            {
-//               m_visualisation_line = lc;
-//               Main.stroke(0, 0, 0);
-//               Main.line(m_visualisation_line.startPos(), m_visualisation_line.endPos());
-//               return null;
-//            }
+    //            if (visualise)
+    //            {
+    //               m_visualisation_line = lc;
+    //               Main.stroke(0, 0, 0);
+    //               Main.line(m_visualisation_line.startPos(), m_visualisation_line.endPos());
+    //               return null;
+    //            }
 
-// private static LineCurve m_visualisation_line;
+    // private static LineCurve m_visualisation_line;
 }

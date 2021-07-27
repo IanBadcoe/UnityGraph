@@ -1,9 +1,5 @@
 ﻿using Assets.Generation.U;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Generation.GeomRep
@@ -22,7 +18,9 @@ namespace Assets.Generation.GeomRep
             Id = IdCounter++;
 
             if (EndParam - StartParam < 1e-12)
+            {
                 throw new NotSupportedException("StartParam must be < EndParam");
+            }
         }
 
         // exquisite abstractions
@@ -34,7 +32,9 @@ namespace Assets.Generation.GeomRep
             float ret = FindParamForPoint_Inner(pnt);
 
             if (!WithinParams(ret, 1e-5f))
+            {
                 return null;
+            }
 
             // forget why I put this in, but I was getting way-off positions at some point...
             // so check quite a loose tolerance...

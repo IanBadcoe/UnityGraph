@@ -2,7 +2,6 @@
 using Assets.Generation.U;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
 
@@ -71,8 +70,10 @@ namespace Assets.Generation.G
         {
             // cannot multiply connect the same node, forwards or backwards
             if (Connects(n))
+            {
                 throw new ArgumentException("Cannot multiply connect from '" + Name +
                       "' to '" + n.Name + "'");
+            }
 
             DirectedEdge e = new DirectedEdge(this, n, min_distance, max_distance, width, layoutCreator);
 
@@ -90,7 +91,9 @@ namespace Assets.Generation.G
         public void Disconnect(Node n)
         {
             if (!Connects(n))
+            {
                 return;
+            }
 
             // simplest just to try removing the forward and reverse edges
             // only the nodes are part of the edge identity
@@ -105,7 +108,9 @@ namespace Assets.Generation.G
             foreach (DirectedEdge e in m_connections)
             {
                 if (e.End == to)
+                {
                     return e;
+                }
             }
 
             return null;
@@ -116,7 +121,9 @@ namespace Assets.Generation.G
             foreach (DirectedEdge e in m_connections)
             {
                 if (e.Start == from)
+                {
                     return e;
+                }
             }
 
             return null;

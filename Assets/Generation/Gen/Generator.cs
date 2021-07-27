@@ -1,12 +1,8 @@
 using Assets.Generation.G;
-using Assets.Generation.Gen.Drawing;
 using Assets.Generation.GeomRep;
 using Assets.Generation.IoC;
 using Assets.Generation.Stepping;
 using Assets.Generation.Templates;
-using Assets.Generation.U;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -19,7 +15,7 @@ namespace Assets.Generation.Gen
         public UnionHelper UnionHelper { get; private set; }
 
         // need a better way of making and setting these, but while we only have one...
-        private TemplateStore Templates = new TemplateStore1();
+        private readonly TemplateStore Templates = new TemplateStore1();
 
         private IoCContainer m_ioc_container;
 
@@ -35,7 +31,8 @@ namespace Assets.Generation.Gen
 
         private Phase m_phase = Phase.Init;
 
-        public Graph Graph {
+        public Graph Graph
+        {
             get;
             private set;
         }
@@ -109,7 +106,7 @@ namespace Assets.Generation.Gen
 
                 case Phase.Done:
                     break;
-//                    return DoneStep();
+                    //                    return DoneStep();
             }
 
             // really shouldn't happen
@@ -214,7 +211,7 @@ namespace Assets.Generation.Gen
 
         private StepperController.StatusReport DoneStep()
         {
-//            m_level = m_union_helper.makeLevel(m_config.CellSize, m_config.WallFacetLength);
+            //            m_level = m_union_helper.makeLevel(m_config.CellSize, m_config.WallFacetLength);
 
             UnionHelper = null;
 

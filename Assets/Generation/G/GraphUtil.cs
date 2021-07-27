@@ -1,12 +1,6 @@
-﻿using Assets.Generation.G;
-using Assets.Generation.U;
+﻿using Assets.Generation.U;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 
 namespace Assets.Generation.G
 {
@@ -21,7 +15,9 @@ namespace Assets.Generation.G
                 foreach (DirectedEdge e2 in edges)
                 {
                     if (e1 == e2)
+                    {
                         break;
+                    }
 
                     var dep = EdgeIntersect(e1, e2);
 
@@ -42,7 +38,9 @@ namespace Assets.Generation.G
                 foreach (DirectedEdge e2 in edges)
                 {
                     if (e1 == e2)
+                    {
                         break;
+                    }
 
                     var dep = EdgeIntersect(e1, e2);
 
@@ -61,10 +59,12 @@ namespace Assets.Generation.G
             Assertion.Assert(edge1 != null);
             Assertion.Assert(edge2 != null);
 
-            Tuple <float, float> p = EdgeIntersect(edge1.Start, edge1.End, edge2.Start, edge2.End);
+            Tuple<float, float> p = EdgeIntersect(edge1.Start, edge1.End, edge2.Start, edge2.End);
 
             if (p == null)
+            {
                 return null;
+            }
 
             return new IntersectionResult(edge1, edge2, p.Item1, p.Item2);
         }

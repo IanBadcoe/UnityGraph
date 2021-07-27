@@ -1,6 +1,5 @@
 ﻿using Assets.Generation.G;
 using Assets.Generation.GeomRep;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,7 +10,7 @@ namespace Assets.Generation.Gen.Drawing
 {
     public class InProgressDrawerUpdater : MonoBehaviour
     {
-        public GameObject CircleDrawerTemplate; 
+        public GameObject CircleDrawerTemplate;
         public GameObject RectangleDrawerTemplate;
 
         Dictionary<object, GameObject> AllDrawers = new Dictionary<object, GameObject>();
@@ -39,11 +38,13 @@ namespace Assets.Generation.Gen.Drawing
         internal void UpdateGeometry(Generator generator)
         {
             if (generator.Graph == null)
+            {
                 return;
+            }
 
             Dictionary<object, GameObject> n_dict = new Dictionary<object, GameObject>();
 
-            foreach(INode node in generator.Graph.GetAllNodes())
+            foreach (INode node in generator.Graph.GetAllNodes())
             {
                 GameObject drawer;
 
@@ -75,7 +76,7 @@ namespace Assets.Generation.Gen.Drawing
                 }
             }
 
-            foreach(var key in AllDrawers.Keys)
+            foreach (var key in AllDrawers.Keys)
             {
                 if (!n_dict.ContainsKey(key))
                 {

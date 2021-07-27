@@ -1,10 +1,6 @@
 ﻿using Assets.Extensions;
 using Assets.Generation.U;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Generation.GeomRep
@@ -63,7 +59,9 @@ namespace Assets.Generation.GeomRep
         public override int GetHashCode()
         {
             if (IsEmpty())
+            {
                 return 0x48e5083f;
+            }
 
             return Min.GetHashCode() ^ Max.GetHashCode();
         }
@@ -71,7 +69,9 @@ namespace Assets.Generation.GeomRep
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj) || obj.GetType() != GetType())
+            {
                 return false;
+            }
 
             Area a_obj = obj as Area;
 

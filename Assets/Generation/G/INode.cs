@@ -7,7 +7,7 @@ namespace Assets.Generation.G
     public interface INode
     {
         string Name { get; }
-        string Codes{ get; }
+        string Codes { get; }
         string Template { get; }
         uint Colour { get; set; }
         Vector2 Position { get; set; }

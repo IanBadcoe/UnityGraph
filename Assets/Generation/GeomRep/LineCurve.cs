@@ -1,9 +1,6 @@
 ﻿using Assets.Extensions;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Generation.GeomRep
@@ -14,20 +11,26 @@ namespace Assets.Generation.GeomRep
         public readonly Vector2 Direction;
 
         public LineCurve(Vector2 position, Vector2 directionCosines, float length)
-            : base (0, length)
+            : base(0, length)
         {
 
             if (position == null)
+            {
                 throw new NullReferenceException("'position' cannot be null");
+            }
 
             if (directionCosines == null)
+            {
                 throw new NullReferenceException("'directionCosines' cannot be null");
+            }
 
             Position = position;
             Direction = directionCosines;
 
             if (!Direction.IsUnit(1.0e-6f))
+            {
                 throw new ArgumentException();
+            }
         }
 
         public LineCurve(Vector2 position, Vector2 directionCosines, float start, float end)
@@ -73,23 +76,33 @@ namespace Assets.Generation.GeomRep
         public override Curve Merge(Curve c_after)
         {
             if (c_after == this)
+            {
                 return null;
+            }
 
             if (!(c_after is LineCurve))
+            {
                 return null;
+            }
 
             LineCurve c_lc = (LineCurve)c_after;
             // could loop for coaxial line swith different origins here
             // but current use is more to re-merge stuff we temporarily split
             // and that all leaves Position the same in both halves
             if (Position != c_lc.Position)
+            {
                 return null;
+            }
 
             if (Direction != c_lc.Direction)
+            {
                 return null;
+            }
 
             if (EndParam != c_lc.StartParam)
+            {
                 return null;
+            }
 
             return new LineCurve(Position, Direction, StartParam, c_lc.EndParam);
         }
@@ -112,13 +125,19 @@ namespace Assets.Generation.GeomRep
         public override bool Equals(object o)
         {
             if (ReferenceEquals(o, this))
+            {
                 return true;
+            }
 
             if (!(o is LineCurve))
+            {
                 return false;
+            }
 
             if (!base.Equals_Inner(o))
+            {
                 return false;
+            }
 
             LineCurve lc_o = (LineCurve)o;
 

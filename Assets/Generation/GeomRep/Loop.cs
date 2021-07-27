@@ -1,11 +1,8 @@
-﻿using System;
+﻿using Assets.Extensions;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using Assets.Extensions;
 using System.Collections.ObjectModel;
+using UnityEngine;
 
 namespace Assets.Generation.GeomRep
 {
@@ -30,7 +27,9 @@ namespace Assets.Generation.GeomRep
             Vector2 e = c.EndPos();
 
             if (!s.Equals(e, 1e-4f))
+            {
                 throw new ArgumentException("Curves do not form a closed loop");
+            }
         }
 
         public Loop(IList<Curve> curves)
@@ -49,7 +48,9 @@ namespace Assets.Generation.GeomRep
                 Vector2 p_end = prev.EndPos();
 
                 if (!c_start.Equals(p_end, 1e-4f))
+                {
                     throw new ArgumentException("Curves do not form a closed loop");
+                }
 
                 prev = curr;
             }
@@ -69,7 +70,9 @@ namespace Assets.Generation.GeomRep
             // multi-part curves and circles, even though the latter
             // just go round and round for any level of param
             if (p < 0)
+            {
                 return null;
+            }
 
             // curve param ranges can be anywhere
             // but the loop param range starts from zero
@@ -118,20 +121,28 @@ namespace Assets.Generation.GeomRep
         public override bool Equals(object o)
         {
             if (o == this)
+            {
                 return true;
+            }
 
             if (!(o is Loop))
+            {
                 return false;
+            }
 
             Loop loop_o = (Loop)o;
 
             if (NumCurves != loop_o.NumCurves)
+            {
                 return false;
+            }
 
             for (int i = 0; i < NumCurves; i++)
             {
                 if (!m_curves[i].Equals(loop_o.m_curves[i]))
+                {
                     return false;
+                }
             }
 
             return true;
@@ -141,7 +152,7 @@ namespace Assets.Generation.GeomRep
         {
             List<Vector3> temp = new List<Vector3>();
 
-            foreach(Curve c in m_curves)
+            foreach (Curve c in m_curves)
             {
                 float param_step = c.ParamRange()
                     * (max_length / c.Length());
@@ -150,7 +161,7 @@ namespace Assets.Generation.GeomRep
 
                 float start_p = c.StartParam;
 
-                while(p < c.ParamRange())
+                while (p < c.ParamRange())
                 {
                     temp.Add(c.ComputePos(start_p + p));
 
@@ -202,11 +213,13 @@ namespace Assets.Generation.GeomRep
         public Area GetBounds()
         {
             if (m_curves.Count == 0)
+            {
                 return new Area();
+            }
 
             Area ret = new Area();
 
-            foreach(var c in m_curves)
+            foreach (var c in m_curves)
             {
                 ret = ret.Union(c.BoundingArea());
             }

@@ -1,9 +1,6 @@
 ﻿using Assets.Generation.G;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Generation.U
@@ -41,7 +38,7 @@ namespace Assets.Generation.U
         public Dictionary<Tuple<INode, INode>, float> FindPathLengths(Graph g, Func<DirectedEdge, float> get_edge_length)
         {
             dists = new Dictionary<Tuple<INode, INode>, float>();
-            
+
             // could fill the whole matrix with summed radii (or zero for the diagonal)
             // except that we'd need to add in the minimum separation and if we ever get >1 value for that
             // it would be a pain, so ATM easier to consider only paths here and min those with radii + minimum separation

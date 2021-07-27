@@ -1,6 +1,5 @@
 ﻿using Assets.Generation.G.GLInterfaces;
 using Assets.Generation.U;
-using UnityEngine;
 
 namespace Assets.Generation.G
 {
@@ -50,7 +49,9 @@ namespace Assets.Generation.G
         public override bool Equals(object o)
         {
             if (o == null || GetType() != o.GetType())
+            {
                 return false;
+            }
 
             DirectedEdge e = o as DirectedEdge;
 

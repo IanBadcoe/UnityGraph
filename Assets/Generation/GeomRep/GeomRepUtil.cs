@@ -2,9 +2,6 @@
 using Assets.Generation.U;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Generation.GeomRep
@@ -14,7 +11,9 @@ namespace Assets.Generation.GeomRep
         public static List<Tuple<float, float>> CurveCurveIntersect(Curve c1, Curve c2)
         {
             if (c1.Equals(c2))
+            {
                 return null;
+            }
 
             Tuple<Vector2, Vector2?> pts;
 
@@ -32,7 +31,9 @@ namespace Assets.Generation.GeomRep
             }
 
             if (pts == null)
+            {
                 return null;
+            }
 
             List<Tuple<float, float>> ret = new List<Tuple<float, float>>();
 
@@ -58,7 +59,9 @@ namespace Assets.Generation.GeomRep
             }
 
             if (ret.Count > 0)
+            {
                 return ret;
+            }
 
             return null;
         }
@@ -110,7 +113,9 @@ namespace Assets.Generation.GeomRep
                   l2.StartPos(), l2.EndPos());
 
             if (ret == null)
+            {
                 return null;
+            }
 
             // inefficient, am going to calculate a position here, just so that I can
             // back-calculate params from it above, however line-line is the only intersection that gives
@@ -132,7 +137,9 @@ namespace Assets.Generation.GeomRep
                   l2.StartPos(), l2.EndPos());
 
             if (ret == null)
+            {
                 return null;
+            }
 
             Vector2 hit1 = l2.ComputePos(l2.StartParam + (l2.EndParam - l2.StartParam) * ret.Item1);
             Vector2? hit2 = null;
@@ -204,7 +211,9 @@ namespace Assets.Generation.GeomRep
             }
 
             if (hit1 == null)
+            {
                 return null;
+            }
 
             return new Tuple<float, float?>(hit1.Value, hit2);
         }

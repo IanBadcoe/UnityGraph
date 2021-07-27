@@ -1,9 +1,4 @@
 ﻿using Assets.Generation.G;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Generation.Gen.Drawing
@@ -18,7 +13,7 @@ namespace Assets.Generation.Gen.Drawing
 
         private void Awake()
         {
-            Renderer = GetComponent<LineRenderer>();            
+            Renderer = GetComponent<LineRenderer>();
         }
 
         private void Update()

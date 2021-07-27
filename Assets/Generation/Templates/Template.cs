@@ -1,10 +1,9 @@
-﻿using Assets.Generation.Templates;
-using Assets.Generation.G;
-using System.Collections.Generic;
-using UnityEngine;
-using System;
-using System.Collections.ObjectModel;
+﻿using Assets.Generation.G;
 using Assets.Generation.U;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using UnityEngine;
 
 namespace Assets.Generation.Templates
 {

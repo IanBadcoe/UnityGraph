@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Assets.Generation.U
+﻿namespace Assets.Generation.U
 {
     public abstract class EqualityBase
     {
@@ -13,10 +7,14 @@ namespace Assets.Generation.U
         public static bool operator ==(EqualityBase lhs, EqualityBase rhs)
         {
             if (ReferenceEquals(lhs, null) && ReferenceEquals(rhs, null))
+            {
                 return true;
+            }
 
             if (ReferenceEquals(lhs, null) || ReferenceEquals(rhs, null))
+            {
                 return false;
+            }
 
             return lhs.Equals(rhs);
         }

@@ -1,14 +1,11 @@
 ﻿using Assets.Generation.GeomRep;
 using Assets.Generation.GeomRep.Layouts;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace Assets.Generation.Templates
 {
     public class TemplateStore1 : TemplateStore
     {
-        DefaultLayoutFactory DefaultLayoutFactory = new DefaultLayoutFactory();
+        readonly DefaultLayoutFactory DefaultLayoutFactory = new DefaultLayoutFactory();
 
         public TemplateStore1()
         {
