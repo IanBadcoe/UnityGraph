@@ -687,19 +687,19 @@ public class GraphTest
 
         INode n1 = g.AddNode("", "", "", 1.0f);
 
-        Assert.IsTrue(g.Bounds().Equals(new Area(new Vector2(-1, -1), new Vector2(2, 2))));
+        Assert.IsTrue(g.Bounds().Equals(new Area(new Vector2(-1, -1), new Vector2(1, 1))));
 
         INode n2 = g.AddNode("", "", "", 2.0f);
 
-        Assert.IsTrue(g.Bounds().Equals(new Area(new Vector2(-2, -2), new Vector2(4, 4))));
+        Assert.IsTrue(g.Bounds().Equals(new Area(new Vector2(-2, -2), new Vector2(2, 2))));
 
         n1.Position = new Vector2(-2, 0);
 
-        Assert.IsTrue(g.Bounds().Equals(new Area(new Vector2(-3, -2), new Vector2(5, 4))));
+        Assert.IsTrue(g.Bounds().Equals(new Area(new Vector2(-3, -2), new Vector2(2, 2))));
 
         n2.Position = new Vector2(10, 10);
 
-        Assert.IsTrue(g.Bounds().Equals(new Area(new Vector2(-3, -1), new Vector2(15, 13))));
+        Assert.IsTrue(g.Bounds().Equals(new Area(new Vector2(-3, -1), new Vector2(12, 12))));
     }
 
     //   [Test]
