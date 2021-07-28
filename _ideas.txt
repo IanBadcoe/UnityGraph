@@ -1,0 +1,21 @@
+UnityGraph ideas:
+
+- render output into 3D scene somewhat like (some) Unexplored levels with rooms separated by void + optional walls/ceilings
+-- some slight 3D design in that things may pass over/under each other
+- topological rewrite rules
+-- different zones in level, e.g. "corridors" vs. "caves"
+- various upgrades to templates
+-- replace > 1 node?
+-- "any number of these" optional
+-- stuff related to topological approaches may also change them
+- loops
+- redesign level on fly
+-- mechanic to update while the user is in it, either:
+--- progress smoothly to new level, shrinking deleted things down to nothing, growing added things and relaxing all as we go
+--- move by discrete phases to new arrangement: 1) remove deletes, 2) move existing, 3) add new
+---- e.g. drop deletes into the void, move existing sideways, raise new stuff out of the void
+- compound rooms (>1 circle clsoe together)
+- non-circular rooms
+-- just place inside circle
+-- non-circular area in relaxation?
+-- four circles in a compound room?
