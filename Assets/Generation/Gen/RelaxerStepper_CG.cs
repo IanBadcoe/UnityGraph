@@ -14,13 +14,14 @@ namespace Assets.Generation.Gen
     {
         public IStepper MakeRelaxer(IoCContainer ioc_container, Graph g, GeneratorConfig c)
         {
-            return new RelaxerStepper_CG(ioc_container, g, c);
+            return new RelaxerStepper_CG(ioc_container, g, c, 0.5);
         }
     }
 
     public class RelaxerStepper_CG : IStepper
     {
         public int MaxIterationsPerStep = 10;
+        public readonly double ConvergenceTightness;
 
         private readonly IoCContainer ioc_container;
         private readonly Graph m_graph;
@@ -59,11 +60,13 @@ namespace Assets.Generation.Gen
 
         public TerminationCondition Status { get; private set; }
 
-        public RelaxerStepper_CG(IoCContainer ioc_container, Graph g, GeneratorConfig c)
+        public RelaxerStepper_CG(IoCContainer ioc_container, Graph g, GeneratorConfig c, double tightness)
         {
             this.ioc_container = ioc_container;
             this.m_graph = g;
             this.m_config = c;
+
+            ConvergenceTightness = tightness;
         }
 
         private void SetUp()
@@ -101,7 +104,7 @@ namespace Assets.Generation.Gen
 
             alglib.mincgcreatef(m_pars, 1e-4, out opt_state);
             alglib.mincgsuggeststep(opt_state, 1);
-            alglib.mincgsetcond(opt_state, 0, 0, 1e-12, MaxIterationsPerStep);
+            alglib.mincgsetcond(opt_state, 0, 0, ConvergenceTightness, MaxIterationsPerStep);
             alglib.mincgsetxrep(opt_state, true);
 
 #if DEBUG

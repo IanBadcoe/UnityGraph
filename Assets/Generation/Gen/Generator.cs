@@ -128,6 +128,7 @@ namespace Assets.Generation.Gen
 
             m_final_relaxer = new StepperController(Graph,
                   new RelaxerStepper_CG(m_ioc_container, Graph, temp));
+                  new RelaxerStepper_CG(m_ioc_container, Graph, temp, 0.01));
 
             m_phase = Phase.GraphExpand;
 
@@ -139,9 +140,7 @@ namespace Assets.Generation.Gen
 
         private StepperController.StatusReport GraphExpandStep()
         {
-            StepperController.StatusReport ret = null;
-
-            ret = m_expander.Step();
+            StepperController.StatusReport ret = m_expander.Step();
 
             if (ret.Complete)
             {
