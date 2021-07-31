@@ -127,7 +127,6 @@ namespace Assets.Generation.Gen
             temp.RelaxationMoveTarget /= 5;
 
             m_final_relaxer = new StepperController(Graph,
-                  new RelaxerStepper_CG(m_ioc_container, Graph, temp));
                   new RelaxerStepper_CG(m_ioc_container, Graph, temp, 0.01));
 
             m_phase = Phase.GraphExpand;
