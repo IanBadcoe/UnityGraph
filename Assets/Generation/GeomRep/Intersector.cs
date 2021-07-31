@@ -103,22 +103,22 @@ namespace Assets.Generation.GeomRep
             // other set, they have no influence on any other loops and can be simply copied inchanged into
             // the output
 
-            Dictionary<IList<Curve>, Area> bound_map1 = new Dictionary<IList<Curve>, Area>();
+            Dictionary<IList<Curve>, Box2> bound_map1 = new Dictionary<IList<Curve>, Box2>();
 
             foreach (IList<Curve> alc1 in working_loops1.Values)
             {
-                Area bound = alc1.Select(l => l.BoundingArea)
-                    .Aggregate(new Area(), (a, b) => a.Union(b));
+                Box2 bound = alc1.Select(l => l.BoundingArea)
+                    .Aggregate(new Box2(), (a, b) => a.Union(b));
 
                 bound_map1.Add(alc1, bound);
             }
 
-            Dictionary<IList<Curve>, Area> bound_map2 = new Dictionary<IList<Curve>, Area>();
+            Dictionary<IList<Curve>, Box2> bound_map2 = new Dictionary<IList<Curve>, Box2>();
 
             foreach (IList<Curve> alc2 in working_loops2.Values)
             {
-                Area bound = alc2.Select(l => l.BoundingArea)
-                    .Aggregate(new Area(), (a, b) => a.Union(b));
+                Box2 bound = alc2.Select(l => l.BoundingArea)
+                    .Aggregate(new Box2(), (a, b) => a.Union(b));
 
                 bound_map2.Add(alc2, bound);
             }
@@ -224,7 +224,7 @@ namespace Assets.Generation.GeomRep
             HashSet<Vector2> curve_joints = new HashSet<Vector2>(all_curves.Select(c => c.StartPos));
 
             // bounding box allows us to create cutting lines that definitely exceed all loop boundaries
-            Area bounds = all_curves.Select(c => c.BoundingArea).Aggregate(new Area(), (a, b) => a.Union(b));
+            Box2 bounds = all_curves.Select(c => c.BoundingArea).Aggregate(new Box2(), (a, b) => a.Union(b));
 
             // but all we need from that is the max length in the box
             float diameter = bounds.Diagonal.magnitude;
@@ -308,8 +308,8 @@ namespace Assets.Generation.GeomRep
         // non-private only for testing
         void RemoveEasyLoops(Dictionary<int, IList<Curve>> working_loops,
                              LoopSet ret,
-                             ICollection<Area> other_bounds,
-                             Dictionary<IList<Curve>, Area> bound_map)
+                             ICollection<Box2> other_bounds,
+                             Dictionary<IList<Curve>, Box2> bound_map)
         {
             List<int> keys = working_loops.Keys.ToList();
 
@@ -317,11 +317,11 @@ namespace Assets.Generation.GeomRep
             {
                 IList<Curve> alc1 = working_loops[i];
 
-                Area bound = bound_map[alc1];
+                Box2 bound = bound_map[alc1];
 
                 bool hits = false;
 
-                foreach (Area b in other_bounds)
+                foreach (Box2 b in other_bounds)
                 {
                     if (!bound.Disjoint(b))
                     {

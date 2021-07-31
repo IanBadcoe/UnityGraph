@@ -9,7 +9,7 @@ namespace Assets.Generation.GeomRep
         public readonly float StartParam;
         public readonly float EndParam;
 
-        public abstract Area BoundingArea { get; }
+        public abstract Box2 BoundingArea { get; }
 
         // geometric length between start and end params
         public abstract float Length { get; }

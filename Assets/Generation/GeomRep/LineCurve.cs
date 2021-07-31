@@ -53,9 +53,9 @@ namespace Assets.Generation.GeomRep
             return new LineCurve(Position, Direction, start, end);
         }
 
-        public override Area BoundingArea
+        public override Box2 BoundingArea
         {
-            get => new Area(StartPos.Min(EndPos), StartPos.Max(EndPos));
+            get => new Box2(StartPos.Min(EndPos), StartPos.Max(EndPos));
         }
 
         public override Vector2 Tangent(float param)

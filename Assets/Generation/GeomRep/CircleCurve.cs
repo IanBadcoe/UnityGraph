@@ -141,14 +141,14 @@ namespace Assets.Generation.GeomRep
             return new CircleCurve(Position, Radius, start, end, Rotation);
         }
 
-        public override Area BoundingArea
+        public override Box2 BoundingArea
         {
             // use whole circle here as the use I have for the moment doesn't need anything
             // tighter
             //
             // full solution is to union together startPos, EndPos and whichever of
             // 0, pi/2, pi and 3pi/2 points are within param range
-            get => new Area(Position - new Vector2(Radius, Radius),
+            get => new Box2(Position - new Vector2(Radius, Radius),
                 Position + new Vector2(Radius, Radius));
         }
 

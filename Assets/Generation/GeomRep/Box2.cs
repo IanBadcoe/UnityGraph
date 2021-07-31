@@ -5,22 +5,22 @@ using UnityEngine;
 
 namespace Assets.Generation.GeomRep
 {
-    public class Area : EqualityBase
+    public class Box2 : EqualityBase
     {
         public readonly Vector2 Min;
         public readonly Vector2 Max;
 
         public Vector2 Diagonal { get => Max - Min; }
 
-        static public Area Empty { get; } = new Area();
+        static public Box2 Empty { get; } = new Box2();
 
-        public Area()
+        public Box2()
         {
             Min = new Vector2(0, 0);
             Max = new Vector2(-1, -1);
         }
 
-        public Area(Vector2 bl, Vector2 tr)
+        public Box2(Vector2 bl, Vector2 tr)
         {
             Min = bl;
             Max = tr;
@@ -33,7 +33,7 @@ namespace Assets.Generation.GeomRep
             return Min.x > Max.x || Min.y > Max.y;
         }
 
-        public Area Union(Area rhs)
+        public Box2 Union(Box2 rhs)
         {
             // empty areas add nothing to other areas
             if (IsEmpty())
@@ -45,10 +45,10 @@ namespace Assets.Generation.GeomRep
                 return this;
             }
 
-            return new Area(Min.Min(rhs.Min), Max.Max(rhs.Max));
+            return new Box2(Min.Min(rhs.Min), Max.Max(rhs.Max));
         }
 
-        public bool Disjoint(Area rhs)
+        public bool Disjoint(Box2 rhs)
         {
             return Min.x > rhs.Max.x
                 || Min.y > rhs.Max.y
@@ -73,7 +73,7 @@ namespace Assets.Generation.GeomRep
                 return false;
             }
 
-            Area a_obj = obj as Area;
+            Box2 a_obj = obj as Box2;
 
             return Min == a_obj.Min && Max == a_obj.Max;
         }

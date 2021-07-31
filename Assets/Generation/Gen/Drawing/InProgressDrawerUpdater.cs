@@ -84,7 +84,7 @@ namespace Assets.Generation.Gen.Drawing
                 }
             }
 
-            Area bounds = generator.Graph.Bounds();
+            Box2 bounds = generator.Graph.Bounds();
             Camera.transform.position = bounds.Centre() + new Vector3(0, 0, -300);
 
             float aspect_ratio = (float)Screen.width / (float)Screen.height;

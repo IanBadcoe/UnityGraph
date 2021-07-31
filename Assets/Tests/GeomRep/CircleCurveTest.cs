@@ -174,9 +174,9 @@ public class CircleCurveTest
         // for the moment we do not account for partial circles, so don't test that...
         CircleCurve cc = new CircleCurve(new Vector2(5, 6), 7);
 
-        Area b = cc.BoundingArea;
+        Box2 b = cc.BoundingArea;
 
-        Assert.AreEqual(new Area(new Vector2(-2, -1), new Vector2(12, 13)), b);
+        Assert.AreEqual(new Box2(new Vector2(-2, -1), new Vector2(12, 13)), b);
     }
 
     [Test]

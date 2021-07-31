@@ -210,14 +210,14 @@ namespace Assets.Generation.GeomRep
             return ret;
         }
 
-        public Area GetBounds()
+        public Box2 GetBounds()
         {
             if (m_curves.Count == 0)
             {
-                return new Area();
+                return new Box2();
             }
 
-            Area ret = new Area();
+            Box2 ret = new Box2();
 
             foreach (var c in m_curves)
             {
@@ -226,5 +226,17 @@ namespace Assets.Generation.GeomRep
 
             return ret;
         }
+
+        //public Loop Reversed()
+        //{
+        //    List<Curve> temp = new List<Curve>();
+
+        //    for (int i = m_curves.Count - 1; i > 0; i--)
+        //    {
+        //        temp.Add(m_curves[i].Reversed());
+        //    }
+
+        //    return new Loop(temp);
+        //}
     }
 }

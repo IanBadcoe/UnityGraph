@@ -54,7 +54,7 @@ public class IntersectorTest
             return null;
         }
 
-        public override Area BoundingArea
+        public override Box2 BoundingArea
         {
             get => null;
         }

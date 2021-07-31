@@ -12,7 +12,7 @@ namespace Assets.Generation.GeomRep
         private readonly List<LoopSet> m_detail_loop_sets = new List<LoopSet>();
         private LoopSet m_merged_loops = new LoopSet();
 
-        private Area m_bounds;
+        private Box2 m_bounds;
         private Vector2 m_start_pos;
 
         private readonly Intersector m_intersector = new Intersector();
@@ -128,7 +128,7 @@ namespace Assets.Generation.GeomRep
 
         private void CalculateBounds()
         {
-            m_bounds = m_merged_loops.Select(l => l.GetBounds()).Aggregate(new Area(), (a, b) => a.Union(b));
+            m_bounds = m_merged_loops.Select(l => l.GetBounds()).Aggregate(new Box2(), (a, b) => a.Union(b));
         }
 
         //public Level makeLevel(floatcell_size, floatwall_facet_length)

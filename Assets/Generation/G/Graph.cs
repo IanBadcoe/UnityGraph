@@ -181,15 +181,15 @@ namespace Assets.Generation.G
             return m_edges.Contains(edge);
         }
 
-        public Area Bounds()
+        public Box2 Bounds()
         {
-            Area ret = Area.Empty;
+            Box2 ret = Box2.Empty;
 
             foreach (INode n in m_nodes)
             {
                 Vector2 rad_box = new Vector2(n.Radius, n.Radius);
 
-                ret = ret.Union(new Area(n.Position - rad_box, n.Position + rad_box));
+                ret = ret.Union(new Box2(n.Position - rad_box, n.Position + rad_box));
             }
 
             return ret;

@@ -63,9 +63,9 @@ public class LineCurveTest
         LineCurve lc2 = new LineCurve(new Vector2(), new Vector2(1 / Mathf.Sqrt(2), 1 / Mathf.Sqrt(2)), 5);
         LineCurve lc3 = new LineCurve(new Vector2(10, 11), new Vector2(0, 1), 5);
 
-        Assert.AreEqual(new Area(new Vector2(-1, -2), new Vector2(4, -2)), lc.BoundingArea);
-        Assert.AreEqual(new Area(new Vector2(), new Vector2(5 / Mathf.Sqrt(2), 5 / Mathf.Sqrt(2))), lc2.BoundingArea);
-        Assert.AreEqual(new Area(new Vector2(10, 11), new Vector2(10, 16)), lc3.BoundingArea);
+        Assert.AreEqual(new Box2(new Vector2(-1, -2), new Vector2(4, -2)), lc.BoundingArea);
+        Assert.AreEqual(new Box2(new Vector2(), new Vector2(5 / Mathf.Sqrt(2), 5 / Mathf.Sqrt(2))), lc2.BoundingArea);
+        Assert.AreEqual(new Box2(new Vector2(10, 11), new Vector2(10, 16)), lc3.BoundingArea);
     }
 
     [Test]
