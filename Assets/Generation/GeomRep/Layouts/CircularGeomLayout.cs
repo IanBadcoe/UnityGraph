@@ -1,26 +1,13 @@
-﻿using UnityEngine;
+﻿using Assets.Generation.G;
+using UnityEngine;
 
 namespace Assets.Generation.GeomRep
 {
     public class CircularGeomLayout : GeomLayout
     {
-        public readonly Vector2 Position;
-        public readonly float Radius;
-
-        public CircularGeomLayout(Vector2 position, float radius)
+        public override Loop MakeBaseGeometry(INode node)
         {
-            Position = position;
-            Radius = radius;
-        }
-
-        public override Loop MakeBaseGeometry()
-        {
-            return new Loop(new CircleCurve(Position, Radius));
-        }
-
-        public override LoopSet MakeDetailGeometry()
-        {
-            return null;
+            return new Loop(new CircleCurve(node.Position, node.Radius));
         }
     }
 }

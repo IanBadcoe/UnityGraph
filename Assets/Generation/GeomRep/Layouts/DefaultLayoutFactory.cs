@@ -7,11 +7,12 @@ namespace Assets.Generation.GeomRep
     {
         public IGeomLayout Create(INode n)
         {
-            return new CircularGeomLayout(n.Position, n.Radius);
+            return new CircularGeomLayout();
         }
 
         public IGeomLayout Create(DirectedEdge de)
         {
+            // default use of rects is for corridors...
             return MakeDefaultCorridor(de);
         }
 
@@ -21,8 +22,7 @@ namespace Assets.Generation.GeomRep
             // so that it doesn't precisely hit at a tangent to any adjoining junction-node's circle
             // -- that causes awkward numerical precision problems in the curve-curve intersection routines
             // which can throw out the union operation
-            return new RectangularGeomLayout(de.Start.Position,
-                  de.End.Position, de.HalfWidth * 0.99f);
+            return new RectangularGeomLayout(0.99f);
         }
 
     }

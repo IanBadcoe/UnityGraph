@@ -9,7 +9,7 @@ namespace Assets.Generation.GeomRep.Layouts
     {
         public IGeomLayout Create(INode n)
         {
-            return new CircularPillarGeomLayout(n.Position, n.Radius);
+            return new CircularPillarGeomLayout();
         }
 
         public IGeomLayout Create(DirectedEdge de)
@@ -20,24 +20,15 @@ namespace Assets.Generation.GeomRep.Layouts
 
     public class CircularPillarGeomLayout : GeomLayout
     {
-        private readonly Vector2 m_position;
-        private readonly float m_rad;
-
-        public CircularPillarGeomLayout(Vector2 position, float radius)
+        public override Loop MakeBaseGeometry(INode node)
         {
-            m_position = position;
-            m_rad = radius;
+            return new Loop(new CircleCurve(node.Position, node.Radius));
         }
 
-        public override Loop MakeBaseGeometry()
-        {
-            return new Loop(new CircleCurve(m_position, m_rad));
-        }
-
-        public override LoopSet MakeDetailGeometry()
+        public override LoopSet MakeDetailGeometry(INode node)
         {
             LoopSet ret = new LoopSet();
-            ret.Add(new Loop(new CircleCurve(m_position, m_rad / 2, CircleCurve.RotationDirection.Reverse)));
+            ret.Add(new Loop(new CircleCurve(node.Position, node.Radius / 2, CircleCurve.RotationDirection.Reverse)));
 
             return ret;
         }
@@ -47,7 +38,7 @@ namespace Assets.Generation.GeomRep.Layouts
     {
         public IGeomLayout Create(INode n)
         {
-            return new FourCircularPillarsGeomLayout(n.Position, n.Radius);
+            return new FourCircularPillarsGeomLayout();
         }
 
         public IGeomLayout Create(DirectedEdge de)
@@ -58,30 +49,21 @@ namespace Assets.Generation.GeomRep.Layouts
 
     public class FourCircularPillarsGeomLayout : GeomLayout
     {
-        private readonly Vector2 m_position;
-        private readonly float m_rad;
-
-        public FourCircularPillarsGeomLayout(Vector2 position, float radius)
+        public override Loop MakeBaseGeometry(INode node)
         {
-            m_position = position;
-            m_rad = radius;
+            return new Loop(new CircleCurve(node.Position, node.Radius));
         }
 
-        public override Loop MakeBaseGeometry()
-        {
-            return new Loop(new CircleCurve(m_position, m_rad));
-        }
-
-        public override LoopSet MakeDetailGeometry()
+        public override LoopSet MakeDetailGeometry(INode node)
         {
             LoopSet ret = new LoopSet();
 
             for (int i = 0; i < 4; i++)
             {
                 float ang = Mathf.PI * 2 * i / 4;
-                Vector2 pos = m_position + new Vector2(Mathf.Sin(ang) * m_rad / 2, Mathf.Cos(ang) * m_rad / 2);
+                Vector2 pos = node.Position + new Vector2(Mathf.Sin(ang) * node.Radius / 2, Mathf.Cos(ang) * node.Radius / 2);
 
-                ret.Add(new Loop(new CircleCurve(pos, m_rad / 6, CircleCurve.RotationDirection.Reverse)));
+                ret.Add(new Loop(new CircleCurve(pos, node.Radius / 6, CircleCurve.RotationDirection.Reverse)));
             }
 
             return ret;

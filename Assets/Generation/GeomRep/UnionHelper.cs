@@ -80,7 +80,7 @@ namespace Assets.Generation.GeomRep
             {
                 GeomLayout gl = n.LayoutCreator.Create(n) as GeomLayout;
 
-                Loop bg = gl.MakeBaseGeometry();
+                Loop bg = gl.MakeBaseGeometry(n);
 
                 // can have node with no geometry...  at least in unit-tests
                 if (bg != null)
@@ -88,7 +88,7 @@ namespace Assets.Generation.GeomRep
                     AddBaseLoop(bg);
                 }
 
-                LoopSet details = gl.MakeDetailGeometry();
+                LoopSet details = gl.MakeDetailGeometry(n);
 
                 // can definitely have no details
                 if (details != null)
@@ -101,14 +101,14 @@ namespace Assets.Generation.GeomRep
             {
                 GeomLayout gl = de.LayoutCreator.Create(de) as GeomLayout;
 
-                Loop l = gl.MakeBaseGeometry();
+                Loop l = gl.MakeBaseGeometry(de);
 
                 if (l != null)
                 {
                     AddBaseLoop(l);
                 }
 
-                LoopSet details = gl.MakeDetailGeometry();
+                LoopSet details = gl.MakeDetailGeometry(de);
 
                 // can definitely have no details
                 if (details != null)
