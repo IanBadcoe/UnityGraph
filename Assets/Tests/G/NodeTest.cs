@@ -6,7 +6,7 @@ using UnityEngine.TestTools;
 using Assets.Generation.G;
 using System;
 using Assets.Generation.U;
-using Assets.Generation.G.GLInterfaces;
+using Assets.Generation.GeomRep;
 
 public class NodeTest
 {
@@ -194,30 +194,15 @@ public class NodeTest
         Assert.AreEqual(0x12345678, n1.Colour);
     }
 
-    private class DummyGeomFactory : IGeomLayoutFactory
-    {
-        public IGeomLayout Create(INode n)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IGeomLayout Create(DirectedEdge de)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     [Test]
-    public void TestGeomLayoutCreator()
+    public void TestGeomLayout()
     {
         Node n1 = new Node("", "", "", 0);
 
-        Assert.IsNull(n1.LayoutCreator);
+        Assert.IsNull(n1.Layout);
 
-        IGeomLayoutFactory dummy = new DummyGeomFactory();
+        Node n2 = new Node("", "", "", 0, CircularGeomLayout.Instance);
 
-        Node n2 = new Node("", "", "", 0, dummy);
-
-        Assert.AreEqual(dummy, n2.LayoutCreator);
+        Assert.AreEqual(CircularGeomLayout.Instance, n2.Layout);
     }
 }

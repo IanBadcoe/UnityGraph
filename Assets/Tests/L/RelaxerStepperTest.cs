@@ -21,13 +21,13 @@ public class RelaxerStepperTest
     [Test]
     public void TestEdgeRelaxation()
     {
-        Graph g = new Graph(null);
+        Graph g = new Graph();
 
-        INode n1 = g.AddNode("n1", "", "", 0);
-        INode n2 = g.AddNode("n2", "", "", 0);
-        INode n3 = g.AddNode("n3", "", "", 0);
-        INode n4 = g.AddNode("n4", "", "", 0);
-        INode n5 = g.AddNode("n5", "", "", 0);
+        INode n1 = g.AddNode("n1", "", "", 0, null);
+        INode n2 = g.AddNode("n2", "", "", 0, null);
+        INode n3 = g.AddNode("n3", "", "", 0, null);
+        INode n4 = g.AddNode("n4", "", "", 0, null);
+        INode n5 = g.AddNode("n5", "", "", 0, null);
 
         // place them non-overlapping and separated in both dimensions
         n1.Position = new Vector2(0, 0);
@@ -37,11 +37,11 @@ public class RelaxerStepperTest
         n5.Position = new Vector2(0, 100);
 
         // a possible triangle and two single-connected nodes
-        DirectedEdge e12 = g.Connect(n1, n2, 100, 100, 0);
-        DirectedEdge e23 = g.Connect(n2, n3, 80, 80, 0);
-        DirectedEdge e31 = g.Connect(n3, n1, 60, 60, 0);
-        DirectedEdge e34 = g.Connect(n3, n4, 120, 120, 0);
-        DirectedEdge e15 = g.Connect(n1, n5, 40, 40, 0);
+        DirectedEdge e12 = g.Connect(n1, n2, 100, 100, 0, null);
+        DirectedEdge e23 = g.Connect(n2, n3, 80, 80, 0, null);
+        DirectedEdge e31 = g.Connect(n3, n1, 60, 60, 0, null);
+        DirectedEdge e34 = g.Connect(n3, n4, 120, 120, 0, null);
+        DirectedEdge e15 = g.Connect(n1, n5, 40, 40, 0, null);
 
         RelaxerStepper rs = new RelaxerStepper(null, g, m_config);
 
@@ -80,11 +80,11 @@ public class RelaxerStepperTest
     [Test]
     public void TestEdgeContradictionRelaxation()
     {
-        Graph g = new Graph(null);
+        Graph g = new Graph();
 
-        INode n1 = g.AddNode("n1", "", "", 0);
-        INode n2 = g.AddNode("n2", "", "", 0);
-        INode n3 = g.AddNode("n3", "", "", 0);
+        INode n1 = g.AddNode("n1", "", "", 0, null);
+        INode n2 = g.AddNode("n2", "", "", 0, null);
+        INode n3 = g.AddNode("n3", "", "", 0, null);
 
         // place them non-overlapping and separated in both dimensions
         n1.Position = new Vector2(0, 0);
@@ -92,9 +92,9 @@ public class RelaxerStepperTest
         n3.Position = new Vector2(0, -100);
 
         // an impossible triangle
-        DirectedEdge e12 = g.Connect(n1, n2, 100, 100, 0);
-        DirectedEdge e23 = g.Connect(n2, n3, 40, 40, 0);
-        DirectedEdge e31 = g.Connect(n3, n1, 40, 40, 0);
+        DirectedEdge e12 = g.Connect(n1, n2, 100, 100, 0, null);
+        DirectedEdge e23 = g.Connect(n2, n3, 40, 40, 0, null);
+        DirectedEdge e31 = g.Connect(n3, n1, 40, 40, 0, null);
 
         RelaxerStepper rs = new RelaxerStepper(null, g, m_config);
 
@@ -126,10 +126,10 @@ public class RelaxerStepperTest
     [Test]
     public void TestNodeWideSeparationRelaxation()
     {
-        Graph g = new Graph(null);
+        Graph g = new Graph();
 
-        INode n1 = g.AddNode("n1", "", "", 10.0f);
-        INode n2 = g.AddNode("n2", "", "", 10.0f);
+        INode n1 = g.AddNode("n1", "", "", 10.0f, null);
+        INode n2 = g.AddNode("n2", "", "", 10.0f, null);
 
         n1.Position = new Vector2(0, 0);
         n2.Position = new Vector2(-100, 0);
@@ -161,10 +161,10 @@ public class RelaxerStepperTest
     [Test]
     public void TestNodeTooCloseRelaxation()
     {
-        Graph g = new Graph(null);
+        Graph g = new Graph();
 
-        INode n1 = g.AddNode("n1", "", "", 10.0f);
-        INode n2 = g.AddNode("n2", "", "", 10.0f);
+        INode n1 = g.AddNode("n1", "", "", 10.0f, null);
+        INode n2 = g.AddNode("n2", "", "", 10.0f, null);
 
         n1.Position = new Vector2(0, 0);
         n2.Position = new Vector2(-1, 0);
@@ -196,20 +196,20 @@ public class RelaxerStepperTest
     [Test]
     public void TestEdgeWideSeparationRelaxation()
     {
-        Graph g = new Graph(null);
+        Graph g = new Graph();
 
-        INode n1 = g.AddNode("edge1start", "", "", 10.0f);
-        INode n2 = g.AddNode("edge1end", "", "", 10.0f);
-        INode n3 = g.AddNode("edge2start", "", "", 10.0f);
-        INode n4 = g.AddNode("edge2end", "", "", 10.0f);
+        INode n1 = g.AddNode("edge1start", "", "", 10.0f, null);
+        INode n2 = g.AddNode("edge1end", "", "", 10.0f, null);
+        INode n3 = g.AddNode("edge2start", "", "", 10.0f, null);
+        INode n4 = g.AddNode("edge2end", "", "", 10.0f, null);
 
         n1.Position = new Vector2(0, 0);
         n2.Position = new Vector2(0, 20);
         n3.Position = new Vector2(100, 0);
         n4.Position = new Vector2(100, 20);
 
-        g.Connect(n1, n2, 20, 20, 10);
-        g.Connect(n3, n4, 20, 20, 10);
+        g.Connect(n1, n2, 20, 20, 10, null);
+        g.Connect(n3, n4, 20, 20, 10, null);
 
         RelaxerStepper rs = new RelaxerStepper(null, g, m_config);
 
@@ -242,20 +242,20 @@ public class RelaxerStepperTest
     [Test]
     public void TestEdgeTooCloseRelaxation()
     {
-        Graph g = new Graph(null);
+        Graph g = new Graph();
 
-        INode n1 = g.AddNode("edge1start", "", "", 10.0f);
-        INode n2 = g.AddNode("edge1end", "", "", 10.0f);
-        INode n3 = g.AddNode("edge2start", "", "", 10.0f);
-        INode n4 = g.AddNode("edge2end", "", "", 10.0f);
+        INode n1 = g.AddNode("edge1start", "", "", 10.0f, null);
+        INode n2 = g.AddNode("edge1end", "", "", 10.0f, null);
+        INode n3 = g.AddNode("edge2start", "", "", 10.0f, null);
+        INode n4 = g.AddNode("edge2end", "", "", 10.0f, null);
 
         n1.Position = new Vector2(0, 0);
         n2.Position = new Vector2(0, 20);
         n3.Position = new Vector2(1, 0);
         n4.Position = new Vector2(1, 20);
 
-        g.Connect(n1, n2, 20, 20, 10);
-        g.Connect(n3, n4, 20, 20, 10);
+        g.Connect(n1, n2, 20, 20, 10, null);
+        g.Connect(n3, n4, 20, 20, 10, null);
 
         RelaxerStepper rs = new RelaxerStepper(null, g, m_config);
 
@@ -288,18 +288,18 @@ public class RelaxerStepperTest
     [Test]
     public void TestEdgeNodeTooCloseRelaxation()
     {
-        Graph g = new Graph(null);
+        Graph g = new Graph();
 
-        INode n1 = g.AddNode("edge1start", "", "", 0.0f);
-        INode n2 = g.AddNode("edge1end", "", "", 0.0f);
-        INode n3 = g.AddNode("node", "", "", 10.0f);
+        INode n1 = g.AddNode("edge1start", "", "", 0.0f, null);
+        INode n2 = g.AddNode("edge1end", "", "", 0.0f, null);
+        INode n3 = g.AddNode("node", "", "", 10.0f, null);
 
         // edge long enough that there is no n1->n3 or n2->n3 interaction
         n1.Position = new Vector2(0, 0);
         n2.Position = new Vector2(0, 100);
         n3.Position = new Vector2(1, 50);
 
-        g.Connect(n1, n2, 100, 100, 10);
+        g.Connect(n1, n2, 100, 100, 10, null);
 
         RelaxerStepper rs = new RelaxerStepper(null, g, m_config);
 
@@ -330,12 +330,12 @@ public class RelaxerStepperTest
     [Test]
     public void TestCrossingEdge_Error()
     {
-        Graph g = new Graph(null);
+        Graph g = new Graph();
 
-        INode n1 = g.AddNode("edge1start", "", "", 10.0f);
-        INode n2 = g.AddNode("edge1end", "", "", 10.0f);
-        INode n3 = g.AddNode("edge2start", "", "", 10.0f);
-        INode n4 = g.AddNode("edge2end", "", "", 10.0f);
+        INode n1 = g.AddNode("edge1start", "", "", 10.0f, null);
+        INode n2 = g.AddNode("edge1end", "", "", 10.0f, null);
+        INode n3 = g.AddNode("edge2start", "", "", 10.0f, null);
+        INode n4 = g.AddNode("edge2end", "", "", 10.0f, null);
 
         // two clearly crossing edges
         n1.Position = new Vector2(0, -100);
@@ -343,8 +343,8 @@ public class RelaxerStepperTest
         n3.Position = new Vector2(-100, 0);
         n4.Position = new Vector2(100, 0);
 
-        g.Connect(n1, n2, 100, 100, 10);
-        g.Connect(n3, n4, 100, 100, 10);
+        g.Connect(n1, n2, 100, 100, 10, null);
+        g.Connect(n3, n4, 100, 100, 10, null);
 
         RelaxerStepper rs = new RelaxerStepper(null, g, m_config);
 
@@ -374,11 +374,11 @@ public class RelaxerStepperTest
 
         // zero length edge
         {
-            Graph g = new Graph(null);
+            Graph g = new Graph();
 
-            INode n1 = g.AddNode("edgesstart", "", "", 10.0f);
-            INode n2 = g.AddNode("edgesmiddle", "", "", 10.0f);
-            INode n3 = g.AddNode("edgesend", "", "", 10.0f);
+            INode n1 = g.AddNode("edgesstart", "", "", 10.0f, null);
+            INode n2 = g.AddNode("edgesmiddle", "", "", 10.0f, null);
+            INode n3 = g.AddNode("edgesend", "", "", 10.0f, null);
 
             // zero length edge and a non-zero one attached at one end that will separate
             // the overlying nodes
@@ -386,8 +386,8 @@ public class RelaxerStepperTest
             n2.Position = new Vector2(0, 0);
             n3.Position = new Vector2(-110, 0);
 
-            g.Connect(n1, n2, 100, 100, 10);
-            g.Connect(n2, n3, 100, 100, 10);
+            g.Connect(n1, n2, 100, 100, 10, null);
+            g.Connect(n2, n3, 100, 100, 10, null);
 
             RelaxerStepper rs = new RelaxerStepper(null, g, m_config);
 
@@ -413,11 +413,11 @@ public class RelaxerStepperTest
 
         // zero node separation
         {
-            Graph g = new Graph(null);
+            Graph g = new Graph();
 
-            INode n1 = g.AddNode("edgestart", "", "", 10.0f);
-            INode n2 = g.AddNode("edgeend", "", "", 10.0f);
-            INode n3 = g.AddNode("node", "", "", 10.0f);
+            INode n1 = g.AddNode("edgestart", "", "", 10.0f, null);
+            INode n2 = g.AddNode("edgeend", "", "", 10.0f, null);
+            INode n3 = g.AddNode("node", "", "", 10.0f, null);
 
             // two zero separation nodes and an edge attached to one that will separate
             // the overlying nodes
@@ -425,7 +425,7 @@ public class RelaxerStepperTest
             n2.Position = new Vector2(110, 0);
             n3.Position = new Vector2(0, 0);
 
-            g.Connect(n1, n2, 100, 100, 10);
+            g.Connect(n1, n2, 100, 100, 10, null);
 
             RelaxerStepper rs = new RelaxerStepper(null, g, m_config);
 
@@ -453,9 +453,9 @@ public class RelaxerStepperTest
     [Test]
     public void TestAdjoiningEdgeOverridesRadii()
     {
-        Graph g = new Graph(null);
-        INode n1 = g.AddNode("n1", "", "", 100);
-        INode n2 = g.AddNode("n2", "", "", 100);
+        Graph g = new Graph();
+        INode n1 = g.AddNode("n1", "", "", 100, null);
+        INode n2 = g.AddNode("n2", "", "", 100, null);
 
         // place them non-overlapping and separated in both dimensions
         n1.Position = new Vector2(0, 0);
@@ -463,7 +463,7 @@ public class RelaxerStepperTest
 
         // edge wants distance of 100, node-radii want 200 but node-radii
         // should be ignored between connected nodes
-        DirectedEdge e12 = g.Connect(n1, n2, 100, 100, 0);
+        DirectedEdge e12 = g.Connect(n1, n2, 100, 100, 0, null);
 
         RelaxerStepper rs = new RelaxerStepper(null, g, m_config);
 
@@ -489,12 +489,12 @@ public class RelaxerStepperTest
     [Test]
     public void TestNonAdjoiningEdgesOverrideRadii()
     {
-        Graph g = new Graph(null);
-        INode n1 = g.AddNode("n1", "", "", 6);
-        INode n2 = g.AddNode("n2", "", "", 0);
-        INode n3 = g.AddNode("n3", "", "", 0);
-        INode n4 = g.AddNode("n4", "", "", 0);
-        INode n5 = g.AddNode("n5", "", "", 0);
+        Graph g = new Graph();
+        INode n1 = g.AddNode("n1", "", "", 6, null);
+        INode n2 = g.AddNode("n2", "", "", 0, null);
+        INode n3 = g.AddNode("n3", "", "", 0, null);
+        INode n4 = g.AddNode("n4", "", "", 0, null);
+        INode n5 = g.AddNode("n5", "", "", 0, null);
 
         // place them non-overlapping and separated in both dimensions
         n1.Position = new Vector2(0, 0);
@@ -505,10 +505,10 @@ public class RelaxerStepperTest
 
         // edges wants distances of 2, n1 radius wants 6 but shortest path through
         // graph should come out below that (for n2, n3) and let them get closer
-        DirectedEdge e12 = g.Connect(n1, n2, 2, 2, 0);
-        DirectedEdge e23 = g.Connect(n2, n3, 2, 2, 0);
-        DirectedEdge e34 = g.Connect(n3, n4, 2, 2, 0);
-        DirectedEdge e45 = g.Connect(n4, n5, 2, 2, 0);
+        DirectedEdge e12 = g.Connect(n1, n2, 2, 2, 0, null);
+        DirectedEdge e23 = g.Connect(n2, n3, 2, 2, 0, null);
+        DirectedEdge e34 = g.Connect(n3, n4, 2, 2, 0, null);
+        DirectedEdge e45 = g.Connect(n4, n5, 2, 2, 0, null);
 
         RelaxerStepper rs = new RelaxerStepper(null, g, m_config);
 
@@ -542,9 +542,9 @@ public class RelaxerStepperTest
     public void TestMinimumSeparation()
     {
         {
-            Graph g = new Graph(null);
-            INode n1 = g.AddNode("n1", "", "", 10.0f);
-            INode n2 = g.AddNode("n2", "", "", 10.0f);
+            Graph g = new Graph();
+            INode n1 = g.AddNode("n1", "", "", 10.0f, null);
+            INode n2 = g.AddNode("n2", "", "", 10.0f, null);
 
             n1.Position = new Vector2(0, 0);
             n2.Position = new Vector2(-1, 0);
@@ -577,18 +577,18 @@ public class RelaxerStepperTest
         }
 
         {
-            Graph g = new Graph(null);
+            Graph g = new Graph();
 
-            INode n1 = g.AddNode("edge1start", "", "", 10.0f);
-            INode n2 = g.AddNode("edge1end", "", "", 10.0f);
-            INode n3 = g.AddNode("node", "", "", 10.0f);
+            INode n1 = g.AddNode("edge1start", "", "", 10.0f, null);
+            INode n2 = g.AddNode("edge1end", "", "", 10.0f, null);
+            INode n3 = g.AddNode("node", "", "", 10.0f, null);
 
             // edge long enough that there is no n1->n3 or n2->n3 interaction
             n1.Position = new Vector2(0, 0);
             n2.Position = new Vector2(0, 100);
             n3.Position = new Vector2(1, 50);
 
-            g.Connect(n1, n2, 100, 100, 10);
+            g.Connect(n1, n2, 100, 100, 10, null);
 
             // add an extra separation of 1 unit
             m_config.RelaxationMinimumSeparation = 1;

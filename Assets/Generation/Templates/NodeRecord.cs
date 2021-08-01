@@ -1,4 +1,4 @@
-﻿using Assets.Generation.G.GLInterfaces;
+﻿using Assets.Generation.GeomRep;
 
 namespace Assets.Generation.Templates
 {
@@ -21,12 +21,12 @@ namespace Assets.Generation.Templates
         public readonly string Codes;                // copied onto node
         public readonly float Radius;
         public readonly uint Colour;
-        public readonly IGeomLayoutFactory LayoutCreator;
+        public readonly GeomLayout Layout;
 
         public NodeRecord(NodeType type, string name,
               bool nudge, NodeRecord positionOn, NodeRecord positionTowards, NodeRecord positionAwayFrom,
               string codes, float radius, uint colour,
-              IGeomLayoutFactory layoutCreator)
+              GeomLayout layout)
         {
             Type = type;
             Name = name;
@@ -37,7 +37,7 @@ namespace Assets.Generation.Templates
             Codes = codes;
             Radius = radius;
             Colour = colour;
-            LayoutCreator = layoutCreator;
+            Layout = layout;
         }
     }
 }

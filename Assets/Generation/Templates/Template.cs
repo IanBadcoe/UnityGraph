@@ -76,7 +76,7 @@ namespace Assets.Generation.Templates
             {
                 if (nr.Type == NodeRecord.NodeType.Internal)
                 {
-                    INode n = graph.AddNode(nr.Name, nr.Codes, Name, nr.Radius, nr.LayoutCreator);
+                    INode n = graph.AddNode(nr.Name, nr.Codes, Name, nr.Radius, nr.Layout);
                     template_to_graph.Add(nr, n);
                     n.Colour = nr.Colour;
                 }
@@ -151,7 +151,7 @@ namespace Assets.Generation.Templates
                 INode nf = template_to_graph[cr.From];
                 INode nt = template_to_graph[cr.To];
 
-                DirectedEdge de = graph.Connect(nf, nt, cr.MinLength, cr.MaxLength, cr.HalfWidth);
+                DirectedEdge de = graph.Connect(nf, nt, cr.MinLength, cr.MaxLength, cr.HalfWidth, cr.Layout);
                 de.Colour = cr.Colour;
             }
         }

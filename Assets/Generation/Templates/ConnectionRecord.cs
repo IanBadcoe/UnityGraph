@@ -1,4 +1,6 @@
-﻿namespace Assets.Generation.Templates
+﻿using Assets.Generation.GeomRep;
+
+namespace Assets.Generation.Templates
 {
     public sealed class ConnectionRecord
     {
@@ -8,11 +10,13 @@
         public readonly float MaxLength;
         public readonly float HalfWidth;
         public readonly uint Colour;
+        public readonly GeomLayout Layout;
 
         public ConnectionRecord(NodeRecord from, NodeRecord to,
                          float min_length, float max_length,
                          float half_width,
-                         uint colour)
+                         uint colour,
+                         GeomLayout layout)
         {
             From = from;
             To = to;
@@ -20,6 +24,7 @@
             MaxLength = max_length;
             HalfWidth = half_width;
             Colour = colour;
+            Layout = layout;
         }
     }
 }

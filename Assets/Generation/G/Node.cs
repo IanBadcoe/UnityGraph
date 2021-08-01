@@ -1,4 +1,4 @@
-﻿using Assets.Generation.G.GLInterfaces;
+﻿using Assets.Generation.GeomRep;
 using Assets.Generation.U;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace Assets.Generation.G
 
         private static readonly ClRand s_rand = new ClRand(1);
 
-        public IGeomLayoutFactory LayoutCreator { get; }
+        public GeomLayout Layout { get; }
 
         public string Name { get; }
         public string Codes { get; }
@@ -32,7 +32,7 @@ namespace Assets.Generation.G
         }
 
         public Node(string name, string codes, string template, float rad,
-            IGeomLayoutFactory layoutCreator)
+            GeomLayout layout)
         {
             Name = name;
             Codes = codes;
@@ -42,7 +42,7 @@ namespace Assets.Generation.G
 
             Radius = rad;
 
-            LayoutCreator = layoutCreator;
+            Layout = layout;
         }
 
         public bool Connects(INode n)
@@ -66,7 +66,7 @@ namespace Assets.Generation.G
         }
 
         public DirectedEdge Connect(Node n, float min_distance, float max_distance, float width,
-              IGeomLayoutFactory layoutCreator)
+              GeomLayout layout)
         {
             // cannot multiply connect the same node, forwards or backwards
             if (Connects(n))
@@ -75,7 +75,7 @@ namespace Assets.Generation.G
                       "' to '" + n.Name + "'");
             }
 
-            DirectedEdge e = new DirectedEdge(this, n, min_distance, max_distance, width, layoutCreator);
+            DirectedEdge e = new DirectedEdge(this, n, min_distance, max_distance, width, layout);
 
             Connect(e);
             n.Connect(e);

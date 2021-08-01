@@ -78,7 +78,7 @@ namespace Assets.Generation.GeomRep
         {
             foreach (INode n in graph.GetAllNodes())
             {
-                GeomLayout gl = n.LayoutCreator.Create(n) as GeomLayout;
+                GeomLayout gl = n.Layout;
 
                 Loop bg = gl.MakeBaseGeometry(n);
 
@@ -99,7 +99,7 @@ namespace Assets.Generation.GeomRep
 
             foreach (DirectedEdge de in graph.GetAllEdges())
             {
-                GeomLayout gl = de.LayoutCreator.Create(de) as GeomLayout;
+                GeomLayout gl = de.Layout;
 
                 Loop l = gl.MakeBaseGeometry(de);
 

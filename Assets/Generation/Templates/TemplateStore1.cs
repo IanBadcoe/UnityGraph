@@ -5,48 +5,46 @@ namespace Assets.Generation.Templates
 {
     public class TemplateStore1 : TemplateStore
     {
-        readonly DefaultLayoutFactory DefaultLayoutFactory = new DefaultLayoutFactory();
-
         public TemplateStore1()
         {
             {
-                TemplateBuilder tb = new TemplateBuilder("Extend Corridor", "e", DefaultLayoutFactory);
+                TemplateBuilder tb = new TemplateBuilder("Extend Corridor", "e");
                 tb.AddNode(NodeRecord.NodeType.In, "i");
                 tb.AddNode(NodeRecord.NodeType.Out, "o");
-                tb.AddNode(NodeRecord.NodeType.Internal, "e1", false, "<target>", "i", null, "e", 55f);
-                tb.AddNode(NodeRecord.NodeType.Internal, "e2", false, "<target>", "o", null, "e", 55f);
+                tb.AddNode(NodeRecord.NodeType.Internal, "e1", false, "<target>", "i", null, "e", 55f, CircularGeomLayout.Instance);
+                tb.AddNode(NodeRecord.NodeType.Internal, "e2", false, "<target>", "o", null, "e", 55f, CircularGeomLayout.Instance);
 
-                tb.Connect("i", "e1", 120, 120, 10);
-                tb.Connect("e1", "e2", 120, 120, 10);
-                tb.Connect("e2", "o", 120, 120, 10);
+                tb.Connect("i", "e1", 120, 120, 10, CorridorLayout.Instance);
+                tb.Connect("e1", "e2", 120, 120, 10, CorridorLayout.Instance);
+                tb.Connect("e2", "o", 120, 120, 10, CorridorLayout.Instance);
 
                 AddTemplate(tb.Build());
             }
 
             {
-                TemplateBuilder tb = new TemplateBuilder("Extend Dead-end", "e", DefaultLayoutFactory);
+                TemplateBuilder tb = new TemplateBuilder("Extend Dead-end", "e");
                 tb.AddNode(NodeRecord.NodeType.In, "i");
-                tb.AddNode(NodeRecord.NodeType.Internal, "e1", false, "<target>", "i", null, "e", 30f);
-                tb.AddNode(NodeRecord.NodeType.Internal, "e2", false, "<target>", null, "i", "e", 60f);
+                tb.AddNode(NodeRecord.NodeType.Internal, "e1", false, "<target>", "i", null, "e", 30f, CircularGeomLayout.Instance);
+                tb.AddNode(NodeRecord.NodeType.Internal, "e2", false, "<target>", null, "i", "e", 60f, CircularGeomLayout.Instance);
 
-                tb.Connect("i", "e1", 120, 120, 10);
-                tb.Connect("e1", "e2", 120, 120, 10);
+                tb.Connect("i", "e1", 120, 120, 10, CorridorLayout.Instance);
+                tb.Connect("e1", "e2", 120, 120, 10, CorridorLayout.Instance);
 
                 AddTemplate(tb.Build());
             }
 
             {
-                TemplateBuilder tb = new TemplateBuilder("Tee", "e", DefaultLayoutFactory);
+                TemplateBuilder tb = new TemplateBuilder("Tee", "e");
                 tb.AddNode(NodeRecord.NodeType.In, "i");
                 tb.AddNode(NodeRecord.NodeType.Out, "o");
-                tb.AddNode(NodeRecord.NodeType.Internal, "j", false, "<target>", null, null, "", 20f,
+                tb.AddNode(NodeRecord.NodeType.Internal, "j", false, "<target>", null, null, "", 20f, CircularGeomLayout.Instance,
                       0xff808040);
-                tb.AddNode(NodeRecord.NodeType.Internal, "side", true, "<target>", null, null, "e", 55f);
+                tb.AddNode(NodeRecord.NodeType.Internal, "side", true, "<target>", null, null, "e", 55f, CircularGeomLayout.Instance);
 
-                tb.Connect("i", "j", 120, 120, 10);
-                tb.Connect("j", "o", 120, 120, 10);
+                tb.Connect("i", "j", 120, 120, 10, CorridorLayout.Instance);
+                tb.Connect("j", "o", 120, 120, 10, CorridorLayout.Instance);
                 // just try a different distance
-                tb.Connect("j", "side", 120, 120, 10);
+                tb.Connect("j", "side", 120, 120, 10, CorridorLayout.Instance);
 
                 AddTemplate(tb.Build());
             }
@@ -167,13 +165,13 @@ namespace Assets.Generation.Templates
             {
                 //DoorPostExpand dh = new DoorPostExpand();
 
-                TemplateBuilder tb = new TemplateBuilder("Rotunda", ""/*, dh*/, DefaultLayoutFactory);
+                TemplateBuilder tb = new TemplateBuilder("Rotunda", ""/*, dh*/);
                 tb.AddNode(NodeRecord.NodeType.In, "i");
                 tb.AddNode(NodeRecord.NodeType.Internal, "rotunda", false, "<target>",
-                      null, null, "e", 70f, 0xff802080,
-                      new FourCircularPillarsLayoutFactory());
+                      null, null, "e", 70f,
+                      FourCircularPillarsGeomLayout.Instance, 0xff802080);
 
-                tb.Connect("i", "rotunda", 120, 120, 10);
+                tb.Connect("i", "rotunda", 120, 120, 10, CorridorLayout.Instance);
 
                 AddTemplate(tb.Build());
             }

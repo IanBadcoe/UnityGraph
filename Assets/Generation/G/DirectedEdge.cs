@@ -1,4 +1,4 @@
-﻿using Assets.Generation.G.GLInterfaces;
+﻿using Assets.Generation.GeomRep;
 using Assets.Generation.U;
 
 namespace Assets.Generation.G
@@ -11,7 +11,7 @@ namespace Assets.Generation.G
         public readonly float MaxLength;
         public readonly float HalfWidth;
 
-        public readonly IGeomLayoutFactory LayoutCreator;
+        public readonly GeomLayout Layout;
 
         public DirectedEdge(INode start, INode end,
               float min_length, float max_length,
@@ -23,7 +23,7 @@ namespace Assets.Generation.G
         public DirectedEdge(INode start, INode end,
               float min_length, float max_length,
               float half_width,
-              IGeomLayoutFactory layout_creator)
+              GeomLayout layout)
         {
             Assertion.Assert(start != null);
             Assertion.Assert(end != null);
@@ -33,7 +33,7 @@ namespace Assets.Generation.G
             MinLength = min_length;
             MaxLength = max_length;
             HalfWidth = half_width;
-            LayoutCreator = layout_creator;
+            Layout = layout;
         }
 
         public override int GetHashCode()

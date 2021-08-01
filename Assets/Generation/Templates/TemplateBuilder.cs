@@ -1,4 +1,4 @@
-﻿using Assets.Generation.G.GLInterfaces;
+﻿using Assets.Generation.GeomRep;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,7 +18,6 @@ namespace Assets.Generation.Templates
         private int m_num_out_nodes = 0;
         private int m_num_internal_nodes = 0;
 
-        public readonly IGeomLayoutFactory DefaultLayoutCreator;
 
         // private final Template.IPostExpand m_post_expand;
 
@@ -27,12 +26,11 @@ namespace Assets.Generation.Templates
         //{
         //}
 
-        public TemplateBuilder(string name, string codes,
-            IGeomLayoutFactory defaultLayoutCreator/*, Template.IPostExpand post_expand*/)
+        public TemplateBuilder(string name, string codes
+            /*, Template.IPostExpand post_expand*/)
         {
             Name = name;
             Codes = codes;
-            DefaultLayoutCreator = defaultLayoutCreator;
 
             // a dummy entry used to represent the node we are replacing in positioning rules
             m_nodes.Add("<target>", new NodeRecord(NodeRecord.NodeType.Target, "<target>",
@@ -75,45 +73,36 @@ namespace Assets.Generation.Templates
             public readonly string NodeName;
         }
 
+        // used mostly for in and out "i" and "o" nodes in templates
+        // e.g. nodes which match something in the pre-graph and are thus never instantiated
+        // (thus zero radius, no flags, no GeomLayout
         public void AddNode(NodeRecord.NodeType type, string name)
         {
             AddNode(type, name, false,
                     "<target>", null, null,
-                    "", 0f);
+                    "", 0f, null);
         }
 
         // types In and Out ignore all parameters after "name"
         public void AddNode(NodeRecord.NodeType type, string name, bool nudge,
               string positionOnName, string positionTowardsName,
               string positionAwayFromName,
-              string codes, float radius)
-        {
-            AddNode(type, name, nudge,
-                    positionOnName, positionTowardsName, positionAwayFromName,
-                    codes, radius,
-                    0xff8c8c8c,
-                    DefaultLayoutCreator);
-        }
-
-        public void AddNode(NodeRecord.NodeType type, string name, bool nudge,
-              string positionOnName, string positionTowardsName,
-              string positionAwayFromName,
               string codes, float radius,
-                uint colour)
+              GeomLayout layout)
         {
             AddNode(type, name, nudge,
                     positionOnName, positionTowardsName, positionAwayFromName,
                     codes, radius,
-                    colour,
-                    DefaultLayoutCreator);
+                    layout,
+                    0xff8c8c8c);
         }
 
         public void AddNode(NodeRecord.NodeType type, string name, bool nudge,
              string positionOnName, string positionTowardsName,
              string positionAwayFromName,
              string codes, float radius,
-             uint colour,
-             IGeomLayoutFactory layoutCreator)
+             GeomLayout layout,
+             uint colour)
         {
             if (name.Contains("->"))
             {
@@ -180,7 +169,7 @@ namespace Assets.Generation.Templates
                   positionOn, positionTowards, positionAwayFrom,
                   codes, radius,
                   colour,
-                  layoutCreator));
+                  layout));
 
             switch (type)
             {
@@ -220,18 +209,21 @@ namespace Assets.Generation.Templates
 
         public void Connect(string from, string to,
                             float min_length, float max_length,
-                            float half_width)
+                            float half_width,
+                            GeomLayout layout)
         {
             Connect(from, to,
                     min_length, max_length,
                     half_width,
-                    0xffb4b4b4);
+                    0xffb4b4b4,
+                    layout);
         }
 
         public void Connect(string from, string to,
                             float min_length, float max_length,
                             float half_width,
-                            uint colour)
+                            uint colour,
+                            GeomLayout layout)
         {
             if (from == null)
             {
@@ -280,7 +272,7 @@ namespace Assets.Generation.Templates
 
             m_connections.Add(
                   Template.MakeConnectionName(from, to),
-                  new ConnectionRecord(nrf, nrt, min_length, max_length, half_width, colour));
+                  new ConnectionRecord(nrf, nrt, min_length, max_length, half_width, colour, layout));
         }
 
         public ReadOnlyDictionary<string, NodeRecord> GetUnmodifiableNodes()

@@ -1,4 +1,4 @@
-﻿using Assets.Generation.G.GLInterfaces;
+﻿using Assets.Generation.GeomRep;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,7 +14,7 @@ namespace Assets.Generation.G
         Vector2 Force { get; set; }
         float Radius { get; }
 
-        public IGeomLayoutFactory LayoutCreator { get; }
+        public GeomLayout Layout { get; }
 
         bool Connects(INode n);
         bool ConnectsForwards(INode to);

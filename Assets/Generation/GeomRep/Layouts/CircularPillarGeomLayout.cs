@@ -1,25 +1,14 @@
 ﻿using Assets.Generation.G;
-using Assets.Generation.G.GLInterfaces;
-using System;
 using UnityEngine;
 
 namespace Assets.Generation.GeomRep.Layouts
 {
-    class CircularPillarLayoutFactory : IGeomLayoutFactory
-    {
-        public IGeomLayout Create(INode n)
-        {
-            return new CircularPillarGeomLayout();
-        }
-
-        public IGeomLayout Create(DirectedEdge de)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     public class CircularPillarGeomLayout : GeomLayout
     {
+        public static GeomLayout Instance { get; } = new CircularPillarGeomLayout();
+
+        private CircularPillarGeomLayout() { }
+
         public override Loop MakeBaseGeometry(INode node)
         {
             return new Loop(new CircleCurve(node.Position, node.Radius));
@@ -34,21 +23,12 @@ namespace Assets.Generation.GeomRep.Layouts
         }
     }
 
-    class FourCircularPillarsLayoutFactory : IGeomLayoutFactory
-    {
-        public IGeomLayout Create(INode n)
-        {
-            return new FourCircularPillarsGeomLayout();
-        }
-
-        public IGeomLayout Create(DirectedEdge de)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     public class FourCircularPillarsGeomLayout : GeomLayout
     {
+        public static GeomLayout Instance { get; } = new FourCircularPillarsGeomLayout();
+
+        private FourCircularPillarsGeomLayout() { }
+
         public override Loop MakeBaseGeometry(INode node)
         {
             return new Loop(new CircleCurve(node.Position, node.Radius));

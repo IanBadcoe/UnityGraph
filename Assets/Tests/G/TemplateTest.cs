@@ -6,7 +6,6 @@ using UnityEngine.TestTools;
 using Assets.Generation.G;
 using System;
 using Assets.Generation.U;
-using Assets.Generation.G.GLInterfaces;
 using Assets.Generation.Templates;
 
 public class TemplateTest
@@ -17,15 +16,15 @@ public class TemplateTest
         // no ins, outs or connections, just swapping one disconnected node for another...
         // place directly on replaced node
         {
-            TemplateBuilder tb = new TemplateBuilder("", "", null);
+            TemplateBuilder tb = new TemplateBuilder("", "");
 
             tb.AddNode(NodeRecord.NodeType.Internal, "a");
 
             Template t = tb.Build();
 
-            Graph g = new Graph(null);
+            Graph g = new Graph();
 
-            INode a = g.AddNode("x", "", "", 0);
+            INode a = g.AddNode("x", "", "", 0, null);
             a.Position = new Vector2(-4, 3);
 
             Assert.IsTrue(t.Expand(g, a, new ClRand(1)));
@@ -38,17 +37,17 @@ public class TemplateTest
         // no ins, outs or connections, just swapping one disconnected node for another...
         // place offset from replaced node
         {
-            TemplateBuilder tb = new TemplateBuilder("", "", null);
+            TemplateBuilder tb = new TemplateBuilder("", "");
 
             tb.AddNode(NodeRecord.NodeType.Internal, "a",
                   true, "<target>", null, null,
-                  "", 0.0f);
+                  "", 0.0f, null);
 
             Template t = tb.Build();
 
-            Graph g = new Graph(null);
+            Graph g = new Graph();
 
-            INode n = g.AddNode("x", "", "", 0);
+            INode n = g.AddNode("x", "", "", 0, null);
             n.Position = new Vector2(-4, 3);
 
             Assert.IsTrue(t.Expand(g, n, new ClRand(1)));
@@ -65,24 +64,24 @@ public class TemplateTest
         // place new node on the "in"
         // (poss not a desirable scenario but should work...)
         {
-            TemplateBuilder tb = new TemplateBuilder("", "", null);
+            TemplateBuilder tb = new TemplateBuilder("", "");
 
             tb.AddNode(NodeRecord.NodeType.In, "in");
             tb.AddNode(NodeRecord.NodeType.Internal, "a",
                   false, "in", null, null,
-                  "", 0.0f);
-            tb.Connect("in", "a", 0, 0, 0);
+                  "", 0.0f, null);
+            tb.Connect("in", "a", 0, 0, 0, null);
 
             Template t = tb.Build();
 
-            Graph g = new Graph(null);
+            Graph g = new Graph();
 
-            INode a = g.AddNode("x", "", "", 0);
+            INode a = g.AddNode("x", "", "", 0, null);
             a.Position = new Vector2(-4, 3);
-            INode in_n = g.AddNode("in", "", "", 0);
+            INode in_n = g.AddNode("in", "", "", 0, null);
             in_n.Position = new Vector2(10, 9);
 
-            g.Connect(in_n, a, 0, 0, 0);
+            g.Connect(in_n, a, 0, 0, 0, null);
 
             Assert.IsTrue(t.Expand(g, a, new ClRand(1)));
             Assert.AreEqual(2, g.NumNodes());
@@ -95,24 +94,24 @@ public class TemplateTest
       // an "in" and a replaced node,
       // place new node offset from the "in"
         {
-            TemplateBuilder tb = new TemplateBuilder("", "", null);
+            TemplateBuilder tb = new TemplateBuilder("", "");
 
             tb.AddNode(NodeRecord.NodeType.In, "in");
             tb.AddNode(NodeRecord.NodeType.Internal, "a",
                   true, "in", null, null,
-                  "", 0.0f);
-            tb.Connect("in", "a", 0, 0, 0);
+                  "", 0.0f, null);
+            tb.Connect("in", "a", 0, 0, 0, null);
 
             Template t = tb.Build();
 
-            Graph g = new Graph(null);
+            Graph g = new Graph();
 
-            INode a = g.AddNode("x", "", "", 0);
+            INode a = g.AddNode("x", "", "", 0, null);
             a.Position = new Vector2(-4, 3);
-            INode in_n = g.AddNode("in", "", "", 0);
+            INode in_n = g.AddNode("in", "", "", 0, null);
             in_n.Position = new Vector2(10, 9);
 
-            g.Connect(in_n, a, 0, 0, 0);
+            g.Connect(in_n, a, 0, 0, 0, null);
 
             Assert.IsTrue(t.Expand(g, a, new ClRand(1)));
             Assert.AreEqual(2, g.NumNodes());
@@ -128,24 +127,24 @@ public class TemplateTest
       // an "in" and a replaced node,
       // place new node on replaced node but moved towards "in"
         {
-            TemplateBuilder tb = new TemplateBuilder("", "", null);
+            TemplateBuilder tb = new TemplateBuilder("", "");
 
             tb.AddNode(NodeRecord.NodeType.In, "in");
             tb.AddNode(NodeRecord.NodeType.Internal, "a",
                   false, "<target>", "in", null,
-                  "", 0.0f);
-            tb.Connect("in", "a", 0, 0, 0);
+                  "", 0.0f, null);
+            tb.Connect("in", "a", 0, 0, 0, null);
 
             Template t = tb.Build();
 
-            Graph g = new Graph(null);
+            Graph g = new Graph();
 
-            INode a = g.AddNode("x", "", "", 0);
+            INode a = g.AddNode("x", "", "", 0, null);
             a.Position = new Vector2(-4, 3);
-            INode in_n = g.AddNode("in", "", "", 0);
+            INode in_n = g.AddNode("in", "", "", 0, null);
             in_n.Position = new Vector2(-14, -7);
 
-            g.Connect(in_n, a, 0, 0, 0);
+            g.Connect(in_n, a, 0, 0, 0, null);
 
             Assert.IsTrue(t.Expand(g, a, new ClRand(1)));
             Assert.AreEqual(2, g.NumNodes());
@@ -160,24 +159,24 @@ public class TemplateTest
       // an "in" and a replaced node,
       // place new node on replaced node but moved away from  "in"
         {
-            TemplateBuilder tb = new TemplateBuilder("", "", null);
+            TemplateBuilder tb = new TemplateBuilder("", "");
 
             tb.AddNode(NodeRecord.NodeType.In, "in");
             tb.AddNode(NodeRecord.NodeType.Internal, "a",
                   false, "<target>", null, "in",
-                  "", 0.0f);
-            tb.Connect("in", "a", 0, 0, 0);
+                  "", 0.0f, null);
+            tb.Connect("in", "a", 0, 0, 0, null);
 
             Template t = tb.Build();
 
-            Graph g = new Graph(null);
+            Graph g = new Graph();
 
-            INode a = g.AddNode("x", "", "", 0);
+            INode a = g.AddNode("x", "", "", 0, null);
             a.Position = new Vector2(-4, 3);
-            INode in_n = g.AddNode("in", "", "", 0);
+            INode in_n = g.AddNode("in", "", "", 0, null);
             in_n.Position = new Vector2(-14, -7);
 
-            g.Connect(in_n, a, 0, 0, 0);
+            g.Connect(in_n, a, 0, 0, 0, null);
 
             Assert.IsTrue(t.Expand(g, a, new ClRand(1)));
             Assert.AreEqual(2, g.NumNodes());
@@ -193,28 +192,28 @@ public class TemplateTest
       // place new node on replaced node but moved away from "in"
       // and towards "out"
         {
-            TemplateBuilder tb = new TemplateBuilder("", "", null);
+            TemplateBuilder tb = new TemplateBuilder("", "");
 
             tb.AddNode(NodeRecord.NodeType.In, "in");
             tb.AddNode(NodeRecord.NodeType.Out, "out");
             tb.AddNode(NodeRecord.NodeType.Internal, "a",
                   false, "<target>", "out", "in",
-                  "", 0.0f);
-            tb.Connect("in", "a", 0, 0, 0);
+                  "", 0.0f, null);
+            tb.Connect("in", "a", 0, 0, 0, null);
 
             Template t = tb.Build();
 
-            Graph g = new Graph(null);
+            Graph g = new Graph();
 
-            INode a = g.AddNode("x", "", "", 0);
+            INode a = g.AddNode("x", "", "", 0, null);
             a.Position = new Vector2(10, 10);
-            INode in_n = g.AddNode("in", "", "", 0);
+            INode in_n = g.AddNode("in", "", "", 0, null);
             in_n.Position = new Vector2(20, 10);
-            INode out_n = g.AddNode("out", "", "", 0);
+            INode out_n = g.AddNode("out", "", "", 0, null);
             out_n.Position = new Vector2(10, 20);
 
-            g.Connect(in_n, a, 0, 0, 0);
-            g.Connect(a, out_n, 0, 0, 0);
+            g.Connect(in_n, a, 0, 0, 0, null);
+            g.Connect(a, out_n, 0, 0, 0, null);
 
             Assert.IsTrue(t.Expand(g, a, new ClRand(1)));
             Assert.AreEqual(3, g.NumNodes());
@@ -262,7 +261,7 @@ public class TemplateTest
 
     //        Template t = tb.Build();
 
-    //        Graph g = new Graph(null);
+    //        Graph g = new Graph();
 
     //        INode a = g.AddNode("x", "", "", 0);
 
@@ -280,31 +279,31 @@ public class TemplateTest
     {
         // cannot expand with unavoidable crossing edges
         {
-            TemplateBuilder tb = new TemplateBuilder("", "", null);
+            TemplateBuilder tb = new TemplateBuilder("", "");
 
             tb.AddNode(NodeRecord.NodeType.In, "in");
             tb.AddNode(NodeRecord.NodeType.Internal, "x",
                   false, "<target>", null, null,
-                  "", 0);
+                  "", 0, null);
 
-            tb.Connect("in", "x", 0, 0, 0);
+            tb.Connect("in", "x", 0, 0, 0, null);
 
             Template t = tb.Build();
 
-            Graph g = new Graph(null);
+            Graph g = new Graph();
 
-            INode a = g.AddNode("a", "", "", 0);
-            INode b = g.AddNode("b", "", "", 0);
-            INode c = g.AddNode("c", "", "", 0);
-            INode d = g.AddNode("d", "", "", 0);
+            INode a = g.AddNode("a", "", "", 0, null);
+            INode b = g.AddNode("b", "", "", 0, null);
+            INode c = g.AddNode("c", "", "", 0, null);
+            INode d = g.AddNode("d", "", "", 0, null);
 
             a.Position = new Vector2(10, 0);
             b.Position = new Vector2(-10, 0);
             c.Position = new Vector2(0, 10);
             d.Position = new Vector2(0, -10);
 
-            g.Connect(a, b, 0, 0, 0);
-            g.Connect(c, d, 0, 0, 0);
+            g.Connect(c, d, 0, 0, 0, null);
+            g.Connect(a, b, 0, 0, 0, null);
 
             IGraphRestore igr = g.CreateRestorePoint();
 
@@ -323,23 +322,23 @@ public class TemplateTest
 
         // fail with various wrong numbers of ins/outs
         {
-            TemplateBuilder tb = new TemplateBuilder("", "", null);
+            TemplateBuilder tb = new TemplateBuilder("", "");
 
             tb.AddNode(NodeRecord.NodeType.In, "in");
             tb.AddNode(NodeRecord.NodeType.Out, "out");
             tb.AddNode(NodeRecord.NodeType.Internal, "x",
                   false, "<target>", null, null,
-                  "", 0);
+                  "", 0, null);
 
             Template t = tb.Build();
 
-            Graph g = new Graph(null);
+            Graph g = new Graph();
 
-            INode a = g.AddNode("a", "", "", 0);
-            INode b = g.AddNode("b", "", "", 0);
-            INode c = g.AddNode("c", "", "", 0);
-            INode d = g.AddNode("d", "", "", 0);
-            INode x = g.AddNode("x", "", "", 0);
+            INode a = g.AddNode("a", "", "", 0, null);
+            INode b = g.AddNode("b", "", "", 0, null);
+            INode c = g.AddNode("c", "", "", 0, null);
+            INode d = g.AddNode("d", "", "", 0, null);
+            INode x = g.AddNode("x", "", "", 0, null);
 
             {
                 IGraphRestore igr = g.CreateRestorePoint();
@@ -351,7 +350,7 @@ public class TemplateTest
                 igr.Restore();
             }
 
-            g.Connect(a, x, 0, 0, 0);
+            g.Connect(a, x, 0, 0, 0, null);
 
             {
                 IGraphRestore igr = g.CreateRestorePoint();
@@ -363,7 +362,7 @@ public class TemplateTest
                 igr.Restore();
             }
 
-            g.Connect(x, b, 0, 0, 0);
+            g.Connect(x, b, 0, 0, 0, null);
 
             {
                 IGraphRestore igr = g.CreateRestorePoint();
@@ -375,7 +374,7 @@ public class TemplateTest
                 igr.Restore();
             }
 
-            g.Connect(c, x, 0, 0, 0);
+            g.Connect(c, x, 0, 0, 0, null);
 
             {
                 IGraphRestore igr = g.CreateRestorePoint();
@@ -387,7 +386,7 @@ public class TemplateTest
                 igr.Restore();
             }
 
-            g.Connect(x, d, 0, 0, 0);
+            g.Connect(x, d, 0, 0, 0, null);
 
             {
                 IGraphRestore igr = g.CreateRestorePoint();
@@ -428,7 +427,7 @@ public class TemplateTest
     [Test]
     public void TestCodes()
     {
-        TemplateBuilder tb = new TemplateBuilder("a", "xyz", null);
+        TemplateBuilder tb = new TemplateBuilder("a", "xyz");
         Template t = tb.Build();
 
         Assert.AreEqual("xyz", t.Codes);
@@ -438,14 +437,14 @@ public class TemplateTest
     public void TestNodesAdded()
     {
         {
-            TemplateBuilder tb = new TemplateBuilder("", "", null);
+            TemplateBuilder tb = new TemplateBuilder("", "");
             Template t = tb.Build();
 
             Assert.AreEqual(-1, t.NodesAdded());
         }
 
         {
-            TemplateBuilder tb = new TemplateBuilder("", "", null);
+            TemplateBuilder tb = new TemplateBuilder("", "");
             tb.AddNode(NodeRecord.NodeType.In, "in1");
             tb.AddNode(NodeRecord.NodeType.Out, "out1");
             Template t = tb.Build();
@@ -455,10 +454,10 @@ public class TemplateTest
         }
 
         {
-            TemplateBuilder tb = new TemplateBuilder("", "", null);
+            TemplateBuilder tb = new TemplateBuilder("", "");
             tb.AddNode(NodeRecord.NodeType.Internal, "internal",
                   false, "<target>", null, null,
-                  "", 0);
+                  "", 0, null);
 
             Template t = tb.Build();
 
@@ -467,13 +466,13 @@ public class TemplateTest
         }
 
         {
-            TemplateBuilder tb = new TemplateBuilder("", "", null);
+            TemplateBuilder tb = new TemplateBuilder("", "");
             tb.AddNode(NodeRecord.NodeType.Internal, "internal",
                   false, "<target>", null, null,
-                  "", 0);
+                  "", 0, null);
             tb.AddNode(NodeRecord.NodeType.Internal, "internal2",
                   false, "<target>", null, null,
-                  "", 0);
+                  "", 0, null);
 
             Template t = tb.Build();
 

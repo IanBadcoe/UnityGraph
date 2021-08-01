@@ -1,4 +1,5 @@
 ﻿using Assets.Generation.G;
+using Assets.Generation.GeomRep;
 using Assets.Generation.IoC;
 using Assets.Generation.Stepping;
 using UnityEngine;
@@ -57,8 +58,7 @@ namespace Assets.Generation.Gen
         private void SplitEdge()
         {
             INode c = m_graph.AddNode("c", "", "EdgeExtend",
-                  m_edge.HalfWidth * 2 /*,
-                  m_geom_maker */);
+                  m_edge.HalfWidth, CircularGeomLayout.Instance);
 
             Vector2 mid = (m_edge.Start.Position + m_edge.End.Position) / 2;
 
@@ -67,8 +67,10 @@ namespace Assets.Generation.Gen
             m_graph.Disconnect(m_edge.Start, m_edge.End);
             // idea of lengths is to force no more length but allow
             // a longer corridor if required
-            DirectedEdge de1 = m_graph.Connect(m_edge.Start, c, m_edge.MinLength / 2, m_edge.MaxLength, m_edge.HalfWidth);
-            DirectedEdge de2 = m_graph.Connect(c, m_edge.End, m_edge.MinLength / 2, m_edge.MaxLength, m_edge.HalfWidth);
+            DirectedEdge de1 = m_graph.Connect(m_edge.Start, c, m_edge.MinLength / 2, m_edge.MaxLength, m_edge.HalfWidth,
+                CorridorLayout.Instance);
+            DirectedEdge de2 = m_graph.Connect(c, m_edge.End, m_edge.MinLength / 2, m_edge.MaxLength, m_edge.HalfWidth,
+                CorridorLayout.Instance);
 
             de1.Colour = m_edge.Colour;
             de2.Colour = m_edge.Colour;

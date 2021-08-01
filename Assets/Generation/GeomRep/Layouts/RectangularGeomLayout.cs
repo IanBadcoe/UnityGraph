@@ -6,14 +6,11 @@ using UnityEngine;
 
 namespace Assets.Generation.GeomRep
 {
-    public class RectangularGeomLayout : GeomLayout
+    public class CorridorLayout : GeomLayout
     {
-        public float WidthScale { get; private set; }
+        public static GeomLayout Instance { get; } = new CorridorLayout();
 
-        public RectangularGeomLayout(float width_scale)
-        {
-            WidthScale = width_scale;
-        }
+        private CorridorLayout() { }
 
         public override Loop MakeBaseGeometry(DirectedEdge edge)
         {
@@ -22,7 +19,11 @@ namespace Assets.Generation.GeomRep
             dir = dir / length;
 
             Vector2 width_dir = dir.Rot270();
-            float actual_half_width = edge.HalfWidth * WidthScale;
+            // scale the corridor rectangle's width down slightly
+            // so that it doesn't precisely hit at a tangent to any adjoining junction-node's circle
+            // -- that causes awkward numerical precision problems in the curve-curve intersection routines
+            // which can throw out the union operation
+            float actual_half_width = edge.HalfWidth * 0.99f;
             Vector2 half_width = width_dir * actual_half_width;
 
             Vector2 start_left = edge.Start.Position + half_width;

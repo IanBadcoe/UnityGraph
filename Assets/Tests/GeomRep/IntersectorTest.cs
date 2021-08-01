@@ -1,14 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.TestTools;
-using Assets.Generation.G;
 using System;
 using Assets.Generation.U;
-using Assets.Generation.G.GLInterfaces;
-using Assets.Generation.Templates;
-using Assets.Generation;
 using Assets.Generation.GeomRep;
 using Assets.Extensions;
 using System.Linq;

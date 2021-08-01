@@ -6,7 +6,6 @@ using UnityEngine.TestTools;
 using Assets.Generation.G;
 using System;
 using Assets.Generation.U;
-using Assets.Generation.G.GLInterfaces;
 using Assets.Generation.Templates;
 
 public class TemplateStoreTest
@@ -17,9 +16,9 @@ public class TemplateStoreTest
     {
         TemplateStore ts = new TemplateStore();
 
-        TemplateBuilder tb1 = new TemplateBuilder("a", "", null);
-        TemplateBuilder tb2 = new TemplateBuilder("b", "", null);
-        TemplateBuilder tb1a = new TemplateBuilder("a", "", null);
+        TemplateBuilder tb1 = new TemplateBuilder("a", "");
+        TemplateBuilder tb2 = new TemplateBuilder("b", "");
+        TemplateBuilder tb1a = new TemplateBuilder("a", "");
 
         Template t1 = tb1.Build();
         Template t2 = tb2.Build();
@@ -47,8 +46,8 @@ public class TemplateStoreTest
     {
         TemplateStore ts = new TemplateStore();
 
-        TemplateBuilder tb1 = new TemplateBuilder("a", "", null);
-        TemplateBuilder tb2 = new TemplateBuilder("b", "", null);
+        TemplateBuilder tb1 = new TemplateBuilder("a", "");
+        TemplateBuilder tb2 = new TemplateBuilder("b", "");
 
         Template t1 = tb1.Build();
         Template t2 = tb2.Build();
@@ -72,8 +71,8 @@ public class TemplateStoreTest
     {
         TemplateStore ts = new TemplateStore();
 
-        TemplateBuilder tb1 = new TemplateBuilder("a", "", null);
-        TemplateBuilder tb2 = new TemplateBuilder("b", "", null);
+        TemplateBuilder tb1 = new TemplateBuilder("a", "");
+        TemplateBuilder tb2 = new TemplateBuilder("b", "");
 
         Template t1 = tb1.Build();
         Template t2 = tb2.Build();
@@ -91,8 +90,8 @@ public class TemplateStoreTest
     {
         TemplateStore ts = new TemplateStore();
 
-        TemplateBuilder tb1 = new TemplateBuilder("a", "", null);
-        TemplateBuilder tb2 = new TemplateBuilder("b", "", null);
+        TemplateBuilder tb1 = new TemplateBuilder("a", "");
+        TemplateBuilder tb2 = new TemplateBuilder("b", "");
 
         Template t1 = tb1.Build();
         Template t2 = tb2.Build();

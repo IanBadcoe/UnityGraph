@@ -53,8 +53,7 @@ namespace Assets.Generation.Gen
                 new TryAllNodesExpandStepperFactory(),
                 new TryAllTemplatesOnOneNodeStepperFactory(),
                 new TryTemplateExpandStepperFactory(),
-                new EdgeAdjusterStepperFactory(),
-                new DefaultLayoutFactory()
+                new EdgeAdjusterStepperFactory()
             );
 
             m_reqSize = 15;
@@ -221,18 +220,18 @@ namespace Assets.Generation.Gen
 
         private Graph MakeSeed()
         {
-            Graph ret = new Graph(m_ioc_container.LayoutFactory);
+            Graph ret = new Graph();
 
-            INode start = ret.AddNode("Start", "<", "Seed", 55f);
-            INode expander = ret.AddNode("engine.StepperController", "e", "Seed", 55f);
-            INode end = ret.AddNode("End", ">", "Seed", 55f);
+            INode start = ret.AddNode("Start", "<", "Seed", 55f, CircularGeomLayout.Instance);
+            INode expander = ret.AddNode("engine.StepperController", "e", "Seed", 55f, CircularGeomLayout.Instance);
+            INode end = ret.AddNode("End", ">", "Seed", 55f, CircularGeomLayout.Instance);
 
             start.Position = new Vector2(0, -100);
             expander.Position = new Vector2(0, 0);
             end.Position = new Vector2(100, 0);
 
-            ret.Connect(start, expander, 90, 110, 10);
-            ret.Connect(expander, end, 90, 110, 10);
+            ret.Connect(start, expander, 90, 110, 10, CorridorLayout.Instance);
+            ret.Connect(expander, end, 90, 110, 10, CorridorLayout.Instance);
 
             //not expandable, which simplifies expansion as start won't need replacing
             return ret;
