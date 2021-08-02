@@ -1,4 +1,6 @@
-﻿namespace Assets.Generation.Stepping
+﻿using Assets.Generation.G;
+
+namespace Assets.Generation.Stepping
 {
     public interface IStepper
     {
@@ -13,5 +15,7 @@
         // some steps will themselves fail when a child fails
         // others will go on to try other stuff
         StepperController.StatusReportInner Step(StepperController.Status status);
+
+        public Graph Graph { get; }
     }
 }

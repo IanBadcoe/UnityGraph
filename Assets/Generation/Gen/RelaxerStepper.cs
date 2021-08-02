@@ -17,8 +17,9 @@ namespace Assets.Generation.Gen
 
     public class RelaxerStepper : IStepper
     {
+        public Graph Graph { get; private set; }
+
         private readonly IoCContainer ioc_container;
-        private readonly Graph m_graph;
         private readonly GeneratorConfig m_config;
 
         private List<INode> m_nodes;
@@ -37,14 +38,14 @@ namespace Assets.Generation.Gen
         public RelaxerStepper(IoCContainer ioc_container, Graph g, GeneratorConfig c)
         {
             this.ioc_container = ioc_container;
-            this.m_graph = g;
+            this.Graph = g;
             this.m_config = c;
         }
 
         private void SetUp()
         {
-            m_nodes = m_graph.GetAllNodes();
-            m_edges = m_graph.GetAllEdges();
+            m_nodes = Graph.GetAllNodes();
+            m_edges = Graph.GetAllEdges();
 
             // these are shortest path lengths through the graph
             //
@@ -56,7 +57,7 @@ namespace Assets.Generation.Gen
             // lengthen an edge (inserting a corner)
             m_node_dists = new ShortestPathFinder();
 
-            m_node_dists.FindPathLengths(m_graph, x => (x.MaxLength + x.MinLength) / 2);
+            m_node_dists.FindPathLengths(Graph, x => (x.MaxLength + x.MinLength) / 2);
 
             m_setup_done = true;
         }

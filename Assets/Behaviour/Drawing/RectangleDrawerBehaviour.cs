@@ -2,9 +2,9 @@
 using Assets.Generation.G;
 using UnityEngine;
 
-namespace Assets.Generation.Gen.Drawing
+namespace Assets.Behaviour.Drawing
 {
-    public class RectangleDrawer : MonoBehaviour, IDrawer
+    public class RectangleDrawerBehaviour : MonoBehaviour
     {
         public DirectedEdge Edge { get; set; }
 

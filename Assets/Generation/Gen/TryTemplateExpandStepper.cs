@@ -17,7 +17,8 @@ namespace Assets.Generation.Gen
 
     internal class TryTemplateExpandStepper : IStepper
     {
-        private readonly Graph m_graph;
+        public Graph Graph { get; private set; }
+
         private readonly INode m_node;
         private readonly Template m_template;
         private readonly GeneratorConfig m_config;
@@ -34,7 +35,7 @@ namespace Assets.Generation.Gen
         public TryTemplateExpandStepper(IoCContainer ioc_container, Graph graph, INode node, Template template, GeneratorConfig config)
         {
             m_ioc_container = ioc_container;
-            m_graph = graph;
+            Graph = graph;
             m_node = node;
             m_template = template;
             m_config = config;
@@ -44,9 +45,9 @@ namespace Assets.Generation.Gen
         {
             if (status == StepperController.Status.StepIn)
             {
-                if (m_template.Expand(m_graph, m_node, m_config.Rand()))
+                if (m_template.Expand(Graph, m_node, m_config.Rand()))
                 {
-                    IStepper child = m_ioc_container.RelaxerFactory.MakeRelaxer(m_ioc_container, m_graph, m_config);
+                    IStepper child = m_ioc_container.RelaxerFactory.MakeRelaxer(m_ioc_container, Graph, m_config);
 
                     return new StepperController.StatusReportInner(StepperController.Status.StepIn,
                           child, "Relaxing successful expansion.");
@@ -122,14 +123,14 @@ namespace Assets.Generation.Gen
 
         private StepperController.StatusReportInner TryLaunchEdgeAdjust()
         {
-            DirectedEdge e = MostStressedEdge(m_graph.GetAllEdges());
+            DirectedEdge e = MostStressedEdge(Graph.GetAllEdges());
 
             if (e == null)
             {
                 return null;
             }
 
-            IStepper child = m_ioc_container.AdjusterFactory.MakeAdjuster(m_ioc_container, m_graph, e, m_config);
+            IStepper child = m_ioc_container.AdjusterFactory.MakeAdjuster(m_ioc_container, Graph, e, m_config);
 
             return new StepperController.StatusReportInner(StepperController.Status.StepIn,
                   child, "Adjusting an edge.");

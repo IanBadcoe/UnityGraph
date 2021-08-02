@@ -1,4 +1,5 @@
 ﻿using Assets.Generation.G;
+using Assets.Generation.Gen;
 using Assets.Generation.GeomRep;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,9 +7,9 @@ using UnityEngine;
 // if the interface for generation can be factored out of the current implementation
 // then this might be drived wholly off the interface and not need to depend on the implementation
 
-namespace Assets.Generation.Gen.Drawing
+namespace Assets.Behaviour.Drawing
 {
-    public class InProgressDrawerUpdater : MonoBehaviour
+    public class InProgressDrawerUpdaterBehaviour : MonoBehaviour
     {
         public GameObject CircleDrawerTemplate;
         public GameObject RectangleDrawerTemplate;
@@ -20,7 +21,7 @@ namespace Assets.Generation.Gen.Drawing
         // but all the nodes and edges would need to be appropriately based-classed as well (nodes have INode but that
         // is for the reverse purpose, of abstracting the non-positional properties, and probably has drifted away from that
         // by now, anyway...)
-        public Generator Generator;
+        public GeneratorProvider GP;
 
         private void Awake()
         {
@@ -29,9 +30,11 @@ namespace Assets.Generation.Gen.Drawing
 
         private void Update()
         {
-            if (Generator)
+            Generator generator = GP != null ? GP.GetGenerator() : null;
+
+            if (generator != null)
             {
-                UpdateGeometry(Generator);
+                UpdateGeometry(generator);
             }
         }
 
@@ -54,7 +57,7 @@ namespace Assets.Generation.Gen.Drawing
                 }
                 else
                 {
-                    CircleDrawer cd = GameObject.Instantiate(CircleDrawerTemplate, transform).GetComponent<CircleDrawer>();
+                    CircleDrawerBehaviour cd = GameObject.Instantiate(CircleDrawerTemplate, transform).GetComponent<CircleDrawerBehaviour>();
                     cd.Node = node;
                     n_dict[node] = cd.gameObject;
                 }
@@ -70,7 +73,7 @@ namespace Assets.Generation.Gen.Drawing
                 }
                 else
                 {
-                    RectangleDrawer rd = GameObject.Instantiate(RectangleDrawerTemplate, transform).GetComponent<RectangleDrawer>();
+                    RectangleDrawerBehaviour rd = GameObject.Instantiate(RectangleDrawerTemplate, transform).GetComponent<RectangleDrawerBehaviour>();
                     rd.Edge = de;
                     n_dict[de] = rd.gameObject;
                 }

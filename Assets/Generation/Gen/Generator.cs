@@ -8,10 +8,15 @@ using UnityEngine;
 
 namespace Assets.Generation.Gen
 {
-    public class Generator : MonoBehaviour
+    public class Generator : IStepper
     {
+        public Graph Graph { get; private set; }
+
         public GeneratorConfig Config;
 
+        // only public as this is where we leave the geometry for the moment
+        // if we send it somewhere else, won't need it here
+        // but for the moment LoopsDrawer finds this here...
         public UnionHelper UnionHelper { get; private set; }
 
         // need a better way of making and setting these, but while we only have one...
@@ -21,32 +26,22 @@ namespace Assets.Generation.Gen
 
         public enum Phase
         {
-            Init,
             GraphExpand,
             FinalRelax,
-            BaseGeometry,
-            Union,
             Done
         }
 
-        private Phase m_phase = Phase.Init;
+        private Phase m_phase = Phase.GraphExpand;
 
-        public Graph Graph
-        {
-            get;
-            private set;
-        }
         public bool Pause { get; set; }
 
-        private StepperController m_expander;
-        private StepperController m_final_relaxer;
-
         private int m_reqSize;
-        private bool m_complete = false;
 
-        private void Start()
+        public Generator(Graph graph, int req_size)
         {
             //UnityEngine.Assertion.Assert.raiseExceptions = true;
+
+            Graph = graph;
 
             m_ioc_container = new IoCContainer(
                 new RelaxerStepper_CGFactory(),
@@ -56,56 +51,27 @@ namespace Assets.Generation.Gen
                 new EdgeAdjusterStepperFactory()
             );
 
-            m_reqSize = 15;
+            m_reqSize = req_size;
         }
 
-        private void Update()
+        public StepperController.StatusReportInner Step(StepperController.Status status)
         {
-            if (Pause)
+            switch (status)
             {
-                return;
-            }
+                case StepperController.Status.StepIn:
+                    return Init();
 
-            if (!m_complete)
-            {
-                StepperController.StatusReport ret;
+                case StepperController.Status.StepOutSuccess:
+                case StepperController.Status.Iterate:
+                    switch (m_phase)
+                    {
+                        case Phase.GraphExpand:
+                            return ExpandDone();
 
-                ret = Step();
-
-                if (ret == null || ret.Complete)
-                {
-                    //if (ret.Status != StepperController.Status.StepOutSuccess)
-                    //{
-                    //    exit();
-                    //}
-
-                    m_complete = true;
-                }
-            }
-        }
-
-        public StepperController.StatusReport Step()
-        {
-            switch (m_phase)
-            {
-                case Phase.Init:
-                    return InitStep();
-
-                case Phase.GraphExpand:
-                    return GraphExpandStep();
-
-                case Phase.FinalRelax:
-                    return FinalRelaxStep();
-
-                case Phase.BaseGeometry:
-                    return BaseGeometryStep();
-
-                case Phase.Union:
-                    return UnionStep();
-
-                case Phase.Done:
+                        case Phase.FinalRelax:
+                            return FinalRelaxDone();
+                    }
                     break;
-                    //                    return DoneStep();
             }
 
             // really shouldn't happen
@@ -113,128 +79,58 @@ namespace Assets.Generation.Gen
             return null;
         }
 
-        private StepperController.StatusReport InitStep()
+        private StepperController.StatusReportInner Init()
         {
-            Graph = MakeSeed();
+            MakeSeed();
 
-            m_expander = new StepperController(Graph,
-                  new ExpandToSizeStepper(m_ioc_container, Graph, m_reqSize, Templates,
-                        Config));
+            IStepper expander = new ExpandToSizeStepper(m_ioc_container, Graph, m_reqSize, Templates, Config);
 
             GeneratorConfig temp = GeneratorConfig.ShallowCopy(Config);
             temp.RelaxationForceTarget /= 5;
             temp.RelaxationMoveTarget /= 5;
 
-            m_final_relaxer = new StepperController(Graph,
-                  new RelaxerStepper_CG(m_ioc_container, Graph, temp, 0.01));
-
             m_phase = Phase.GraphExpand;
 
-            return new StepperController.StatusReport(
-                  new StepperController.StatusReportInner(StepperController.Status.Iterate,
-                     null, "engine.Level creation initialised"),
-                  false);
+            return new StepperController.StatusReportInner(StepperController.Status.StepIn,
+                     expander, "engine.Level creation initialised");
         }
 
-        private StepperController.StatusReport GraphExpandStep()
+        private StepperController.StatusReportInner ExpandDone()
         {
-            StepperController.StatusReport ret = m_expander.Step();
+            IStepper stepper = new RelaxerStepper_CG(m_ioc_container, Graph, Config, 0.01);
 
-            if (ret.Complete)
-            {
-                m_phase = Phase.FinalRelax;
+            m_phase = Phase.FinalRelax;
 
-                return new StepperController.StatusReport(
-                        StepperController.Status.Iterate,
-                        ret.Log,
-                        false);
-            }
-
-            return ret;
+            return new StepperController.StatusReportInner(StepperController.Status.StepIn, stepper, "Expansion done");
         }
 
-        private StepperController.StatusReport FinalRelaxStep()
-        {
-            StepperController.StatusReport ret = null;
-
-            ret = m_final_relaxer.Step();
-
-            if (ret.Complete)
-            {
-                m_phase = Phase.BaseGeometry;
-
-                return new StepperController.StatusReport(
-                        StepperController.Status.Iterate,
-                        ret.Log,
-                        false);
-            }
-
-            return ret;
-        }
-
-        private StepperController.StatusReport BaseGeometryStep()
+        private StepperController.StatusReportInner FinalRelaxDone()
         {
             UnionHelper = new UnionHelper();
 
             UnionHelper.GenerateGeometry(Graph);
 
-            m_phase = Phase.Union;
+            while (!UnionHelper.UnionOne(Config.Rand()))
+                ;
 
-            return new StepperController.StatusReport(
-                  new StepperController.StatusReportInner(StepperController.Status.Iterate,
-                        null, "engine.Level base geometry generated"),
-                  false);
+            m_phase = Phase.Done;
+
+            return new StepperController.StatusReportInner(StepperController.Status.StepOutSuccess,
+                        null, "Geometry merged.");
         }
 
-        private StepperController.StatusReport UnionStep()
+        private void MakeSeed()
         {
-            bool done = UnionHelper.UnionOne(Config.Rand());
-
-            if (done)
-            {
-                m_phase = Phase.Done;
-
-                return new StepperController.StatusReport(
-                      new StepperController.StatusReportInner(StepperController.Status.StepOutSuccess,
-                            null, "Geometry merged."),
-                      false);
-            }
-
-            return new StepperController.StatusReport(
-                    new StepperController.StatusReportInner(StepperController.Status.Iterate,
-                        null, "Merging geometry"),
-                    false);
-        }
-
-        private StepperController.StatusReport DoneStep()
-        {
-            //            m_level = m_union_helper.makeLevel(m_config.CellSize, m_config.WallFacetLength);
-
-            UnionHelper = null;
-
-            return new StepperController.StatusReport(
-                    StepperController.Status.StepOutSuccess,
-                    "engine.Level complete",
-                    true);
-        }
-
-        private Graph MakeSeed()
-        {
-            Graph ret = new Graph();
-
-            INode start = ret.AddNode("Start", "<", "Seed", 55f, CircularGeomLayout.Instance);
-            INode expander = ret.AddNode("engine.StepperController", "e", "Seed", 55f, CircularGeomLayout.Instance);
-            INode end = ret.AddNode("End", ">", "Seed", 55f, CircularGeomLayout.Instance);
+            INode start = Graph.AddNode("Start", "<", "Seed", 55f, CircularGeomLayout.Instance);
+            INode expander = Graph.AddNode("engine.StepperController", "e", "Seed", 55f, CircularGeomLayout.Instance);
+            INode end = Graph.AddNode("End", ">", "Seed", 55f, CircularGeomLayout.Instance);
 
             start.Position = new Vector2(0, -100);
             expander.Position = new Vector2(0, 0);
             end.Position = new Vector2(100, 0);
 
-            ret.Connect(start, expander, 90, 110, 10, CorridorLayout.Instance);
-            ret.Connect(expander, end, 90, 110, 10, CorridorLayout.Instance);
-
-            //not expandable, which simplifies expansion as start won't need replacing
-            return ret;
+            Graph.Connect(start, expander, 90, 110, 10, CorridorLayout.Instance);
+            Graph.Connect(expander, end, 90, 110, 10, CorridorLayout.Instance);
         }
     }
 }

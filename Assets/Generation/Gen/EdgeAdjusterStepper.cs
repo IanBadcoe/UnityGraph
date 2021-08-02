@@ -16,14 +16,15 @@ namespace Assets.Generation.Gen
 
     internal class EdgeAdjusterStepper : IStepper
     {
-        private readonly Graph m_graph;
+        public Graph Graph { get; private set; }
+
         private readonly DirectedEdge m_edge;
         private readonly GeneratorConfig m_config;
         private readonly IoCContainer m_ioc_container;
 
         public EdgeAdjusterStepper(IoCContainer ioc_container, Graph graph, DirectedEdge edge, GeneratorConfig config)
         {
-            m_graph = graph;
+            Graph = graph;
             m_edge = edge;
             m_config = config;
             m_ioc_container = ioc_container;
@@ -36,7 +37,7 @@ namespace Assets.Generation.Gen
                 case StepperController.Status.StepIn:
                     SplitEdge();
 
-                    IStepper child = m_ioc_container.RelaxerFactory.MakeRelaxer(m_ioc_container, m_graph, m_config);
+                    IStepper child = m_ioc_container.RelaxerFactory.MakeRelaxer(m_ioc_container, Graph, m_config);
 
                     return new StepperController.StatusReportInner(StepperController.Status.StepIn,
                           child, "Relaxing split edge.");
@@ -57,19 +58,19 @@ namespace Assets.Generation.Gen
 
         private void SplitEdge()
         {
-            INode c = m_graph.AddNode("c", "", "EdgeExtend",
+            INode c = Graph.AddNode("c", "", "EdgeExtend",
                   m_edge.HalfWidth, CircularGeomLayout.Instance);
 
             Vector2 mid = (m_edge.Start.Position + m_edge.End.Position) / 2;
 
             c.Position = mid;
 
-            m_graph.Disconnect(m_edge.Start, m_edge.End);
+            Graph.Disconnect(m_edge.Start, m_edge.End);
             // idea of lengths is to force no more length but allow
             // a longer corridor if required
-            DirectedEdge de1 = m_graph.Connect(m_edge.Start, c, m_edge.MinLength / 2, m_edge.MaxLength, m_edge.HalfWidth,
+            DirectedEdge de1 = Graph.Connect(m_edge.Start, c, m_edge.MinLength / 2, m_edge.MaxLength, m_edge.HalfWidth,
                 CorridorLayout.Instance);
-            DirectedEdge de2 = m_graph.Connect(c, m_edge.End, m_edge.MinLength / 2, m_edge.MaxLength, m_edge.HalfWidth,
+            DirectedEdge de2 = Graph.Connect(c, m_edge.End, m_edge.MinLength / 2, m_edge.MaxLength, m_edge.HalfWidth,
                 CorridorLayout.Instance);
 
             de1.Colour = m_edge.Colour;

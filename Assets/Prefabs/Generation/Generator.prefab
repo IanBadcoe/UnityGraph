@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6519645942250547586}
-  - component: {fileID: 8874595389178911298}
   - component: {fileID: 5915779746768243298}
   - component: {fileID: 921310462}
+  - component: {fileID: 2003294203}
   m_Layer: 0
   m_Name: Generator
   m_TagString: Untagged
@@ -33,29 +33,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8874595389178911298
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9020293378318520130}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f65affd054929c42bf460c2164c5991, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Config:
-    RelaxationMinimumSeparation: 5
-    EdgeToNodeForceScale: 1
-    EdgeLengthForceScale: 0.01
-    NodeToNodeForceScale: 1
-    RelaxationMaxMove: 1
-    RelaxationForceTarget: 0.001
-    RelaxationMoveTarget: 0.01
-    RandomSeed: 38
-    CellSize: 20
-    WallFacetLength: 10
 --- !u!114 &5915779746768243298
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70,7 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CircleDrawerTemplate: {fileID: 3984474223022568685, guid: 17c8f939b1f40e549b66005bf96c9a6d, type: 3}
   RectangleDrawerTemplate: {fileID: 3984474223022568685, guid: 7297d11495d5a9d45af61fbb8b7e53b3, type: 3}
-  Generator: {fileID: 8874595389178911298}
+  GP: {fileID: 2003294203}
 --- !u!114 &921310462
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -83,5 +60,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90030c1d68874cf43877312b0fb2fe58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Generator: {fileID: 8874595389178911298}
+  GP: {fileID: 2003294203}
   LoopDrawTemplate: {fileID: 3984474223022568685, guid: 2a3ecf15db5fe5148b57881a9ba0ea5c, type: 3}
+--- !u!114 &2003294203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9020293378318520130}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4950fecd6b750b541bad8629df3bfd76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Config:
+    RelaxationMinimumSeparation: 5
+    EdgeToNodeForceScale: 1
+    EdgeLengthForceScale: 0.01
+    NodeToNodeForceScale: 1
+    RelaxationMaxMove: 1
+    RelaxationForceTarget: 0.001
+    RelaxationMoveTarget: 0.01
+    RandomSeed: 38
+    CellSize: 20
+    WallFacetLength: 10

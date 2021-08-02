@@ -9,7 +9,8 @@ namespace Assets.Generation.Gen
 {
     class ExpandToSizeStepper : IStepper
     {
-        private readonly Graph m_graph;
+        public Graph Graph { get; private set; }
+
         private readonly int m_required_size;
         private readonly TemplateStore m_templates;
         private readonly GeneratorConfig m_config;
@@ -21,8 +22,8 @@ namespace Assets.Generation.Gen
                                    GeneratorConfig c)
         {
             this.m_ioc_container = m_ioc_container;
-            m_graph = graph;
-            m_orig_size = m_graph == null ? 0 : m_graph.NumNodes();
+            Graph = graph;
+            m_orig_size = Graph == null ? 0 : Graph.NumNodes();
             m_required_size = required_size;
             m_templates = templates;
             m_config = c;
@@ -34,24 +35,24 @@ namespace Assets.Generation.Gen
             {
                 case StepperController.Status.StepIn:
                 case StepperController.Status.StepOutSuccess:
-                    if (m_graph.NumNodes() >= m_required_size)
+                    if (Graph.NumNodes() >= m_required_size)
                     {
-                        Debug.WriteLine($"Completing expansion steps, current size: {m_graph.NumNodes()}, reached target: {m_required_size}");
+                        Debug.WriteLine($"Completing expansion steps, current size: {Graph.NumNodes()}, reached target: {m_required_size}");
 
                         return new StepperController.StatusReportInner(StepperController.Status.StepOutSuccess,
                                 null, "Target size reached");
                     }
 
-                    Debug.WriteLine($"Starting expand step, current size: {m_graph.NumNodes()}, target: {m_required_size}");
+                    Debug.WriteLine($"Starting expand step, current size: {Graph.NumNodes()}, target: {m_required_size}");
 
                     IStepper child = m_ioc_container.AllNodesExpanderFactory.MakeAllNodesExpander(
-                            m_ioc_container, m_graph, m_templates, m_config);
+                            m_ioc_container, Graph, m_templates, m_config);
 
                     return new StepperController.StatusReportInner(StepperController.Status.StepIn,
                             child, "More expansion required.");
 
                 case StepperController.Status.StepOutFailure:
-                    if (m_graph.NumNodes() > m_orig_size)
+                    if (Graph.NumNodes() > m_orig_size)
                     {
                         return new StepperController.StatusReportInner(StepperController.Status.StepOutSuccess,
                                 null, "Partial success");

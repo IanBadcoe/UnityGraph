@@ -17,7 +17,8 @@ namespace Assets.Generation.Gen
 
     internal class TryAllTemplatesOnOneNodeStepper : IStepper
     {
-        private readonly Graph m_graph;
+        public Graph Graph { get; private set; }
+
         private readonly INode m_node;
         private readonly List<Template> m_templates;
         private readonly GeneratorConfig m_config;
@@ -26,7 +27,7 @@ namespace Assets.Generation.Gen
         public TryAllTemplatesOnOneNodeStepper(IoCContainer ioc_container, Graph graph, INode node, List<Template> templates, GeneratorConfig config)
         {
             m_ioc_container = ioc_container;
-            m_graph = graph;
+            Graph = graph;
             m_node = node;
             m_config = config;
             m_templates = templates;
@@ -51,7 +52,7 @@ namespace Assets.Generation.Gen
             Template t = Util.RemoveRandom(m_config.Rand(), m_templates);
 
             IStepper child = m_ioc_container.NodeTemplateExpanderFactory.MakeNodeTemplateExpander(
-                  m_ioc_container, m_graph, m_node, t, m_config);
+                  m_ioc_container, Graph, m_node, t, m_config);
 
             return new StepperController.StatusReportInner(StepperController.Status.StepIn,
                   child, "Trying to expand node: " + m_node.Name + " with template: " + t.Name);

@@ -18,7 +18,7 @@ namespace Assets.Generation.Gen
 
     internal class TryAllNodesExpandStepper : IStepper
     {
-        private readonly Graph m_graph;
+        public Graph Graph { get; private set; }
         private readonly TemplateStore m_templates;
         private readonly GeneratorConfig m_config;
         private readonly IoCContainer m_ioc_container;
@@ -28,11 +28,11 @@ namespace Assets.Generation.Gen
         public TryAllNodesExpandStepper(IoCContainer ioc_container, Graph graph, TemplateStore templates, GeneratorConfig config)
         {
             m_ioc_container = ioc_container;
-            m_graph = graph;
+            Graph = graph;
             m_templates = templates;
             m_config = config;
 
-            m_all_nodes = m_graph.GetAllNodes();
+            m_all_nodes = Graph.GetAllNodes();
         }
 
         public StepperController.StatusReportInner Step(StepperController.Status status)
@@ -64,7 +64,7 @@ namespace Assets.Generation.Gen
             }
 
             IStepper child = m_ioc_container.NodeExpanderFactory.MakeNodeExpander(
-                  m_ioc_container, m_graph, node, templates, m_config);
+                  m_ioc_container, Graph, node, templates, m_config);
 
             return new StepperController.StatusReportInner(StepperController.Status.StepIn,
                   child, "Trying to expand node: " + node.Name);

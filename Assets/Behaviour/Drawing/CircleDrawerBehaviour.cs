@@ -1,9 +1,9 @@
 ﻿using Assets.Generation.G;
 using UnityEngine;
 
-namespace Assets.Generation.Gen.Drawing
+namespace Assets.Behaviour.Drawing
 {
-    public class CircleDrawer : MonoBehaviour, IDrawer
+    public class CircleDrawerBehaviour : MonoBehaviour
     {
         public INode Node { get; set; }
 

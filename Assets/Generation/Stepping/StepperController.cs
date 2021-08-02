@@ -9,7 +9,7 @@ namespace Assets.Generation.Stepping
         private readonly Stack<Tuple<IStepper, IGraphRestore>>
               m_stack = new Stack<Tuple<IStepper, IGraphRestore>>();
 
-        private readonly Graph m_graph;
+        private Graph Graph { get; set; }
         private Status m_last_step_status;
 
         public enum Status
@@ -62,9 +62,8 @@ namespace Assets.Generation.Stepping
             }
         }
 
-        public StepperController(Graph graph, IStepper initial_stepper)
+        public StepperController(IStepper initial_stepper)
         {
-            m_graph = graph;
             PushStepper(initial_stepper);
             // we start with a (conceptual) step in from the invoking code
             m_last_step_status = Status.StepIn;
@@ -77,6 +76,11 @@ namespace Assets.Generation.Stepping
             if (stepper == null)
             {
                 throw new NullReferenceException("Attempt to step without an initial stepper.  Either you failed to supply one, or this engine.StepperController has completed.");
+            }
+
+            if (Graph == null)
+            {
+                Graph = stepper.Graph;
             }
 
             StatusReportInner eri = stepper.Step(m_last_step_status);
@@ -104,7 +108,7 @@ namespace Assets.Generation.Stepping
         private void PushStepper(IStepper stepper)
         {
             m_stack.Push(
-                  new Tuple<IStepper, IGraphRestore>(stepper, m_graph != null ? m_graph.CreateRestorePoint() : null));
+                  new Tuple<IStepper, IGraphRestore>(stepper, Graph != null ? Graph.CreateRestorePoint() : null));
         }
 
         private IStepper CurrentStepper()
