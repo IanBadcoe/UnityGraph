@@ -1,4 +1,5 @@
 ﻿using Assets.Generation.U;
+using Assets.Extensions;
 using System;
 using UnityEngine;
 
@@ -118,5 +119,10 @@ namespace Assets.Generation.GeomRep
         }
 
         protected abstract Vector2 ComputePos_Inner(float param);
+
+        internal bool Adjoins(Curve c2, float tol)
+        {
+            return StartPos.Equals(c2.EndPos, tol) || EndPos.Equals(c2.StartPos, tol);
+        }
     }
 }

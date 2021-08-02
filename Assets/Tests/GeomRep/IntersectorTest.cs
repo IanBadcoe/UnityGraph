@@ -485,7 +485,7 @@ public class IntersectorTest
 
             LoopSet ret = m_intersector.Union(ls1, ls2, 1e-5f, new ClRand(1));
 
-            Assert.IsNull(ret);
+            Assert.IsTrue(ret.Count == 0);
         }
 
         // something union nothing should equal something
@@ -785,7 +785,8 @@ public class IntersectorTest
         public override bool ExtractInternalCurves(
             float tol, ClRand ClRand,
             Dictionary<Curve, AnnotatedCurve> forward_annotations_map, HashSet<Curve> all_curves,
-            HashSet<AnnotatedCurve> open, HashSet<Vector2> curve_joints, float diameter)
+            HashSet<AnnotatedCurve> open, HashSet<Vector2> curve_joints, float diameter,
+            UnionType type)
         {
             return false;
         }
@@ -914,6 +915,59 @@ public class IntersectorTest
             Assert.IsFalse(m_intersector.LineClearsPoints(lc1, hs, 1e-5f));
             Assert.IsTrue(m_intersector.LineClearsPoints(lc2, hs, 1e-5f));
         }
+    }
+
+    [Test]
+    public void TestRandomUnions()
+    {
+        const int NumTests = 1000;
+        const int NumShapes = 5;
+
+        for(int i = 0; i < NumTests; i++)
+        {
+            // let us jump straight to a given test
+            ClRand test_rand = new ClRand(i);
+
+            LoopSet merged = new LoopSet();
+
+            for (int j = 0; j < NumShapes; j++)
+            {
+                LoopSet ls2 = RandShapeLoop(test_rand);
+
+                // point here is to run all the Unions internal logic/asserts
+                merged = m_intersector.Union(merged, ls2, 1e-5f, new ClRand(1));
+            }
+        }
+    }
+
+    private LoopSet RandShapeLoop(ClRand test_rand)
+    {
+        LoopSet ret = new LoopSet();
+
+        if (test_rand.Nextfloat() > 0.5f)
+        {
+            ret.Add(new Loop(new CircleCurve(
+                test_rand.Nextpos(0, 10),
+                test_rand.Nextfloat() * 2 + 0.1f,
+                test_rand.Nextfloat() > 0.5f ? CircleCurve.RotationDirection.Forwards : CircleCurve.RotationDirection.Reverse)));
+        }
+        else
+        {
+            Vector2 p1 = test_rand.Nextpos(0, 10);
+            Vector2 p2 = test_rand.Nextpos(0, 10);
+            Vector2 p3 = test_rand.Nextpos(0, 10);
+
+            // triangles cannot be self-intersecting
+            Loop loop = new Loop(new List<Curve>{
+                LineCurve.MakeFromPoints(p1, p2),
+                LineCurve.MakeFromPoints(p2, p3),
+                LineCurve.MakeFromPoints(p3, p1),
+            });
+
+            ret.Add(loop);
+        }
+
+        return ret;
     }
 
     //// This one asserts because it somehow tries to make a discontinuous loop

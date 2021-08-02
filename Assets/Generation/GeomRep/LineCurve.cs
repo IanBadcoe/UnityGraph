@@ -11,6 +11,12 @@ namespace Assets.Generation.GeomRep
         public readonly Vector2 Position;
         public readonly Vector2 Direction;
 
+        public static LineCurve MakeFromPoints(Vector2 from, Vector2 to)
+        {
+            Vector2 vec = (to - from);
+            return new LineCurve(from, vec.normalized, vec.magnitude);
+        }
+
         public LineCurve(Vector2 position, Vector2 directionCosines, float length)
             : base(0, length)
         {

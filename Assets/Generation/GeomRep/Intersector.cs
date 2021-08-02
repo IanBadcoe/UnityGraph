@@ -3,6 +3,7 @@ using Assets.Generation.U;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace Assets.Generation.GeomRep
@@ -53,36 +54,97 @@ namespace Assets.Generation.GeomRep
             }
         }
 
-        public LoopSet Union(LoopSet ls1, LoopSet ls2, float tol,
-                             ClRand random)
+        // union operation cannot return a mix of positive and negative top-level curves
+        // e.g. if you think of a negative curve as something subtracted from a positive curve
+        // if we have inputs like this:
+        //
+        //    +--+ <- -ve curve (in one loopset)
+        //    |  |
+        // +--+--+--+ <- +ve curve (in the other)
+        // |  |  |  |
+        // +--+--+--+
+        //    |  |
+        //    +--+
+        //
+        // then the output must be either:
+        //
+        // +--+  +--+
+        // |  |  |  |
+        // +--+  +--+
+        //
+        // or
+        //    +--+
+        //    |  |
+        //    +--+
+        //
+        //    +--+
+        //    |  |
+        //    +--+
+        //
+        // according to whether we selected WantPositive or WantNegative
+        //
+        // the output can obviously contain nested curves of the opposite polarity:
+        //
+        // +--------+
+        // |        | <- +ve curve with a negative curved cutting a hole in it
+        // |  +--+  |
+        // |  |  |  |
+        // |  +--+  |
+        // |        |
+        // +--------+
+        //
+        // But we cannot represent a mix of opposite polarity curves at the top level
+        // (because that is essentially not completely unioned)
+
+        public enum UnionType
         {
-            if (ls1.Count == 0 && ls2.Count == 0)
+            WantPositive,
+            WantNegative
+        }
+
+        public LoopSet Union(LoopSet previously_merged, LoopSet to_merge, float tol,
+                             ClRand random,
+                             UnionType type = UnionType.WantPositive)
+        {
+#if DEBUG
+            ValidateInputs(previously_merged, "previously_merged");
+            ValidateInputs(to_merge, "ls2");
+            //for()
+#endif
+
+            // any loops in to_merge can be struck off as they will have no effect
+            // (and following code cannot handle them anyway, as they both overlap but don't intersect)
+            RemoveIdenticalLoops(previously_merged, to_merge);
+
+            // if there is no input left, we're done
+            if (to_merge.Count == 0)
             {
-                return null;
+                return previously_merged;
             }
 
-            // simple case, also covers us being handed the same instance twice
-            if (ls1.Equals(ls2))
-            {
-                return ls1;
-            }
+            // needing to check +ve/-ve curve type shoots any simple early-outs in the foot
+            //// simple case, also covers us being handed the same instance twice
+            //if (ls1.Equals(ls2))
+            //{
+            //    return ls1;
+            //}
 
-            if (ls1.Count == 0)
-            {
-                return ls2;
-            }
+            //if (ls1.Count == 0)
+            //{
+            //    return ls2;
+            //}
 
-            if (ls2.Count == 0)
-            {
-                return ls1;
-            }
+            //if (ls2.Count == 0)
+            //{
+            //    return ls1;
+            //}
 
             // used later as an id for which loop an AnnotationCurve comes from
             int loop_count = 0;
 
             Dictionary<int, IList<Curve>> working_loops1 = new Dictionary<int, IList<Curve>>();
 
-            foreach (Loop l in ls1)
+            foreach (Loop l in previously_merged)
             {
                 working_loops1.Add(loop_count, new List<Curve>(l.Curves));
                 loop_count++;
@@ -90,7 +152,7 @@ namespace Assets.Generation.GeomRep
 
             Dictionary<int, IList<Curve>> working_loops2 = new Dictionary<int, IList<Curve>>();
 
-            foreach (Loop l in ls2)
+            foreach (Loop l in to_merge)
             {
                 working_loops2.Add(loop_count, new List<Curve>(l.Curves));
                 loop_count++;
@@ -100,7 +162,7 @@ namespace Assets.Generation.GeomRep
             LoopSet ret = new LoopSet();
 
             // first, an easy bit, any loops from either set whos bounding boxes are disjunct from all loops in the
-            // other set, they have no influence on any other loops and can be simply copied inchanged into
+            // other set, they have no influence on any other loops and can be simply copied unchanged into
             // the output
 
             Dictionary<IList<Curve>, Box2> bound_map1 = new Dictionary<IList<Curve>, Box2>();
@@ -123,8 +185,10 @@ namespace Assets.Generation.GeomRep
                 bound_map2.Add(alc2, bound);
             }
 
-            RemoveEasyLoops(working_loops1, ret, bound_map2.Values, bound_map1);
-            RemoveEasyLoops(working_loops2, ret, bound_map1.Values, bound_map2);
+            // likewise this wouldn't distinguish -ve/+ve curves, which is required for
+            // UnionType switching
+            //RemoveEasyLoops(working_loops1, ret, bound_map2.Values, bound_map1);
+            //RemoveEasyLoops(working_loops2, ret, bound_map1.Values, bound_map2);
 
             HashSet<Tuple<int, int>> splittings = new HashSet<Tuple<int, int>>();
 
@@ -141,13 +205,17 @@ namespace Assets.Generation.GeomRep
                         splittings.Add(new Tuple<int, int>(i, j));
                     }
 
+#if DEBUG
                     // has a side effect of checking that the loops are still loops
-                    //            new engine.brep.Loop(alc1);
-                    //            new engine.brep.Loop(alc2);
+                    new Loop(alc1);
+                    new Loop(alc2);
+#endif
                 }
             }
 
-            Dictionary<Curve, AnnotatedCurve> forward_annotations_map = new Dictionary<Curve, AnnotatedCurve>();
+            Dictionary<Curve, AnnotatedCurve> forward_annotations_map
+                = new Dictionary<Curve, AnnotatedCurve>(
+                    new IdentityEqualityComparer<Curve>());
 
             // build forward and reverse chains of annotation-curves around both loops
             foreach (int i in working_loops1.Keys)
@@ -229,7 +297,11 @@ namespace Assets.Generation.GeomRep
             // but all we need from that is the max length in the box
             float diameter = bounds.Diagonal.magnitude;
 
-            if (!ExtractInternalCurves(tol, random, forward_annotations_map, all_curves, open, curve_joints, diameter))
+            if (!ExtractInternalCurves(tol,
+                random,
+                forward_annotations_map, all_curves, open, curve_joints,
+                diameter,
+                type))
             {
                 return null;
             }
@@ -247,22 +319,121 @@ namespace Assets.Generation.GeomRep
 
             // this would imply _everything_ was internal, which is impossible without
             // a dimension warp
-            Assertion.Assert(ret.Count > 0);
+            // we can get that, now we're considering -ve top-level curves, they can leave nothing in the
+            // output if we have type == WantPositive (or the reverse for +ve and WantNegative)
+            //Assertion.Assert(ret.Count > 0);
 
             return ret;
         }
 
+        private static void RemoveIdenticalLoops(LoopSet previously_merged, LoopSet ls2)
+        {
+            List<Loop> to_remove = new List<Loop>();
+
+            foreach (var loop1 in previously_merged)
+            {
+                foreach (var loop2 in ls2)
+                {
+                    if (loop1 == loop2)
+                    {
+                        to_remove.Add(loop2);
+                    }
+                }
+            }
+
+            foreach (var loop in to_remove)
+            {
+                ls2.Remove(loop);
+            }
+        }
+
+        private void ValidateInputs(LoopSet ls, string name)
+        {
+            for (int i = 0; i < ls.Count; i++)
+            {
+                var loop = ls[i];
+                CheckSelfIntersection(loop, name);
+
+                for (int j = i + 1; j < ls.Count; j++)
+                {
+                    var loop2 = ls[j];
+
+                    CheckLoopIntersection(loop, loop2, name);
+                }
+            }
+        }
+
+        private void CheckLoopIntersection(Loop loop, Loop loop2, string name)
+        {
+            for (int i = 0; i < loop.NumCurves - 1; i++)
+            {
+                var c1 = loop.Curves[i];
+
+                for (int j = i + 1; j < loop2.NumCurves; j++)
+                {
+                    var c2 = loop2.Curves[j];
+                    if (ReferenceEquals(loop, loop2))
+                    {
+                        throw new ArgumentException("Same curve object present twice in loop", name);
+                    }
+                    else if (loop == loop2)
+                    {
+                        throw new ArgumentException("Two copies of the same loop", name);
+                    }
+                    else if (GeomRepUtil.CurveCurveIntersect(c1, c2) != null)
+                    {
+                        throw new ArgumentException("Two loops intersects", name);
+                    }
+                }
+            }
+        }
+
+        private void CheckSelfIntersection(Loop loop, string name)
+        {
+            for (int i = 0; i < loop.NumCurves - 1; i++)
+            {
+                var c1 = loop.Curves[i];
+
+                for (int j = i + 1; j < loop.NumCurves; j++)
+                {
+                    var c2 = loop.Curves[j];
+
+                    if (ReferenceEquals(c1, c2))
+                    {
+                        throw new ArgumentException("Same curve object present twice in loop", name);
+                    }
+                    else if (c1 == c2)
+                    {
+                        throw new ArgumentException("Same curve present twice in loop", name);
+                    }
+                    // adjoining curves may intersect, but no others
+                    else if (!c1.Adjoins(c2, 1e-4f)
+                        && GeomRepUtil.CurveCurveIntersect(c1, c2) != null)
+                    {
+                        throw new ArgumentException("Curves in loop intersect", name);
+                    }
+                }
+            }
+        }
+
         // public and virtual only for unit-tests
         virtual public bool ExtractInternalCurves(
-            float tol, ClRand random,
+            float tol,
+            ClRand random,
             Dictionary<Curve, AnnotatedCurve> forward_annotations_map, HashSet<Curve> all_curves,
-            HashSet<AnnotatedCurve> open, HashSet<Vector2> curve_joints, float diameter)
+            HashSet<AnnotatedCurve> open, HashSet<Vector2> curve_joints,
+            float diameter,
+            UnionType type)
         {
+            // if we find a curve is non-internal while inspecting another, need not look at it again
+            HashSet<AnnotatedCurve> seen = new HashSet<AnnotatedCurve>();
+            int non_zero_value = type == UnionType.WantPositive ? 1 : -1;
+
             foreach (Curve c in all_curves)
             {
                 AnnotatedCurve ac_c = forward_annotations_map[c];
 
-                if (!open.Contains(ac_c))
+                if (!open.Contains(ac_c) || seen.Contains(ac_c))
                 {
                     continue;
                 }
@@ -291,10 +462,14 @@ namespace Assets.Generation.GeomRep
                     if (open.Contains(ac_intersecting))
                     {
                         // three cases, 0 -> 1, 1 -> 0 and anything else
-                        if ((prev_crossings != 0 || crossings != 1)
-                              && (prev_crossings != 1 || crossings != 0))
+                        if ((prev_crossings != 0 || crossings != non_zero_value)
+                              && (prev_crossings != non_zero_value || crossings != 0))
                         {
                             open.Remove(ac_intersecting);
+                        }
+                        else
+                        {
+                            seen.Add(ac_intersecting);
                         }
                     }
 
@@ -532,8 +707,8 @@ namespace Assets.Generation.GeomRep
                     float dot = c.Tangent(intersection.Item2).Dot(lc.Direction.Rot270());
 
                     // chicken out and scrap any line that has a glancing contact with a curve
-                    // a bit more than .1 degrees
-                    if (Mathf.Abs(dot) < 0.001)
+                    // a bit more than 1 degree
+                    if (Mathf.Abs(dot) < 0.01)
                     {
                         return null;
                     }
@@ -745,6 +920,20 @@ namespace Assets.Generation.GeomRep
             AnnotatedCurve ac_forward_last = forward_annotations_map[prev];
 
             ac_forward_last.Next = ac_forward_first;
+        }
+
+        sealed class IdentityEqualityComparer<T> : IEqualityComparer<T>
+            where T : class
+        {
+            public int GetHashCode(T value)
+            {
+                return RuntimeHelpers.GetHashCode(value);
+            }
+
+            public bool Equals(T left, T right)
+            {
+                return left == right; // Reference identity comparison
+            }
         }
     }
 

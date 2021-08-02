@@ -245,6 +245,14 @@ namespace Assets.Generation.U
         }
 
 
+        public virtual Vector2 Nextpos(float low, float high)
+        {
+            return new Vector2(
+                Nextfloat() * (high - low) + low,
+                Nextfloat() * (high - low) + low);
+        }
+
+
         /*==================================NextBytes===================================
         **Action:  Fills the byte array with random bytes [0..0x7f].  The entire array is filled.
         **Returns:Void

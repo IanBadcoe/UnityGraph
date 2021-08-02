@@ -1,4 +1,5 @@
 ﻿using Assets.Extensions;
+using Assets.Generation.U;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -6,7 +7,7 @@ using UnityEngine;
 
 namespace Assets.Generation.GeomRep
 {
-    public class Loop
+    public class Loop : EqualityBase
     {
         private readonly List<Curve> m_curves = new List<Curve>();
         private readonly float m_param_range;
@@ -120,7 +121,7 @@ namespace Assets.Generation.GeomRep
 
         public override bool Equals(object o)
         {
-            if (o == this)
+            if (ReferenceEquals(o , this))
             {
                 return true;
             }
