@@ -85,10 +85,6 @@ namespace Assets.Generation.Gen
 
             IStepper expander = new ExpandToSizeStepper(m_ioc_container, Graph, m_reqSize, Templates, Config);
 
-            GeneratorConfig temp = GeneratorConfig.ShallowCopy(Config);
-            temp.RelaxationForceTarget /= 5;
-            temp.RelaxationMoveTarget /= 5;
-
             m_phase = Phase.GraphExpand;
 
             return new StepperController.StatusReportInner(StepperController.Status.StepIn,
@@ -97,7 +93,7 @@ namespace Assets.Generation.Gen
 
         private StepperController.StatusReportInner ExpandDone()
         {
-            IStepper stepper = new RelaxerStepper_CG(m_ioc_container, Graph, Config, 0.01);
+            IStepper stepper = new RelaxerStepper_CG(m_ioc_container, Graph, Config, true);
 
             m_phase = Phase.FinalRelax;
 

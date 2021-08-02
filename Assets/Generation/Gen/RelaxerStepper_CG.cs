@@ -14,7 +14,7 @@ namespace Assets.Generation.Gen
     {
         public IStepper MakeRelaxer(IoCContainer ioc_container, Graph g, GeneratorConfig c)
         {
-            return new RelaxerStepper_CG(ioc_container, g, c, 0.5);
+            return new RelaxerStepper_CG(ioc_container, g, c, false);
         }
     }
 
@@ -23,9 +23,7 @@ namespace Assets.Generation.Gen
         public Graph Graph { get; private set; }
 
         public int MaxIterationsPerStep = 10;
-        public readonly double ConvergenceTightness;
 
-        private readonly IoCContainer ioc_container;
         private readonly GeneratorConfig m_config;
         alglib.mincgstate opt_state;
 
@@ -45,6 +43,8 @@ namespace Assets.Generation.Gen
         private int m_energy_count = 0;
         private int m_iterations = 0;
 
+        readonly bool Final;
+
         public enum TerminationCondition
         {
             InfOrNanError,
@@ -61,13 +61,11 @@ namespace Assets.Generation.Gen
 
         public TerminationCondition Status { get; private set; }
 
-        public RelaxerStepper_CG(IoCContainer ioc_container, Graph g, GeneratorConfig c, double tightness)
+        public RelaxerStepper_CG(IoCContainer ioc_container, Graph g, GeneratorConfig c, bool final)
         {
-            this.ioc_container = ioc_container;
-            this.Graph = g;
-            this.m_config = c;
-
-            ConvergenceTightness = tightness;
+            Graph = g;
+            m_config = c;
+            Final = final;
         }
 
         private void SetUp()
@@ -105,7 +103,9 @@ namespace Assets.Generation.Gen
 
             alglib.mincgcreatef(m_pars, 1e-4, out opt_state);
             alglib.mincgsuggeststep(opt_state, 1);
-            alglib.mincgsetcond(opt_state, 0, 0, ConvergenceTightness, MaxIterationsPerStep);
+            alglib.mincgsetcond(opt_state, 0, 0,
+                Final ? m_config.FinalRelaxationMoveTarget : m_config.IntermediateRelaxationMoveTarget,
+                MaxIterationsPerStep);
             alglib.mincgsetxrep(opt_state, true);
 
 #if DEBUG
