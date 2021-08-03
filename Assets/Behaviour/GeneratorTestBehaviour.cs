@@ -1,24 +1,38 @@
 using Assets.Generation.G;
 using Assets.Generation.Gen;
 using Assets.Generation.GeomRep;
-using Assets.Generation.IoC;
 using Assets.Generation.Stepping;
-using Assets.Generation.Templates;
+using System.Collections.Generic;
 using UnityEngine;
 
 
 namespace Assets.Behaviour
 {
-    public class GeneratorTestBehaviour : GeneratorProvider
+    public class GeneratorTestBehaviour : DataProvider
     {
         public GeneratorConfig Config = new GeneratorConfig();
         public int RequiredSize = 15;
 
         private readonly Generator m_generator;
 
-        public override Generator GetGenerator()
+        public override IReadOnlyList<Loop> GetLoops()
         {
-            return m_generator;
+            if (m_generator != null && m_generator.UnionHelper != null)
+            {
+                return m_generator.UnionHelper.MergedLoops;
+            }
+
+            return null;
+        }
+
+        public override Graph GetGraph()
+        {
+            if (m_generator != null)
+            {
+                return m_generator.Graph;
+            }
+
+            return null;
         }
 
         GeneratorTestBehaviour()

@@ -21,7 +21,7 @@ namespace Assets.Behaviour.Drawing
         // but all the nodes and edges would need to be appropriately based-classed as well (nodes have INode but that
         // is for the reverse purpose, of abstracting the non-positional properties, and probably has drifted away from that
         // by now, anyway...)
-        public GeneratorProvider GP;
+        public DataProvider DP;
 
         private void Awake()
         {
@@ -30,24 +30,24 @@ namespace Assets.Behaviour.Drawing
 
         private void Update()
         {
-            Generator generator = GP != null ? GP.GetGenerator() : null;
+            Graph graph = DP != null ? DP.GetGraph() : null;
 
-            if (generator != null)
+            if (graph != null)
             {
-                UpdateGeometry(generator);
+                UpdateGeometry(graph);
             }
         }
 
-        internal void UpdateGeometry(Generator generator)
+        internal void UpdateGeometry(Graph graph)
         {
-            if (generator.Graph == null)
+            if (graph == null)
             {
                 return;
             }
 
             Dictionary<object, GameObject> n_dict = new Dictionary<object, GameObject>();
 
-            foreach (INode node in generator.Graph.GetAllNodes())
+            foreach (INode node in graph.GetAllNodes())
             {
                 GameObject drawer;
 
@@ -63,7 +63,7 @@ namespace Assets.Behaviour.Drawing
                 }
             }
 
-            foreach (DirectedEdge de in generator.Graph.GetAllEdges())
+            foreach (DirectedEdge de in graph.GetAllEdges())
             {
                 GameObject drawer;
 
@@ -87,10 +87,10 @@ namespace Assets.Behaviour.Drawing
                 }
             }
 
-            Box2 bounds = generator.Graph.Bounds();
+            Box2 bounds = graph.Bounds();
             Camera.transform.position = bounds.Centre() + new Vector3(0, 0, -300);
 
-            float aspect_ratio = (float)Screen.width / (float)Screen.height;
+            float aspect_ratio = Screen.width / (float)Screen.height;
             float req_size = Mathf.Max(bounds.Diagonal.y, bounds.Diagonal.x / aspect_ratio);
 
             Camera.orthographicSize = req_size / 2;

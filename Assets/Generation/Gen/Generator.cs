@@ -22,7 +22,7 @@ namespace Assets.Generation.Gen
         // need a better way of making and setting these, but while we only have one...
         private readonly TemplateStore Templates = new TemplateStore1();
 
-        private IoCContainer m_ioc_container;
+        private readonly IoCContainer m_ioc_container;
 
         public enum Phase
         {
@@ -35,7 +35,7 @@ namespace Assets.Generation.Gen
 
         public bool Pause { get; set; }
 
-        private int m_reqSize;
+        private readonly int m_reqSize;
 
         public Generator(Graph graph, int req_size)
         {
@@ -107,7 +107,9 @@ namespace Assets.Generation.Gen
             UnionHelper.GenerateGeometry(Graph);
 
             while (!UnionHelper.UnionOne(Config.Rand()))
+            {
                 ;
+            }
 
             m_phase = Phase.Done;
 

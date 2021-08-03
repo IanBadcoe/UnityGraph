@@ -1,5 +1,4 @@
-﻿using Assets.Generation.Gen;
-using Assets.Generation.GeomRep;
+﻿using Assets.Generation.GeomRep;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -8,18 +7,18 @@ namespace Assets.Behaviour.Drawing
 {
     public class LoopsDrawerBehaviour : MonoBehaviour
     {
-        public GeneratorProvider GP;
+        [SerializeField, SerializeReference]
+        public DataProvider DP;
         public GameObject LoopDrawTemplate;
         readonly Dictionary<Loop, LineRenderer> RendererMap = new Dictionary<Loop, LineRenderer>();
 
         private void Update()
         {
-            Generator generator = GP != null ? GP.GetGenerator() : null;
-            UnionHelper union_helper = generator?.UnionHelper;
+            var loops = DP.GetLoops();
 
-            if (union_helper != null)
+            if (loops != null)
             {
-                foreach (Loop loop in union_helper.MergedLoops)
+                foreach (Loop loop in loops)
                 {
                     if (!RendererMap.ContainsKey(loop))
                     {
@@ -40,8 +39,7 @@ namespace Assets.Behaviour.Drawing
 
             foreach (Loop loop in RendererMap.Keys)
             {
-                if (union_helper?.MergedLoops == null
-                    || !union_helper.MergedLoops.Contains(loop))
+                if (loops == null || !loops.Contains(loop))
                 {
                     GameObject.Destroy(RendererMap[loop]);
                     to_remove.Add(loop);

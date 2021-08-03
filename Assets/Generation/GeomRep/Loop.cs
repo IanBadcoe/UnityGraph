@@ -121,7 +121,7 @@ namespace Assets.Generation.GeomRep
 
         public override bool Equals(object o)
         {
-            if (ReferenceEquals(o , this))
+            if (ReferenceEquals(o, this))
             {
                 return true;
             }
