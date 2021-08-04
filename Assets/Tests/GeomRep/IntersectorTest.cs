@@ -72,6 +72,11 @@ public class IntersectorTest
         {
             return Vector2.zero;
         }
+    
+        public override Curve Reversed()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [Test]
@@ -362,7 +367,7 @@ public class IntersectorTest
         // two concentric circles, inner one -ve, expect 1, 0, 1, 0
         {
             CircleCurve cc1 = new CircleCurve(new Vector2(), 5);
-            CircleCurve cc2 = new CircleCurve(new Vector2(), 3, CircleCurve.RotationDirection.Reverse);
+            CircleCurve cc2 = new CircleCurve(new Vector2(), 3, RotationDirection.Reverse);
 
             HashSet<Curve> all_curves = new HashSet<Curve>();
             all_curves.Add(cc1);
@@ -568,8 +573,8 @@ public class IntersectorTest
             Assert.AreEqual(1, cc2.Radius, 1e-5f);
 
             // same direction
-            Assert.AreEqual(CircleCurve.RotationDirection.Forwards, cc1.Rotation);
-            Assert.AreEqual(CircleCurve.RotationDirection.Forwards, cc2.Rotation);
+            Assert.AreEqual(RotationDirection.Forwards, cc1.Rotation);
+            Assert.AreEqual(RotationDirection.Forwards, cc2.Rotation);
 
             // joined end-to-end
             Assert.IsTrue(cc1.StartPos.Equals(cc2.EndPos, 1e-5f));
@@ -595,12 +600,12 @@ public class IntersectorTest
             LoopSet ls2 = new LoopSet();
 
             Loop l1a = new Loop(new CircleCurve(new Vector2(), 1));
-            Loop l1b = new Loop(new CircleCurve(new Vector2(), 0.3f, CircleCurve.RotationDirection.Reverse));
+            Loop l1b = new Loop(new CircleCurve(new Vector2(), 0.3f, RotationDirection.Reverse));
             ls1.Add(l1a);
             ls1.Add(l1b);
 
             Loop l2a = new Loop(new CircleCurve(new Vector2(1, 0), 1));
-            Loop l2b = new Loop(new CircleCurve(new Vector2(1, 0), 0.3f, CircleCurve.RotationDirection.Reverse));
+            Loop l2b = new Loop(new CircleCurve(new Vector2(1, 0), 0.3f, RotationDirection.Reverse));
             ls2.Add(l2a);
             ls2.Add(l2b);
 
@@ -643,8 +648,8 @@ public class IntersectorTest
             Assert.AreEqual(1, cc2.Radius, 1e-5f);
 
             // same direction
-            Assert.AreEqual(CircleCurve.RotationDirection.Forwards, cc1.Rotation);
-            Assert.AreEqual(CircleCurve.RotationDirection.Forwards, cc2.Rotation);
+            Assert.AreEqual(RotationDirection.Forwards, cc1.Rotation);
+            Assert.AreEqual(RotationDirection.Forwards, cc2.Rotation);
 
             // joined end-to-end
             Assert.IsTrue(cc1.StartPos.Equals(cc2.EndPos, 1e-5f));
@@ -693,8 +698,8 @@ public class IntersectorTest
             Assert.AreEqual(1, cc2.Radius, 1e-5f);
 
             // same direction
-            Assert.AreEqual(CircleCurve.RotationDirection.Forwards, cc1.Rotation);
-            Assert.AreEqual(CircleCurve.RotationDirection.Forwards, cc2.Rotation);
+            Assert.AreEqual(RotationDirection.Forwards, cc1.Rotation);
+            Assert.AreEqual(RotationDirection.Forwards, cc2.Rotation);
 
             // joined end-to-end
             Assert.IsTrue(cc1.StartPos.Equals(cc2.EndPos, 1e-5f));
@@ -721,7 +726,7 @@ public class IntersectorTest
             Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
             ls1.Add(l1);
 
-            Loop l2 = new Loop(new CircleCurve(new Vector2(0.5f, 0), 0.5f, CircleCurve.RotationDirection.Reverse));
+            Loop l2 = new Loop(new CircleCurve(new Vector2(0.5f, 0), 0.5f, RotationDirection.Reverse));
             ls2.Add(l2);
 
             LoopSet ret = m_intersector.Union(ls1, ls2, 1e-5f, new ClRand(1));
@@ -749,8 +754,8 @@ public class IntersectorTest
             Assert.AreEqual(0.5, right.Radius, 1e-5f);
 
             // same direction
-            Assert.AreEqual(CircleCurve.RotationDirection.Forwards, left.Rotation);
-            Assert.AreEqual(CircleCurve.RotationDirection.Reverse, right.Rotation);
+            Assert.AreEqual(RotationDirection.Forwards, left.Rotation);
+            Assert.AreEqual(RotationDirection.Reverse, right.Rotation);
 
             Assert.AreEqual(new Vector2(0, 0), left.Position);
             Assert.AreEqual(new Vector2(0.5f, 0), right.Position);
@@ -949,7 +954,7 @@ public class IntersectorTest
             ret.Add(new Loop(new CircleCurve(
                 test_rand.Nextpos(0, 10),
                 test_rand.Nextfloat() * 2 + 0.1f,
-                test_rand.Nextfloat() > 0.5f ? CircleCurve.RotationDirection.Forwards : CircleCurve.RotationDirection.Reverse)));
+                test_rand.Nextfloat() > 0.5f ? RotationDirection.Forwards : RotationDirection.Reverse)));
         }
         else
         {
@@ -1008,7 +1013,7 @@ public class IntersectorTest
     ////   public void testPrecisionProblem()
     ////   {
     ////      engine.brep.Curve circle = new engine.brep.CircleCurve(new engine.XY(340.5690029832473, -103.41524432252388), 10.0,
-    ////            0.0, Math.PI * 2, engine.brep.CircleCurve.RotationDirection.Forwards);
+    ////            0.0, Math.PI * 2, engine.brep.RotationDirection.Forwards);
     ////
     ////      List<engine.brep.Curve> alc1 = new List<Curve>();
     ////      alc1.Add(circle);

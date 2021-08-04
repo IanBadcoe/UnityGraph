@@ -3,6 +3,7 @@ using Assets.Generation.U;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using UnityEngine;
 
 namespace Assets.Generation.GeomRep
@@ -33,7 +34,46 @@ namespace Assets.Generation.GeomRep
             }
         }
 
-        public Loop(IList<Curve> curves)
+        public static Loop MakePolygon(IEnumerable<Vector2> pnts, RotationDirection polarity)
+        {
+            Vector2 prev = pnts.Last();
+
+            List<Curve> curves = new List<Curve>();
+
+            foreach(var curr in pnts)
+            {
+                curves.Add(LineCurve.MakeFromPoints(prev, curr));
+
+                prev = curr;
+            }
+
+            Loop ret = new Loop(curves);
+
+            RotationDirection actual_rotation = GeomRepUtil.GetPolygonDirection(ret);
+
+            if (polarity != RotationDirection.DontCare
+                && actual_rotation != RotationDirection.DontCare
+                && polarity != actual_rotation)
+            {
+                ret = ret.Reversed();
+            }
+
+            return ret;
+        }
+
+        public Loop Reversed()
+        {
+            List<Curve> ret = new List<Curve>();
+
+            foreach(var c in m_curves)
+            {
+                ret.Insert(0, c.Reversed());
+            }
+
+            return new Loop(ret);
+        }
+
+        public Loop(IEnumerable<Curve> curves)
         {
             m_curves.AddRange(curves);
 

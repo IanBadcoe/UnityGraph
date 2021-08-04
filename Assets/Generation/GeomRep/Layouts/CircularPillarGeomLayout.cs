@@ -17,7 +17,7 @@ namespace Assets.Generation.GeomRep.Layouts
         public override LoopSet MakeDetailGeometry(INode node)
         {
             LoopSet ret = new LoopSet();
-            ret.Add(new Loop(new CircleCurve(node.Position, node.Radius / 2, CircleCurve.RotationDirection.Reverse)));
+            ret.Add(new Loop(new CircleCurve(node.Position, node.Radius / 2, RotationDirection.Reverse)));
 
             return ret;
         }
@@ -43,7 +43,7 @@ namespace Assets.Generation.GeomRep.Layouts
                 float ang = Mathf.PI * 2 * i / 4;
                 Vector2 pos = node.Position + new Vector2(Mathf.Sin(ang) * node.Radius / 2, Mathf.Cos(ang) * node.Radius / 2);
 
-                ret.Add(new Loop(new CircleCurve(pos, node.Radius / 6, CircleCurve.RotationDirection.Reverse)));
+                ret.Add(new Loop(new CircleCurve(pos, node.Radius / 6, RotationDirection.Reverse)));
             }
 
             return ret;

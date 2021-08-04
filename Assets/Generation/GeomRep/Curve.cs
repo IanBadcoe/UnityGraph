@@ -72,6 +72,8 @@ namespace Assets.Generation.GeomRep
             return ret;
         }
 
+        public abstract Curve Reversed();
+
         // this can return values off the end of our param range, but the caller checks that
         protected abstract float FindParamForPoint_Inner(Vector2 pnt);
 

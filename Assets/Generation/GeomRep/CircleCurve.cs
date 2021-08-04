@@ -4,15 +4,32 @@ using UnityEngine;
 
 namespace Assets.Generation.GeomRep
 {
+    public enum RotationDirection
+    {
+        Forwards,
+        Reverse,
+        DontCare
+    }
+
+    public static class RotationDirectionExtensions
+    {
+        public static RotationDirection Invert(this RotationDirection rot)
+        {
+            switch(rot)
+            {
+                case RotationDirection.Forwards:
+                    return RotationDirection.Reverse;
+                case RotationDirection.Reverse:
+                    return RotationDirection.Forwards;
+                default:
+                    return RotationDirection.DontCare;
+            }
+        }
+    }
+
     [System.Diagnostics.DebuggerDisplay("Pos = {Position}, From = {StartPos}, To = {EndPos}, Dir = {Rotation}")]
     public class CircleCurve : Curve
     {
-        public enum RotationDirection
-        {
-            Forwards,
-            Reverse
-        }
-
         readonly public Vector2 Position;
         readonly public float Radius;
         readonly public RotationDirection Rotation;
@@ -240,6 +257,13 @@ namespace Assets.Generation.GeomRep
         public bool IsCyclic()
         {
             return Util.ClockAwareAngleCompare(StartParam, EndParam, 1e-6f);
+        }
+        public override Curve Reversed()
+        {
+            // start and end remain the same way around for a reversed circle
+            // we just flip the "Rotation" field to say we mean the other direction
+            return new CircleCurve(Position, Radius, StartParam, EndParam,
+                Rotation.Invert());
         }
     }
 }

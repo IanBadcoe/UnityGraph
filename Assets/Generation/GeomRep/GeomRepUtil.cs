@@ -66,6 +66,14 @@ namespace Assets.Generation.GeomRep
             return null;
         }
 
+        public static RotationDirection GetPolygonDirection(Loop ret)
+        {
+            float area = SignedPolygonArea(ret);
+
+            return area > 0 ? RotationDirection.Forwards :
+                area < 0 ? RotationDirection.Reverse :
+                RotationDirection.DontCare;
+        }
         private static Tuple<Vector2, Vector2?> CircleCurveIntersect(CircleCurve c1, Curve c2)
         {
             if (c2 is CircleCurve)
@@ -216,6 +224,30 @@ namespace Assets.Generation.GeomRep
             }
 
             return new Tuple<float, float?>(hit1.Value, hit2);
+        }
+        // only works for loops made of LineCurve
+        public static float SignedPolygonArea(Loop l)
+        {
+            float ret = 0;
+
+            foreach(var c in l.Curves)
+            {
+                LineCurve lc = c as LineCurve;
+
+                Assertion.Assert(lc != null);
+
+                ret += (lc.StartPos.y + lc.EndPos.y) * (lc.EndPos.x - lc.StartPos.x);
+            }
+
+            return ret / 2;
+        }
+
+        public static float DistFromLine(Vector2 l1, Vector2 l2, Vector2 p)
+        {
+            var rel = p - l1;
+            var dir = (l2 - l1).normalized;
+
+            return rel.Dot(dir.Rot90());
         }
     }
 }
