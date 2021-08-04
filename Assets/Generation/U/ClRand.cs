@@ -207,7 +207,7 @@ namespace Assets.Generation.U
             //Contract.EndContractBlock();
 
             long range = (long)maxValue - minValue;
-            if (range <= (long)Int32.MaxValue)
+            if (range <= int.MaxValue)
             {
                 return ((int)(Sample() * range) + minValue);
             }

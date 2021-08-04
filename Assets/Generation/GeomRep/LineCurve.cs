@@ -132,6 +132,7 @@ namespace Assets.Generation.GeomRep
             // params and pos used to achieve that differ
             return StartPos == lc_o.StartPos && EndPos == lc_o.EndPos;
         }
+
         public override Curve Reversed()
         {
             return LineCurve.MakeFromPoints(EndPos, StartPos);

@@ -40,7 +40,7 @@ namespace Assets.Generation.GeomRep
 
             List<Curve> curves = new List<Curve>();
 
-            foreach(var curr in pnts)
+            foreach (var curr in pnts)
             {
                 curves.Add(LineCurve.MakeFromPoints(prev, curr));
 
@@ -65,7 +65,7 @@ namespace Assets.Generation.GeomRep
         {
             List<Curve> ret = new List<Curve>();
 
-            foreach(var c in m_curves)
+            foreach (var c in m_curves)
             {
                 ret.Insert(0, c.Reversed());
             }
@@ -267,17 +267,5 @@ namespace Assets.Generation.GeomRep
 
             return ret;
         }
-
-        //public Loop Reversed()
-        //{
-        //    List<Curve> temp = new List<Curve>();
-
-        //    for (int i = m_curves.Count - 1; i > 0; i--)
-        //    {
-        //        temp.Add(m_curves[i].Reversed());
-        //    }
-
-        //    return new Loop(temp);
-        //}
     }
 }

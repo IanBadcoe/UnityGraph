@@ -69,6 +69,8 @@ namespace Assets.Generation.GeomRep
                            RotationDirection rotation)
             : base(Util.FixupAngle(start_angle), FixEndAngle(start_angle, end_angle))
         {
+            // we have to have a direction
+            Assertion.Assert(rotation != RotationDirection.DontCare);
 
             Position = position;
             Radius = radius;
@@ -258,6 +260,7 @@ namespace Assets.Generation.GeomRep
         {
             return Util.ClockAwareAngleCompare(StartParam, EndParam, 1e-6f);
         }
+
         public override Curve Reversed()
         {
             // start and end remain the same way around for a reversed circle

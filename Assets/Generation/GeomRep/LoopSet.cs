@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Assets.Generation.GeomRep
 {
@@ -55,6 +56,11 @@ namespace Assets.Generation.GeomRep
             }
 
             return true;
+        }
+
+        public Box2 GetBounds()
+        {
+            return this.Aggregate(new Box2(), (b, l) => b.Union(l.GetBounds()));
         }
     }
 }
