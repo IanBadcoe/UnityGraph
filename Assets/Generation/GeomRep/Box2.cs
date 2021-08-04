@@ -26,21 +26,21 @@ namespace Assets.Generation.GeomRep
             Max = tr;
         }
 
-        public bool IsEmpty()
+        public bool IsEmpty
         {
             // if either high edge is on the wrong side of the low edge, we are empty
             // (empty is different from zero-sized, edges are in the same place for that)
-            return Min.x > Max.x || Min.y > Max.y;
+            get => Min.x > Max.x || Min.y > Max.y;
         }
 
         public Box2 Union(Box2 rhs)
         {
             // empty areas add nothing to other areas
-            if (IsEmpty())
+            if (IsEmpty)
             {
                 return rhs;
             }
-            else if (rhs.IsEmpty())
+            else if (rhs.IsEmpty)
             {
                 return this;
             }
@@ -58,7 +58,7 @@ namespace Assets.Generation.GeomRep
 
         public override int GetHashCode()
         {
-            if (IsEmpty())
+            if (IsEmpty)
             {
                 return 0x48e5083f;
             }
