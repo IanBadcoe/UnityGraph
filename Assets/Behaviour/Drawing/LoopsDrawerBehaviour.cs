@@ -10,7 +10,15 @@ namespace Assets.Behaviour.Drawing
         [SerializeField, SerializeReference]
         public DataProvider DP;
         public GameObject LoopDrawTemplate;
+        public bool ControlCamera;
         readonly Dictionary<Loop, LineRenderer> RendererMap = new Dictionary<Loop, LineRenderer>();
+
+        Camera Camera;
+
+        private void Awake()
+        {
+            Camera = Transform.FindObjectOfType<Camera>();
+        }
 
         private void Update()
         {
@@ -22,7 +30,9 @@ namespace Assets.Behaviour.Drawing
                 {
                     if (!RendererMap.ContainsKey(loop))
                     {
-                        Vector3[] points = loop.Facet(10.0f);
+                        float len = loop.ParamRange;
+
+                        Vector3[] points = loop.Facet(1);
 
                         var renderer = GameObject.Instantiate(LoopDrawTemplate, transform);
 
@@ -49,6 +59,19 @@ namespace Assets.Behaviour.Drawing
             foreach (Loop loop in to_remove)
             {
                 RendererMap.Remove(loop);
+            }
+
+
+            if (ControlCamera && Camera != null)
+            {
+                Box2 bounds = RendererMap.Keys.Aggregate(new Box2(), (b, l) => b.Union(l.GetBounds()));
+
+                Camera.transform.position = bounds.Centre() + new Vector3(0, 0, -300);
+
+                float aspect_ratio = Screen.width / (float)Screen.height;
+                float req_size = Mathf.Max(bounds.Diagonal.y, bounds.Diagonal.x / aspect_ratio);
+
+                Camera.orthographicSize = req_size / 2;
             }
         }
     }
