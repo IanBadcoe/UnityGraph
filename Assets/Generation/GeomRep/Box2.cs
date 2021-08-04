@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace Assets.Generation.GeomRep
 {
+    [System.Diagnostics.DebuggerDisplay("Min = {Min}, Max = {Max}, Diag = {Diagonal} {IsEmpty ? \"Empty\" : \"\"}")]
     public class Box2 : EqualityBase
     {
         public readonly Vector2 Min;
