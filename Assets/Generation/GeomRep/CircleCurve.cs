@@ -237,7 +237,7 @@ namespace Assets.Generation.GeomRep
 
         public override bool WithinParams(float p, float tol)
         {
-            if (IsCyclic())
+            if (IsCyclic)
             {
                 return true;
             }
@@ -256,9 +256,9 @@ namespace Assets.Generation.GeomRep
             return p < EndParam + tol;
         }
 
-        public bool IsCyclic()
+        public bool IsCyclic
         {
-            return Util.ClockAwareAngleCompare(StartParam, EndParam, 1e-6f);
+            get => Util.ClockAwareAngleCompare(StartParam, EndParam, 1e-6f);
         }
 
         public override Curve Reversed()

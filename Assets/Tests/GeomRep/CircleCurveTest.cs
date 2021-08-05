@@ -357,9 +357,9 @@ public class CircleCurveTest
         CircleCurve cc3 = new CircleCurve(new Vector2(), 1, Mathf.PI, 3 * Mathf.PI);
         CircleCurve cc4 = new CircleCurve(new Vector2(), 1, 0, 3 * Mathf.PI / 2);
 
-        Assert.IsTrue(cc1.IsCyclic());
-        Assert.IsTrue(cc2.IsCyclic());
-        Assert.IsTrue(cc3.IsCyclic());
-        Assert.IsFalse(cc4.IsCyclic());
+        Assert.IsTrue(cc1.IsCyclic);
+        Assert.IsTrue(cc2.IsCyclic);
+        Assert.IsTrue(cc3.IsCyclic);
+        Assert.IsFalse(cc4.IsCyclic);
     }
 }
