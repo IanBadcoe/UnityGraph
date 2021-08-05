@@ -252,4 +252,97 @@ public class LineCurveTest
         //noinspection EqualsWithItself
         Assert.AreEqual(lc, lc2);
     }
+
+    [Test]
+    public void TestNormDist()
+    {
+        {
+            LineCurve lc1 = LineCurve.MakeFromPoints(new Vector2(0, 0), new Vector2(1, 0));
+            LineCurve lc1r = LineCurve.MakeFromPoints(new Vector2(1, 0), new Vector2(0, 0));
+            LineCurve lc1m = LineCurve.MakeFromPoints(new Vector2(1, 1), new Vector2(2, 1));
+            LineCurve lc1mr = LineCurve.MakeFromPoints(new Vector2(2, 1), new Vector2(1, 1));
+
+            LineCurve.NormalAndDistLineParams exp = new LineCurve.NormalAndDistLineParams(new Vector2(0, 1), 0);
+            LineCurve.NormalAndDistLineParams expm = new LineCurve.NormalAndDistLineParams(new Vector2(0, 1), 1);
+
+            Assert.AreEqual(exp, lc1.GetNormAndDistDescription());
+            Assert.AreEqual(exp, lc1r.GetNormAndDistDescription());
+            Assert.AreEqual(expm, lc1m.GetNormAndDistDescription());
+            Assert.AreEqual(expm, lc1mr.GetNormAndDistDescription());
+        }
+
+        List<LineCurve> all_lc2s = new List<LineCurve>();
+
+        for (int offset_x = 0; offset_x <= 1; offset_x += 1)
+        {
+            for (int offset_y = 0; offset_y <= 1; offset_y += 1)
+            {
+                int hx = 3;
+                int hy = 4;
+
+                foreach (bool neg in new List<bool> { true, false })
+                {
+                    if (neg)
+                    {
+                        hx = -hx;
+                        hy = -hy;
+                    }
+
+                    List<LineCurve> lc2s = new List<LineCurve>();
+
+                    lc2s.Add(LineCurve.MakeFromPoints(new Vector2(offset_x, offset_y), new Vector2(hx + offset_x, hy + offset_y)));
+                    lc2s.Add(LineCurve.MakeFromPoints(new Vector2(hx + offset_x, hy + offset_y), new Vector2(offset_x, offset_y)));
+
+                    var expected = lc2s[0].GetNormAndDistDescription();
+
+                    foreach (var c in lc2s)
+                    {
+                        // reversal should never change result
+                        Assert.IsTrue(expected.Equals(c.GetNormAndDistDescription(), 1e-4f));
+                    }
+
+                    all_lc2s.AddRange(lc2s);
+                }
+            }
+        }
+
+        {
+            var expected = all_lc2s[0].GetNormAndDistDescription();
+
+            foreach (var c in all_lc2s)
+            {
+                // translation, reversal and mirroring should never change normal
+                Assert.IsTrue(
+                    (expected.Normal - c.GetNormAndDistDescription().Normal).magnitude < 1e-4f
+                    || (expected.Normal - -c.GetNormAndDistDescription().Normal).magnitude < 1e-4f);
+            }
+        }
+    }
+
+    [Test]
+    public void TestCoaxial()
+    {
+        for(float ang = 0; ang < Mathf.PI * 2; ang += 0.1f)
+        {
+            float sk = Mathf.Sin(ang);
+            float ck = Mathf.Cos(ang);
+
+            Vector2 p1 = new Vector2(sk * 3, ck * 3);
+            Vector2 p2 = new Vector2(sk * 5, ck * 5);
+            Vector2 p3 = new Vector2(sk * 11, ck * 11);
+            Vector2 p4 = new Vector2(sk * 103, ck * 103);
+
+            var lc1 = LineCurve.MakeFromPoints(p1, p2);
+            var lc1x = LineCurve.MakeFromPoints(p1 + new Vector2(ck, sk) * 0.01f, p2);
+
+            var lc2 = LineCurve.MakeFromPoints(p3, p4);
+            var lc3 = LineCurve.MakeFromPoints(p2, p4);
+
+            Assert.IsTrue(lc1.Coaxial(lc2, 1e-4f));
+            Assert.IsTrue(lc2.Coaxial(lc1, 1e-4f));
+            Assert.IsTrue(lc1.Coaxial(lc3, 1e-4f));
+
+            Assert.IsFalse(lc1.Coaxial(lc1x, 1e-4f));
+        }
+    }
 }

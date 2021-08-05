@@ -7,7 +7,6 @@ namespace Assets.Behaviour.Drawing
 {
     public class LoopsDrawerBehaviour : MonoBehaviour
     {
-        [SerializeField, SerializeReference]
         public DataProvider DP;
         public GameObject LoopDrawTemplate;
         public bool ControlCamera;

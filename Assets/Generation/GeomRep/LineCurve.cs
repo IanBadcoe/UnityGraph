@@ -1,4 +1,5 @@
 ﻿using Assets.Extensions;
+using Assets.Generation.U;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -141,6 +142,78 @@ namespace Assets.Generation.GeomRep
         public float Slope()
         {
             return (EndPos.y - StartPos.y) / (EndPos.x - StartPos.x);
+        }
+        public bool Coaxial(LineCurve lc2, float tol)
+        {
+            // this returns a normalised return, so the direction and dist will be the same
+            // even if the lines run in opposite directions
+            var desc = GetNormAndDistDescription();
+            var lc2_desc = lc2.GetNormAndDistDescription();
+
+            return desc.Equals(lc2_desc, tol);
+        }
+
+        public class NormalAndDistLineParams : EqualityBase
+        {
+            public readonly Vector2 Normal;
+            public readonly float Dist;
+
+            public NormalAndDistLineParams(Vector2 normal, float dist)
+            {
+                Normal = normal;
+                Dist = dist;
+            }
+
+            public static NormalAndDistLineParams operator-(NormalAndDistLineParams val)
+            {
+                return new NormalAndDistLineParams(-val.Normal, -val.Dist);
+            }
+
+            private bool Equals_Internal(NormalAndDistLineParams other, float tol)
+            {
+                if (Mathf.Abs(other.Dist - Dist) > tol)
+                    return false;
+
+                return (other.Normal - Normal).magnitude <= tol;
+            }
+
+            public bool Equals(NormalAndDistLineParams other, float tol)
+            {
+                var neg = -this;
+
+                return Equals_Internal(other, tol)
+                    || neg.Equals_Internal(other, tol);
+            }
+
+            public override bool Equals(object o)
+            {
+                if (!(o is NormalAndDistLineParams))
+                    return false;
+
+                var other = o as NormalAndDistLineParams;
+
+                return Equals(other, 0.0f);
+            }
+
+            public override int GetHashCode()
+            {
+                return Normal.GetHashCode() + Dist.GetHashCode() * 7;
+            }
+        }
+
+        // Returns the params for an implicit equation:
+        // p . normal - dist = 0
+        public NormalAndDistLineParams GetNormAndDistDescription()
+        {
+            Vector2 norm = Normal(0);
+            float dist = StartPos.Dot(norm);
+
+            // wanted to settle on one of the two equivalent solutions
+            // (norm, dist) vs. (-norm, -dist) but numerical precision problems
+            // mean we cannot reliably tell them apart (the same line reversed can still give
+            // different solutions if dist is v.v.close to zero)
+
+            return new NormalAndDistLineParams(norm, dist);
         }
     }
 }
