@@ -134,11 +134,106 @@ namespace Assets.Generation.U
             return a;
         }
 
+        // as above, but returns a adjustedt to lie
+        // between 0.0 and 2 PI *above* rel_to
+        public static float FixupAngleRelativeTo(float a, float rel_to)
+        {
+            while (a < rel_to)
+            {
+                a += Mathf.PI * 2;
+            }
+
+            while (a >= rel_to + Mathf.PI * 2)
+            {
+                a -= Mathf.PI * 2;
+            }
+
+            return a;
+        }
+
         public static bool ClockAwareAngleCompare(float a1, float a2, float tol)
         {
             float diff = FixupAngle(Mathf.Abs(a1 - a2));
 
             return diff <= tol || diff >= Mathf.PI * 2 - tol;
+        }
+
+        public class AngleRange : EqualityBase
+        {
+            public readonly float Start;
+            public readonly float End;
+
+            public AngleRange(float start, float end)
+            {
+                Start = FixupAngle(start);
+                End = FixupAngle(end);
+            }
+
+            public bool Equals(AngleRange other, float tol)
+            {
+                return Mathf.Abs(Start - other.Start) <= tol
+                    && Mathf.Abs(End - other.End) <= tol;
+            }
+
+            public override bool Equals(object o)
+            {
+                if (!(o is AngleRange))
+                {
+                    return false;
+                }
+
+                return Equals(o as AngleRange, 0.0f);
+            }
+
+            public override int GetHashCode()
+            {
+                return Start.GetHashCode() ^ 3 * End.GetHashCode();
+            }
+        }
+
+        public static IList<AngleRange> ClockAwareRangeOverlap(float a_start, float a_end, float b_start, float b_end, float tol)
+        {
+            IList<AngleRange> ret = new List<AngleRange>();
+
+            Assertion.Assert(a_start >= 0 && a_start <= Mathf.PI * 2);
+            Assertion.Assert(a_end >= 0 && a_end <= Mathf.PI * 2);
+            Assertion.Assert(b_start >= 0 && b_start <= Mathf.PI * 2);
+            Assertion.Assert(b_end >= 0 && b_end <= Mathf.PI * 2);
+
+            {
+                // rotate angles by whole turns so that both ends are >= their starts,
+                // and b_start is > a_start
+                float a_end_r = FixupAngleRelativeTo(a_end, a_start);
+                float b_start_r = FixupAngleRelativeTo(b_start, a_start);
+                float b_end_r = FixupAngleRelativeTo(b_end, b_start_r);
+
+                if (b_start_r + tol < a_end_r)
+                {
+                    ret.Add(new AngleRange(
+                        b_start_r, Math.Min(a_end_r, b_end_r)));
+                }
+            }
+
+            {
+                // rotate angles by whole turns so that both ends are >= their starts,
+                // and a_start is > b_start
+                float b_end_r = FixupAngleRelativeTo(b_end, b_start);
+                float a_start_r = FixupAngleRelativeTo(a_start, b_start);
+                float a_end_r = FixupAngleRelativeTo(a_end, a_start_r);
+
+                if (a_start_r + tol < b_end_r)
+                {
+                    ret.Add(new AngleRange(
+                        a_start_r, Math.Min(b_end_r, a_end_r)));
+                }
+            }
+
+            if (ret.Count == 0)
+            {
+                return null;
+            }
+
+            return ret;
         }
 
         public static T RemoveRandom<T>(ClRand random, List<T> col)
