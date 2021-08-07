@@ -322,7 +322,7 @@ public class LineCurveTest
     [Test]
     public void TestCoaxial()
     {
-        for(float ang = 0; ang < Mathf.PI * 2; ang += 0.1f)
+        for (float ang = 0; ang < Mathf.PI * 2; ang += 0.1f)
         {
             float sk = Mathf.Sin(ang);
             float ck = Mathf.Cos(ang);
@@ -343,6 +343,180 @@ public class LineCurveTest
             Assert.IsTrue(lc1.Coaxial(lc3, 1e-4f));
 
             Assert.IsFalse(lc1.Coaxial(lc1x, 1e-4f));
+        }
+    }
+
+    [Test]
+    public void TestSplitCoincidentCurves()
+    {
+        for (float ang = 0; ang < Mathf.PI * 2; ang += 0.1f)
+        {
+            float sk = Mathf.Sin(ang);
+            float ck = Mathf.Cos(ang);
+
+            Vector2 p1 = new Vector2(sk * 3, ck * 3);
+            Vector2 p2 = new Vector2(sk * 5, ck * 5);
+            Vector2 p3 = new Vector2(sk * 7, ck * 7);
+            Vector2 p4 = new Vector2(sk * 9, ck * 9);
+
+            var lc1 = LineCurve.MakeFromPoints(p1, p3);
+            var lc2 = LineCurve.MakeFromPoints(p2, p4);
+            var lc3 = LineCurve.MakeFromPoints(p1, p4);
+            var lc4 = LineCurve.MakeFromPoints(p2, p3);
+            var lc1x = LineCurve.MakeFromPoints(p1 + new Vector2(ck, sk) * 0.01f, p2);
+
+            Assert.IsNull(lc1.SplitCoincidentCurves(lc1x, 1e-4f));
+            Assert.IsNull(lc2.SplitCoincidentCurves(lc1x, 1e-4f));
+            Assert.IsNull(lc3.SplitCoincidentCurves(lc1x, 1e-4f));
+            Assert.IsNull(lc4.SplitCoincidentCurves(lc1x, 1e-4f));
+            //          3   5   7   9
+            // line 1 : --------- 
+            // line 2 :     ---------
+            // line 3 : -------------
+            // line 4 :     -----
+
+            // null operation comes back null
+            Assert.IsNull(lc1.SplitCoincidentCurves(lc1, 1e-4f));
+
+            {
+                var curves = lc1.SplitCoincidentCurves(lc2, 1e-4f);
+                Assert.IsNotNull(curves);
+                Assert.IsNotNull(curves.Item1);
+                Assert.IsNotNull(curves.Item2);
+                Assert.AreEqual(2, curves.Item1.Count);
+                Assert.AreEqual(2, curves.Item2.Count);
+
+                CheckCurveSplit(lc1, new List<float> { 2 }, curves.Item1);
+                CheckCurveSplit(lc2, new List<float> { 2 }, curves.Item2);
+            }
+
+            {
+                var curves = lc1.SplitCoincidentCurves(lc3, 1e-4f);
+                Assert.IsNotNull(curves);
+                Assert.IsNull(curves.Item1);
+                Assert.IsNotNull(curves.Item2);
+                Assert.AreEqual(2, curves.Item2.Count);
+
+                CheckCurveSplit(lc3, new List<float> { 4 }, curves.Item2);
+            }
+
+            {
+                var curves = lc2.SplitCoincidentCurves(lc3, 1e-4f);
+                Assert.IsNotNull(curves);
+                Assert.IsNull(curves.Item1);
+                Assert.IsNotNull(curves.Item2);
+                Assert.AreEqual(2, curves.Item2.Count);
+
+                CheckCurveSplit(lc3, new List<float> { 2 }, curves.Item2);
+            }
+
+            {
+                var curves = lc3.SplitCoincidentCurves(lc4, 1e-4f);
+                Assert.IsNotNull(curves);
+                Assert.IsNotNull(curves.Item1);
+                Assert.IsNull(curves.Item2);
+                Assert.AreEqual(3, curves.Item1.Count);
+
+                CheckCurveSplit(lc3, new List<float> { 2, 4 }, curves.Item1);
+            }
+
+            var lc1r = lc1.Reversed();
+            var lc2r = lc2.Reversed();
+            var lc3r = lc3.Reversed();
+            var lc4r = lc4.Reversed();
+            var lc1xr = lc1x.Reversed();
+
+            Assert.IsNull(lc1r.SplitCoincidentCurves(lc1x, 1e-4f));
+            Assert.IsNull(lc2r.SplitCoincidentCurves(lc1x, 1e-4f));
+            Assert.IsNull(lc3r.SplitCoincidentCurves(lc1x, 1e-4f));
+            Assert.IsNull(lc4r.SplitCoincidentCurves(lc1x, 1e-4f));
+
+            Assert.IsNull(lc1.SplitCoincidentCurves(lc1xr, 1e-4f));
+            Assert.IsNull(lc2.SplitCoincidentCurves(lc1xr, 1e-4f));
+            Assert.IsNull(lc3.SplitCoincidentCurves(lc1xr, 1e-4f));
+            Assert.IsNull(lc4.SplitCoincidentCurves(lc1xr, 1e-4f));
+
+            Assert.IsNull(lc1.SplitCoincidentCurves(lc1, 1e-4f));
+            Assert.IsNull(lc2.SplitCoincidentCurves(lc2, 1e-4f));
+            Assert.IsNull(lc3.SplitCoincidentCurves(lc3, 1e-4f));
+            Assert.IsNull(lc4.SplitCoincidentCurves(lc4, 1e-4f));
+
+            {
+                var curves = lc1.SplitCoincidentCurves(lc2r, 1e-4f);
+                Assert.IsNotNull(curves);
+                Assert.IsNotNull(curves.Item1);
+                Assert.IsNotNull(curves.Item2);
+                Assert.AreEqual(2, curves.Item1.Count);
+                Assert.AreEqual(2, curves.Item2.Count);
+
+                CheckCurveSplit(lc1, new List<float> { 2 }, curves.Item1);
+                CheckCurveSplit(lc2, new List<float> { 2 }, curves.Item2);
+            }
+
+
+            {
+                var curves = lc1.SplitCoincidentCurves(lc3r, 1e-4f);
+                Assert.IsNotNull(curves);
+                Assert.IsNull(curves.Item1);
+                Assert.IsNotNull(curves.Item2);
+                Assert.AreEqual(2, curves.Item2.Count);
+
+                CheckCurveSplit(lc3, new List<float> { 2 }, curves.Item2);
+            }
+
+            {
+                var curves = lc2.SplitCoincidentCurves(lc3r, 1e-4f);
+                Assert.IsNotNull(curves);
+                Assert.IsNull(curves.Item1);
+                Assert.IsNotNull(curves.Item2);
+                Assert.AreEqual(2, curves.Item2.Count);
+
+                CheckCurveSplit(lc3, new List<float> { 4 }, curves.Item2);
+            }
+
+            {
+                var curves = lc3.SplitCoincidentCurves(lc4r, 1e-4f);
+                Assert.IsNotNull(curves);
+                Assert.IsNotNull(curves.Item1);
+                Assert.IsNull(curves.Item2);
+                Assert.AreEqual(3, curves.Item1.Count);
+
+                CheckCurveSplit(lc3, new List<float> { 2, 4 }, curves.Item1);
+            }
+
+
+            var lca = LineCurve.MakeFromPoints(p1, p2);
+            var lcb = LineCurve.MakeFromPoints(p3, p4);
+
+            {
+                // coaxial but non-overlapping along the ray
+                var parsab = lca.SplitCoincidentCurves(lcb, 1e-4f);
+                Assert.IsNull(parsab);
+
+                var parsba = lca.SplitCoincidentCurves(lcb, 1e-4f);
+                Assert.IsNull(parsba);
+            }
+        }
+    }
+
+    private void CheckCurveSplit(LineCurve input, List<float> splits, IList<Curve> curves)
+    {
+        Assert.AreEqual(splits.Count + 1, curves.Count);
+
+        Assert.AreEqual(input.StartParam, curves[0].StartParam, 1e-4f);
+        Assert.AreEqual(input.EndParam, curves.Last().EndParam, 1e-4f);
+
+        for (int i = 0; i < splits.Count; i++)
+        {
+            Assert.AreEqual(splits[i], curves[i].EndParam, 1e-4f);
+            Assert.AreEqual(splits[i], curves[i + 1].StartParam, 1e-4f);
+        }
+
+        foreach(var c in curves)
+        {
+            var lc = c as LineCurve;
+            Assert.IsNotNull(lc);
+            Assert.IsTrue(input.Coaxial(lc, 1e-4f));
         }
     }
 }

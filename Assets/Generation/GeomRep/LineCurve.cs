@@ -1,6 +1,7 @@
 ﻿using Assets.Extensions;
 using Assets.Generation.U;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -143,6 +144,54 @@ namespace Assets.Generation.GeomRep
         {
             return (EndPos.y - StartPos.y) / (EndPos.x - StartPos.x);
         }
+
+        public override Tuple<IList<Curve>, IList<Curve>> SplitCoincidentCurves(Curve c2, float tol)
+        {
+            if (!(c2 is LineCurve))
+            {
+                return null;
+            }
+
+            LineCurve lc2 = c2 as LineCurve;
+
+            if (!Coaxial(lc2, tol))
+            {
+                return null;
+            }
+
+            float c1_c_start = FindParamForPoint_Clamped(lc2.StartPos, tol);
+            float c1_c_end = FindParamForPoint_Clamped(lc2.EndPos, tol);
+            float c2_c_start = lc2.FindParamForPoint_Clamped(StartPos, tol);
+            float c2_c_end = lc2.FindParamForPoint_Clamped(EndPos, tol);
+
+            float c1_c_lower = Math.Min(c1_c_start, c1_c_end);
+            float c1_c_higher = Math.Max(c1_c_start, c1_c_end);
+            float c2_c_lower = Math.Min(c2_c_start, c2_c_end);
+            float c2_c_higher = Math.Max(c2_c_start, c2_c_end);
+
+            IList<Curve> ret1 = new List<Curve> { this };
+            IList<Curve> ret2 = new List<Curve> { c2 };
+
+            ConditionalSplitCurveList(tol, ret1, c1_c_lower);
+            ConditionalSplitCurveList(tol, ret1, c1_c_higher);
+
+            ConditionalSplitCurveList(tol, ret2, c2_c_lower);
+            ConditionalSplitCurveList(tol, ret2, c2_c_higher);
+
+            // if there was no split, we have only the original curve in the output,
+            // and no need to return that...
+            if (ret1.Count == 1)
+                ret1 = null;
+
+            if (ret2.Count == 1)
+                ret2 = null;
+
+            if (ret1 == null && ret2 == null)
+                return null;
+
+            return new Tuple<IList<Curve>, IList<Curve>>(ret1, ret2);
+        }
+
         public bool Coaxial(LineCurve lc2, float tol)
         {
             // this returns a normalised return, so the direction and dist will be the same
@@ -197,7 +246,7 @@ namespace Assets.Generation.GeomRep
 
             public override int GetHashCode()
             {
-                return Normal.GetHashCode() + Dist.GetHashCode() * 7;
+                return Normal.GetHashCode() ^ Dist.GetHashCode() * 7;
             }
         }
 

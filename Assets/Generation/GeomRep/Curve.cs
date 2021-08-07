@@ -1,6 +1,7 @@
 ﻿using Assets.Extensions;
 using Assets.Generation.U;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Generation.GeomRep
@@ -54,11 +55,11 @@ namespace Assets.Generation.GeomRep
 
         public abstract Vector2 Normal(float p);
 
-        public float? FindParamForPoint(Vector2 pnt)
+        public float? FindParamForPoint(Vector2 pnt, float tol = 1e-5f)
         {
             float ret = FindParamForPoint_Inner(pnt);
 
-            if (!WithinParams(ret, 1e-5f))
+            if (!WithinParams(ret, tol))
             {
                 return null;
             }
@@ -68,6 +69,17 @@ namespace Assets.Generation.GeomRep
             //
             // we now allow the point to be off the curve
             //Assertion.Assert((ComputePos(ret) - pnt).magnitude < 1e-3f);
+
+            return ret;
+        }
+
+        // differs from the above, in that if the point is off the end of the line, we just return the end-point
+        // used for finding coincident portions of coaxial lines
+        public float FindParamForPoint_Clamped(Vector2 pnt, float tol = 1e-5f)
+        {
+            float ret = FindParamForPoint_Inner(pnt);
+
+            ret = Mathf.Clamp(ret, StartParam, EndParam);
 
             return ret;
         }
@@ -122,9 +134,27 @@ namespace Assets.Generation.GeomRep
 
         protected abstract Vector2 ComputePos_Inner(float param);
 
-        internal bool Adjoins(Curve c2, float tol)
+        public bool Adjoins(Curve c2, float tol)
         {
             return StartPos.Equals(c2.EndPos, tol) || EndPos.Equals(c2.StartPos, tol);
+        }
+
+        public abstract Tuple<IList<Curve>, IList<Curve>> SplitCoincidentCurves(Curve c2, float tol);
+        
+        protected static void ConditionalSplitCurveList(float tol, IList<Curve> curve_list, float split_param)
+        {
+            for(int i = 0; i < curve_list.Count; i++)
+            {
+                Curve c = curve_list[i];
+                // negative tolerance requires us to be significantly within, e.g. not just on the endpoint
+                if (c.WithinParams(split_param, -tol))
+                {
+                    curve_list[i] = c.CloneWithChangedParams(c.StartParam, split_param);
+                    curve_list.Insert(i + 1, c.CloneWithChangedParams(split_param, c.EndParam));
+
+                    return;
+                }
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Assets.Generation.U;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Generation.GeomRep
@@ -15,7 +16,7 @@ namespace Assets.Generation.GeomRep
     {
         public static RotationDirection Invert(this RotationDirection rot)
         {
-            switch(rot)
+            switch (rot)
             {
                 case RotationDirection.Forwards:
                     return RotationDirection.Reverse;
@@ -51,23 +52,10 @@ namespace Assets.Generation.GeomRep
         {
         }
 
-        private static float FixEndAngle(float start_angle, float end_angle)
-        {
-            start_angle = Util.FixupAngle(start_angle);
-            end_angle = Util.FixupAngle(end_angle);
-
-            if (end_angle <= start_angle)
-            {
-                end_angle += Mathf.PI * 2;
-            }
-
-            return end_angle;
-        }
-
         public CircleCurve(Vector2 position, float radius,
                            float start_angle, float end_angle,
                            RotationDirection rotation)
-            : base(Util.FixupAngle(start_angle), FixEndAngle(start_angle, end_angle))
+            : base(Util.FixupAngle(start_angle), Util.FixEndAngle(start_angle, end_angle))
         {
             // we have to have a direction
             Assertion.Assert(rotation != RotationDirection.DontCare);
@@ -267,6 +255,55 @@ namespace Assets.Generation.GeomRep
             // we just flip the "Rotation" field to say we mean the other direction
             return new CircleCurve(Position, Radius, StartParam, EndParam,
                 Rotation.Invert());
+        }
+
+        public override Tuple<IList<Curve>, IList<Curve>> SplitCoincidentCurves(Curve c2, float tol)
+        {
+            if (!(c2 is CircleCurve))
+                return null;
+
+            var cc2 = c2 as CircleCurve;
+
+            if ((Position - cc2.Position).magnitude > tol)
+                return null;
+
+            if (Mathf.Abs(Radius - cc2.Radius) > tol)
+                return null;
+
+            var common_range = Util.ClockAwareRangeOverlap(StartParam, EndParam, cc2.StartParam, cc2.EndParam, tol);
+
+            if (common_range == null)
+                return null;
+
+            IList<Curve> ret1 = new List<Curve> { this };
+            IList<Curve> ret2 = new List<Curve> { c2 };
+
+            foreach(var r in common_range)
+            {
+                ConditionalSplitCurveList(tol, ret1, r.Start);
+                ConditionalSplitCurveList(tol, ret1, r.End);
+                ConditionalSplitCurveList(tol, ret2, r.Start);
+                ConditionalSplitCurveList(tol, ret2, r.End);
+            }
+
+            // if there was no split, we have only the original curve in the output,
+            // and no need to return that...
+            if (ret1.Count == 1)
+                ret1 = null;
+
+            if (ret2.Count == 1)
+                ret2 = null;
+
+            if (ret1 == null && ret2 == null)
+                return null;
+
+            return new Tuple<IList<Curve>, IList<Curve>>(ret1, ret2);
+        }
+
+        public bool PartOfSameCircle(CircleCurve other, float tol)
+        {
+            return Mathf.Abs(Radius - other.Radius) < tol
+                && (Position - other.Position).magnitude < tol;
         }
     }
 }

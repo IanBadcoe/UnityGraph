@@ -77,6 +77,10 @@ public class IntersectorTest
         {
             throw new NotImplementedException();
         }
+        public override Tuple<IList<Curve>, IList<Curve>> SplitCoincidentCurves(Curve c2, float tol)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [Test]
