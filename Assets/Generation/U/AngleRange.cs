@@ -83,7 +83,7 @@ namespace Assets.Generation.U
         //
         // and that this, given two identical inputs assumes that a difference of zero is intended,
         // not 2 * PI
-        private static float FixupAngleRelative(float relative_to, float relative_angle)
+        public static float FixupAngleRelative(float relative_to, float relative_angle)
         {
             relative_angle = FixupAngle(relative_angle);
 

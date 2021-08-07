@@ -135,6 +135,10 @@ namespace Assets.Generation.GeomRep
             for(int i = 0; i < curve_list.Count; i++)
             {
                 Curve c = curve_list[i];
+
+                // we have to be on the same rotation around the clock
+                split_param = AngleRange.FixupAngleRelative(c.StartParam, split_param);
+
                 // negative tolerance requires us to be significantly within, e.g. not just on the endpoint
                 // "WithinParams is not suitable here, because what we really mean in this case is
                 // whether we are significantly away from an existing end

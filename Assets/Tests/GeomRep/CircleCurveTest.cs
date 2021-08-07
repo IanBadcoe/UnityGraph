@@ -1,4 +1,5 @@
 ﻿using Assets.Generation.GeomRep;
+using Assets.Generation.U;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -380,6 +381,9 @@ public class CircleCurveTest
         CircleCurve cc4 = new CircleCurve(pos, 1, 0, 3);
         CircleCurve cc5 = new CircleCurve(pos, 1, 1, 2);
 
+        CircleCurve cc6 = new CircleCurve(pos, 1, 1, 5);
+        CircleCurve cc7 = new CircleCurve(pos, 1, 4, 2);
+
         // let's just check each partial circle against the full one
         {
             var curves = cc1.SplitCoincidentCurves(cc2, 1e-4f);
@@ -489,6 +493,18 @@ public class CircleCurveTest
             CheckCurveSplit(cc4, new List<float> { 1, 2 }, curves.Item1);
         }
 
+        // ranges that sum to > 360 can generate two splits in both curves
+        {
+            var curves = cc6.SplitCoincidentCurves(cc7, 1e-4f);
+
+            Assert.IsNotNull(curves);
+            Assert.IsNotNull(curves.Item1);
+            Assert.IsNotNull(curves.Item2);
+
+            CheckCurveSplit(cc6, new List<float> { 2, 4 }, curves.Item1);
+            CheckCurveSplit(cc7, new List<float> { 5, 1 }, curves.Item2);
+        }
+
         // ----
         // now repeat some of the above with one or more curves reversed
         // ----
@@ -498,6 +514,8 @@ public class CircleCurveTest
         var cc3r = cc3.Reversed() as CircleCurve;
         var cc4r = cc4.Reversed() as CircleCurve;
         var cc5r = cc5.Reversed() as CircleCurve;
+
+        var cc6r = cc6.Reversed() as CircleCurve;
 
         // let's just check each partial circle against the full one
         {
@@ -609,20 +627,119 @@ public class CircleCurveTest
             CheckCurveSplit(cc4r, new List<float> { 1, 2 }, curves.Item1);
         }
 
-        //@@ midnight-crossing cases
+        // ranges that sum to > 360 can generate two splits in both curves
+        {
+            var curves = cc6r.SplitCoincidentCurves(cc7, 1e-4f);
+
+            Assert.IsNotNull(curves);
+            Assert.IsNotNull(curves.Item1);
+            Assert.IsNotNull(curves.Item2);
+
+            CheckCurveSplit(cc6r, new List<float> { 2, 4 }, curves.Item1);
+            CheckCurveSplit(cc7, new List<float> { 5, 1 }, curves.Item2);
+        }
+
+        // midnight-crossing cases
+
+        for (int i = 1; i < 10; i++)
+        {
+            float radians = -i * 0.5f;
+
+            var cc1mc = RotatedAnticlockwise(cc1, radians);
+            var cc2mc = RotatedAnticlockwise(cc2, radians);
+            var cc3mc = RotatedAnticlockwise(cc3, radians);
+            var cc4mc = RotatedAnticlockwise(cc4, radians);
+            var cc5mc = RotatedAnticlockwise(cc5, radians);
+
+            // let's just check each partial circle against the full one
+            {
+                var curves = cc1mc.SplitCoincidentCurves(cc2mc, 1e-4f);
+
+                Assert.IsNotNull(curves);
+                Assert.IsNotNull(curves.Item1);
+                Assert.IsNull(curves.Item2);
+
+                CheckCurveSplit(cc1mc, new List<float> { cc2mc.EndParam }, curves.Item1);
+            }
+
+            // ranges overlapping at the end split both curves
+            {
+                var curves = cc2mc.SplitCoincidentCurves(cc3mc, 1e-4f);
+
+                Assert.IsNotNull(curves);
+                Assert.IsNotNull(curves.Item1);
+                Assert.IsNotNull(curves.Item2);
+
+                CheckCurveSplit(cc2mc, new List<float> { cc3mc.StartParam }, curves.Item1);
+                CheckCurveSplit(cc3mc, new List<float> { cc2mc.EndParam }, curves.Item2);
+            }
+
+            {
+                var curves = cc5mc.SplitCoincidentCurves(cc4mc, 1e-4f);
+
+                Assert.IsNotNull(curves);
+                Assert.IsNull(curves.Item1);
+                Assert.IsNotNull(curves.Item2);
+
+                CheckCurveSplit(cc4mc, new List<float> { cc5mc.StartParam, cc5mc.EndParam }, curves.Item2);
+            }
+
+            var cc1mcr = cc1mc.Reversed() as CircleCurve;
+            var cc3mcr = cc3mc.Reversed() as CircleCurve;
+            var cc5mcr = cc5mc.Reversed() as CircleCurve;
+
+            // let's just check each partial circle against the full one
+            {
+                var curves = cc1mcr.SplitCoincidentCurves(cc2mc, 1e-4f);
+
+                Assert.IsNotNull(curves);
+                Assert.IsNotNull(curves.Item1);
+                Assert.IsNull(curves.Item2);
+
+                CheckCurveSplit(cc1mcr, new List<float> { cc2mc.EndParam }, curves.Item1);
+            }
+
+            // ranges overlapping at the end split both curves
+            {
+                var curves = cc2mc.SplitCoincidentCurves(cc3mcr, 1e-4f);
+
+                Assert.IsNotNull(curves);
+                Assert.IsNotNull(curves.Item1);
+                Assert.IsNotNull(curves.Item2);
+
+                CheckCurveSplit(cc2mc, new List<float> { cc3mcr.StartParam }, curves.Item1);
+                CheckCurveSplit(cc3mcr, new List<float> { cc2mc.EndParam }, curves.Item2);
+            }
+
+            {
+                var curves = cc5mcr.SplitCoincidentCurves(cc4mc, 1e-4f);
+
+                Assert.IsNotNull(curves);
+                Assert.IsNull(curves.Item1);
+                Assert.IsNotNull(curves.Item2);
+
+                CheckCurveSplit(cc4mc, new List<float> { cc5mcr.StartParam, cc5mcr.EndParam }, curves.Item2);
+            }
+
+        }
+    }
+
+    private CircleCurve RotatedAnticlockwise(CircleCurve cc, float radians)
+    {
+        return new CircleCurve(cc.Position, cc.Radius, cc.StartParam + radians, cc.EndParam + radians, cc.Rotation);
     }
 
     private void CheckCurveSplit(CircleCurve input, List<float> splits, IList<Curve> curves)
     {
         Assert.AreEqual(splits.Count + 1, curves.Count);
 
-        Assert.AreEqual(input.StartParam, curves[0].StartParam, 1e-4f);
-        Assert.AreEqual(input.EndParam, curves.Last().EndParam, 1e-4f);
+        Assert.IsTrue(Util.ClockAwareAngleCompare(input.StartParam, curves[0].StartParam, 1e-4f));
+        Assert.IsTrue(Util.ClockAwareAngleCompare(input.EndParam, curves.Last().EndParam, 1e-4f));
 
         for (int i = 0; i < splits.Count; i++)
         {
-            Assert.AreEqual(splits[i], curves[i].EndParam, 1e-4f);
-            Assert.AreEqual(splits[i], curves[i + 1].StartParam, 1e-4f);
+            Assert.IsTrue(Util.ClockAwareAngleCompare(splits[i], curves[i].EndParam, 1e-4f));
+            Assert.IsTrue(Util.ClockAwareAngleCompare(splits[i], curves[i + 1].StartParam, 1e-4f));
         }
 
         foreach (var c in curves)
