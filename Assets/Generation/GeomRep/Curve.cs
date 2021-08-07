@@ -8,8 +8,8 @@ namespace Assets.Generation.GeomRep
 {
     public abstract class Curve : EqualityBase
     {
-        public readonly float StartParam;
-        public readonly float EndParam;
+        public abstract float StartParam { get; }
+        public abstract float EndParam { get; }
 
         public abstract Box2 BoundingArea { get; }
 
@@ -29,17 +29,6 @@ namespace Assets.Generation.GeomRep
         public float ParamRange
         {
             get => EndParam - StartParam;
-        }
-
-        protected Curve(float start_param, float end_param)
-        {
-            StartParam = start_param;
-            EndParam = end_param;
-
-            if (EndParam - StartParam < 1e-12)
-            {
-                throw new NotSupportedException("StartParam must be < EndParam");
-            }
         }
 
         // exquisite abstractions

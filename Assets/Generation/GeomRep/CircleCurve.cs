@@ -31,9 +31,15 @@ namespace Assets.Generation.GeomRep
     [System.Diagnostics.DebuggerDisplay("Pos = {Position}, From = {StartPos}, To = {EndPos}, Dir = {Rotation}")]
     public class CircleCurve : Curve
     {
+        public override float StartParam { get => AngleRange.Start; }
+        public override float EndParam { get => AngleRange.End; }
+
+        readonly public AngleRange AngleRange;
         readonly public Vector2 Position;
         readonly public float Radius;
         readonly public RotationDirection Rotation;
+
+        public bool IsCyclic { get => AngleRange.IsCyclic; }
 
         public CircleCurve(Vector2 position, float radius)
             : this(position, radius, 0, Mathf.PI * 2)
@@ -55,8 +61,16 @@ namespace Assets.Generation.GeomRep
         public CircleCurve(Vector2 position, float radius,
                            float start_angle, float end_angle,
                            RotationDirection rotation)
-            : base(Util.FixupAngle(start_angle), Util.FixEndAngle(start_angle, end_angle))
+            : this (position, radius, new AngleRange(start_angle, end_angle), rotation)
         {
+        }
+
+        public CircleCurve(Vector2 position, float radius,
+                           AngleRange angle_range,
+                           RotationDirection rotation)
+        {
+            AngleRange = angle_range;
+
             // we have to have a direction
             Assertion.Assert(rotation != RotationDirection.DontCare);
 
@@ -244,11 +258,6 @@ namespace Assets.Generation.GeomRep
             return p < EndParam + tol;
         }
 
-        public bool IsCyclic
-        {
-            get => Util.ClockAwareAngleCompare(StartParam, EndParam, 1e-6f);
-        }
-
         public override Curve Reversed()
         {
             // start and end remain the same way around for a reversed circle
@@ -270,7 +279,7 @@ namespace Assets.Generation.GeomRep
             if (Mathf.Abs(Radius - cc2.Radius) > tol)
                 return null;
 
-            var common_range = Util.ClockAwareRangeOverlap(StartParam, EndParam, cc2.StartParam, cc2.EndParam, tol);
+            var common_range = AngleRange.ClockAwareRangeOverlap(cc2.AngleRange, tol);
 
             if (common_range == null)
                 return null;

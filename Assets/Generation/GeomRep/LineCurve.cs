@@ -10,6 +10,9 @@ namespace Assets.Generation.GeomRep
     [System.Diagnostics.DebuggerDisplay("From = {StartPos}, To = {EndPos}")]
     public class LineCurve : Curve
     {
+        public override float StartParam { get; }
+        public override float EndParam { get; }
+
         public readonly Vector2 Position;
         public readonly Vector2 Direction;
 
@@ -20,8 +23,14 @@ namespace Assets.Generation.GeomRep
         }
 
         public LineCurve(Vector2 position, Vector2 directionCosines, float length)
-            : base(0, length)
+            : this(position, directionCosines, 0, length)
         {
+        }
+
+        public LineCurve(Vector2 position, Vector2 directionCosines, float start, float end)
+        {
+            StartParam = start;
+            EndParam = end;
             Position = position;
             Direction = directionCosines;
 
@@ -29,14 +38,6 @@ namespace Assets.Generation.GeomRep
             {
                 throw new ArgumentException();
             }
-        }
-
-        public LineCurve(Vector2 position, Vector2 directionCosines, float start, float end)
-            : base(start, end)
-        {
-
-            Position = position;
-            Direction = directionCosines;
         }
 
         protected override Vector2 ComputePos_Inner(float param)

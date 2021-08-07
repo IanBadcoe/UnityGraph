@@ -13,10 +13,13 @@ public class IntersectorTest
     
     class FakeCurve : Curve
     {
+        public override float StartParam => throw new NotImplementedException();
+
+        public override float EndParam => throw new NotImplementedException();
+
         public readonly String Name;
         
         public FakeCurve(String name)
-            : base(0, 1)
         {
             Name = name;
         }
