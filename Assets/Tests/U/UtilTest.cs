@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 class UtilTest
 {
@@ -123,12 +124,42 @@ class UtilTest
         {
             var res = Util.ClockAwareRangeOverlap(1, 0, 4, 3, 1e-4f);
 
-
             Assert.AreEqual(2, res.Count);
             Assert.IsTrue(new Util.AngleRange(1, 3).Equals(res[0], 1e-4f)
                 || new Util.AngleRange(4, 0).Equals(res[0], 1e-4f));
             Assert.IsTrue(new Util.AngleRange(1, 3).Equals(res[1], 1e-4f)
                 || new Util.AngleRange(4, 0).Equals(res[1], 1e-4f));
+        }
+
+        // if one of the ranges is a full circle
+        {
+            var res = Util.ClockAwareRangeOverlap(0, Mathf.PI * 2, 0, 1, 1e-4f); 
+
+            Assert.AreEqual(1, res.Count);
+            Assert.IsTrue(new Util.AngleRange(0, 1).Equals(res[0], 1e-4f));
+        }
+
+        {
+            var res = Util.ClockAwareRangeOverlap(0, 1, 0, Mathf.PI * 2, 1e-4f);
+
+            Assert.AreEqual(1, res.Count);
+            Assert.IsTrue(new Util.AngleRange(0, 1).Equals(res[0], 1e-4f));
+        }
+
+        // or both are
+        {
+            var res = Util.ClockAwareRangeOverlap(0, Mathf.PI * 2, 0, Mathf.PI * 2, 1e-4f);
+
+            Assert.AreEqual(1, res.Count);
+            Assert.IsTrue(new Util.AngleRange(0, Mathf.PI * 2).Equals(res[0], 1e-4f));
+        }
+
+        // even if the second range crosses midnight
+        {
+            var res = Util.ClockAwareRangeOverlap(0, Mathf.PI * 2, 5, 1, 1e-4f);
+
+            Assert.AreEqual(1, res.Count);
+            Assert.IsTrue(new Util.AngleRange(5, 1).Equals(res[0], 1e-4f));
         }
     }
 }

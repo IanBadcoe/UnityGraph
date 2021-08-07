@@ -134,6 +134,20 @@ namespace Assets.Generation.U
             return a;
         }
 
+        // end angles have the special property that they can be > PI * 2 in order to make them greater than the start angle
+        public static float FixEndAngle(float start_angle, float end_angle)
+        {
+            start_angle = Util.FixupAngle(start_angle);
+            end_angle = Util.FixupAngle(end_angle);
+
+            if (end_angle <= start_angle)
+            {
+                end_angle += Mathf.PI * 2;
+            }
+
+            return end_angle;
+        }
+
         // as above, but returns a adjustedt to lie
         // between 0.0 and 2 PI *above* rel_to
         public static float FixupAngleRelativeTo(float a, float rel_to)
@@ -143,7 +157,7 @@ namespace Assets.Generation.U
                 a += Mathf.PI * 2;
             }
 
-            while (a >= rel_to + Mathf.PI * 2)
+            while (a > rel_to + Mathf.PI * 2)
             {
                 a -= Mathf.PI * 2;
             }
@@ -166,7 +180,7 @@ namespace Assets.Generation.U
             public AngleRange(float start, float end)
             {
                 Start = FixupAngle(start);
-                End = FixupAngle(end);
+                End = FixEndAngle(start, end);
             }
 
             public bool Equals(AngleRange other, float tol)
@@ -194,6 +208,22 @@ namespace Assets.Generation.U
         public static IList<AngleRange> ClockAwareRangeOverlap(float a_start, float a_end, float b_start, float b_end, float tol)
         {
             IList<AngleRange> ret = new List<AngleRange>();
+
+            // special cases, if either range is a whole circle, then the return is just the other range
+            // (awkward to work that out with the below code...)
+            if (a_start < tol && a_end > Mathf.PI * 2 - tol)
+            {
+                ret.Add(new AngleRange(b_start, b_end));
+
+                return ret;
+            }
+
+            if (b_start < tol && b_end > Mathf.PI * 2 - tol)
+            {
+                ret.Add(new AngleRange(a_start, a_end));
+
+                return ret;
+            }
 
             Assertion.Assert(a_start >= 0 && a_start <= Mathf.PI * 2);
             Assertion.Assert(a_end >= 0 && a_end <= Mathf.PI * 2);
