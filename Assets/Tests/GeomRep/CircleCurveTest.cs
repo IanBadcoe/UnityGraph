@@ -362,4 +362,274 @@ public class CircleCurveTest
         Assert.IsTrue(cc3.IsCyclic);
         Assert.IsFalse(cc4.IsCyclic);
     }
+
+    [Test]
+    public void TestSplitConcidentCurves()
+    {
+        Vector2 pos = new Vector2(0, 0);
+
+        CircleCurve cc1 = new CircleCurve(pos, 1);
+        CircleCurve cc1x1 = new CircleCurve(new Vector2(0.1f, 0), 1);
+        CircleCurve cc1x2 = new CircleCurve(pos, 1.1f);
+
+        Assert.IsNull(cc1.SplitCoincidentCurves(cc1x2, 1e-4f));
+        Assert.IsNull(cc1.SplitCoincidentCurves(cc1x1, 1e-4f));
+
+        CircleCurve cc2 = new CircleCurve(pos, 1, 0, 2);
+        CircleCurve cc3 = new CircleCurve(pos, 1, 1, 3);
+        CircleCurve cc4 = new CircleCurve(pos, 1, 0, 3);
+        CircleCurve cc5 = new CircleCurve(pos, 1, 1, 2);
+
+        // let's just check each partial circle against the full one
+        {
+            var curves = cc1.SplitCoincidentCurves(cc2, 1e-4f);
+
+            Assert.IsNotNull(curves);
+            Assert.IsNotNull(curves.Item1);
+            Assert.IsNull(curves.Item2);
+
+            CheckCurveSplit(cc1, new List<float> { 2 }, curves.Item1);
+        }
+
+        {
+            var curves = cc1.SplitCoincidentCurves(cc3, 1e-4f);
+
+            Assert.IsNotNull(curves);
+            Assert.IsNotNull(curves.Item1);
+            Assert.IsNull(curves.Item2);
+
+            CheckCurveSplit(cc1, new List<float> { 1, 3 }, curves.Item1);
+        }
+
+        {
+            var curves = cc1.SplitCoincidentCurves(cc4, 1e-4f);
+
+            Assert.IsNotNull(curves);
+            Assert.IsNotNull(curves.Item1);
+            Assert.IsNull(curves.Item2);
+
+            CheckCurveSplit(cc1, new List<float> { 3 }, curves.Item1);
+        }
+
+        {
+            var curves = cc1.SplitCoincidentCurves(cc5, 1e-4f);
+
+            Assert.IsNotNull(curves);
+            Assert.IsNotNull(curves.Item1);
+            Assert.IsNull(curves.Item2);
+
+            CheckCurveSplit(cc1, new List<float> { 1, 2 }, curves.Item1);
+        }
+
+        // ranges overlapping at the end split both curves
+        {
+            var curves = cc2.SplitCoincidentCurves(cc3, 1e-4f);
+
+            Assert.IsNotNull(curves);
+            Assert.IsNotNull(curves.Item1);
+            Assert.IsNotNull(curves.Item2);
+
+            CheckCurveSplit(cc2, new List<float> { 1 }, curves.Item1);
+            CheckCurveSplit(cc3, new List<float> { 2 }, curves.Item2);
+        }
+
+        // and the same the other way around
+        {
+            var curves = cc3.SplitCoincidentCurves(cc2, 1e-4f);
+
+            Assert.IsNotNull(curves);
+            Assert.IsNotNull(curves.Item1);
+            Assert.IsNotNull(curves.Item2);
+
+            CheckCurveSplit(cc3, new List<float> { 2 }, curves.Item1);
+            CheckCurveSplit(cc2, new List<float> { 1 }, curves.Item2);
+        }
+
+        // ranges that are a subset split the other but are not split themselves
+        {
+            var curves = cc2.SplitCoincidentCurves(cc4, 1e-4f);
+
+            Assert.IsNotNull(curves);
+            Assert.IsNull(curves.Item1);
+            Assert.IsNotNull(curves.Item2);
+
+            CheckCurveSplit(cc4, new List<float> { 2 }, curves.Item2);
+        }
+
+        // and the same the other way around
+        {
+            var curves = cc4.SplitCoincidentCurves(cc2, 1e-4f);
+
+            Assert.IsNotNull(curves);
+            Assert.IsNotNull(curves.Item1);
+            Assert.IsNull(curves.Item2);
+
+            CheckCurveSplit(cc4, new List<float> { 2 }, curves.Item1);
+        }
+
+        // and the same (only two splits) if the subset is not at one end
+        {
+            var curves = cc5.SplitCoincidentCurves(cc4, 1e-4f);
+
+            Assert.IsNotNull(curves);
+            Assert.IsNull(curves.Item1);
+            Assert.IsNotNull(curves.Item2);
+
+            CheckCurveSplit(cc4, new List<float> { 1, 2 }, curves.Item2);
+        }
+
+        // and the same the other way around
+        {
+            var curves = cc4.SplitCoincidentCurves(cc5, 1e-4f);
+
+            Assert.IsNotNull(curves);
+            Assert.IsNotNull(curves.Item1);
+            Assert.IsNull(curves.Item2);
+
+            CheckCurveSplit(cc4, new List<float> { 1, 2 }, curves.Item1);
+        }
+
+        // ----
+        // now repeat some of the above with one or more curves reversed
+        // ----
+
+        var cc1r = cc1.Reversed() as CircleCurve;
+        var cc2r = cc2.Reversed() as CircleCurve;
+        var cc3r = cc3.Reversed() as CircleCurve;
+        var cc4r = cc4.Reversed() as CircleCurve;
+        var cc5r = cc5.Reversed() as CircleCurve;
+
+        // let's just check each partial circle against the full one
+        {
+            var curves = cc1r.SplitCoincidentCurves(cc2, 1e-4f);
+
+            Assert.IsNotNull(curves);
+            Assert.IsNotNull(curves.Item1);
+            Assert.IsNull(curves.Item2);
+
+            CheckCurveSplit(cc1r, new List<float> { 2 }, curves.Item1);
+        }
+
+        // let's just check each partial circle against the full one
+        {
+            var curves = cc1.SplitCoincidentCurves(cc2r, 1e-4f);
+
+            Assert.IsNotNull(curves);
+            Assert.IsNotNull(curves.Item1);
+            Assert.IsNull(curves.Item2);
+
+            CheckCurveSplit(cc1, new List<float> { 2 }, curves.Item1);
+        }
+
+        {
+            var curves = cc1r.SplitCoincidentCurves(cc3, 1e-4f);
+
+            Assert.IsNotNull(curves);
+            Assert.IsNotNull(curves.Item1);
+            Assert.IsNull(curves.Item2);
+
+            CheckCurveSplit(cc1r, new List<float> { 1, 3 }, curves.Item1);
+        }
+
+        {
+            var curves = cc1.SplitCoincidentCurves(cc3r, 1e-4f);
+
+            Assert.IsNotNull(curves);
+            Assert.IsNotNull(curves.Item1);
+            Assert.IsNull(curves.Item2);
+
+            CheckCurveSplit(cc1, new List<float> { 1, 3 }, curves.Item1);
+        }
+
+        // ranges overlapping at the end split both curves
+        {
+            var curves = cc2r.SplitCoincidentCurves(cc3, 1e-4f);
+
+            Assert.IsNotNull(curves);
+            Assert.IsNotNull(curves.Item1);
+            Assert.IsNotNull(curves.Item2);
+
+            CheckCurveSplit(cc2r, new List<float> { 1 }, curves.Item1);
+            CheckCurveSplit(cc3, new List<float> { 2 }, curves.Item2);
+        }
+
+        // and the same the other way around
+        {
+            var curves = cc3r.SplitCoincidentCurves(cc2, 1e-4f);
+
+            Assert.IsNotNull(curves);
+            Assert.IsNotNull(curves.Item1);
+            Assert.IsNotNull(curves.Item2);
+
+            CheckCurveSplit(cc3r, new List<float> { 2 }, curves.Item1);
+            CheckCurveSplit(cc2, new List<float> { 1 }, curves.Item2);
+        }
+
+        // ranges that are a subset split the other but are not split themselves
+        {
+            var curves = cc2r.SplitCoincidentCurves(cc4, 1e-4f);
+
+            Assert.IsNotNull(curves);
+            Assert.IsNull(curves.Item1);
+            Assert.IsNotNull(curves.Item2);
+
+            CheckCurveSplit(cc4, new List<float> { 2 }, curves.Item2);
+        }
+
+        // and the same the other way around
+        {
+            var curves = cc4r.SplitCoincidentCurves(cc2, 1e-4f);
+
+            Assert.IsNotNull(curves);
+            Assert.IsNotNull(curves.Item1);
+            Assert.IsNull(curves.Item2);
+
+            CheckCurveSplit(cc4r, new List<float> { 2 }, curves.Item1);
+        }
+
+        // and the same (only two splits) if the subset is not at one end
+        {
+            var curves = cc5r.SplitCoincidentCurves(cc4, 1e-4f);
+
+            Assert.IsNotNull(curves);
+            Assert.IsNull(curves.Item1);
+            Assert.IsNotNull(curves.Item2);
+
+            CheckCurveSplit(cc4, new List<float> { 1, 2 }, curves.Item2);
+        }
+
+        // and the same the other way around
+        {
+            var curves = cc4r.SplitCoincidentCurves(cc5, 1e-4f);
+
+            Assert.IsNotNull(curves);
+            Assert.IsNotNull(curves.Item1);
+            Assert.IsNull(curves.Item2);
+
+            CheckCurveSplit(cc4r, new List<float> { 1, 2 }, curves.Item1);
+        }
+
+        //@@ midnight-crossing cases
+    }
+
+    private void CheckCurveSplit(CircleCurve input, List<float> splits, IList<Curve> curves)
+    {
+        Assert.AreEqual(splits.Count + 1, curves.Count);
+
+        Assert.AreEqual(input.StartParam, curves[0].StartParam, 1e-4f);
+        Assert.AreEqual(input.EndParam, curves.Last().EndParam, 1e-4f);
+
+        for (int i = 0; i < splits.Count; i++)
+        {
+            Assert.AreEqual(splits[i], curves[i].EndParam, 1e-4f);
+            Assert.AreEqual(splits[i], curves[i + 1].StartParam, 1e-4f);
+        }
+
+        foreach (var c in curves)
+        {
+            var lc = c as CircleCurve;
+            Assert.IsNotNull(lc);
+            Assert.IsTrue(input.PartOfSameCircle(lc, 1e-4f));
+        }
+    }
 }

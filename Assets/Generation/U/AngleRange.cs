@@ -68,14 +68,6 @@ namespace Assets.Generation.U
         public static float FixupEndAngle(float start_angle, float end_angle)
         {
             start_angle = FixupAngle(start_angle);
-
-            return FixupAngleRelative(start_angle, end_angle);
-        }
-
-        // the difference between this and the previous is this makes no assumptions about what range
-        // start_angle should be in
-        private static float FixupAngleRelative(float start_angle, float end_angle)
-        {
             end_angle = FixupAngle(end_angle);
 
             while (end_angle <= start_angle)
@@ -84,6 +76,23 @@ namespace Assets.Generation.U
             }
 
             return end_angle;
+        }
+
+        // the difference between this and the previous is this makes no assumptions about what range
+        // start_angle should be in
+        //
+        // and that this, given two identical inputs assumes that a difference of zero is intended,
+        // not 2 * PI
+        private static float FixupAngleRelative(float relative_to, float relative_angle)
+        {
+            relative_angle = FixupAngle(relative_angle);
+
+            while (relative_angle < relative_to)
+            {
+                relative_angle += Mathf.PI * 2;
+            }
+
+            return relative_angle;
         }
 
         public IList<AngleRange> ClockAwareRangeOverlap(AngleRange b, float tol)
@@ -107,36 +116,42 @@ namespace Assets.Generation.U
             }
 
             {
-                // rotate angles by whole turns so that both ends are >= their starts,
-                // and b_start is > a_start
-                float a_end_r = FixupAngleRelative(Start, End);
+                // rotate angles by whole turns so that b_start is > a_start
+                // (both ends are already > their resp. start)
                 float b_start_r = FixupAngleRelative(Start, b.Start);
-                float b_end_r = FixupAngleRelative(b_start_r, b.End);
+                // shift b.End by the same amount
+                float b_end_r = b.End + b_start_r - b.Start;
 
-                if (b_start_r + tol < a_end_r)
+                if (b_start_r + tol < End)
                 {
                     ret.Add(new AngleRange(
-                        b_start_r, Math.Min(a_end_r, b_end_r)));
+                        b_start_r, Math.Min(End, b_end_r)));
                 }
             }
 
             {
                 // rotate angles by whole turns so that both ends are >= their starts,
                 // and a_start is > b_start
-                float b_end_r = FixupAngleRelative(b.Start, b.End);
                 float a_start_r = FixupAngleRelative(b.Start, Start);
-                float a_end_r = FixupAngleRelative(a_start_r, End);
+                float a_end_r = End + a_start_r - Start;
 
-                if (a_start_r + tol < b_end_r)
+                if (a_start_r + tol < b.End)
                 {
                     ret.Add(new AngleRange(
-                        a_start_r, Math.Min(b_end_r, a_end_r)));
+                        a_start_r, Math.Min(b.End, a_end_r)));
                 }
             }
 
             if (ret.Count == 0)
             {
                 return null;
+            }
+
+            // two ranges with the same start can trigger both the above clauses
+            // but we only have one overlap
+            if (ret.Count == 2 && ret[0] == ret[1])
+            {
+                ret.RemoveAt(1);
             }
 
             return ret;

@@ -16,6 +16,30 @@ class AngleRangeTest
         Assert.IsNull(new AngleRange(1, 2).ClockAwareRangeOverlap(new AngleRange(3, 4), 1e-4f));
         Assert.IsNull(new AngleRange(3, 4).ClockAwareRangeOverlap(new AngleRange(1, 2), 1e-4f));
 
+        // identities
+        {
+            var res = new AngleRange(1, 3).ClockAwareRangeOverlap(new AngleRange(1, 3), 1e-4f);
+
+            Assert.AreEqual(1, res.Count);
+            Assert.IsTrue(new AngleRange(1, 3).Equals(res[0], 1e-4f));
+        }
+
+        // one range a truncation of the other
+        {
+            var res = new AngleRange(1, 2).ClockAwareRangeOverlap(new AngleRange(1, 3), 1e-4f);
+
+            Assert.AreEqual(1, res.Count);
+            Assert.IsTrue(new AngleRange(1, 2).Equals(res[0], 1e-4f));
+        }
+
+        // one range a truncation of the other
+        {
+            var res = new AngleRange(1, 3).ClockAwareRangeOverlap(new AngleRange(1, 2), 1e-4f);
+
+            Assert.AreEqual(1, res.Count);
+            Assert.IsTrue(new AngleRange(1, 2).Equals(res[0], 1e-4f));
+        }
+
         // same but with an overlap at the end
         {
             var res = new AngleRange(1, 3).ClockAwareRangeOverlap(new AngleRange(2, 4), 1e-4f);

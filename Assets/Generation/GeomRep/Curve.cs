@@ -136,11 +136,18 @@ namespace Assets.Generation.GeomRep
             {
                 Curve c = curve_list[i];
                 // negative tolerance requires us to be significantly within, e.g. not just on the endpoint
-                if (c.WithinParams(split_param, -tol))
+                // "WithinParams is not suitable here, because what we really mean in this case is
+                // whether we are significantly away from an existing end
+                // and full circles have everything "within params" but still have theoretical ends
+                // which we do not need to split if we hit them...
+                //if (c.WithinParams(split_param, -tol))
+                // this has no effect on lines
+                if (split_param > c.StartParam + tol && split_param < c.EndParam - tol)
                 {
                     curve_list[i] = c.CloneWithChangedParams(c.StartParam, split_param);
                     curve_list.Insert(i + 1, c.CloneWithChangedParams(split_param, c.EndParam));
 
+                    // we really ought to hit only one curve with one split-point
                     return;
                 }
             }
