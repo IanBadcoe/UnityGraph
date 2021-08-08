@@ -97,19 +97,16 @@ namespace Assets.Generation.GeomRep
             return StartParam.GetHashCode() + EndParam.GetHashCode() * 31;
         }
 
-        public override abstract bool Equals(object o);
-        protected bool Equals_Inner(object o)
-        {
-            // need caller to have checked these
-            Assertion.Assert(o is Curve);
-            Assertion.Assert(!ReferenceEquals(o, this));
+        public abstract bool Equals(Curve c, float tol);
 
-            Curve co = (Curve)o;
+        public override bool Equals(object o) {
+            Curve c = o as Curve;
 
-            return co.StartParam == StartParam && co.EndParam == EndParam;
+            if (c == null)
+                return false;
+
+            return Equals(c, 0.0f);
         }
-
-        // concrete methods
 
         public float ParamCoordinateDist(float p1, float p2)
         {
@@ -129,33 +126,6 @@ namespace Assets.Generation.GeomRep
         }
 
         public abstract Tuple<IList<Curve>, IList<Curve>> SplitCoincidentCurves(Curve c2, float tol);
-        
-        protected static void ConditionalSplitCurveList(float tol, IList<Curve> curve_list, float split_param)
-        {
-            for(int i = 0; i < curve_list.Count; i++)
-            {
-                Curve c = curve_list[i];
-
-                // we have to be on the same rotation around the clock
-                split_param = AngleRange.FixupAngleRelative(c.StartParam, split_param);
-
-                // negative tolerance requires us to be significantly within, e.g. not just on the endpoint
-                // "WithinParams is not suitable here, because what we really mean in this case is
-                // whether we are significantly away from an existing end
-                // and full circles have everything "within params" but still have theoretical ends
-                // which we do not need to split if we hit them...
-                //if (c.WithinParams(split_param, -tol))
-                // this has no effect on lines
-                if (split_param > c.StartParam + tol && split_param < c.EndParam - tol)
-                {
-                    curve_list[i] = c.CloneWithChangedParams(c.StartParam, split_param);
-                    curve_list.Insert(i + 1, c.CloneWithChangedParams(split_param, c.EndParam));
-
-                    // we really ought to hit only one curve with one split-point
-                    return;
-                }
-            }
-        }
 
         public abstract bool SameSupercurve(Curve curve, float tol);
     }

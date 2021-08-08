@@ -117,23 +117,23 @@ namespace Assets.Generation.GeomRep
             return StartPos.GetHashCode() * 31 ^ EndPos.GetHashCode();
         }
 
-        public override bool Equals(object o)
+        public override bool Equals(Curve c, float tol)
         {
-            if (ReferenceEquals(o, this))
+            if (ReferenceEquals(c, this))
             {
                 return true;
             }
 
-            if (!(o is LineCurve))
+            if (!(c is LineCurve))
             {
                 return false;
             }
 
-            LineCurve lc_o = (LineCurve)o;
+            LineCurve lc = (LineCurve)c;
 
             // the lines are equal if their begining and end are equal, even if the
             // params and pos used to achieve that differ
-            return StartPos == lc_o.StartPos && EndPos == lc_o.EndPos;
+            return StartPos == lc.StartPos && EndPos == lc.EndPos;
         }
 
         public override Curve Reversed()
@@ -148,6 +148,10 @@ namespace Assets.Generation.GeomRep
 
         public override Tuple<IList<Curve>, IList<Curve>> SplitCoincidentCurves(Curve c2, float tol)
         {
+            // we can never split ourselves
+            if (Equals(c2, tol))
+                return null;
+
             if (!(c2 is LineCurve))
             {
                 return null;
@@ -191,6 +195,26 @@ namespace Assets.Generation.GeomRep
                 return null;
 
             return new Tuple<IList<Curve>, IList<Curve>>(ret1, ret2);
+        }
+
+        private static void ConditionalSplitCurveList(float tol, IList<Curve> curve_list, float split_param)
+        {
+            for (int i = 0; i < curve_list.Count; i++)
+            {
+                Curve c = curve_list[i];
+
+                // negative tolerance requires us to be significantly within, e.g. not just on the endpoint
+                // "WithinParams is not suitable here, because what we really mean in this case is
+                // whether we are significantly away from an existing end
+                if (split_param > c.StartParam + tol && split_param < c.EndParam - tol)
+                {
+                    curve_list[i] = c.CloneWithChangedParams(c.StartParam, split_param);
+                    curve_list.Insert(i + 1, c.CloneWithChangedParams(split_param, c.EndParam));
+
+                    // we really ought to hit only one curve with one split-point
+                    return;
+                }
+            }
         }
 
         public class NormalAndDistLineParams : EqualityBase

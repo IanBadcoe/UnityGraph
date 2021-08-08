@@ -107,28 +107,26 @@ namespace Assets.Generation.GeomRep
                   ^ (Rotation == RotationDirection.Forwards ? 1 : 0);
         }
 
-        public override bool Equals(object o)
+        public override bool Equals(Curve c, float tol)
         {
-            if (ReferenceEquals(o, this))
+            if (ReferenceEquals(c, this))
             {
                 return true;
             }
 
-            if (!(o is CircleCurve))
+            if (!(c is CircleCurve))
             {
                 return false;
             }
 
-            if (!base.Equals_Inner(o))
-            {
+            CircleCurve cc = (CircleCurve)c;
+
+            if (!AngleRange.Equals(cc.AngleRange, tol))
                 return false;
-            }
 
-            CircleCurve cc_o = (CircleCurve)o;
-
-            return Position.Equals(cc_o.Position)
-                  && Radius == cc_o.Radius
-                  && Rotation == cc_o.Rotation;
+            return Position.Equals(cc.Position)
+                  && Radius == cc.Radius
+                  && Rotation == cc.Rotation;
         }
 
         protected override float FindParamForPoint_Inner(Vector2 pnt)
@@ -307,6 +305,32 @@ namespace Assets.Generation.GeomRep
                 return null;
 
             return new Tuple<IList<Curve>, IList<Curve>>(ret1, ret2);
+        }
+
+        private static void ConditionalSplitCurveList(float tol, IList<Curve> curve_list, float split_param)
+        {
+            for (int i = 0; i < curve_list.Count; i++)
+            {
+                Curve c = curve_list[i];
+
+                // we have to be on the same rotation around the clock
+                split_param = AngleRange.FixupAngleRelative(c.StartParam, split_param);
+
+                // negative tolerance requires us to be significantly within, e.g. not just on the endpoint
+                // "WithinParams is not suitable here, because what we really mean in this case is
+                // whether we are significantly away from an existing end
+                // and full circles have everything "within params" but still have theoretical ends
+                // which we do not need to split if we hit them...
+                //if (c.WithinParams(split_param, -tol))
+                if (split_param > c.StartParam + tol && split_param < c.EndParam - tol)
+                {
+                    curve_list[i] = c.CloneWithChangedParams(c.StartParam, split_param);
+                    curve_list.Insert(i + 1, c.CloneWithChangedParams(split_param, c.EndParam));
+
+                    // we really ought to hit only one curve with one split-point
+                    return;
+                }
+            }
         }
 
         public override bool SameSupercurve(Curve curve, float tol)

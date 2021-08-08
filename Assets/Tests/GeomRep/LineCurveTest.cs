@@ -349,21 +349,21 @@ public class LineCurveTest
     [Test]
     public void TestSplitCoincidentCurves()
     {
-        for (float ang = 0; ang < Mathf.PI * 2; ang += 0.1f)
+        for (float ang = 0; ang < Mathf.PI * 2; ang += 0.5f)
         {
             float sk = Mathf.Sin(ang);
             float ck = Mathf.Cos(ang);
 
-            Vector2 p1 = new Vector2(sk * 3, ck * 3);
-            Vector2 p2 = new Vector2(sk * 5, ck * 5);
-            Vector2 p3 = new Vector2(sk * 7, ck * 7);
-            Vector2 p4 = new Vector2(sk * 9, ck * 9);
+            Vector2 p1 = new Vector2(sk * 10, ck * 10);
+            Vector2 p2 = new Vector2(sk * 20, ck * 20);
+            Vector2 p3 = new Vector2(sk * 30, ck * 30);
+            Vector2 p4 = new Vector2(sk * 40, ck * 40);
 
             var lc1 = LineCurve.MakeFromPoints(p1, p3);
             var lc2 = LineCurve.MakeFromPoints(p2, p4);
             var lc3 = LineCurve.MakeFromPoints(p1, p4);
             var lc4 = LineCurve.MakeFromPoints(p2, p3);
-            var lc1x = LineCurve.MakeFromPoints(p1 + new Vector2(ck, sk) * 0.01f, p2);
+            var lc1x = LineCurve.MakeFromPoints(p1 + new Vector2(ck, sk) * 0.1f, p2);
 
             Assert.IsNull(lc1.SplitCoincidentCurves(lc1x, 1e-4f));
             Assert.IsNull(lc2.SplitCoincidentCurves(lc1x, 1e-4f));
@@ -386,8 +386,8 @@ public class LineCurveTest
                 Assert.AreEqual(2, curves.Item1.Count);
                 Assert.AreEqual(2, curves.Item2.Count);
 
-                CheckCurveSplit(lc1, new List<float> { 2 }, curves.Item1);
-                CheckCurveSplit(lc2, new List<float> { 2 }, curves.Item2);
+                CheckCurveSplit(lc1, new List<float> { 10 }, curves.Item1);
+                CheckCurveSplit(lc2, new List<float> { 10 }, curves.Item2);
             }
 
             {
@@ -397,7 +397,7 @@ public class LineCurveTest
                 Assert.IsNotNull(curves.Item2);
                 Assert.AreEqual(2, curves.Item2.Count);
 
-                CheckCurveSplit(lc3, new List<float> { 4 }, curves.Item2);
+                CheckCurveSplit(lc3, new List<float> { 20 }, curves.Item2);
             }
 
             {
@@ -407,7 +407,7 @@ public class LineCurveTest
                 Assert.IsNotNull(curves.Item2);
                 Assert.AreEqual(2, curves.Item2.Count);
 
-                CheckCurveSplit(lc3, new List<float> { 2 }, curves.Item2);
+                CheckCurveSplit(lc3, new List<float> { 10 }, curves.Item2);
             }
 
             {
@@ -417,7 +417,7 @@ public class LineCurveTest
                 Assert.IsNull(curves.Item2);
                 Assert.AreEqual(3, curves.Item1.Count);
 
-                CheckCurveSplit(lc3, new List<float> { 2, 4 }, curves.Item1);
+                CheckCurveSplit(lc3, new List<float> { 10, 20 }, curves.Item1);
             }
 
             var lc1r = lc1.Reversed();
@@ -449,8 +449,8 @@ public class LineCurveTest
                 Assert.AreEqual(2, curves.Item1.Count);
                 Assert.AreEqual(2, curves.Item2.Count);
 
-                CheckCurveSplit(lc1, new List<float> { 2 }, curves.Item1);
-                CheckCurveSplit(lc2, new List<float> { 2 }, curves.Item2);
+                CheckCurveSplit(lc1, new List<float> { 10 }, curves.Item1);
+                CheckCurveSplit(lc2, new List<float> { 10 }, curves.Item2);
             }
 
 
@@ -461,7 +461,7 @@ public class LineCurveTest
                 Assert.IsNotNull(curves.Item2);
                 Assert.AreEqual(2, curves.Item2.Count);
 
-                CheckCurveSplit(lc3, new List<float> { 2 }, curves.Item2);
+                CheckCurveSplit(lc3, new List<float> { 10 }, curves.Item2);
             }
 
             {
@@ -471,7 +471,7 @@ public class LineCurveTest
                 Assert.IsNotNull(curves.Item2);
                 Assert.AreEqual(2, curves.Item2.Count);
 
-                CheckCurveSplit(lc3, new List<float> { 4 }, curves.Item2);
+                CheckCurveSplit(lc3, new List<float> { 20 }, curves.Item2);
             }
 
             {
@@ -481,7 +481,7 @@ public class LineCurveTest
                 Assert.IsNull(curves.Item2);
                 Assert.AreEqual(3, curves.Item1.Count);
 
-                CheckCurveSplit(lc3, new List<float> { 2, 4 }, curves.Item1);
+                CheckCurveSplit(lc3, new List<float> { 10, 20 }, curves.Item1);
             }
 
 

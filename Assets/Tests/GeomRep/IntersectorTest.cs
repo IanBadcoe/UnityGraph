@@ -35,10 +35,10 @@ public class IntersectorTest
             return 0;
         }
 
-        public override bool Equals(object o)
+        public override bool Equals(Curve c, float tol)
         {
             // we're only going to want to compare unique modelling for the test cases
-            return ReferenceEquals(this, o);
+            return ReferenceEquals(this, c);
         }
 
         protected override float FindParamForPoint_Inner(Vector2 first)
