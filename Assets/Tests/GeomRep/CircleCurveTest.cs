@@ -746,7 +746,7 @@ public class CircleCurveTest
         {
             var lc = c as CircleCurve;
             Assert.IsNotNull(lc);
-            Assert.IsTrue(input.PartOfSameCircle(lc, 1e-4f));
+            Assert.IsTrue(input.SameSupercurve(lc, 1e-4f));
         }
     }
 }

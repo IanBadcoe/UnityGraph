@@ -309,10 +309,15 @@ namespace Assets.Generation.GeomRep
             return new Tuple<IList<Curve>, IList<Curve>>(ret1, ret2);
         }
 
-        public bool PartOfSameCircle(CircleCurve other, float tol)
+        public override bool SameSupercurve(Curve curve, float tol)
         {
-            return Mathf.Abs(Radius - other.Radius) < tol
-                && (Position - other.Position).magnitude < tol;
+            CircleCurve cc = curve as CircleCurve;
+
+            if (cc == null)
+                return false;
+
+            return Mathf.Abs(Radius - cc.Radius) < tol
+                && (Position - cc.Position).magnitude < tol;
         }
     }
 }

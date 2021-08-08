@@ -156,5 +156,7 @@ namespace Assets.Generation.GeomRep
                 }
             }
         }
+
+        public abstract bool SameSupercurve(Curve curve, float tol);
     }
 }

@@ -338,11 +338,11 @@ public class LineCurveTest
             var lc2 = LineCurve.MakeFromPoints(p3, p4);
             var lc3 = LineCurve.MakeFromPoints(p2, p4);
 
-            Assert.IsTrue(lc1.Coaxial(lc2, 1e-4f));
-            Assert.IsTrue(lc2.Coaxial(lc1, 1e-4f));
-            Assert.IsTrue(lc1.Coaxial(lc3, 1e-4f));
+            Assert.IsTrue(lc1.SameSupercurve(lc2, 1e-4f));
+            Assert.IsTrue(lc2.SameSupercurve(lc1, 1e-4f));
+            Assert.IsTrue(lc1.SameSupercurve(lc3, 1e-4f));
 
-            Assert.IsFalse(lc1.Coaxial(lc1x, 1e-4f));
+            Assert.IsFalse(lc1.SameSupercurve(lc1x, 1e-4f));
         }
     }
 
@@ -516,7 +516,7 @@ public class LineCurveTest
         {
             var lc = c as LineCurve;
             Assert.IsNotNull(lc);
-            Assert.IsTrue(input.Coaxial(lc, 1e-4f));
+            Assert.IsTrue(input.SameSupercurve(lc, 1e-4f));
         }
     }
 }

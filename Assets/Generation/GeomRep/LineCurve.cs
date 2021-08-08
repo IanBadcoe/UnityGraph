@@ -155,7 +155,7 @@ namespace Assets.Generation.GeomRep
 
             LineCurve lc2 = c2 as LineCurve;
 
-            if (!Coaxial(lc2, tol))
+            if (!SameSupercurve(lc2, tol))
             {
                 return null;
             }
@@ -191,16 +191,6 @@ namespace Assets.Generation.GeomRep
                 return null;
 
             return new Tuple<IList<Curve>, IList<Curve>>(ret1, ret2);
-        }
-
-        public bool Coaxial(LineCurve lc2, float tol)
-        {
-            // this returns a normalised return, so the direction and dist will be the same
-            // even if the lines run in opposite directions
-            var desc = GetNormAndDistDescription();
-            var lc2_desc = lc2.GetNormAndDistDescription();
-
-            return desc.Equals(lc2_desc, tol);
         }
 
         public class NormalAndDistLineParams : EqualityBase
@@ -264,6 +254,21 @@ namespace Assets.Generation.GeomRep
             // different solutions if dist is v.v.close to zero)
 
             return new NormalAndDistLineParams(norm, dist);
+        }
+
+        public override bool SameSupercurve(Curve curve, float tol)
+        {
+            LineCurve lc = curve as LineCurve;
+
+            if (lc == null)
+                return false;
+
+            // this returns a normalised return, so the direction and dist will be the same
+            // even if the lines run in opposite directions
+            var desc = GetNormAndDistDescription();
+            var lc_desc = lc.GetNormAndDistDescription();
+
+            return desc.Equals(lc_desc, tol);
         }
     }
 }
