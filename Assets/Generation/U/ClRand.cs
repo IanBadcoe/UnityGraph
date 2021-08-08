@@ -271,5 +271,10 @@ namespace Assets.Generation.U
                 buffer[i] = (byte)(InternalSample() % (Byte.MaxValue + 1));
             }
         }
+
+        public virtual float NextfloatRange(float from, float to)
+        {
+            return from + (to - from) * Nextfloat();
+        }
     }
 }

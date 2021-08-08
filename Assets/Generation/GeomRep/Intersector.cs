@@ -438,10 +438,8 @@ namespace Assets.Generation.GeomRep
                     continue;
                 }
 
-                Vector2 mid_point = c.Pos((c.StartParam + c.EndParam) / 2);
-
-                List<Tuple<Curve, int>> intervals = TryFindIntersections(mid_point, all_curves, curve_joints,
-                                                                         diameter, tol, random);
+                var intervals = TryFindIntersections(c, all_curves, curve_joints,
+                                                     diameter, tol, random);
 
                 // failure, don't really expect this as have had multiple tries and it
                 // shouldn't be so hard to find a good cutting line
@@ -625,14 +623,29 @@ namespace Assets.Generation.GeomRep
         }
 
         // virtual and non-private for unit-testing only
+        // return is a list of which curve, crossing number after curve, dot-product with stabbing line
         virtual public List<Tuple<Curve, int>> TryFindIntersections(
-            Vector2 mid_point,
+            Curve c,
             HashSet<Curve> all_curves,
             HashSet<Vector2> curve_joints,
             float diameter, float tol,
             ClRand random)
         {
-            for (int i = 0; i < 25; i++)
+            Vector2 point = c.Pos(random.NextfloatRange(c.StartParam, c.EndParam));
+
+            return TryFindIntersections(point, all_curves, curve_joints, diameter, tol, random);
+        }
+
+        // virtual and non-private for unit-testing only
+        // return is a list of which curve, crossing number after curve, dot-product with stabbing line
+		virtual public List<Tuple<Curve, int>> TryFindIntersections(
+            Vector2 point,
+            HashSet<Curve> all_curves,
+            HashSet<Vector2> curve_joints,
+            float diameter, float tol,
+            ClRand random)
+        {
+		    for (int i = 0; i < 25; i++)
             {
                 float rand_ang = random.Nextfloat() * Mathf.PI * 2;
                 float dx = Mathf.Sin(rand_ang);
@@ -640,7 +653,7 @@ namespace Assets.Generation.GeomRep
 
                 Vector2 direction = new Vector2(dx, dy);
 
-                Vector2 start = mid_point - direction * diameter;
+                Vector2 start = point - direction * diameter;
 
                 LineCurve lc = new LineCurve(start, direction, 2 * diameter);
 

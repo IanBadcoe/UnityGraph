@@ -84,6 +84,10 @@ public class IntersectorTest
         {
             throw new NotImplementedException();
         }
+        public override bool SameSupercurve(Curve curve, float tol)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [Test]
