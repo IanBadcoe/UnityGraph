@@ -1,5 +1,6 @@
 ﻿namespace Assets.Generation.G
 {
+    [System.Diagnostics.DebuggerDisplay("({T1}, {T2})")]
     public class IntersectionResult : DirectedEdgePair
     {
         public readonly float T1;

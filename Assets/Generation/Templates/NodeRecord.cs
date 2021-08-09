@@ -2,6 +2,7 @@
 
 namespace Assets.Generation.Templates
 {
+    [System.Diagnostics.DebuggerDisplay("Name = {Name}, Type = {Type}, Codes = {Codes}")]
     public sealed class NodeRecord
     {
         public enum NodeType

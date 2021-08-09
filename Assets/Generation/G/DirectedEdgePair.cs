@@ -2,6 +2,7 @@
 
 namespace Assets.Generation.G
 {
+    [System.Diagnostics.DebuggerDisplay("Edge1 = {Edge1}, Edge2 = {Edge2}")]
     public class DirectedEdgePair : EqualityBase
     {
         public readonly DirectedEdge Edge1;

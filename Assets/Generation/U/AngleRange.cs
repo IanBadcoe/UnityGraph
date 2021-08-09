@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Assets.Generation.U
 {
+    [System.Diagnostics.DebuggerDisplay("Start = {Start}, End = {End}")]
     public class AngleRange : EqualityBase
     {
         public readonly float Start;

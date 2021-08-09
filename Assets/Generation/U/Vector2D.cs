@@ -2,6 +2,7 @@
 
 namespace Assets.Generation.U
 {
+    [System.Diagnostics.DebuggerDisplay("({X}, {Y})")]
     public class Vector2D
     {
         public readonly double X;

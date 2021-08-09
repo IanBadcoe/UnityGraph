@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace Assets.Generation.GeomRep
 {
+    [System.Diagnostics.DebuggerDisplay("Curves = {NumCurves}")]
     public class Loop : EqualityBase
     {
         private readonly List<Curve> m_curves = new List<Curve>();

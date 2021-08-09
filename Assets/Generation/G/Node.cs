@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace Assets.Generation.G
 {
+    [System.Diagnostics.DebuggerDisplay("Name = {Name}")]
     public class Node : INode
     {
         private readonly int m_num;

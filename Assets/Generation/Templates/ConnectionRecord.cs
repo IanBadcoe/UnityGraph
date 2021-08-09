@@ -2,6 +2,7 @@
 
 namespace Assets.Generation.Templates
 {
+    [System.Diagnostics.DebuggerDisplay("From = {From}, To = {To}, Min = {MinLength}, Max = {MaxLength}")]
     public sealed class ConnectionRecord
     {
         public readonly NodeRecord From;

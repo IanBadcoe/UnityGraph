@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Assets.Generation.GeomRep
 {
+    [System.Diagnostics.DebuggerDisplay("Loops = {m_base_loops.Count}, Details = {m_detail_loop_sets.Count}, Merged = {m_merged_loops.Count}")]
     public class UnionHelper
     {
         private readonly List<Loop> m_base_loops = new List<Loop>();

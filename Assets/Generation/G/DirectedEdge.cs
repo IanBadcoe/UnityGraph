@@ -3,6 +3,7 @@ using Assets.Generation.U;
 
 namespace Assets.Generation.G
 {
+    [System.Diagnostics.DebuggerDisplay("Start = {Start}, End = {End}, Min = {MinLength}, Max = {MaxLength}")]
     public class DirectedEdge : EqualityBase
     {
         public readonly INode Start;

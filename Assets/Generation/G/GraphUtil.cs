@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Assets.Generation.G
 {
-    public class GraphUtil
+    public static class GraphUtil
     {
         public static HashSet<IntersectionResult> FindCrossingEdges(List<DirectedEdge> edges)
         {

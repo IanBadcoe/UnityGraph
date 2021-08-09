@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace Assets.Generation.Templates
 {
+    [System.Diagnostics.DebuggerDisplay("Name = {Name}, Codes = {Codes}")]
     public class Template
     {
         private readonly int m_num_in_nodes;

@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace Assets.Generation.G
 {
+    [System.Diagnostics.DebuggerDisplay("Nodes = {NumNodes}, Edges = {NumEdges}")]
     public class Graph
     {
         private readonly HashSet<Node> m_nodes = new HashSet<Node>();
