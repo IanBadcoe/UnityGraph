@@ -44,16 +44,8 @@ namespace Assets.Generation.GeomRep
 
         // only non-private for unit-testing
         [System.Diagnostics.DebuggerDisplay("Loop1 = {Loop1Out}, Loop2 = {Loop2Out}")]
-        public class Splice
+        public class Splice : List<AnnotatedCurve>
         {
-            public readonly AnnotatedCurve Loop1Out;
-            public readonly AnnotatedCurve Loop2Out;
-
-            public Splice(AnnotatedCurve l1out, AnnotatedCurve l2out)
-            {
-                Loop1Out = l1out;
-                Loop2Out = l2out;
-            }
         }
 
         // union operation cannot return a mix of positive and negative top-level curves
@@ -319,9 +311,9 @@ namespace Assets.Generation.GeomRep
                     }
                 }
 
-                // these two processes should touch the same set of loop-pairs
-                HashSet<Tuple<int, int>> splicings = new HashSet<Tuple<int, int>>(endSpliceMap.Values.Select(x => new Tuple<int, int>(x.Loop1Out.LoopNumber, x.Loop2Out.LoopNumber)));
-                Assertion.Assert(splittings.Union(splicings).Count() == splittings.Count);
+                //// these two processes should touch the same set of loop-pairs
+                //HashSet<Tuple<int, int>> splicings = new HashSet<Tuple<int, int>>(endSpliceMap.Values.Select(x => new Tuple<int, int>(x.Loop1Out.LoopNumber, x.Loop2Out.LoopNumber)));
+                //Assertion.Assert(splittings.Union(splicings).Count() == splittings.Count);
             }
 
             while (open.Count > 0)
@@ -606,33 +598,35 @@ namespace Assets.Generation.GeomRep
                 }
                 else
                 {
-                    if (splice.Loop1Out == start_ac
-                          || splice.Loop2Out == start_ac)
+                    if (splice.Contains(start_ac))
                     {
                         break;
                     }
 
                     // at every splice, at least one of the two possible exits should be still open
-                    Assertion.Assert(open.Contains(splice.Loop1Out) || open.Contains(splice.Loop2Out));
+                    Assertion.Assert(splice.Where(x => open.Contains(x)).Any());
 
-                    if (!open.Contains(splice.Loop1Out))
+                    // for the moment this is what we handle, as we get into more complex cases, fix things here
+                    Assertion.Assert(splice.Count == 2);
+
+                    if (!open.Contains(splice[0]))
                     {
-                        curr_ac = splice.Loop2Out;
+                        curr_ac = splice[1];
                     }
-                    else if (!open.Contains(splice.Loop2Out))
+                    else if (!open.Contains(splice[1]))
                     {
-                        curr_ac = splice.Loop1Out;
+                        curr_ac = splice[0];
                     }
 
                     // if both exit curves are still in open (happens with osculating circles)
                     // we need to take the one that puts us on a different loop
-                    else if (curr_ac.LoopNumber != splice.Loop1Out.LoopNumber)
+                    else if (curr_ac.LoopNumber != splice[0].LoopNumber)
                     {
-                        curr_ac = splice.Loop1Out;
+                        curr_ac = splice[0];
                     }
                     else
                     {
-                        curr_ac = splice.Loop2Out;
+                        curr_ac = splice[1];
                     }
                 }
             }
@@ -867,9 +861,10 @@ namespace Assets.Generation.GeomRep
 
                     if (dist.magnitude < 1e-4f)
                     {
-                        Splice s = new Splice(
+                        Splice s = new Splice() {
                             forward_annotations_map[l1curr],
-                            forward_annotations_map[l2curr]);
+                            forward_annotations_map[l2curr]
+                        };
 
                         if (endSpliceMap.ContainsKey(l1prev)
                             || endSpliceMap.ContainsKey(l2prev))

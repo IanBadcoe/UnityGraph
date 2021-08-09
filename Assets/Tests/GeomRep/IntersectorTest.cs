@@ -276,8 +276,7 @@ public class IntersectorTest
         // two splices, with two in and two out curves each
         Assert.AreEqual(4, endSpliceMap.Count);
 
-        HashSet<Intersector.Splice> unique = new HashSet<Intersector.Splice>();
-        unique.UnionWith(endSpliceMap.Values);
+        HashSet<Intersector.Splice> unique = new HashSet<Intersector.Splice>(endSpliceMap.Values);
 
         Assert.AreEqual(2, unique.Count);
 
@@ -286,8 +285,10 @@ public class IntersectorTest
             HashSet<Intersector.AnnotatedCurve> l1fset = new HashSet<Intersector.AnnotatedCurve>();
             HashSet<Intersector.AnnotatedCurve> l2fset = new HashSet<Intersector.AnnotatedCurve>();
 
-            Intersector.AnnotatedCurve acl1f = s.Loop1Out;
-            Intersector.AnnotatedCurve acl2f = s.Loop2Out;
+            Assert.AreEqual(2, s.Count);
+
+            Intersector.AnnotatedCurve acl1f = s[0];
+            Intersector.AnnotatedCurve acl2f = s[1];
 
             for (int i = 0; i < 4; i++)
             {
