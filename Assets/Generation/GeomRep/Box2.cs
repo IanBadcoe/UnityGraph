@@ -27,6 +27,11 @@ namespace Assets.Generation.GeomRep
             Max = tr;
         }
 
+        public Box2(int x1, int y1, int x2, int y2)
+            : this(new Vector2(x1, y1), new Vector2(x2, y2))
+        {
+        }
+
         public bool IsEmpty
         {
             // if either high edge is on the wrong side of the low edge, we are empty

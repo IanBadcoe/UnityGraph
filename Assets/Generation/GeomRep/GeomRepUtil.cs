@@ -6,9 +6,9 @@ using UnityEngine;
 
 namespace Assets.Generation.GeomRep
 {
-    public class GeomRepUtil
+    public static class GeomRepUtil
     {
-        public static List<Tuple<float, float>> CurveCurveIntersect(Curve c1, Curve c2)
+        public static List<Tuple<float, float>> CurveCurveIntersect(Curve c1, Curve c2, float tol = 1e-5f)
         {
             if (c1.Equals(c2))
             {
@@ -38,8 +38,8 @@ namespace Assets.Generation.GeomRep
             List<Tuple<float, float>> ret = new List<Tuple<float, float>>();
 
             {
-                float? pc1 = c1.FindParamForPoint(pts.Item1);
-                float? pc2 = c2.FindParamForPoint(pts.Item1);
+                float? pc1 = c1.FindParamForPoint(pts.Item1, tol);
+                float? pc2 = c2.FindParamForPoint(pts.Item1, tol);
 
                 if (pc1 != null && pc2 != null)
                 {
@@ -49,8 +49,8 @@ namespace Assets.Generation.GeomRep
 
             if (pts.Item2 != null)
             {
-                float? pc1 = c1.FindParamForPoint(pts.Item2.Value);
-                float? pc2 = c2.FindParamForPoint(pts.Item2.Value);
+                float? pc1 = c1.FindParamForPoint(pts.Item2.Value, tol);
+                float? pc2 = c2.FindParamForPoint(pts.Item2.Value, tol);
 
                 if (pc1 != null && pc2 != null)
                 {
@@ -230,7 +230,7 @@ namespace Assets.Generation.GeomRep
         {
             float ret = 0;
 
-            foreach(var c in l.Curves)
+            foreach (var c in l.Curves)
             {
                 LineCurve lc = c as LineCurve;
 

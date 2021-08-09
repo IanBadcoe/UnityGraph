@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 using System;
@@ -6,6 +5,7 @@ using Assets.Generation.U;
 using Assets.Generation.GeomRep;
 using Assets.Extensions;
 using System.Linq;
+using System.Collections.Generic;
 
 public class IntersectorTest
 {
@@ -75,15 +75,17 @@ public class IntersectorTest
         {
             return Vector2.zero;
         }
-    
+
         public override Curve Reversed()
         {
             throw new NotImplementedException();
         }
+
         public override Tuple<IList<Curve>, IList<Curve>> SplitCoincidentCurves(Curve c2, float tol)
         {
             throw new NotImplementedException();
         }
+
         public override bool SameSupercurve(Curve curve, float tol)
         {
             throw new NotImplementedException();
@@ -268,7 +270,8 @@ public class IntersectorTest
 
         m_intersector.FindSplices(curves1, curves2,
               forward_annotations_map,
-              endSpliceMap);
+              endSpliceMap,
+              null, null);
 
         // two splices, with two in and two out curves each
         Assert.AreEqual(4, endSpliceMap.Count);
@@ -318,15 +321,13 @@ public class IntersectorTest
         {
             CircleCurve cc = new CircleCurve(new Vector2(), 5);
 
-            HashSet<Curve> all_curves = new HashSet<Curve>();
-            all_curves.Add(cc);
+            HashSet<Curve> all_curves = new HashSet<Curve> { cc };
 
             HashSet<Vector2> curve_joints = new HashSet<Vector2>();
             curve_joints.Add(cc.StartPos);
 
-            List<Tuple<Curve, int>> ret =
-                  m_intersector.TryFindIntersections(
-                        new Vector2(0, -5),
+            var ret = m_intersector.TryFindIntersections(
+                        cc,
                         all_curves,
                         curve_joints,
                         10, 1e-5f,
@@ -335,10 +336,16 @@ public class IntersectorTest
 
             Assert.IsNotNull(ret);
             Assert.AreEqual(2, ret.Count);
-            Assert.AreEqual(cc, ret[0].Item1);
-            Assert.AreEqual(cc, ret[1].Item1);
-            Assert.AreEqual(1, ret[0].Item2);
-            Assert.AreEqual(0, ret[1].Item2);
+            Assert.AreEqual(cc, ret[0].Curve);
+            Assert.AreEqual(cc, ret[1].Curve);
+            Assert.AreEqual(1, ret[0].CrossingNumber);
+            Assert.AreEqual(0, ret[1].CrossingNumber);
+            // we do not know what angle it scanned at
+            // but the first intersection should be +ve and the second negative
+            Assert.IsTrue(ret[0].DotProduct > 0);
+            Assert.IsTrue(ret[1].DotProduct < 0);
+            // and the first after the second
+            Assert.IsTrue(ret[1].Distance >= ret[0].Distance);
         }
 
         // two concentric circles, expect 1, 2, 1, 0
@@ -346,17 +353,21 @@ public class IntersectorTest
             CircleCurve cc1 = new CircleCurve(new Vector2(), 5);
             CircleCurve cc2 = new CircleCurve(new Vector2(), 3);
 
-            HashSet<Curve> all_curves = new HashSet<Curve>();
-            all_curves.Add(cc1);
-            all_curves.Add(cc2);
+            HashSet<Curve> all_curves = new HashSet<Curve>
+            {
+                cc1,
+                cc2
+            };
 
-            HashSet<Vector2> curve_joints = new HashSet<Vector2>();
-            curve_joints.Add(cc1.StartPos);
-            curve_joints.Add(cc2.StartPos);
+            HashSet<Vector2> curve_joints = new HashSet<Vector2>
+            {
+                cc1.StartPos,
+                cc2.StartPos
+            };
 
-            List<Tuple<Curve, int>> ret =
+            var ret =
                   m_intersector.TryFindIntersections(
-                        new Vector2(0, 0),  // use centre to force hitting both circles
+                        cc2,
                         all_curves,
                         curve_joints,
                         10, 1e-5f,
@@ -365,14 +376,21 @@ public class IntersectorTest
 
             Assert.IsNotNull(ret);
             Assert.AreEqual(4, ret.Count);
-            Assert.AreEqual(cc1, ret[0].Item1);
-            Assert.AreEqual(cc2, ret[1].Item1);
-            Assert.AreEqual(cc2, ret[2].Item1);
-            Assert.AreEqual(cc1, ret[3].Item1);
-            Assert.AreEqual(1, ret[0].Item2);
-            Assert.AreEqual(2, ret[1].Item2);
-            Assert.AreEqual(1, ret[2].Item2);
-            Assert.AreEqual(0, ret[3].Item2);
+            Assert.AreEqual(cc1, ret[0].Curve);
+            Assert.AreEqual(cc2, ret[1].Curve);
+            Assert.AreEqual(cc2, ret[2].Curve);
+            Assert.AreEqual(cc1, ret[3].Curve);
+            Assert.AreEqual(1, ret[0].CrossingNumber);
+            Assert.AreEqual(2, ret[1].CrossingNumber);
+            Assert.AreEqual(1, ret[2].CrossingNumber);
+            Assert.AreEqual(0, ret[3].CrossingNumber);
+            Assert.IsTrue(ret[0].DotProduct > 0);
+            Assert.IsTrue(ret[1].DotProduct > 0);
+            Assert.IsTrue(ret[2].DotProduct < 0);
+            Assert.IsTrue(ret[3].DotProduct < 0);
+            Assert.IsTrue(ret[1].Distance >= ret[0].Distance);
+            Assert.IsTrue(ret[2].Distance >= ret[1].Distance);
+            Assert.IsTrue(ret[3].Distance >= ret[2].Distance);
         }
 
         // two concentric circles, inner one -ve, expect 1, 0, 1, 0
@@ -380,17 +398,21 @@ public class IntersectorTest
             CircleCurve cc1 = new CircleCurve(new Vector2(), 5);
             CircleCurve cc2 = new CircleCurve(new Vector2(), 3, RotationDirection.Reverse);
 
-            HashSet<Curve> all_curves = new HashSet<Curve>();
-            all_curves.Add(cc1);
-            all_curves.Add(cc2);
+            HashSet<Curve> all_curves = new HashSet<Curve>
+            {
+                cc1,
+                cc2
+            };
 
-            HashSet<Vector2> curve_joints = new HashSet<Vector2>();
-            curve_joints.Add(cc1.StartPos);
-            curve_joints.Add(cc2.StartPos);
+            HashSet<Vector2> curve_joints = new HashSet<Vector2>
+            {
+                cc1.StartPos,
+                cc2.StartPos
+            };
 
-            List<Tuple<Curve, int>> ret =
+            var ret =
                   m_intersector.TryFindIntersections(
-                        new Vector2(0, 0),  // use centre to force hitting both circles
+                        cc2,
                         all_curves,
                         curve_joints,
                         10, 1e-5f,
@@ -399,14 +421,21 @@ public class IntersectorTest
 
             Assert.IsNotNull(ret);
             Assert.AreEqual(4, ret.Count);
-            Assert.AreEqual(cc1, ret[0].Item1);
-            Assert.AreEqual(cc2, ret[1].Item1);
-            Assert.AreEqual(cc2, ret[2].Item1);
-            Assert.AreEqual(cc1, ret[3].Item1);
-            Assert.AreEqual(1, (int)ret[0].Item2);
-            Assert.AreEqual(0, (int)ret[1].Item2);
-            Assert.AreEqual(1, (int)ret[2].Item2);
-            Assert.AreEqual(0, (int)ret[3].Item2);
+            Assert.AreEqual(cc1, ret[0].Curve);
+            Assert.AreEqual(cc2, ret[1].Curve);
+            Assert.AreEqual(cc2, ret[2].Curve);
+            Assert.AreEqual(cc1, ret[3].Curve);
+            Assert.AreEqual(1, (int)ret[0].CrossingNumber);
+            Assert.AreEqual(0, (int)ret[1].CrossingNumber);
+            Assert.AreEqual(1, (int)ret[2].CrossingNumber);
+            Assert.AreEqual(0, (int)ret[3].CrossingNumber);
+            Assert.IsTrue(ret[0].DotProduct > 0);
+            Assert.IsTrue(ret[1].DotProduct < 0);
+            Assert.IsTrue(ret[2].DotProduct > 0);
+            Assert.IsTrue(ret[3].DotProduct < 0);
+            Assert.IsTrue(ret[1].Distance >= ret[0].Distance);
+            Assert.IsTrue(ret[2].Distance >= ret[1].Distance);
+            Assert.IsTrue(ret[3].Distance >= ret[2].Distance);
         }
     }
 
@@ -422,35 +451,41 @@ public class IntersectorTest
             CircleCurve cc1 = new CircleCurve(new Vector2(), 5, 0, Mathf.PI);
             CircleCurve cc2 = new CircleCurve(new Vector2(), 5, Mathf.PI, 2 * Mathf.PI);
 
-            HashSet<Curve> all_curves = new HashSet<Curve>();
-            all_curves.Add(cc1);
-            all_curves.Add(cc2);
+            HashSet<Curve> all_curves = new HashSet<Curve>
+            {
+                cc1,
+                cc2
+            };
 
             LineCurve lc = new LineCurve(new Vector2(-10, 0), new Vector2(1, 0), 20);
 
-            List<Tuple<Curve, int>> ret =
+            var ret =
                   m_intersector.TryFindCurveIntersections(
                         lc,
                         all_curves);
 
             Assert.IsNotNull(ret);
             Assert.AreEqual(2, ret.Count);
-            Assert.AreEqual(cc2, ret[0].Item1);
-            Assert.AreEqual(cc1, ret[1].Item1);
-            Assert.AreEqual(1, (int)ret[0].Item2);
-            Assert.AreEqual(0, (int)ret[1].Item2);
+            Assert.AreEqual(cc2, ret[0].Curve);
+            Assert.AreEqual(cc1, ret[1].Curve);
+            Assert.AreEqual(1, ret[0].CrossingNumber);
+            Assert.AreEqual(0, ret[1].CrossingNumber);
+            Assert.AreEqual(5, ret[0].Distance, 1e-4f);
+            Assert.AreEqual(15, ret[1].Distance, 1e-4f);
         }
 
         // miss the circle, expect null
         {
             CircleCurve cc1 = new CircleCurve(new Vector2(), 5);
 
-            HashSet<Curve> all_curves = new HashSet<Curve>();
-            all_curves.Add(cc1);
+            HashSet<Curve> all_curves = new HashSet<Curve>
+            {
+                cc1
+            };
 
             LineCurve lc = new LineCurve(new Vector2(-10, 0), new Vector2(0, 1), 20);
 
-            List<Tuple<Curve, int>> ret =
+            var ret =
                   m_intersector.TryFindCurveIntersections(
                         lc,
                         all_curves);
@@ -462,12 +497,14 @@ public class IntersectorTest
         {
             CircleCurve cc1 = new CircleCurve(new Vector2(), 5);
 
-            HashSet<Curve> all_curves = new HashSet<Curve>();
-            all_curves.Add(cc1);
+            HashSet<Curve> all_curves = new HashSet<Curve>
+            {
+                cc1
+            };
 
             LineCurve lc = new LineCurve(new Vector2(-5, -5), new Vector2(0, 1), 20);
 
-            List<Tuple<Curve, int>> ret =
+            var ret =
                   m_intersector.TryFindCurveIntersections(
                         lc,
                         all_curves);
@@ -798,7 +835,7 @@ public class IntersectorTest
 
     class IntersectorDummy1 : Intersector
     {
-        public override bool ExtractInternalCurves(
+        public override bool RemoveUnwantedCurves(
             float tol, ClRand ClRand,
             Dictionary<Curve, AnnotatedCurve> forward_annotations_map, HashSet<Curve> all_curves,
             HashSet<AnnotatedCurve> open, HashSet<Vector2> curve_joints, float diameter,
@@ -810,8 +847,8 @@ public class IntersectorTest
 
     class IntersectorDummy2 : Intersector
     {
-        public override List<Tuple<Curve, int>> TryFindIntersections(
-            Vector2 mid_point,
+        public override List<Interval> TryFindIntersections(
+            Curve c,
             HashSet<Curve> all_curves,
             HashSet<Vector2> curve_joints,
             float diameter, float tol,
@@ -865,7 +902,7 @@ public class IntersectorTest
             Assert.IsNull(ret);
         }
 
-        // if tryFindIntersections fails, we bail
+        // if tryFindIntersections fails, we throw
         {
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
@@ -878,12 +915,21 @@ public class IntersectorTest
 
             Intersector i = new IntersectorDummy2();
 
-            LoopSet ret = i.Union(ls1, ls2, 1e-5f, new ClRand(1));
+            bool caught = false;
 
-            Assert.IsNull(ret);
+            try
+            {
+                LoopSet ret = i.Union(ls1, ls2, 1e-5f, new ClRand(1));
+            }
+            catch(AnalysisFailedException)
+            {
+                caught = true;
+            }
+
+            Assert.IsTrue(caught);
         }
 
-        // if tryFindIntersections fails, we bail
+        // if tryFindIntersections fails (for a different reason), we throw
         {
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
@@ -896,9 +942,18 @@ public class IntersectorTest
 
             Intersector i = new IntersectorDummy3();
 
-            LoopSet ret = i.Union(ls1, ls2, 1e-5f, new ClRand(1));
+            bool caught = false;
 
-            Assert.IsNull(ret);
+            try
+            {
+                LoopSet ret = i.Union(ls1, ls2, 1e-5f, new ClRand(1));
+            }
+            catch (AnalysisFailedException)
+            {
+                caught = true;
+            }
+
+            Assert.IsTrue(caught);
         }
     }
 
@@ -984,6 +1039,685 @@ public class IntersectorTest
         }
 
         return ret;
+    }
+
+    [Test]
+    public void PolygonRotationTest()
+    {
+        Vector2 p1 = new Vector2(0, 0);
+        Vector2 p2 = new Vector2(0, 1);
+        Vector2 p3 = new Vector2(1, 1);
+        Vector2 p4 = new Vector2(1, 0);
+
+        {
+            // clockwise is forwards is a positive polygon
+            Loop l = Loop.MakePolygon(new List<Vector2> { p1, p2, p3, p4 }, RotationDirection.Forwards);
+            LoopSet ls1 = new LoopSet(l);
+
+            LoopSet ret = m_intersector.Union(new LoopSet(), ls1,
+                1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            Assert.AreEqual(ls1, ret);
+
+            ret = m_intersector.Union(new LoopSet(), ls1,
+                1e-5f, new ClRand(1), Intersector.UnionType.WantNegative);
+
+            Assert.AreEqual(0, ret.Count);
+        }
+
+        {
+            // anti-clockwise is reverse is a negative polygon
+            Loop l = Loop.MakePolygon(new List<Vector2> { p1, p2, p3, p4 }, RotationDirection.Reverse);
+            LoopSet ls1 = new LoopSet(l);
+
+            LoopSet ret = m_intersector.Union(new LoopSet(), ls1,
+                1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            Assert.AreEqual(0, ret.Count);
+
+            ret = m_intersector.Union(new LoopSet(), ls1,
+                1e-5f, new ClRand(1), Intersector.UnionType.WantNegative);
+
+            Assert.AreEqual(ls1, ret);
+        }
+    }
+
+    [Test]
+    public void TestPolygonCircleCases()
+    {
+        // outside the circle, touching at 3 o'clock
+        List<Vector2> p1 = new List<Vector2> {
+            new Vector2(1, 0),
+            new Vector2(2, 0),
+            new Vector2(2, 1)
+        };
+
+        // inside the circle, touching at 3 o'clock
+        List<Vector2> p2 = new List<Vector2> {
+            new Vector2(1, 0),
+            new Vector2(0.5f, 0),
+            new Vector2(0.5f, 0.5f)
+        };
+
+        // touching at 3 o'clock, crossing right across the circle and out the other side
+        List<Vector2> p3 = new List<Vector2> {
+            new Vector2(1, 0),
+            new Vector2(-2, 0),
+            new Vector2(-2, 0.5f)
+        };
+
+        // completely crossing the circle and out the other side
+        List<Vector2> p4 = new List<Vector2> {
+            new Vector2(2, 0),
+            new Vector2(-2, 0),
+            new Vector2(-2, 0.5f)
+        };
+
+        LoopSet p1f = new LoopSet(Loop.MakePolygon(p1, RotationDirection.Forwards));
+        LoopSet p1r = new LoopSet(Loop.MakePolygon(p1, RotationDirection.Reverse));
+        LoopSet p2f = new LoopSet(Loop.MakePolygon(p2, RotationDirection.Forwards));
+        LoopSet p2r = new LoopSet(Loop.MakePolygon(p2, RotationDirection.Reverse));
+        LoopSet p3f = new LoopSet(Loop.MakePolygon(p3, RotationDirection.Forwards));
+        LoopSet p3r = new LoopSet(Loop.MakePolygon(p3, RotationDirection.Reverse));
+        LoopSet p4f = new LoopSet(Loop.MakePolygon(p4, RotationDirection.Forwards));
+        LoopSet p4r = new LoopSet(Loop.MakePolygon(p4, RotationDirection.Reverse));
+
+        LoopSet circ = new LoopSet(new Loop(new CircleCurve(new Vector2(0, 0), 1)));
+
+        {
+            LoopSet merged = m_intersector.Union(circ, p1f, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            Assert.AreEqual(1, merged.Count);
+            Assert.AreEqual(4, merged[0].Curves.Count);
+            Assert.AreEqual(new Box2(new Vector2(-1, -1), new Vector2(2, 1)), merged.GetBounds());
+        }
+
+        {
+            LoopSet merged = m_intersector.Union(circ, p1r, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            Assert.AreEqual(1, merged.Count);
+            Assert.AreEqual(1, merged[0].Curves.Count);
+            Assert.AreEqual(new Box2(new Vector2(-1, -1), new Vector2(1, 1)), merged.GetBounds());
+        }
+
+        {
+            LoopSet merged = m_intersector.Union(circ, p2f, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            Assert.AreEqual(1, merged.Count);
+            Assert.AreEqual(1, merged[0].Curves.Count);
+            Assert.AreEqual(new Box2(new Vector2(-1, -1), new Vector2(1, 1)), merged.GetBounds());
+        }
+
+        {
+            LoopSet merged = m_intersector.Union(circ, p2r, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            Assert.AreEqual(1, merged.Count);
+            Assert.AreEqual(4, merged[0].Curves.Count);
+            Assert.AreEqual(new Box2(new Vector2(-1, -1), new Vector2(1, 1)), merged.GetBounds());
+        }
+
+        {
+            LoopSet merged = m_intersector.Union(circ, p3f, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            Assert.AreEqual(1, merged.Count);
+            Assert.AreEqual(4, merged[0].Curves.Count);
+            Assert.AreEqual(new Box2(new Vector2(-2, -1), new Vector2(1, 1)), merged.GetBounds());
+        }
+
+        {
+            LoopSet merged = m_intersector.Union(circ, p3r, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            // because our rule is, when two curves intersect, to change curve if possible, we get two pieces out here
+            //          ____
+            //         /    \ <-- c1
+            //        /______\
+            // c2 -->  ___---/
+            //         \____/ <-- c1
+            //       
+            Assert.AreEqual(2, merged.Count);
+            Assert.AreEqual(2, merged[0].Curves.Count);
+            Assert.AreEqual(2, merged[1].Curves.Count);
+            Assert.AreEqual(new Box2(new Vector2(-1, -1), new Vector2(1, 1)), merged.GetBounds());
+        }
+
+        {
+            LoopSet merged = m_intersector.Union(circ, p4f, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            Assert.AreEqual(1, merged.Count);
+            Assert.AreEqual(7, merged[0].Curves.Count);
+            Assert.AreEqual(new Box2(new Vector2(-2, -1), new Vector2(2, 1)), merged.GetBounds());
+        }
+
+        {
+            LoopSet merged = m_intersector.Union(circ, p4r, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            // cut cleanly into two
+            Assert.AreEqual(2, merged.Count);
+            Assert.AreEqual(2, merged[0].Curves.Count);
+            Assert.AreEqual(2, merged[1].Curves.Count);
+            Assert.AreEqual(new Box2(new Vector2(-1, -1), new Vector2(1, 1)), merged.GetBounds());
+        }
+    }
+
+    [Test]
+    public void TestCoincidentLines()
+    {
+        {
+            // simple degenerate polygon should disappear
+            Vector2 p1 = new Vector2(0, 0);
+            Vector2 p2 = new Vector2(1, 0);
+
+            LoopSet ls1 = new LoopSet(
+                new Loop(new List<Curve>
+                {
+                    LineCurve.MakeFromPoints(p1, p2),
+                    LineCurve.MakeFromPoints(p2, p1),
+                }));
+
+            LoopSet ls1r = new LoopSet(
+                new Loop(new List<Curve>
+                {
+                    LineCurve.MakeFromPoints(p2, p1),
+                    LineCurve.MakeFromPoints(p1, p2),
+                }));
+
+            // with the old implementation, one out of forwards and backwards on this should fail
+            // (because the order of presenting the two curves will make it look like a zero-sized
+            // +ve poly or a zero-sized -ve poly...)
+            LoopSet merged = m_intersector.Union(new LoopSet(), ls1, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            Assert.AreEqual(0, merged.Count);
+
+            merged = m_intersector.Union(new LoopSet(), ls1r, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            Assert.AreEqual(0, merged.Count);
+        }
+
+        {
+            // slightly more complex degenerate polygon should disappear
+            Vector2 p1 = new Vector2(0, 0);
+            Vector2 p2 = new Vector2(1, 0);
+            Vector2 p3 = new Vector2(2, 0);
+            Vector2 p4 = new Vector2(3, 0);
+
+            // p1 -> p3 -> p2 -> p4 -> p1
+
+            LoopSet ls1 = new LoopSet(
+                new Loop(new List<Curve>
+                {
+                    LineCurve.MakeFromPoints(p1, p3),
+                    LineCurve.MakeFromPoints(p3, p2),
+                    LineCurve.MakeFromPoints(p2, p4),
+                    LineCurve.MakeFromPoints(p4, p1),
+                })
+            );
+
+            LoopSet ls1r = new LoopSet(
+                ls1[0].Reversed()
+            );
+
+            // with the old implementation, one out of forwards and backwards on this should fail
+            // (because the order of presenting the two curves will make it look like a zero-sized
+            // +ve poly or a zero-sized -ve poly...)
+            LoopSet merged = m_intersector.Union(new LoopSet(), ls1, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            Assert.AreEqual(0, merged.Count);
+
+            merged = m_intersector.Union(new LoopSet(), ls1r, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            Assert.AreEqual(0, merged.Count);
+        }
+
+        {
+            // degenerate U should disappear
+            //
+            // throws, actually, as it triggers curve intersection detection
+            // technically that is wrong, but unless I need to support it...
+            
+            Vector2 p1 = new Vector2(0, 0);
+            Vector2 p2 = new Vector2(1, 0);
+            Vector2 p3 = new Vector2(1, 1);
+            Vector2 p4 = new Vector2(0, 1);
+
+            // p1 -> p3 -> p2 -> p4 -> p3 -> p2 -> p1
+
+            LoopSet ls1 = new LoopSet(
+                new Loop(new List<Curve>
+                {
+                    LineCurve.MakeFromPoints(p1, p2),
+                    LineCurve.MakeFromPoints(p2, p3),
+                    LineCurve.MakeFromPoints(p3, p4),
+                    LineCurve.MakeFromPoints(p4, p3),
+                    LineCurve.MakeFromPoints(p3, p2),
+                    LineCurve.MakeFromPoints(p2, p1),
+                })
+            );
+
+            LoopSet ls1r = new LoopSet(
+                ls1[0].Reversed()
+            );
+
+            int catches = 0;
+
+            // with the old implementation, one out of forwards and backwards on this should fail
+            // (because the order of presenting the two curves will make it look like a zero-sized
+            // +ve poly or a zero-sized -ve poly...)
+
+            try
+            {
+                LoopSet merged = m_intersector.Union(new LoopSet(), ls1, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+            }
+            catch (ArgumentException)
+            {
+                catches += 1;
+            }
+
+            try
+            {
+                LoopSet merged = m_intersector.Union(new LoopSet(), ls1r, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+            }
+            catch (ArgumentException)
+            {
+                catches += 1;
+            }
+
+            Assert.AreEqual(2, catches);
+        }
+
+        // similarly an attempt at:
+        // +---+
+        // |   |
+        // |   +===+
+        // |   |
+        // +---+
+        //
+        // will throw, which is good because it would need a fix-up of the following curve
+        // across where the double bit is deleted
+    }
+
+    [Test]
+    public void TestCoincidentCurves()
+    {
+        //// Including where only parts coincide
+        //{
+        //    // these make a set of boxes as follows:
+        //    //
+        //    //             +----------+              +----------+
+        //    //             |          |              |          |
+        //    //    +--------+          |     +--------+          |
+        //    //    |        |          |     |                   |
+        //    //    |        +------+   |     |        +------+   |
+        //    //    |        |      |   |     |        |      |   |
+        //    //    |   +----+      |   |     |   +----+      |   |
+        //    //    |   |    |      |   |     |   |           |   |
+        //    //    |   |    +--+   |   |     |   |    +--+   |   |
+        //    //    |   |    |  |   |   | ==> |   |    |  |   |   |
+        //    //    |   |    +--+   |   |     |   |    +--+   |   |
+        //    //    |   |    |      |   |     |   |           |   |
+        //    //    |   +----+      |   |     |   +----+      |   |
+        //    //    |        |      |   |     |        |      |   |
+        //    //    |        +------+   |     |        +------+   |
+        //    //    |        |          |     |                   |
+        //    //    +--------+          |     +--------+          |
+        //    //             |          |              |          |
+        //    //             +----------+              +----------+
+        //    //
+        //    // (all +ve)
+        //    LoopSet box5 = new LoopSet(
+        //        Loop.MakePolygon(new List<Vector2> {
+        //            new Vector2(0, 0),
+        //            new Vector2(0, 10),
+        //            new Vector2(10, 10),
+        //            new Vector2(10, 0),
+        //        }, RotationDirection.Forwards)
+        //    );
+        //    LoopSet box4 = new LoopSet(
+        //        Loop.MakePolygon(new List<Vector2> {
+        //            new Vector2(0, 1),
+        //            new Vector2(0, 9),
+        //            new Vector2(-8, 9),
+        //            new Vector2(-8, 1),
+        //        }, RotationDirection.Forwards)
+        //    );
+        //    LoopSet box3 = new LoopSet(
+        //        Loop.MakePolygon(new List<Vector2> {
+        //            new Vector2(0, 2),
+        //            new Vector2(0, 8),
+        //            new Vector2(6, 8),
+        //            new Vector2(6, 2),
+        //        }, RotationDirection.Reverse)
+        //    );
+        //    LoopSet box2 = new LoopSet(
+        //        Loop.MakePolygon(new List<Vector2> {
+        //            new Vector2(0, 3),
+        //            new Vector2(0, 7),
+        //            new Vector2(-4, 7),
+        //            new Vector2(-4, 3),
+        //        }, RotationDirection.Reverse)
+        //    );
+        //    LoopSet box1 = new LoopSet(
+        //        Loop.MakePolygon(new List<Vector2> {
+        //            new Vector2(0, 4),
+        //            new Vector2(0, 6),
+        //            new Vector2(2, 6),
+        //            new Vector2(2, 4),
+        //        }, RotationDirection.Forwards)
+        //    );
+
+        //    // with the old implementation, one out of forwards and backwards on this should fail
+        //    // (because the order of presenting the two curves will make it look like a zero-sized
+        //    // +ve poly or a zero-sized -ve poly...)
+
+        //    // box4 and box5 presented together should just merge
+        //    LoopSet merged = m_intersector.Union(new LoopSet(), box5.Concatenate(box4), 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+        //    Assert.AreEqual(1, merged.Count);
+        //    Assert.AreEqual()
+
+        //    merged = m_intersector.Union(new LoopSet(), ls1r, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+        //    Assert.AreEqual(0, merged.Count);
+        //}
+
+        {
+            // two opposite circles should disappear
+            LoopSet ls1 = new LoopSet(
+                new List<Loop> {
+                    new Loop(new CircleCurve(new Vector2(), 1, RotationDirection.Forwards)),
+                    new Loop(new CircleCurve(new Vector2(), 1, RotationDirection.Reverse)),
+                }
+            );
+
+            LoopSet ls1r = ls1.Reversed();
+
+            // with the old implementation, one out of forwards and backwards on this should fail
+            // (because the order of presenting the two curves will make it look like a zero-sized
+            // +ve poly or a zero-sized -ve poly...)
+            LoopSet merged = m_intersector.Union(new LoopSet(), ls1, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            Assert.AreEqual(0, merged.Count);
+
+            merged = m_intersector.Union(new LoopSet(), ls1r, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            Assert.AreEqual(0, merged.Count);
+        }
+
+        {
+            // rects that take out parts of each other should work
+            LoopSet ls1 = new LoopSet(LineCurve.MakeRect(0, 0, 20, 20));
+            LoopSet ls2 = new LoopSet(LineCurve.MakeRect(5, 0, 15, 20).Reversed());
+
+            LoopSet merged = m_intersector.Union(ls1, ls2, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            Assert.AreEqual(2, merged.Count);
+            Assert.AreEqual(new Box2(0, 0, 20, 20), merged.GetBounds());
+
+            merged = m_intersector.Union(ls2, ls1, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            Assert.AreEqual(2, merged.Count);
+            Assert.AreEqual(new Box2(0, 0, 20, 20), merged.GetBounds());
+
+            merged = m_intersector.Union(ls2.Reversed(), ls1.Reversed(), 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            // in this case the outer -ve box should disappear, taking the inner box with it
+            Assert.AreEqual(0, merged.Count);
+
+            merged = m_intersector.Union(ls1.Reversed(), ls2.Reversed(), 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            Assert.AreEqual(0, merged.Count);
+        }
+
+        {
+            // rects that abut should work
+            LoopSet ls1 = new LoopSet(LineCurve.MakeRect(0, 0, 20, 20));
+            LoopSet ls2 = new LoopSet(LineCurve.MakeRect(5, -10, 15, 0).Reversed());
+
+            // -ve touching rect should just dissappear
+            LoopSet merged = m_intersector.Union(ls1, ls2, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            Assert.AreEqual(1, merged.Count);
+            Assert.AreEqual(new Box2(0, 0, 20, 20), merged.GetBounds());
+
+            merged = m_intersector.Union(ls2, ls1, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            Assert.AreEqual(1, merged.Count);
+            Assert.AreEqual(new Box2(0, 0, 20, 20), merged.GetBounds());
+
+            // +ve touching rect should get merged in
+            merged = m_intersector.Union(ls1, ls2.Reversed(), 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            Assert.AreEqual(1, merged.Count);
+            Assert.AreEqual(new Box2(0, -10, 20, 20), merged.GetBounds());
+
+            merged = m_intersector.Union(ls2.Reversed(), ls1, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+
+            Assert.AreEqual(1, merged.Count);
+            Assert.AreEqual(new Box2(0, -10, 20, 20), merged.GetBounds());
+        }
+    }
+
+    private void FixCrossings(IList<Intersector.Interval> list)
+    {
+        int crossings = 0;
+
+        for(int i = 0; i < list.Count; i++)
+        {
+            // relying on the fact I set all the dot-products to +/- 1
+            Intersector.Interval interval = list[i];
+
+            crossings += (int)interval.DotProduct;
+            var interval2 = new Intersector.Interval(interval.Curve, crossings, interval.DotProduct, interval.Distance);
+
+            list[i] = interval2;
+        }
+    }
+
+    // crossing number should only ever vary by 1, irrespective of what we delete
+    private void CheckCrossings(IList<Intersector.Interval> list)
+    {
+        int crossing = list[0].CrossingNumber;
+
+        for(int i = 1; i < list.Count; i++)
+        {
+            int here_crossings = list[i].CrossingNumber;
+            Assert.AreEqual(1, Math.Abs(crossing - here_crossings));
+            crossing = here_crossings;
+        }
+
+        // and we should always get back to zero
+        // nope, not for arbitrary test cases
+        // Assert.AreEqual(0, crossing);
+    }
+
+    readonly Curve l = LineCurve.MakeFromPoints(0, 0, 1, 0);
+    readonly Curve lr = LineCurve.MakeFromPoints(1, 0, 0, 0);
+
+    private void AddIntervals(string code, float dist, List<Intersector.Interval> list)
+    {
+        for(int i = 0; i < code.Length; i++)
+        {
+            if (code[i] == 'p')
+            {
+                list.Add(new Intersector.Interval(l, 0, 1, dist));
+            }
+            else
+            {
+                list.Add(new Intersector.Interval(lr, 0, -1, dist));
+            }
+        }
+
+        FixCrossings(list);
+    }
+
+    [Test]
+    public void TestEliminateCancellingLines()
+    {
+        {
+            // whatever we add separated in distance doesn't get eliminated
+            List<Intersector.Interval> list = new List<Intersector.Interval>();
+
+            AddIntervals("p", 0, list);
+
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+
+            Assert.AreEqual(1, list.Count);
+            CheckCrossings(list);
+
+            AddIntervals("r", 1, list);
+
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+
+            Assert.AreEqual(2, list.Count);
+            CheckCrossings(list);
+
+            AddIntervals("p", 2, list);
+
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+
+            Assert.AreEqual(3, list.Count);
+            CheckCrossings(list);
+        }
+
+        {
+            // multiple lines with the same orientation should not cancel
+            List<Intersector.Interval> list = new List<Intersector.Interval>();
+
+            AddIntervals("pp", 0, list);
+
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+
+            Assert.AreEqual(2, list.Count);
+            CheckCrossings(list);
+
+            AddIntervals("p", 0, list);
+
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+
+            Assert.AreEqual(3, list.Count);
+            CheckCrossings(list);
+        }
+
+        {
+            // two opposite lines at the same point should cancel
+            List<Intersector.Interval> list = new List<Intersector.Interval>();
+
+            AddIntervals("pr", 0, list);
+
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+
+            Assert.AreEqual(0, list.Count);
+        }
+
+        {
+            // multiple pairs of opposite lines should cancel
+            List<Intersector.Interval> list = new List<Intersector.Interval>();
+
+            AddIntervals("prprprpr", 0, list);
+
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+
+            Assert.AreEqual(0, list.Count);
+        }
+
+        {
+            // order should not matter
+            List<Intersector.Interval> list = new List<Intersector.Interval>();
+
+            AddIntervals("pppprrrr", 0, list);
+
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+
+            Assert.AreEqual(0, list.Count);
+
+            AddIntervals("rrrrpppp", 0, list);
+
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+
+            Assert.AreEqual(0, list.Count);
+
+            AddIntervals("pprrprrp", 0, list);
+
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+
+            Assert.AreEqual(0, list.Count);
+        }
+
+        {
+            // any excess +ve or -ve lines should persist
+            List<Intersector.Interval> list = new List<Intersector.Interval>();
+
+            AddIntervals("ppprr", 0, list);
+
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+
+            Assert.AreEqual(1, list.Count);
+            CheckCrossings(list);
+
+            list.Clear();
+
+            AddIntervals("rrrrppppr", 0, list);
+
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+
+            Assert.AreEqual(1, list.Count);
+            CheckCrossings(list);
+
+            list.Clear();
+
+            AddIntervals("prpprrprp", 0, list);
+
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+
+            Assert.AreEqual(1, list.Count);
+            CheckCrossings(list);
+        }
+
+        {
+            // multiple separate groups should behave the same
+            List<Intersector.Interval> list = new List<Intersector.Interval>();
+
+            AddIntervals("prpr", 0, list);
+            AddIntervals("prpr", 1, list);
+
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+
+            Assert.AreEqual(0, list.Count);
+
+            AddIntervals("prppr", 0, list);
+            AddIntervals("prpr", 1, list);
+
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+
+            Assert.AreEqual(1, list.Count);
+            Assert.AreEqual(0, list[0].Distance);
+            CheckCrossings(list);
+
+            list.Clear();
+
+            AddIntervals("prpr", 0, list);
+            AddIntervals("pprpr", 1, list);
+
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+
+            Assert.AreEqual(1, list.Count);
+            Assert.AreEqual(1, list[0].Distance);
+            CheckCrossings(list);
+        }
+
+        {
+            // if there is lots of counting crossings up and down, it should remain stepwise after any cancellings
+            List<Intersector.Interval> list = new List<Intersector.Interval>();
+
+            AddIntervals("prprpp", 0, list);
+            AddIntervals("prpr", 1, list);
+            AddIntervals("prrpr", 2, list);
+            AddIntervals("r", 3, list);
+
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+
+            Assert.AreEqual(4, list.Count);
+            CheckCrossings(list);
+        }
     }
 
     //// This one asserts because it somehow tries to make a discontinuous loop

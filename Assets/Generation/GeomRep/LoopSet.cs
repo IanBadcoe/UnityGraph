@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Assets.Generation.GeomRep
 {
+    [System.Diagnostics.DebuggerDisplay("Loops = {Count}")]
     public class LoopSet : List<Loop>
     {
         public LoopSet()
@@ -13,6 +15,14 @@ namespace Assets.Generation.GeomRep
         public LoopSet(Loop loop)
         {
             Add(loop);
+        }
+
+        public LoopSet(IEnumerable<Loop> loops)
+        {
+            foreach(var l in loops)
+            {
+                Add(l);
+            }
         }
 
         public override int GetHashCode()
@@ -61,6 +71,18 @@ namespace Assets.Generation.GeomRep
         public Box2 GetBounds()
         {
             return this.Aggregate(new Box2(), (b, l) => b.Union(l.GetBounds()));
+        }
+
+        public LoopSet Reversed()
+        {
+            // whether to reverse the order of the loops of not, in theory order in a loopset doesn't matter???
+            return new LoopSet(this.Select(l => l.Reversed()));
+        }
+
+        // just does dumb concatenation
+        public LoopSet Concatenate(LoopSet other)
+        {
+            return new LoopSet(this.Concat(other));
         }
     }
 }
