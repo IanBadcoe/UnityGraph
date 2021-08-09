@@ -132,8 +132,7 @@ namespace Assets.Generation.Gen
 
             alglib.mincgoptimize(opt_state, EnergyFunc, ReportFunc, null);
 
-            alglib.mincgreport report;
-            alglib.mincgresults(opt_state, out m_pars, out report);
+            alglib.mincgresults(opt_state, out m_pars, out alglib.mincgreport report);
             // optimiser seems restart from the original pars, unless we explicitly tell it to restart from
             // it's current end position
             alglib.mincgrestartfrom(opt_state, m_pars);
@@ -148,8 +147,7 @@ namespace Assets.Generation.Gen
             m_iterations += report.iterationscount;
 
 #if DEBUG
-            alglib.optguardreport ogrep;
-            alglib.mincgoptguardresults(opt_state, out ogrep);
+            alglib.mincgoptguardresults(opt_state, out alglib.optguardreport ogrep);
 
             // I *believe* my energies are c1 continuous (they are piecewise functions of the form
             // d > d0 : 0

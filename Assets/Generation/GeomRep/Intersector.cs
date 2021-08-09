@@ -654,8 +654,7 @@ namespace Assets.Generation.GeomRep
                 open.Remove(curr_ac);
 
                 // look for a splice that ends this curve
-                Splice splice;
-                endSpliceMap.TryGetValue(c, out splice);
+                endSpliceMap.TryGetValue(c, out Splice splice);
 
                 // if no splice we just follow the chain of ACs
                 if (splice == null)

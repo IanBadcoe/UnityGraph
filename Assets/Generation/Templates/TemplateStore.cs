@@ -31,9 +31,8 @@ namespace Assets.Generation.Templates
 
         public Template FindByName(string name)
         {
-            Template ret;
 
-            if (m_templates.TryGetValue(name, out ret))
+            if (m_templates.TryGetValue(name, out Template ret))
             {
                 return ret;
             }

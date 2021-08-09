@@ -48,9 +48,8 @@ namespace Assets.Behaviour.Drawing
 
             foreach (INode node in graph.GetAllNodes())
             {
-                GameObject drawer;
 
-                if (AllDrawers.TryGetValue(node, out drawer))
+                if (AllDrawers.TryGetValue(node, out GameObject drawer))
                 {
                     n_dict[node] = drawer;
                 }
@@ -64,9 +63,8 @@ namespace Assets.Behaviour.Drawing
 
             foreach (DirectedEdge de in graph.GetAllEdges())
             {
-                GameObject drawer;
 
-                if (AllDrawers.TryGetValue(de, out drawer))
+                if (AllDrawers.TryGetValue(de, out GameObject drawer))
                 {
                     n_dict[de] = drawer;
                 }

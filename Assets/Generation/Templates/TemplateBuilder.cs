@@ -187,8 +187,7 @@ namespace Assets.Generation.Templates
 
         public NodeRecord FindNodeRecord(string name)
         {
-            NodeRecord ret;
-            if (m_nodes.TryGetValue(name, out ret))
+            if (m_nodes.TryGetValue(name, out NodeRecord ret))
             {
                 return ret;
             }
@@ -198,8 +197,7 @@ namespace Assets.Generation.Templates
 
         public ConnectionRecord FindConnectionRecord(string from, string to)
         {
-            ConnectionRecord ret;
-            if (m_connections.TryGetValue(Template.MakeConnectionName(from, to), out ret))
+            if (m_connections.TryGetValue(Template.MakeConnectionName(from, to), out ConnectionRecord ret))
             {
                 return ret;
             }
