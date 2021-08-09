@@ -125,21 +125,7 @@ namespace Assets.Generation.GeomRep
             }
 
             // needing to check +ve/-ve curve type shoots any simple early-outs in the foot
-            //// simple case, also covers us being handed the same instance twice
-            //if (ls1.Equals(ls2))
-            //{
-            //    return ls1;
-            //}
-
-            //if (ls1.Count == 0)
-            //{
-            //    return ls2;
-            //}
-
-            //if (ls2.Count == 0)
-            //{
-            //    return ls1;
-            //}
+            // ...
 
             // used later as an id for which loop an AnnotationCurve comes from
             int loop_count = 0;
@@ -166,31 +152,8 @@ namespace Assets.Generation.GeomRep
             // first, an easy bit, any loops from either set whose bounding boxes are disjunct from all loops in the
             // other set, they have no influence on any other loops and can be simply copied unchanged into
             // the output
-
-            //Dictionary<IList<Curve>, Box2> bound_map1 = new Dictionary<IList<Curve>, Box2>();
-
-            //foreach (IList<Curve> alc1 in working_loops1.Values)
-            //{
-            //    Box2 bound = alc1.Select(l => l.BoundingArea)
-            //        .Aggregate(new Box2(), (a, b) => a.Union(b));
-
-            //    bound_map1.Add(alc1, bound);
-            //}
-
-            //Dictionary<IList<Curve>, Box2> bound_map2 = new Dictionary<IList<Curve>, Box2>();
-
-            //foreach (IList<Curve> alc2 in working_loops2.Values)
-            //{
-            //    Box2 bound = alc2.Select(l => l.BoundingArea)
-            //        .Aggregate(new Box2(), (a, b) => a.Union(b));
-
-            //    bound_map2.Add(alc2, bound);
-            //}
-
-            // likewise this wouldn't distinguish -ve/+ve curves, which is required for
-            // UnionType switching
-            //RemoveEasyLoops(working_loops1, ret, bound_map2.Values, bound_map1);
-            //RemoveEasyLoops(working_loops2, ret, bound_map1.Values, bound_map2);
+            //
+            // could still do this, but would have to select only the +ve or -ve loops according to UnionType
 
             HashSet<Tuple<int, int>> splittings = new HashSet<Tuple<int, int>>();
 
@@ -210,6 +173,16 @@ namespace Assets.Generation.GeomRep
                     // curves that wholly or partly overlay each other do not intersect
                     // but we still need to split them because we need to discard some overlapping parts
                     // (but not necessarily the whole curve)
+                    //
+                    // mostly SplitCurvesAtIntersections catches these but if we had something like
+                    //
+                    //        |                 |
+                    //        +-----+-----+-----+
+                    // +-------------------------------+
+                    // |                               |
+                    //
+                    // (where there is no actual gap between the horizontal lines)
+                    // then this catches the need to split the long line
                     if (SplitCurvesAtCoincidences(alc1, alc2, 1e-4f))
                     {
                         splittings.Add(new Tuple<int, int>(i, j));
@@ -602,41 +575,6 @@ namespace Assets.Generation.GeomRep
             }
         }
 
-        // non-private only for testing
-        void RemoveEasyLoops(Dictionary<int, IList<Curve>> working_loops,
-                             LoopSet ret,
-                             ICollection<Box2> other_bounds,
-                             Dictionary<IList<Curve>, Box2> bound_map)
-        {
-            List<int> keys = working_loops.Keys.ToList();
-
-            foreach (int i in keys)
-            {
-                IList<Curve> alc1 = working_loops[i];
-
-                Box2 bound = bound_map[alc1];
-
-                bool hits = false;
-
-                foreach (Box2 b in other_bounds)
-                {
-                    if (!bound.Disjoint(b))
-                    {
-                        hits = true;
-                        break;
-                    }
-                }
-
-                if (!hits)
-                {
-                    ret.Add(new Loop(alc1));
-                    working_loops.Remove(i);
-                    // won't need the bounds of this again, either
-                    bound_map.Remove(alc1);
-                }
-            }
-        }
-
         Loop ExtractLoop(HashSet<AnnotatedCurve> open,
                          AnnotatedCurve start_ac,
                          Dictionary<Curve, Splice> endSpliceMap)
@@ -752,6 +690,9 @@ namespace Assets.Generation.GeomRep
             }
         }
 
+        // this is an interval in the sense that CrossingNumber describes the conditions on the
+        // stabbling line *after* we intersect Curve and Distance at an angle of DotProduct
+        // so it is more like "LowerBoundaryOfIntervalOnStabbingLine" OK?
         [System.Diagnostics.DebuggerDisplay("Curve = {Curve}, Crossings = {CrossingNumber}, Dot = {DotProduct}, Dist = {Distance}")]
         public struct Interval
         {
@@ -1164,70 +1105,4 @@ namespace Assets.Generation.GeomRep
             }
         }
     }
-
-    //      if (visualise)
-    //      {
-    //         Random r = new Random(1);
-    //
-    //         Main.clear(255);
-    //         XY pnt = working_loops1.get(0).get(2).startPos();
-    //         Area size = new Area(pnt.minus(new XY(.001, .001)),
-    //               pnt.plus(new XY(.001, .001)));
-    ////         engine.Area size = bounds;
-    //         Main.scaleTo(size);
-    //
-    //         Main.fill(r.nextInt(256), r.nextInt(256), 256);
-    //         for(Splice s : endSpliceMap.values())
-    //         {
-    //            Main.circle(s.Loop1Out.Curve.startPos().X,
-    //                  s.Loop1Out.Curve.startPos().Y,
-    //                  size.DX() * 0.004);
-    //         }
-    //
-    //         for(List<Curve> alc1 : working_loops1.values())
-    //         {
-    //            Main.strokeWidth(size.DX() * 0.001);
-    //            Main.stroke(256, r.nextInt(128), r.nextInt(128));
-    //            Loop l = new Loop(alc1);
-    //            Main.drawLoopPoints(l.facet(.3));
-    //
-    //            for(Curve c : l.getCurves())
-    //            {
-    //               XY end = c.endPos();
-    //               Main.circle(end.X, end.Y, size.DX() * 0.002);
-    //            }
-    //         }
-    //
-    //         for (List<Curve> alc2 : working_loops2.values())
-    //         {
-    //            Main.stroke(r.nextInt(128), 256, r.nextInt(128));
-    //            Loop l = new Loop(alc2);
-    //            Main.drawLoopPoints(l.facet(.3));
-    //
-    //            for(Curve c : l.getCurves())
-    //            {
-    //               XY end = c.endPos();
-    //               Main.circle(end.X, end.Y, size.DX() * 0.002);
-    //            }
-    //         }
-    //      }
-
-    //      // don't keep eating random numbers if we're visualising the same frame over and over
-    //      if (visualise && m_visualisation_line != null)
-    //      {
-    //         Main.stroke(0, 0, 0);
-    //         Main.line(m_visualisation_line.startPos(), m_visualisation_line.endPos());
-    //
-    //         return null;
-    //      }
-
-    //            if (visualise)
-    //            {
-    //               m_visualisation_line = lc;
-    //               Main.stroke(0, 0, 0);
-    //               Main.line(m_visualisation_line.startPos(), m_visualisation_line.endPos());
-    //               return null;
-    //            }
-
-    // private static LineCurve m_visualisation_line;
 }
