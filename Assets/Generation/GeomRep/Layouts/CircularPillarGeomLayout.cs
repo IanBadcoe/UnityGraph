@@ -16,8 +16,10 @@ namespace Assets.Generation.GeomRep.Layouts
 
         public override LoopSet MakeDetailGeometry(INode node)
         {
-            LoopSet ret = new LoopSet();
-            ret.Add(new Loop(new CircleCurve(node.Position, node.Radius / 2, RotationDirection.Reverse)));
+            LoopSet ret = new LoopSet
+            {
+                new Loop(new CircleCurve(node.Position, node.Radius / 2, RotationDirection.Reverse))
+            };
 
             return ret;
         }

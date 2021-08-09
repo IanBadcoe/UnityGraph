@@ -39,8 +39,10 @@ namespace Assets.Behaviour
         {
             Graph graph = new Graph();
 
-            m_generator = new Generator(graph, RequiredSize);
-            m_generator.Config = Config;
+            m_generator = new Generator(graph, RequiredSize)
+            {
+                Config = Config
+            };
         }
 
         private void Start()

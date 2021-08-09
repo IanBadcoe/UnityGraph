@@ -68,9 +68,10 @@ namespace Assets.Generation.Templates
 
             // here we might check codes, if we haven't already
 
-            Dictionary<NodeRecord, INode> template_to_graph = new Dictionary<NodeRecord, INode>();
-
-            template_to_graph.Add(FindNodeRecord("<target>"), target);
+            Dictionary<NodeRecord, INode> template_to_graph = new Dictionary<NodeRecord, INode>
+            {
+                { FindNodeRecord("<target>"), target }
+            };
 
             // create nodes for each we are adding and map to their NodeRecords
             foreach (NodeRecord nr in m_nodes.Values)
