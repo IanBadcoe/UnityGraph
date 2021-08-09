@@ -99,11 +99,14 @@ namespace Assets.Generation.GeomRep
 
         public abstract bool Equals(Curve c, float tol);
 
-        public override bool Equals(object o) {
+        public override bool Equals(object o)
+        {
             Curve c = o as Curve;
 
             if (c == null)
+            {
                 return false;
+            }
 
             return Equals(c, 0.0f);
         }

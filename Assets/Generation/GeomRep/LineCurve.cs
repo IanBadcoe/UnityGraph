@@ -174,7 +174,9 @@ namespace Assets.Generation.GeomRep
         {
             // we can never split ourselves
             if (Equals(c2, tol))
+            {
                 return null;
+            }
 
             if (!(c2 is LineCurve))
             {
@@ -210,13 +212,19 @@ namespace Assets.Generation.GeomRep
             // if there was no split, we have only the original curve in the output,
             // and no need to return that...
             if (ret1.Count == 1)
+            {
                 ret1 = null;
+            }
 
             if (ret2.Count == 1)
+            {
                 ret2 = null;
+            }
 
             if (ret1 == null && ret2 == null)
+            {
                 return null;
+            }
 
             return new Tuple<IList<Curve>, IList<Curve>>(ret1, ret2);
         }
@@ -253,7 +261,7 @@ namespace Assets.Generation.GeomRep
                 Dist = dist;
             }
 
-            public static NormalAndDistLineParams operator-(NormalAndDistLineParams val)
+            public static NormalAndDistLineParams operator -(NormalAndDistLineParams val)
             {
                 return new NormalAndDistLineParams(-val.Normal, -val.Dist);
             }
@@ -261,7 +269,9 @@ namespace Assets.Generation.GeomRep
             private bool Equals_Internal(NormalAndDistLineParams other, float tol)
             {
                 if (Mathf.Abs(other.Dist - Dist) > tol)
+                {
                     return false;
+                }
 
                 return (other.Normal - Normal).magnitude <= tol;
             }
@@ -277,7 +287,9 @@ namespace Assets.Generation.GeomRep
             public override bool Equals(object o)
             {
                 if (!(o is NormalAndDistLineParams))
+                {
                     return false;
+                }
 
                 var other = o as NormalAndDistLineParams;
 
@@ -310,7 +322,9 @@ namespace Assets.Generation.GeomRep
             LineCurve lc = curve as LineCurve;
 
             if (lc == null)
+            {
                 return false;
+            }
 
             // this returns a normalised return, so the direction and dist will be the same
             // even if the lines run in opposite directions

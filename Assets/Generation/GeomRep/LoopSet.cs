@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Assets.Generation.GeomRep
@@ -19,7 +18,7 @@ namespace Assets.Generation.GeomRep
 
         public LoopSet(IEnumerable<Loop> loops)
         {
-            foreach(var l in loops)
+            foreach (var l in loops)
             {
                 Add(l);
             }

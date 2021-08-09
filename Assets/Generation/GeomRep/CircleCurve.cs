@@ -61,7 +61,7 @@ namespace Assets.Generation.GeomRep
         public CircleCurve(Vector2 position, float radius,
                            float start_angle, float end_angle,
                            RotationDirection rotation)
-            : this (position, radius, new AngleRange(start_angle, end_angle), rotation)
+            : this(position, radius, new AngleRange(start_angle, end_angle), rotation)
         {
         }
 
@@ -122,7 +122,9 @@ namespace Assets.Generation.GeomRep
             CircleCurve cc = (CircleCurve)c;
 
             if (!AngleRange.Equals(cc.AngleRange, tol))
+            {
                 return false;
+            }
 
             return Position.Equals(cc.Position)
                   && Radius == cc.Radius
@@ -267,25 +269,33 @@ namespace Assets.Generation.GeomRep
         public override Tuple<IList<Curve>, IList<Curve>> SplitCoincidentCurves(Curve c2, float tol)
         {
             if (!(c2 is CircleCurve))
+            {
                 return null;
+            }
 
             var cc2 = c2 as CircleCurve;
 
             if ((Position - cc2.Position).magnitude > tol)
+            {
                 return null;
+            }
 
             if (Mathf.Abs(Radius - cc2.Radius) > tol)
+            {
                 return null;
+            }
 
             var common_range = AngleRange.ClockAwareRangeOverlap(cc2.AngleRange, tol);
 
             if (common_range == null)
+            {
                 return null;
+            }
 
             IList<Curve> ret1 = new List<Curve> { this };
             IList<Curve> ret2 = new List<Curve> { c2 };
 
-            foreach(var r in common_range)
+            foreach (var r in common_range)
             {
                 ConditionalSplitCurveList(tol, ret1, r.Start);
                 ConditionalSplitCurveList(tol, ret1, r.End);
@@ -296,13 +306,19 @@ namespace Assets.Generation.GeomRep
             // if there was no split, we have only the original curve in the output,
             // and no need to return that...
             if (ret1.Count == 1)
+            {
                 ret1 = null;
+            }
 
             if (ret2.Count == 1)
+            {
                 ret2 = null;
+            }
 
             if (ret1 == null && ret2 == null)
+            {
                 return null;
+            }
 
             return new Tuple<IList<Curve>, IList<Curve>>(ret1, ret2);
         }
@@ -338,7 +354,9 @@ namespace Assets.Generation.GeomRep
             CircleCurve cc = curve as CircleCurve;
 
             if (cc == null)
+            {
                 return false;
+            }
 
             return Mathf.Abs(Radius - cc.Radius) < tol
                 && (Position - cc.Position).magnitude < tol;

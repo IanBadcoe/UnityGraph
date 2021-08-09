@@ -529,7 +529,7 @@ namespace Assets.Generation.GeomRep
         // (e.g. approximating zero separation)
         // we can cancel any pairs that lie in exactly opposite directions
         // (because we have already snipped curves to separate coincident subsections)
-        public void EliminateCancellingLines(List<Interval> intervals, 
+        public void EliminateCancellingLines(List<Interval> intervals,
             HashSet<AnnotatedCurve> open, float tol,
             Dictionary<Curve, AnnotatedCurve> forward_annotations_map)
         {
@@ -538,13 +538,15 @@ namespace Assets.Generation.GeomRep
             while (start < intervals.Count)
             {
                 int end = 0;
-                for(int i = start + 1; i < intervals.Count; i++)
+                for (int i = start + 1; i < intervals.Count; i++)
                 {
                     Interval int1 = intervals[i - 1];
                     Interval int2 = intervals[i];
 
                     if (int2.Distance - int1.Distance >= tol)
+                    {
                         break;
+                    }
 
                     end = i + 1;
                 }
@@ -1090,7 +1092,7 @@ namespace Assets.Generation.GeomRep
 
                         c1 = working_loop1[i] = ret.Item1[0];
 
-                        for(int n_ins = 1; n_ins < ret.Item1.Count; n_ins++)
+                        for (int n_ins = 1; n_ins < ret.Item1.Count; n_ins++)
                         {
                             working_loop1.Insert(i + n_ins, ret.Item1[n_ins]);
                         }
