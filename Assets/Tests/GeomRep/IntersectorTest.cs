@@ -109,7 +109,7 @@ public class IntersectorTest
         curves.Add(cd);
         curves.Add(ce);
 
-        Dictionary<Curve, Intersector.AnnotatedCurve> forward_annotations_map = new Dictionary<Curve, Intersector.AnnotatedCurve>();
+        Dictionary<Curve, Intersector.AnnotatedCurve> forward_annotations_map = Intersector.MakeForwardAnnotationsMap();
 
         m_intersector.BuildAnnotationChains(curves, 1, forward_annotations_map);
 
@@ -119,12 +119,6 @@ public class IntersectorTest
             Assert.IsNotNull(forward_annotations_map[c]);
             Assert.AreEqual(1, forward_annotations_map[c].LoopNumber);
         }
-
-        Assert.AreEqual(cb, forward_annotations_map[ca].Next.Curve);
-        Assert.AreEqual(cc, forward_annotations_map[cb].Next.Curve);
-        Assert.AreEqual(cd, forward_annotations_map[cc].Next.Curve);
-        Assert.AreEqual(ce, forward_annotations_map[cd].Next.Curve);
-        Assert.AreEqual(ca, forward_annotations_map[ce].Next.Curve);
     }
 
     [Test]
@@ -247,71 +241,123 @@ public class IntersectorTest
     [Test]
     public void TestFindSplices()
     {
-        Curve cc1 = new CircleCurve(new Vector2(), 1);
-        Curve cc2 = new CircleCurve(new Vector2(1, 0), 1);
-
-        List<Curve> curves1 = new List<Curve>();
-        curves1.Add(cc1);
-
-        List<Curve> curves2 = new List<Curve>();
-        curves2.Add(cc2);
-
-        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
-
-        Dictionary<Curve, Intersector.AnnotatedCurve> forward_annotations_map = new Dictionary<Curve, Intersector.AnnotatedCurve>();
-
-        m_intersector.BuildAnnotationChains(curves1, 1,
-              forward_annotations_map);
-
-        m_intersector.BuildAnnotationChains(curves2, 2,
-              forward_annotations_map);
-
-        Dictionary<Curve, Intersector.Splice> endSpliceMap = new Dictionary<Curve, Intersector.Splice>();
-
-        m_intersector.FindSplices(curves1, curves2,
-              forward_annotations_map,
-              endSpliceMap,
-              null, null);
-
-        // two splices, with two in and two out curves each
-        Assert.AreEqual(4, endSpliceMap.Count);
-
-        HashSet<Intersector.Splice> unique = new HashSet<Intersector.Splice>(endSpliceMap.Values);
-
-        Assert.AreEqual(2, unique.Count);
-
-        foreach (Intersector.Splice s in unique)
         {
-            HashSet<Intersector.AnnotatedCurve> l1fset = new HashSet<Intersector.AnnotatedCurve>();
-            HashSet<Intersector.AnnotatedCurve> l2fset = new HashSet<Intersector.AnnotatedCurve>();
+            Curve cc1 = new CircleCurve(new Vector2(), 1);
+            Curve cc2 = new CircleCurve(new Vector2(1, 0), 1);
 
-            Assert.AreEqual(2, s.Count);
+            List<Curve> curves1 = new List<Curve>();
+            curves1.Add(cc1);
 
-            Intersector.AnnotatedCurve acl1f = s[0];
-            Intersector.AnnotatedCurve acl2f = s[1];
+            List<Curve> curves2 = new List<Curve>();
+            curves2.Add(cc2);
 
-            for (int i = 0; i < 4; i++)
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
+
+            Dictionary<Curve, Intersector.AnnotatedCurve> forward_annotations_map = Intersector.MakeForwardAnnotationsMap();
+
+            m_intersector.BuildAnnotationChains(curves1, 1,
+                  forward_annotations_map);
+
+            m_intersector.BuildAnnotationChains(curves2, 2,
+                  forward_annotations_map);
+
+            var open = Intersector.MakeOpenSet(forward_annotations_map);
+
+            Dictionary<Curve, Intersector.Splice> endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            List<Curve> all_curves = curves1.Concat(curves2).ToList();
+
+            var clustered_joints = m_intersector.ClusterJoints(
+                new HashSet<Vector2>(
+                    all_curves.SelectMany(c => new List<Vector2> { c.StartPos, c.EndPos })), 1e-4f);
+
+            m_intersector.FindSplices(open, clustered_joints, endSpliceMap);
+
+            // four splices:
+            // 2 on the 12 o'clock original breaks in the two curves with one in and one out
+            // 2 on the new intersections, with 2 ins and 2 outs
+            Assert.AreEqual(6, endSpliceMap.Count);
+
+            HashSet<Intersector.Splice> unique = new HashSet<Intersector.Splice>(endSpliceMap.Values);
+
+            Assert.AreEqual(4, unique.Count);
+
+            foreach(var c in all_curves)
             {
-                l1fset.Add(acl1f);
-                l2fset.Add(acl2f);
+                Assert.IsTrue(endSpliceMap.Keys.Contains(c));
 
-                acl1f = acl1f.Next;
-                acl2f = acl2f.Next;
+                foreach(var c2 in endSpliceMap[c])
+                {
+                    // everything in our endSpliceMap should start very close to our end...
+                    Assert.IsTrue((c.EndPos - c2.Curve.StartPos).magnitude < 1.5e-4f);
+                }
             }
+        }
 
-            // although we stepped four times, the loops are of length 3 and we
-            // shouldn't have found any more AnnotationCurves
-            Assert.AreEqual(3, l1fset.Count);
-            Assert.AreEqual(3, l2fset.Count);
+        {
+            Curve cc1 = new CircleCurve(new Vector2(), 1);
+            Curve cc2 = new CircleCurve(new Vector2(1, 0), 1);
+            Loop l3 = Loop.MakeRect(0.5f, -2, 3, 2);
 
-            // loops of AnnotationCurves should be unique
-            Assert.IsFalse(l1fset.Overlaps(l2fset));
+            List<Curve> curves1 = new List<Curve> { cc1 };
 
-            HashSet<Curve> l1fcset = new HashSet<Curve>(l1fset.Select(x => x.Curve));
-            HashSet<Curve> l2fcset = new HashSet<Curve>(l2fset.Select(x => x.Curve));
+            List<Curve> curves2 = new List<Curve> { cc2 };
 
-            // and l1 and l2 don't contain any of the same curves
-            Assert.IsFalse(l1fcset.Overlaps(l2fcset));
+            List<Curve> curves3 = l3.Curves.ToList();
+
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
+            m_intersector.SplitCurvesAtIntersections(curves1, curves3, 1e-5f);
+            m_intersector.SplitCurvesAtIntersections(curves2, curves3, 1e-5f);
+
+            Dictionary<Curve, Intersector.AnnotatedCurve> forward_annotations_map = Intersector.MakeForwardAnnotationsMap();
+
+            m_intersector.BuildAnnotationChains(curves1, 1,
+                  forward_annotations_map);
+
+            m_intersector.BuildAnnotationChains(curves2, 2,
+                  forward_annotations_map);
+
+            m_intersector.BuildAnnotationChains(curves3, 3,
+                  forward_annotations_map);
+
+            var open = Intersector.MakeOpenSet(forward_annotations_map);
+
+            Dictionary<Curve, Intersector.Splice> endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            var clustered_joints = m_intersector.ClusterJoints(
+                new HashSet<Vector2>(
+                    curves1
+                        .Concat(curves2)
+                        .Concat(curves3)
+                        .SelectMany(c => new List<Vector2> { c.StartPos, c.EndPos })),
+                1e-4f);
+
+            Assert.AreEqual(8, clustered_joints.Count);
+
+            m_intersector.FindSplices(open, clustered_joints, endSpliceMap);
+
+            // eight splices:
+            // 2 on the 12 o'clock original breaks in the two curves with one in and one out
+            // 4 around the rectangle with one in and one out
+            // 2 on the new intersections, with 3 ins and 3 outs
+
+            // means 10 curves running into a splice
+            Assert.AreEqual(12, endSpliceMap.Count);
+
+            HashSet<Intersector.Splice> unique = new HashSet<Intersector.Splice>(endSpliceMap.Values);
+
+            Assert.AreEqual(8, unique.Count);
+
+            foreach (Intersector.Splice s in unique)
+            {
+                HashSet<int> loop_nums = new HashSet<int>(s.Select(x => x.LoopNumber));
+
+                // each loop should feature up to once in each splice
+                Assert.AreEqual(s.Select(x => x.LoopNumber).Count(), loop_nums.Count);
+
+                // the way we laid this out, there are no splices where two things meet, just 1 or 3
+                Assert.IsTrue(loop_nums.Count == 1 || loop_nums.Count == 3);
+            }
         }
     }
 
@@ -322,7 +368,7 @@ public class IntersectorTest
         {
             CircleCurve cc = new CircleCurve(new Vector2(), 5);
 
-            HashSet<Curve> all_curves = new HashSet<Curve> { cc };
+            HashSet<Curve> all_curves = Intersector.MakeAllCurvesSet( cc );
 
             HashSet<Vector2> curve_joints = new HashSet<Vector2>();
             curve_joints.Add(cc.StartPos);
@@ -354,11 +400,12 @@ public class IntersectorTest
             CircleCurve cc1 = new CircleCurve(new Vector2(), 5);
             CircleCurve cc2 = new CircleCurve(new Vector2(), 3);
 
-            HashSet<Curve> all_curves = new HashSet<Curve>
-            {
-                cc1,
-                cc2
-            };
+            HashSet<Curve> all_curves = Intersector.MakeAllCurvesSet(new List<Curve>
+                {
+                    cc1,
+                    cc2
+                }
+            );
 
             HashSet<Vector2> curve_joints = new HashSet<Vector2>
             {
@@ -399,11 +446,12 @@ public class IntersectorTest
             CircleCurve cc1 = new CircleCurve(new Vector2(), 5);
             CircleCurve cc2 = new CircleCurve(new Vector2(), 3, RotationDirection.Reverse);
 
-            HashSet<Curve> all_curves = new HashSet<Curve>
-            {
-                cc1,
-                cc2
-            };
+            HashSet<Curve> all_curves = Intersector.MakeAllCurvesSet(new List<Curve>
+                {
+                    cc1,
+                    cc2
+                }
+            );
 
             HashSet<Vector2> curve_joints = new HashSet<Vector2>
             {
@@ -452,11 +500,12 @@ public class IntersectorTest
             CircleCurve cc1 = new CircleCurve(new Vector2(), 5, 0, Mathf.PI);
             CircleCurve cc2 = new CircleCurve(new Vector2(), 5, Mathf.PI, 2 * Mathf.PI);
 
-            HashSet<Curve> all_curves = new HashSet<Curve>
-            {
-                cc1,
-                cc2
-            };
+            HashSet<Curve> all_curves = Intersector.MakeAllCurvesSet(new List<Curve>
+                {
+                    cc1,
+                    cc2
+                }
+            );
 
             LineCurve lc = new LineCurve(new Vector2(-10, 0), new Vector2(1, 0), 20);
 
@@ -479,10 +528,11 @@ public class IntersectorTest
         {
             CircleCurve cc1 = new CircleCurve(new Vector2(), 5);
 
-            HashSet<Curve> all_curves = new HashSet<Curve>
-            {
-                cc1
-            };
+            HashSet<Curve> all_curves = Intersector.MakeAllCurvesSet(new List<Curve>
+                {
+                    cc1
+                }
+            );
 
             LineCurve lc = new LineCurve(new Vector2(-10, 0), new Vector2(0, 1), 20);
 
@@ -498,10 +548,11 @@ public class IntersectorTest
         {
             CircleCurve cc1 = new CircleCurve(new Vector2(), 5);
 
-            HashSet<Curve> all_curves = new HashSet<Curve>
-            {
-                cc1
-            };
+            HashSet<Curve> all_curves = Intersector.MakeAllCurvesSet(new List<Curve>
+                {
+                    cc1
+                }
+            );
 
             LineCurve lc = new LineCurve(new Vector2(-5, -5), new Vector2(0, 1), 20);
 
@@ -956,6 +1007,46 @@ public class IntersectorTest
 
             Assert.IsTrue(caught);
         }
+
+        {
+            // iron cross has four possible outputs from one curve
+            var pcentre = new Vector2();
+            var p1tl = new Vector2(-1.0f, 0.5f);
+            var p2tl = new Vector2(-0.5f, 1.0f);
+            var p1tr = new Vector2(0.5f, 1.0f);
+            var p2tr = new Vector2(1.0f, 0.5f);
+            var p1bl = new Vector2(1.0f, -0.5f);
+            var p2bl = new Vector2(0.5f, -1.0f);
+            var p1br = new Vector2(-0.5f, -1.0f);
+            var p2br = new Vector2(-1.0f, -0.5f);
+
+            Loop l1 = Loop.MakePolygon(new List<Vector2>
+            {
+                pcentre, p1tl, p2tl,
+            }, RotationDirection.Forwards);
+
+            Loop l2 = Loop.MakePolygon(new List<Vector2>
+            {
+                pcentre, p1tr, p2tr,
+            }, RotationDirection.Forwards);
+
+            Loop l3 = Loop.MakePolygon(new List<Vector2>
+            {
+                pcentre, p1br, p2br,
+            }, RotationDirection.Forwards);
+
+            Loop l4 = Loop.MakePolygon(new List<Vector2>
+            {
+                pcentre, p1bl, p2bl,
+            }, RotationDirection.Forwards);
+
+            LoopSet ls1 = new LoopSet
+            {
+                l1, l2, l3, l4
+            };
+
+            m_intersector.Union(new LoopSet(), ls1, 1e-4f, new ClRand(1));
+        }
     }
 
     [Test]
@@ -1271,9 +1362,6 @@ public class IntersectorTest
 
         {
             // degenerate U should disappear
-            //
-            // throws, actually, as it triggers curve intersection detection
-            // technically that is wrong, but unless I need to support it...
             
             Vector2 p1 = new Vector2(0, 0);
             Vector2 p2 = new Vector2(1, 0);
@@ -1298,31 +1386,13 @@ public class IntersectorTest
                 ls1[0].Reversed()
             );
 
-            int catches = 0;
+            LoopSet merged = m_intersector.Union(new LoopSet(), ls1, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
 
-            // with the old implementation, one out of forwards and backwards on this should fail
-            // (because the order of presenting the two curves will make it look like a zero-sized
-            // +ve poly or a zero-sized -ve poly...)
+            Assert.AreEqual(0, merged.Count);
 
-            try
-            {
-                LoopSet merged = m_intersector.Union(new LoopSet(), ls1, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
-            }
-            catch (ArgumentException)
-            {
-                catches += 1;
-            }
+            merged = m_intersector.Union(new LoopSet(), ls1r, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
 
-            try
-            {
-                LoopSet merged = m_intersector.Union(new LoopSet(), ls1r, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
-            }
-            catch (ArgumentException)
-            {
-                catches += 1;
-            }
-
-            Assert.AreEqual(2, catches);
+            Assert.AreEqual(0, merged.Count);
         }
 
         // similarly an attempt at:
@@ -1445,8 +1515,8 @@ public class IntersectorTest
 
         {
             // rects that take out parts of each other should work
-            LoopSet ls1 = new LoopSet(LineCurve.MakeRect(0, 0, 20, 20));
-            LoopSet ls2 = new LoopSet(LineCurve.MakeRect(5, 0, 15, 20).Reversed());
+            LoopSet ls1 = new LoopSet(Loop.MakeRect(0, 0, 20, 20));
+            LoopSet ls2 = new LoopSet(Loop.MakeRect(5, 0, 15, 20).Reversed());
 
             LoopSet merged = m_intersector.Union(ls1, ls2, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
 
@@ -1470,8 +1540,8 @@ public class IntersectorTest
 
         {
             // rects that abut should work
-            LoopSet ls1 = new LoopSet(LineCurve.MakeRect(0, 0, 20, 20));
-            LoopSet ls2 = new LoopSet(LineCurve.MakeRect(5, -10, 15, 0).Reversed());
+            LoopSet ls1 = new LoopSet(Loop.MakeRect(0, 0, 20, 20));
+            LoopSet ls2 = new LoopSet(Loop.MakeRect(5, -10, 15, 0).Reversed());
 
             // -ve touching rect should just dissappear
             LoopSet merged = m_intersector.Union(ls1, ls2, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
@@ -1718,6 +1788,93 @@ public class IntersectorTest
 
             Assert.AreEqual(4, list.Count);
             CheckCrossings(list);
+        }
+    }
+
+    [Test]
+    public void TestClusterJoints()
+    {
+        {
+            // widely separated points should come through unchanged
+            HashSet<Vector2> set = new HashSet<Vector2>
+            {
+                new Vector2(0, 0)
+            };
+
+            var ret = m_intersector.ClusterJoints(set, 1.0f);
+
+            Assert.AreEqual(1, ret.Count);
+            Assert.AreEqual(set, ret);
+
+            // --
+
+            set.Add(new Vector2(10, 0));
+
+            ret = m_intersector.ClusterJoints(set, 1.0f);
+
+            Assert.AreEqual(2, ret.Count);
+            Assert.AreEqual(set, ret);
+
+            set.Add(new Vector2(10, 10));
+
+            ret = m_intersector.ClusterJoints(set, 1.0f);
+
+            Assert.AreEqual(3, ret.Count);
+            Assert.AreEqual(set, ret);
+        }
+
+        {
+            // clusters should decay into their centroids
+            HashSet<Vector2> set = new HashSet<Vector2>
+            {
+                new Vector2(0, 0),
+                new Vector2(1, 0),
+                new Vector2(1, 1),
+                new Vector2(0, 1),
+
+                new Vector2(10, 0),
+                new Vector2(11, 0),
+                new Vector2(11, 1),
+                new Vector2(10, 1),
+
+                new Vector2(0, 10),
+                new Vector2(1, 10),
+                new Vector2(1, 11),
+                new Vector2(0, 11),
+            };
+
+            var ret = m_intersector.ClusterJoints(set, 2.0f);
+
+            Assert.AreEqual(3, ret.Count);
+            Assert.IsTrue(ret.Contains(new Vector2(0.5f, 0.5f)));
+            Assert.IsTrue(ret.Contains(new Vector2(10.5f, 0.5f)));
+            Assert.IsTrue(ret.Contains(new Vector2(0.5f, 10.5f)));
+        }
+
+        {
+            // order is irrelevant
+            HashSet<Vector2> set = new HashSet<Vector2>
+            {
+                new Vector2(1, 1),
+                new Vector2(0, 0),
+                new Vector2(10, 0),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(1, 10),
+                new Vector2(0, 11),
+                new Vector2(11, 0),
+                new Vector2(11, 1),
+                new Vector2(10, 1),
+                new Vector2(0, 10),
+                new Vector2(1, 11),
+            };
+
+            var ret = m_intersector.ClusterJoints(set, 2.0f);
+
+            Assert.AreEqual(3, ret.Count);
+            Assert.IsTrue(ret.Contains(new Vector2(0.5f, 0.5f)));
+            Assert.IsTrue(ret.Contains(new Vector2(10.5f, 0.5f)));
+            Assert.IsTrue(ret.Contains(new Vector2(0.5f, 10.5f)));
         }
     }
 

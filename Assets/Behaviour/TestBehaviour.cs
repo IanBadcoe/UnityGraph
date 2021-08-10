@@ -39,6 +39,8 @@ namespace Assets.Behaviour
                         merged = intersector.Union(merged, ls2, 1e-5f, new ClRand(1));
                     }
                 }
+
+                m_loops = merged;
             }
             catch (LoopDisplayException lde)
             {

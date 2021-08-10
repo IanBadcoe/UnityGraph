@@ -35,6 +35,25 @@ namespace Assets.Generation.GeomRep
             }
         }
 
+        public static Loop MakeRect(float x1, float y1, float x2, float y2)
+        {
+            Assertion.Assert(x1 <= x2);
+            Assertion.Assert(y1 <= y2);
+
+            var c1 = new Vector2(x1, y1);
+            var c2 = new Vector2(x1, y2);
+            var c3 = new Vector2(x2, y2);
+            var c4 = new Vector2(x2, y1);
+
+            return new Loop(
+                new List<Curve> {
+                    LineCurve.MakeFromPoints(c1, c2),
+                    LineCurve.MakeFromPoints(c2, c3),
+                    LineCurve.MakeFromPoints(c3, c4),
+                    LineCurve.MakeFromPoints(c4, c1),
+                });
+        }
+
         public static Loop MakePolygon(IEnumerable<Vector2> pnts, RotationDirection polarity)
         {
             Vector2 prev = pnts.Last();

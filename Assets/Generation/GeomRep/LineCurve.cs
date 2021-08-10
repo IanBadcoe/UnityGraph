@@ -27,25 +27,6 @@ namespace Assets.Generation.GeomRep
             return MakeFromPoints(new Vector2(v1, v2), new Vector2(v3, v4));
         }
 
-        public static Loop MakeRect(float x1, float y1, float x2, float y2)
-        {
-            Assertion.Assert(x1 <= x2);
-            Assertion.Assert(y1 <= y2);
-
-            var c1 = new Vector2(x1, y1);
-            var c2 = new Vector2(x1, y2);
-            var c3 = new Vector2(x2, y2);
-            var c4 = new Vector2(x2, y1);
-
-            return new Loop(
-                new List<Curve> {
-                    MakeFromPoints(c1, c2),
-                    MakeFromPoints(c2, c3),
-                    MakeFromPoints(c3, c4),
-                    MakeFromPoints(c4, c1),
-                });
-        }
-
         public LineCurve(Vector2 position, Vector2 directionCosines, float length)
             : this(position, directionCosines, 0, length)
         {
