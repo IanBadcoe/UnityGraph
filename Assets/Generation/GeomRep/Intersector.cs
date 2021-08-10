@@ -497,7 +497,9 @@ namespace Assets.Generation.GeomRep
             UnionType type)
         {
             // if we find a curve is non-internal while inspecting another, need not look at it again
-            HashSet<AnnotatedCurve> seen = new HashSet<AnnotatedCurve>();
+            HashSet<AnnotatedCurve> seen = new HashSet<AnnotatedCurve>(
+                new ReferenceComparer<AnnotatedCurve>());
+
             int non_zero_value = type == UnionType.WantPositive ? 1 : -1;
 
             foreach (Curve c in all_curves)
@@ -530,7 +532,7 @@ namespace Assets.Generation.GeomRep
 
                     AnnotatedCurve ac_intersecting = forward_annotations_map[intersection.Curve];
 
-                    if (open.Contains(ac_intersecting))
+                    if (open.Contains(ac_intersecting) && !seen.Contains(ac_intersecting))
                     {
                         // three cases, 0 -> 1, 1 -> 0 and anything else
                         if ((prev_crossings != 0 || crossings != non_zero_value)
