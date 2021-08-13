@@ -119,16 +119,16 @@ namespace Assets.Generation.Gen
 
         private void MakeSeed()
         {
-            INode start = Graph.AddNode("Start", "<", 55f, CircularGeomLayout.Instance);
-            INode expander = Graph.AddNode("engine.StepperController", "e", 55f, CircularGeomLayout.Instance);
-            INode end = Graph.AddNode("End", ">", 55f, CircularGeomLayout.Instance);
+            INode start = Graph.AddNode("Start", "<", 3f, CircularGeomLayout.Instance);
+            INode expander = Graph.AddNode("engine.StepperController", "e", 1f, CircularGeomLayout.Instance);
+            INode end = Graph.AddNode("End", ">", 3f, CircularGeomLayout.Instance);
 
-            start.Position = new Vector2(0, -100);
+            start.Position = new Vector2(0, -4);
             expander.Position = new Vector2(0, 0);
-            end.Position = new Vector2(100, 0);
+            end.Position = new Vector2(4, 0);
 
-            Graph.Connect(start, expander, 90, 110, 10, CorridorLayout.Instance);
-            Graph.Connect(expander, end, 90, 110, 10, CorridorLayout.Instance);
+            Graph.Connect(start, expander, 3.5f, 4.5f, 1, CorridorLayout.Instance);
+            Graph.Connect(expander, end, 3.5f, 4.5f, 1, CorridorLayout.Instance);
         }
     }
 }
