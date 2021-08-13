@@ -227,8 +227,6 @@ namespace Assets.Generation.GeomRep
                 {
                     temp.Add(c.Pos(start_p + p, false));
 
-                    // wrong for cicles, as their range is in radians, not meters
-                    // should add a "scaled" param for just this purpose
                     p += param_step;
                 }
             }
@@ -267,7 +265,6 @@ namespace Assets.Generation.GeomRep
                         -c.Normal(p + param_step / 2))
                     );
 
-                    // see comment on Facet
                     p += param_step;
                 }
             }
