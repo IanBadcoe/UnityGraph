@@ -287,7 +287,8 @@ namespace Assets.Generation.G
                 m_nodes_added.ForEach(n => m_graph.RemoveNodeInner(n));
 
                 // put back anything we removed
-                foreach (var key in m_nodes_removed.Keys) {
+                foreach (var key in m_nodes_removed.Keys)
+                {
                     m_graph.AddNodeInner(key);
                     key.Parent = m_nodes_removed[key];
                 }

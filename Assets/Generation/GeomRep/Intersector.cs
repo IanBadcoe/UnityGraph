@@ -94,7 +94,7 @@ namespace Assets.Generation.GeomRep
                              UnionType type = UnionType.WantPositive)
         {
             ValidatePreviouslyMerged(previously_merged, "previously_merged");
-//            ValidateInputs(to_merge, "ls2");
+            //            ValidateInputs(to_merge, "ls2");
 
             // any loops in to_merge can be struck off as they will have no effect
             // (and following code cannot handle them anyway, as they both overlap but don't intersect)
@@ -725,7 +725,9 @@ namespace Assets.Generation.GeomRep
                 }
 
                 if (curr_ac == start_ac)
+                {
                     break;
+                }
             }
 
             // because input cyclic curves have a joint at 12 o'clock
