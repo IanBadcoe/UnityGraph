@@ -1,11 +1,12 @@
-﻿using Assets.Generation.GeomRep;
+﻿using Assets.Generation.Gen;
+using Assets.Generation.GeomRep;
 using Assets.Generation.Templates;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Generation.G
 {
-    public interface INode : IHMChild
+    public interface INode : IHMChild, IRelaxationParamSource
     {
         string Name { get; }
         string Codes { get; }

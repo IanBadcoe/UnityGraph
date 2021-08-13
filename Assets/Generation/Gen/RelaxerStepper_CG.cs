@@ -10,6 +10,12 @@ using UnityEngine;
 
 namespace Assets.Generation.Gen
 {
+    public interface IRelaxationParamSource
+    {
+        int PutParams(double[] array, int offset);
+        void GetParams(double[] array, int offset);
+    }
+
     internal class RelaxerStepper_CGFactory : IRelaxerFactory
     {
         public IStepper MakeRelaxer(IoCContainer ioc_container, Graph g, GeneratorConfig c)
@@ -30,7 +36,8 @@ namespace Assets.Generation.Gen
         private List<INode> m_nodes;
         private List<DirectedEdge> m_edges;
         private double[] m_pars;
-        private readonly Dictionary<INode, int> m_node2pars_idx = new Dictionary<INode, int>();
+        private readonly Dictionary<IRelaxationParamSource, int> m_source2pars_idx
+            = new Dictionary<IRelaxationParamSource, int>();
 
         // whichever is smaller out of the summed-radii and the
         // shortest path through the graph between two nodes
@@ -91,14 +98,11 @@ namespace Assets.Generation.Gen
 
             int p_num = 0;
 
-            foreach (var n in m_nodes)
+            foreach (IRelaxationParamSource irps in m_nodes)
             {
-                m_node2pars_idx[n] = p_num;
+                m_source2pars_idx[irps] = p_num;
 
-                m_pars[p_num + 0] = n.Position.x;
-                m_pars[p_num + 1] = n.Position.y;
-
-                p_num += 2;
+                p_num += irps.PutParams(m_pars, p_num);
             }
 
             alglib.mincgcreatef(m_pars, 1e-4, out opt_state);
@@ -272,8 +276,8 @@ namespace Assets.Generation.Gen
 
             foreach (var edge in m_edges)
             {
-                int start_p_idx = m_node2pars_idx[edge.Start];
-                int end_p_idx = m_node2pars_idx[edge.End];
+                int start_p_idx = m_source2pars_idx[edge.Start];
+                int end_p_idx = m_source2pars_idx[edge.End];
 
                 Vector2D start_pos = new Vector2D(pars[start_p_idx], pars[start_p_idx + 1]);
                 Vector2D end_pos = new Vector2D(pars[end_p_idx], pars[end_p_idx + 1]);
@@ -285,8 +289,8 @@ namespace Assets.Generation.Gen
 
             foreach (var edge in m_edges)
             {
-                int start_p_idx = m_node2pars_idx[edge.Start];
-                int end_p_idx = m_node2pars_idx[edge.End];
+                int start_p_idx = m_source2pars_idx[edge.Start];
+                int end_p_idx = m_source2pars_idx[edge.End];
 
                 Vector2D start_pos = new Vector2D(pars[start_p_idx], pars[start_p_idx + 1]);
                 Vector2D end_pos = new Vector2D(pars[end_p_idx], pars[end_p_idx + 1]);

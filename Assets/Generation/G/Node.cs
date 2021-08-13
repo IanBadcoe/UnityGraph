@@ -185,5 +185,18 @@ namespace Assets.Generation.G
         {
             return m_connections.Count;
         }
+
+        public int PutParams(double[] array, int offset)
+        {
+            array[offset + 0] = Position.x;
+            array[offset + 1] = Position.y;
+
+            return 2;
+        }
+
+        public void GetParams(double[] array, int offset)
+        {
+            Position = new Vector2((float)array[offset + 0], (float)array[offset + 1]);
+        }
     }
 }
