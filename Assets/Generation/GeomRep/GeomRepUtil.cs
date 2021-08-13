@@ -163,7 +163,7 @@ namespace Assets.Generation.GeomRep
         }
 
         public static Tuple<float, float?> CircleLineIntersect(Vector2 circlePos, float circleRadius,
-                                                                      Vector2 lineStart, Vector2 lineEnd)
+                                                               Vector2 lineStart, Vector2 lineEnd)
         {
             Vector2 d = lineEnd - lineStart;
             Vector2 f = lineStart - circlePos;
@@ -201,31 +201,40 @@ namespace Assets.Generation.GeomRep
 
             float tol = 1e-5f;
 
-            float? hit1 = null;
+            float hit1 = t1;
             float? hit2 = null;
 
-            if (t1 >= -tol && t1 <= 1 + tol)
-            {
-                hit1 = t1;
-            }
+            hit1 = t1;
 
-            if (t2 >= -tol && t2 <= 1 + tol)
+            if (Math.Abs(t1 - t2) > tol)
             {
                 hit2 = t2;
             }
 
-            if (hit1 == null)
-            {
-                hit1 = hit2;
-                hit2 = null;
-            }
+            // we, in fact do not care about the param ranges here, as the caller checks that
+            // using a tolerance we supply and which matters
+            // so do not do the following checks
+            // VVV
 
-            if (hit1 == null)
-            {
-                return null;
-            }
+            //if (t1 >= -tol && t1 <= 1 + tol)
+            //{
+            //    hit1 = t1;
+            //}
 
-            return new Tuple<float, float?>(hit1.Value, hit2);
+            //if (t2 >= -tol && t2 <= 1 + tol)
+            //{
+            //    hit2 = t2;
+            //}
+
+            //if (hit1 == null)
+            //{
+            //    hit1 = hit2;
+            //    hit2 = null;
+            //}
+
+            // ^^^
+
+            return new Tuple<float, float?>(hit1, hit2);
         }
         // only works for loops made of LineCurve
         public static float SignedPolygonArea(Loop l)

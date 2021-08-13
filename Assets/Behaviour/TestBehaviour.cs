@@ -20,7 +20,7 @@ namespace Assets.Behaviour
             {
                 const int NumShapes = 5;
 
-                int i = 996;
+                int i = 110;
 
                 Intersector intersector = new Intersector();
 
@@ -33,11 +33,8 @@ namespace Assets.Behaviour
                 {
                     LoopSet ls2 = RandShapeLoop(test_rand);
 
-                    if (j == 0 || j == 4)
-                    {
-                        // point here is to run all the Unions internal logic/asserts
-                        merged = intersector.Union(merged, ls2, 1e-5f, new ClRand(1));
-                    }
+                    // point here is to run all the Unions internal logic/asserts
+                    merged = intersector.Union(merged, ls2, 1e-5f, new ClRand(1));
                 }
 
                 m_loops = merged;

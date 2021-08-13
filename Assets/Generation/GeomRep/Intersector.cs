@@ -41,12 +41,6 @@ namespace Assets.Generation.GeomRep
             }
         }
 
-        // only non-private for unit-testing
-        [System.Diagnostics.DebuggerDisplay("Loop1 = {Loop1Out}, Loop2 = {Loop2Out}")]
-        public class Splice : List<AnnotatedCurve>
-        {
-        }
-
         // union operation cannot return a mix of positive and negative top-level curves
         // e.g. if you think of a negative curve as something subtracted from a positive curve
         // if we have inputs like this:
@@ -137,21 +131,21 @@ namespace Assets.Generation.GeomRep
 
             LoopSet ret = new LoopSet();
 
+            // could still do this, but would have to select only the +ve or -ve loops according to UnionType
+            //                VVVV
             // first, an easy bit, any loops from either set whose bounding boxes are disjunct from all loops in the
             // other set, they have no influence on any other loops and can be simply copied unchanged into
             // the output
-            //
-            // could still do this, but would have to select only the +ve or -ve loops according to UnionType
 
             // split all curves that intersect
-            foreach (int i in working_loops1.Keys)
+            //
+            // we assume (and try to validate, above) that previously_merged contained nothing freaky
+            // but to_merge comes with no guarrantees and gets checked against itself
+            foreach (var alc1 in working_loops1.Values.Concat(working_loops2.Values))
             {
-                var alc1 = working_loops1[i];
-                foreach (int j in working_loops2.Keys)
+                foreach (var alc2 in working_loops2.Values)
                 {
-                    var alc2 = working_loops2[j];
-
-                    SplitCurvesAtIntersections(alc1, alc2, 1e-4f);
+                    SplitCurvesAtIntersections(alc1, alc2, 5e-4f);
 
                     // curves that wholly or partly overlay each other do not intersect
                     // but we still need to split them because we need to discard some overlapping parts
@@ -297,7 +291,7 @@ namespace Assets.Generation.GeomRep
             // we do this using the clustered joints, because otherwise very small lines can
             // cause problems where the line is too small to be considered, and that leaves
             // a gap that we would somehow have to detect and compensate for...
-            Dictionary<Curve, Splice> endSpliceMap = MakeEndSpliceMap();
+            Dictionary<Curve, List<AnnotatedCurve>> endSpliceMap = MakeEndSpliceMap();
 
             FindSplices(open, clustered_joints, endSpliceMap);
 
@@ -325,9 +319,9 @@ namespace Assets.Generation.GeomRep
                                 new ReferenceComparer<Curve>());
         }
 
-        public static Dictionary<Curve, Splice> MakeEndSpliceMap()
+        public static Dictionary<Curve, List<AnnotatedCurve>> MakeEndSpliceMap()
         {
-            return new Dictionary<Curve, Splice>(
+            return new Dictionary<Curve, List<AnnotatedCurve>>(
                             new ReferenceComparer<Curve>());
         }
 
@@ -386,7 +380,8 @@ namespace Assets.Generation.GeomRep
                 if (found_i != -1)
                 {
                     groups[found_i].AddRange(groups[found_j]);
-                    centroids[found_i] = groups[found_i].Aggregate(new Vector2(), (x, y) => x + y) / groups[found_i].Count;
+                    centroids[found_i] =
+                        groups[found_i].Aggregate(new Vector2(), (x, y) => x + y) / groups[found_i].Count;
                     groups.RemoveAt(found_j);
                     centroids.RemoveAt(found_j);
                 }
@@ -416,7 +411,7 @@ namespace Assets.Generation.GeomRep
             }
         }
 
-        private void ValidatePreviouslyMerged(LoopSet ls, string name)
+        public static void ValidatePreviouslyMerged(LoopSet ls, string name)
         {
             for (int i = 0; i < ls.Count; i++)
             {
@@ -664,7 +659,7 @@ namespace Assets.Generation.GeomRep
 
         Loop ExtractLoop(HashSet<AnnotatedCurve> open,
                          AnnotatedCurve start_ac,
-                         Dictionary<Curve, Splice> endSpliceMap)
+                         Dictionary<Curve, List<AnnotatedCurve>> endSpliceMap)
         {
             AnnotatedCurve curr_ac = start_ac;
 
@@ -679,7 +674,7 @@ namespace Assets.Generation.GeomRep
                 open.Remove(curr_ac);
 
                 // look for a splice that ends this curve
-                endSpliceMap.TryGetValue(c, out Splice splice);
+                endSpliceMap.TryGetValue(c, out List<AnnotatedCurve> splice);
 
                 Assertion.Assert(splice != null);
 
@@ -943,16 +938,16 @@ namespace Assets.Generation.GeomRep
 
         // public for unit-tests
         public void FindSplices(HashSet<AnnotatedCurve> open, HashSet<Vector2> clustered_joints,
-            Dictionary<Curve, Splice> endSpliceMap)
+            Dictionary<Curve, List<AnnotatedCurve>> endSpliceMap)
         {
-            Dictionary<Vector2, Splice> splices = clustered_joints.ToDictionary(x => x, x => new Splice());
+            Dictionary<Vector2, List<AnnotatedCurve>> splices = clustered_joints.ToDictionary(x => x, x => new List<AnnotatedCurve>());
 
             foreach (var c in open)
             {
                 float out_closest_2 = float.MaxValue;
                 float in_closest_2 = float.MaxValue;
-                Splice out_found_splice = null;
-                Splice in_found_splice = null;
+                List<AnnotatedCurve> out_found_splice = null;
+                List<AnnotatedCurve> in_found_splice = null;
 
                 foreach (var j in clustered_joints)
                 {
@@ -980,109 +975,134 @@ namespace Assets.Generation.GeomRep
         }
 
         // non-private only for unit-tests
-        public bool SplitCurvesAtIntersections(
+        public void SplitCurvesAtIntersections(
             IList<Curve> working_loop1, IList<Curve> working_loop2,
             float tol)
         {
-            int intersection_count = 0;
+            SplitCurveAtIntersections(working_loop1, working_loop2, tol);
+
+            if (!ReferenceEquals(working_loop1, working_loop2))
+            {
+                SplitCurveAtIntersections(working_loop2, working_loop1, tol);
+            }
+        }
+
+        public void SplitCurveAtIntersections(
+            IList<Curve> working_loop1, IList<Curve> working_loop2,
+            float tol)
+        {
+            bool same_loop = ReferenceEquals(working_loop1, working_loop2);
+
+            Dictionary<Curve, List<float>> detected_splits = new Dictionary<Curve, List<float>>(
+                new ReferenceComparer<Curve>()
+            );
 
             for (int i = 0; i < working_loop1.Count; i++)
             {
                 Curve c1 = working_loop1[i];
                 for (int j = 0; j < working_loop2.Count; j++)
                 {
+                    // no point testing a line against itself, and testing adjoining lines is not only unnecessary
+                    // but also dangerous because very shallow triangles give us numerical precision problems in
+                    // line-line intersection
+
+                    if (same_loop && (i - j + working_loop1.Count) % working_loop1.Count <= 1)
+                        break;
+
                     Curve c2 = working_loop2[j];
 
-                    bool any_splits;
+                    // we intersect with a broad tolerance, because if we split the occasional curve that is off the end
+                    // of another one, it should not be a problem, but not splitting a curve we should will be a problem
+                    List<Tuple<float, float>> ret = GeomRepUtil.CurveCurveIntersect(c1, c2, 0.01f);
 
-                    do
+                    if (ret == null)
                     {
-                        any_splits = false;
+                        continue;
+                    }
 
-                        // we intersect with a broad tolerance, because if we split the occasional curve that is off the end
-                        // of another one, it should not be a problem, but not splitting a curve we should will be a problem
-                        List<Tuple<float, float>> ret = GeomRepUtil.CurveCurveIntersect(c1, c2, 0.01f);
+                    // we only count up in case the earlier entries fall close to existing splits and
+                    // are ignored, otherwise if the first intersection causes a split
+                    // we exit this loop immediately and look at the first pair from the newly inserted curve(s)
+                    // instead
+                    for (int k = 0; k < ret.Count; k++)
+                    {
+                        Tuple<float, float> split_points = ret[k];
 
-                        if (ret == null)
+                        float start_dist = c1.ParamCoordinateDist(c1.StartParam, split_points.Item1);
+                        float end_dist = c1.ParamCoordinateDist(c1.EndParam, split_points.Item1);
+
+                        // if we are far enough from existing splits
+                        if (start_dist > tol && end_dist > tol)
                         {
-                            break;
-                        }
-
-                        // we only count up in case the earlier entries fall close to existing splits and
-                        // are ignored, otherwise if the first intersection causes a split
-                        // we exit this loop immediately and look at the first pair from the newly inserted curve(s)
-                        // instead
-                        for (int k = 0; k < ret.Count && !any_splits; k++)
-                        {
-                            Tuple<float, float> split_points = ret[k];
-
-                            float start_dist = c1.ParamCoordinateDist(c1.StartParam, split_points.Item1);
-                            float end_dist = c1.ParamCoordinateDist(c1.EndParam, split_points.Item1);
-
-                            // this is still an intersection, even if we do not have to add a split because it hits an existing one
-                            intersection_count++;
-
-                            // if we are far enough from existing splits
-                            if (start_dist > tol && end_dist > tol)
+                            List<float> list;
+                            
+                            if (!detected_splits.TryGetValue(c1, out list))
                             {
-                                any_splits = true;
-
-                                Curve c1split1 = c1.CloneWithChangedParams(c1.StartParam, split_points.Item1);
-                                Curve c1split2 = c1.CloneWithChangedParams(split_points.Item1, c1.EndParam);
-
-                                working_loop1[i] = c1split1;
-                                working_loop1.Insert(i + 1, c1split2);
-
-                                // once we've split once any second split could be in either new curve
-                                // and also any further comparisons of the original c1 now need to be done separately on the two
-                                // fragments
-                                //
-                                // so all-in-all simplest seems to be to pretend the two earlier fragments were where we were
-                                // all along and re-start this (c1, c2) pair using them
-                                //
-                                // this will lead to a little repetition, as c1split2 will be checked against working_list2 items
-                                // at indices < j, but hardly seems worth worrying about for small-ish curve numbers with few splits
-                                c1 = c1split1;
+                                list = detected_splits[c1] = new List<float>();
                             }
 
-                            // this is still an intersection, even if we do not have to add a split because it hits an existing one
-                            intersection_count++;
+                            bool already = false;
 
-                            start_dist = c2.ParamCoordinateDist(c2.StartParam, split_points.Item2);
-                            end_dist = c2.ParamCoordinateDist(c2.EndParam, split_points.Item2);
-
-                            // if we are far enough from existing splits
-                            if (start_dist > tol && end_dist > tol)
+                            foreach(var p in list)
                             {
-                                any_splits = true;
+                                if (Math.Abs(p - split_points.Item1) < tol)
+                                {
+                                    already = true;
+                                    break;
+                                }
+                            }
 
-                                Curve c2split1 = c2.CloneWithChangedParams(c2.StartParam, split_points.Item2);
-                                Curve c2split2 = c2.CloneWithChangedParams(split_points.Item2, c2.EndParam);
-
-                                working_loop2[j] = c2split1;
-                                working_loop2.Insert(j + 1, c2split2);
-
-                                // see comment in previous if-block
-                                c2 = c2split1;
+                            if (!already)
+                            {
+                                list.Add(split_points.Item1);
                             }
                         }
-                    } while (any_splits);
+                    }
                 }
             }
 
-            // we expect even numbers of crossings
-            Assertion.Assert(intersection_count % 2 == 0);
+            foreach(var split in detected_splits)
+            {
+                var c = split.Key;
+                var pars = split.Value;
 
-            return intersection_count > 0;
+                float par_offset = 0;
+
+                foreach(var par in pars.OrderBy(x => x))
+                {
+                    Curve c1split1 = c.CloneWithChangedParams(c.StartParam, par - par_offset);
+                    Curve c1split2 = c.CloneWithChangedParams(par - par_offset, c.EndParam);
+
+                    int idx = working_loop1.IndexOf(c);
+
+                    working_loop1[idx] = c1split1;
+                    working_loop1.Insert(idx + 1, c1split2);
+
+                    // any further split will be in the later half, because we sorted then ascending
+                    c = c1split2;
+                    // par will still work for the new curve, because we left its Position the same
+                    // and just altered its StarParam
+                }
+            }
         }
 
         // non-private only for unit-tests
-        public bool SplitCurvesAtCoincidences(
+        public void SplitCurvesAtCoincidences(
             IList<Curve> working_loop1, IList<Curve> working_loop2,
             float tol)
         {
-            bool any_found = false;
+            SplitCurveAtCoincidences(working_loop1, working_loop2, tol);
 
+            if (!ReferenceEquals(working_loop1, working_loop2))
+            {
+                SplitCurveAtCoincidences(working_loop2, working_loop1, tol);
+            }
+        }
+
+        public void SplitCurveAtCoincidences(
+            IList<Curve> working_loop1, IList<Curve> working_loop2,
+            float tol)
+        {
             for (int i = 0; i < working_loop1.Count; i++)
             {
                 Curve c1 = working_loop1[i];
@@ -1099,14 +1119,6 @@ namespace Assets.Generation.GeomRep
 
                     if (ret.Item1 != null)
                     {
-                        any_found = true;
-
-                        // once we've split once the new curves still need testing against the rest of the
-                        // other loop, further splits could be in any new curve
-                        //
-                        // so all-in-all simplest seems to be to pretend the two earlier fragments were where we were
-                        // all along and re-start this (c1, c2) pair using them
-
                         c1 = working_loop1[i] = ret.Item1[0];
 
                         for (int n_ins = 1; n_ins < ret.Item1.Count; n_ins++)
@@ -1114,28 +1126,8 @@ namespace Assets.Generation.GeomRep
                             working_loop1.Insert(i + n_ins, ret.Item1[n_ins]);
                         }
                     }
-
-                    if (ret.Item2 != null)
-                    {
-                        any_found = true;
-
-                        // once we've split once the new curves still need testing against the rest of the
-                        // other loop, further splits could be in any new curve
-                        //
-                        // so all-in-all simplest seems to be to pretend the two earlier fragments were where we were
-                        // all along and re-start this (c1, c2) pair using them
-
-                        c2 = working_loop2[i] = ret.Item2[0];
-
-                        for (int n_ins = 1; n_ins < ret.Item2.Count; n_ins++)
-                        {
-                            working_loop2.Insert(i + n_ins, ret.Item2[n_ins]);
-                        }
-                    }
                 }
             }
-
-            return any_found;
         }
 
         // only non-private for unit-testing
