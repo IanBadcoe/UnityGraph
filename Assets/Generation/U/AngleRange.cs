@@ -117,7 +117,7 @@ namespace Assets.Generation.U
             }
 
             {
-                // rotate angles by whole turns so that b_start is > a_start
+                // rotate angles by whole turns so that b_start is >= a_start
                 // (both ends are already > their resp. start)
                 float b_start_r = FixupAngleRelative(Start, b.Start);
                 // shift b.End by the same amount
@@ -150,7 +150,7 @@ namespace Assets.Generation.U
 
             // two ranges with the same start can trigger both the above clauses
             // but we only have one overlap
-            if (ret.Count == 2 && ret[0] == ret[1])
+            if (ret.Count == 2 && ret[0].Equals(ret[1], tol))
             {
                 ret.RemoveAt(1);
             }
