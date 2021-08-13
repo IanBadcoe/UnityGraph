@@ -119,9 +119,9 @@ namespace Assets.Generation.Gen
 
         private void MakeSeed()
         {
-            INode start = Graph.AddNode("Start", "<", "Seed", 55f, CircularGeomLayout.Instance);
-            INode expander = Graph.AddNode("engine.StepperController", "e", "Seed", 55f, CircularGeomLayout.Instance);
-            INode end = Graph.AddNode("End", ">", "Seed", 55f, CircularGeomLayout.Instance);
+            INode start = Graph.AddNode("Start", "<", 55f, CircularGeomLayout.Instance);
+            INode expander = Graph.AddNode("engine.StepperController", "e", 55f, CircularGeomLayout.Instance);
+            INode end = Graph.AddNode("End", ">", 55f, CircularGeomLayout.Instance);
 
             start.Position = new Vector2(0, -100);
             expander.Position = new Vector2(0, 0);

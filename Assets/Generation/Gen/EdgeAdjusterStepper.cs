@@ -58,8 +58,8 @@ namespace Assets.Generation.Gen
 
         private void SplitEdge()
         {
-            INode c = Graph.AddNode("c", "", "EdgeExtend",
-                  m_edge.HalfWidth, CircularGeomLayout.Instance);
+            INode c = Graph.AddNode("c", "", 
+                m_edge.HalfWidth, CircularGeomLayout.Instance);
 
             Vector2 mid = (m_edge.Start.Position + m_edge.End.Position) / 2;
 

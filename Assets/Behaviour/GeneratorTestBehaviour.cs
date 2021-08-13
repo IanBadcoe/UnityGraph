@@ -10,10 +10,10 @@ namespace Assets.Behaviour
 {
     public class GeneratorTestBehaviour : DataProvider
     {
+        public int NodesLimit = 10;
         public GeneratorConfig Config = new GeneratorConfig();
-        public int RequiredSize = 15;
 
-        private readonly Generator m_generator;
+        private Generator m_generator;
 
         public override IReadOnlyList<Loop> GetLoops()
         {
@@ -35,18 +35,15 @@ namespace Assets.Behaviour
             return null;
         }
 
-        GeneratorTestBehaviour()
+        private void Start()
         {
             Graph graph = new Graph();
 
-            m_generator = new Generator(graph, RequiredSize)
+            m_generator = new Generator(graph, NodesLimit)
             {
                 Config = Config
             };
-        }
 
-        private void Start()
-        {
             GameObject go = new GameObject();
             go.transform.parent = transform.parent;
             StepperBehaviour sb = go.AddComponent<StepperBehaviour>();

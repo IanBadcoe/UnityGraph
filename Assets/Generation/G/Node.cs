@@ -1,4 +1,5 @@
 ﻿using Assets.Generation.GeomRep;
+using Assets.Generation.Templates;
 using Assets.Generation.U;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,6 @@ namespace Assets.Generation.G
 
         public string Name { get; }
         public string Codes { get; }
-        public string Template { get; }
         public float Radius { get; }
 
         public Vector2 Pos { get; set; }
@@ -27,23 +27,51 @@ namespace Assets.Generation.G
         public Vector2 Position { get; set; }
         public Vector2 Force { get; set; }
 
-        public Node(string name, string codes, string template, float rad)
-            : this(name, codes, template, rad, null)
+        HierarchyMetadata m_parent;
+        public HierarchyMetadata Parent
+        {
+            get
+            {
+                return m_parent;
+            }
+            set
+            {
+                if (m_parent != null)
+                {
+                    m_parent.Children.Remove(this);
+                }
+
+                m_parent = value;
+
+                if (m_parent != null)
+                {
+                    m_parent.Children.Add(this);
+                }
+            }
+        }
+
+        public IList<IHMChild> Children { get; }
+
+        public Node(string name, string codes, float rad, HierarchyMetadata parent = null)
+            : this(name, codes, rad, null, parent)
         {
         }
 
-        public Node(string name, string codes, string template, float rad,
-            GeomLayout layout)
+        public Node(string name, string codes, float rad,
+            GeomLayout layout, HierarchyMetadata parent = null)
         {
             Name = name;
             Codes = codes;
-            Template = template;
 
             m_num = s_rand.Next();
 
             Radius = rad;
 
             Layout = layout;
+
+            Parent = parent;
+
+            Children = new List<IHMChild>();
         }
 
         public bool Connects(INode n)

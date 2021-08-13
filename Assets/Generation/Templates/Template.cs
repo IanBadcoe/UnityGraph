@@ -56,6 +56,8 @@ namespace Assets.Generation.Templates
             IReadOnlyList<DirectedEdge> target_in_connections = target.GetInConnections();
             IReadOnlyList<DirectedEdge> target_out_connections = target.GetOutConnections();
 
+            HierarchyMetadata hm = new HierarchyMetadata(target.Parent, this);
+
             if (m_num_in_nodes != target_in_connections.Count)
             {
                 return false;
@@ -78,13 +80,13 @@ namespace Assets.Generation.Templates
             {
                 if (nr.Type == NodeRecord.NodeType.Internal)
                 {
-                    INode n = graph.AddNode(nr.Name, nr.Codes, Name, nr.Radius, nr.Layout);
+                    INode n = graph.AddNode(nr.Name, nr.Codes, nr.Radius, nr.Layout, hm);
                     template_to_graph.Add(nr, n);
                     n.Colour = nr.Colour;
                 }
             }
 
-            // find nodes for in connections and map to their NodeRecords
+            // find nodes for in-connections and map to their NodeRecords
             {
                 IEnumerator<DirectedEdge> g_it = target_in_connections.GetEnumerator();
 
@@ -101,7 +103,7 @@ namespace Assets.Generation.Templates
                 }
             }
 
-            // find nodes for out connections and map to their NodeRecords
+            // find nodes for out-connections and map to their NodeRecords
             {
                 IEnumerator<DirectedEdge> g_it = target_out_connections.GetEnumerator();
 

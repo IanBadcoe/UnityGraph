@@ -1,4 +1,5 @@
 ﻿using Assets.Generation.GeomRep;
+using Assets.Generation.Templates;
 using Assets.Generation.U;
 using System;
 using System.Collections.Generic;
@@ -15,10 +16,10 @@ namespace Assets.Generation.G
 
         public GraphRestore Restore { get; private set; }
 
-        public INode AddNode(string name, string codes, string template, float rad,
-                             GeomLayout layout)
+        public INode AddNode(string name, string codes, float rad,
+                             GeomLayout layout, HierarchyMetadata parent = null)
         {
-            Node n = new Node(name, codes, template, rad, layout);
+            Node n = new Node(name, codes, rad, layout, parent);
 
             if (Restore != null)
             {
@@ -48,6 +49,8 @@ namespace Assets.Generation.G
             {
                 Restore.RemoveNode(node);
             }
+            // restore has made a note of this and will restore if we undo
+            node.Parent = null;
 
             RemoveNodeInner(node);
 
@@ -214,7 +217,7 @@ namespace Assets.Generation.G
 
             private readonly Graph m_graph;
             private readonly List<Node> m_nodes_added = new List<Node>();
-            private readonly List<Node> m_nodes_removed = new List<Node>();
+            private readonly Dictionary<Node, HierarchyMetadata> m_nodes_removed = new Dictionary<Node, HierarchyMetadata>();
             private readonly List<NodePos> m_positions = new List<NodePos>();
             private readonly Dictionary<DirectedEdge, RestoreAction> m_connections = new Dictionary<DirectedEdge, RestoreAction>();
             public GraphRestore ChainFrom { get; }
@@ -284,8 +287,10 @@ namespace Assets.Generation.G
                 m_nodes_added.ForEach(n => m_graph.RemoveNodeInner(n));
 
                 // put back anything we removed
-                m_nodes_removed.ForEach(n => m_graph.AddNodeInner(n));
-
+                foreach (var key in m_nodes_removed.Keys) {
+                    m_graph.AddNodeInner(key);
+                    key.Parent = m_nodes_removed[key];
+                }
                 // which means we must be able to restore the original connections
                 foreach (var e in m_connections.Keys)
                 {
@@ -347,7 +352,9 @@ namespace Assets.Generation.G
             {
                 if (!m_nodes_added.Remove(node))
                 {
-                    m_nodes_removed.Add(node);
+                    // the caller needs to disconnect the parent, but if we undo,
+                    // we need to put it back
+                    m_nodes_removed[node] = node.Parent;
                 }
             }
 
