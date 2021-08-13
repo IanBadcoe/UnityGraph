@@ -3,6 +3,7 @@ using Assets.Generation.U;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using UnityEngine;
 
 namespace Assets.Generation.Templates
@@ -86,6 +87,8 @@ namespace Assets.Generation.Templates
                 }
             }
 
+            HashSet<float> existing_corridor_widths = new HashSet<float>();
+
             // find nodes for in-connections and map to their NodeRecords
             {
                 IEnumerator<DirectedEdge> g_it = target_in_connections.GetEnumerator();
@@ -99,6 +102,8 @@ namespace Assets.Generation.Templates
                         INode g_conn = g_it.Current.Start;
 
                         template_to_graph.Add(nr, g_conn);
+
+                        existing_corridor_widths.Add(g_it.Current.HalfWidth);
                     }
                 }
             }
@@ -116,11 +121,19 @@ namespace Assets.Generation.Templates
                         INode g_conn = g_it.Current.End;
 
                         template_to_graph.Add(nr, g_conn);
+
+                        existing_corridor_widths.Add(g_it.Current.HalfWidth);
                     }
                 }
             }
 
-            ApplyConnections(target, template_to_graph, graph);
+            if (existing_corridor_widths.Count == 0)
+            {
+                existing_corridor_widths.Add(1);
+            }
+
+            ApplyConnections(target, template_to_graph, graph,
+                Util.RemoveRandom(random, existing_corridor_widths.ToList()));
 
             // make three attempts to position the nodes
             // no point if no random components, but pretty cheap to do...
@@ -142,7 +155,7 @@ namespace Assets.Generation.Templates
         }
 
         private void ApplyConnections(INode node_replacing, Dictionary<NodeRecord, INode> template_to_graph,
-                                      Graph graph)
+                                      Graph graph, float existing_width)
         {
             foreach (DirectedEdge e in node_replacing.GetConnections())
             {
@@ -155,7 +168,14 @@ namespace Assets.Generation.Templates
                 INode nf = template_to_graph[cr.From];
                 INode nt = template_to_graph[cr.To];
 
-                DirectedEdge de = graph.Connect(nf, nt, cr.MinLength, cr.MaxLength, cr.HalfWidth, cr.Layout);
+                float half_width = cr.HalfWidth;
+
+                if (half_width == -1)
+                {
+                    half_width = existing_width;
+                }
+
+                DirectedEdge de = graph.Connect(nf, nt, cr.MinLength, cr.MaxLength, half_width, cr.Layout);
                 de.Colour = cr.Colour;
             }
         }

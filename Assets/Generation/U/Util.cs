@@ -142,7 +142,7 @@ namespace Assets.Generation.U
             return ang;
         }
 
-        public static T RemoveRandom<T>(ClRand random, List<T> col)
+        public static T RemoveRandom<T>(ClRand random, IList<T> col)
         {
             int which = (int)(random.Nextfloat() * col.Count);
 
