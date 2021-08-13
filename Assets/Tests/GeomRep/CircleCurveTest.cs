@@ -13,20 +13,7 @@ public class CircleCurveTest
     [Test]
     public void TestCtor()
     {
-        {
-            bool thrown = false;
-
-            try
-            {
-                new CircleCurve(new Vector2(), -1);
-            }
-            catch (ArgumentException)
-            {
-                thrown = true;
-            }
-
-            Assert.IsTrue(thrown);
-        }
+        Assert.Throws<ArgumentException>(() => new CircleCurve(new Vector2(), -1));
 
         {
             CircleCurve cc = new CircleCurve(new Vector2(), 1, 0, Mathf.PI * 3);
