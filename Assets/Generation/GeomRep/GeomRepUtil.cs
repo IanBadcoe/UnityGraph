@@ -197,7 +197,7 @@ namespace Assets.Generation.GeomRep
             //       ->  o                     o ->              | -> |
             // FallShort (t1>1,t2>1), Past (t1<0,t2<0), CompletelyInside(t1<0, t2>1)
 
-            float tol = 1e-12f;
+            float tol = 1e-5f;
 
             float? hit1 = null;
             float? hit2 = null;
