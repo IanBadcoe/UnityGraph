@@ -64,6 +64,26 @@ namespace Assets.Generation.Templates
             }
 
             {
+                TemplateBuilder tb = new TemplateBuilder("Loop Tee", "");
+                tb.AddNode(NodeRecord.NodeType.In, "i");
+                tb.AddNode(NodeRecord.NodeType.Out, "o");
+                tb.AddNode(NodeRecord.NodeType.Internal, "j", false, "<target>", null, null, "", 1f, CircularGeomLayout.Instance,
+                      0xff808040);
+                tb.AddNode(NodeRecord.NodeType.Internal, "side-j", true, "<target>", null, "i", "", 1f, CircularGeomLayout.Instance);
+                tb.AddNode(NodeRecord.NodeType.Internal, "side", true, "<target>", null, "o", "", 4f, CircularGeomLayout.Instance);
+
+                tb.Connect("i", "j", 3.5f, 4.5f, -1, CorridorLayout.Instance);
+                tb.Connect("j", "o", 3.5f, 4.5f, -1, CorridorLayout.Instance);
+                tb.Connect("j", "side-j", 3.5f, 4.5f, 0.5f, CorridorLayout.Instance);
+                tb.Connect("side-j", "side", 3.5f, 4.5f, 0.5f, CorridorLayout.Instance);
+
+                tb.ExtraForce("j", "side", 1, 1);
+                tb.ExtraForce("j", "side-j", 15, 1);
+
+                AddTemplate(tb.Build());
+            }
+
+            {
                 //DoorPostExpand dh = new DoorPostExpand();
 
                 TemplateBuilder tb = new TemplateBuilder("Rotunda", ""/*, dh*/);

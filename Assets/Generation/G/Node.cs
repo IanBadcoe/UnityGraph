@@ -186,17 +186,19 @@ namespace Assets.Generation.G
             return m_connections.Count;
         }
 
-        public int PutParams(double[] array, int offset)
+        public int GetParams(List<double> list, int offset)
         {
-            array[offset + 0] = Position.x;
-            array[offset + 1] = Position.y;
+            list.Add(Position.x);
+            list.Add(Position.y);
 
             return 2;
         }
 
-        public void GetParams(double[] array, int offset)
+        public int SetParams(double[] array, int offset)
         {
             Position = new Vector2((float)array[offset + 0], (float)array[offset + 1]);
+
+            return 2;
         }
     }
 }

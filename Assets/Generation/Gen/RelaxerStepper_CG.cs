@@ -1,6 +1,7 @@
 ﻿using Assets.Generation.G;
 using Assets.Generation.IoC;
 using Assets.Generation.Stepping;
+using Assets.Generation.Templates;
 using Assets.Generation.U;
 using System;
 using System.Collections.Generic;
@@ -12,8 +13,8 @@ namespace Assets.Generation.Gen
 {
     public interface IRelaxationParamSource
     {
-        int PutParams(double[] array, int offset);
-        void GetParams(double[] array, int offset);
+        int GetParams(List<double> pars, int offset);
+        int SetParams(double[] array, int offset);
     }
 
     internal class RelaxerStepper_CGFactory : IRelaxerFactory
@@ -35,9 +36,12 @@ namespace Assets.Generation.Gen
 
         private List<INode> m_nodes;
         private List<DirectedEdge> m_edges;
+        private List<Force> m_extra_forces;
+
         private double[] m_pars;
         private readonly Dictionary<IRelaxationParamSource, int> m_source2pars_idx
             = new Dictionary<IRelaxationParamSource, int>();
+
 
         // whichever is smaller out of the summed-radii and the
         // shortest path through the graph between two nodes
@@ -79,6 +83,18 @@ namespace Assets.Generation.Gen
         {
             m_nodes = Graph.GetAllNodes();
             m_edges = Graph.GetAllEdges();
+            m_extra_forces =
+                m_nodes
+                    .Select(x => x.Parent)
+                    .Where(x => x != null)
+                    .Distinct()
+                    .SelectMany(x => x.GetExtraForces())
+                    // we may have removed one end of this force, in which case ignore it
+                    // but we won't delete it, as we may undo some graph edits
+                    // and it would be a pain to make that also remove and re-add relatively rare
+                    // extra forces
+                    .Where(x => Graph.Contains(x.N1) && Graph.Contains(x.N2))
+                    .ToList();
 
             // these are shortest path lengths through the graph
             //
@@ -94,7 +110,7 @@ namespace Assets.Generation.Gen
 
             int num_pars = m_nodes.Count * 2;
 
-            m_pars = new double[num_pars];
+            var temp = new List<double>();
 
             int p_num = 0;
 
@@ -102,8 +118,10 @@ namespace Assets.Generation.Gen
             {
                 m_source2pars_idx[irps] = p_num;
 
-                p_num += irps.PutParams(m_pars, p_num);
+                p_num += irps.GetParams(temp, p_num);
             }
+
+            m_pars = temp.ToArray();
 
             alglib.mincgcreatef(m_pars, 1e-4, out opt_state);
             alglib.mincgsuggeststep(opt_state, 1);
@@ -168,8 +186,6 @@ namespace Assets.Generation.Gen
             System.Diagnostics.Debug.WriteLine($"c0: {!ogrep.nonc0suspected} c1: {!ogrep.nonc1suspected}");
 #endif
 
-            int p_num = 0;
-
             if (GraphUtil.AnyCrossingEdges(m_edges))
             {
                 return new StepperController.StatusReportInner(StepperController.Status.StepOutFailure,
@@ -196,12 +212,12 @@ namespace Assets.Generation.Gen
                   $"CG-optimiser unexpected status: {Status}");
             }
 
+            int p_num = 0;
+
             // do this even for intermediate states, to allow display
             foreach (var n in m_nodes)
             {
-                n.Position = new Vector2((float)m_pars[p_num + 0], (float)m_pars[p_num + 1]);
-
-                p_num += 2;
+                p_num += n.SetParams(m_pars, p_num);
             }
 
             if (Status == TerminationCondition.MaxIterationsReached)
@@ -252,16 +268,17 @@ namespace Assets.Generation.Gen
             double nn_func = 0;
             double e_func = 0;
             double ne_func = 0;
+            double ef_func = 0;
 
-            for (int i = 0; i < m_nodes.Count - 1; i++)
+            foreach (var n1 in m_nodes)
             {
-                var n1 = m_nodes[i];
-                Vector2D n1pos = new Vector2D(pars[i * 2], pars[i * 2 + 1]);
+                int n1_idx = m_source2pars_idx[n1];
+                Vector2D n1pos = new Vector2D(pars[n1_idx], pars[n1_idx + 1]);
 
-                for (int j = i + 1; j < m_nodes.Count; j++)
+                foreach (var n2 in m_nodes)
                 {
-                    var n2 = m_nodes[j];
-                    Vector2D n2pos = new Vector2D(pars[j * 2], pars[j * 2 + 1]);
+                    int n2_idx = m_source2pars_idx[n2];
+                    Vector2D n2pos = new Vector2D(pars[n2_idx], pars[n2_idx + 1]);
 
                     double dist = (n1pos - n2pos).Magnitude;
 
@@ -317,13 +334,27 @@ namespace Assets.Generation.Gen
                 }
             }
 
+            foreach(var f in m_extra_forces)
+            {
+                int n1_idx = m_source2pars_idx[f.N1];
+                int n2_idx = m_source2pars_idx[f.N2];
+
+                Vector2D n1pos = new Vector2D(pars[n1_idx], pars[n1_idx + 1]);
+                Vector2D n2pos = new Vector2D(pars[n2_idx], pars[n2_idx + 1]);
+
+                double dist = (n1pos - n2pos).Magnitude;
+
+                ef_func += f.CalcEnergy(dist);
+            }
+
             func =
                 nn_func * m_config.NodeToNodeForceScale
                 + e_func * m_config.EdgeLengthForceScale
-                + ne_func * m_config.EdgeToNodeForceScale;
+                + ne_func * m_config.EdgeToNodeForceScale
+                + ef_func * m_config.ExtraForceScale;
         }
 
-        double NodeNodeEnergy(double d, double d_min)
+        public static double NodeNodeEnergy(double d, double d_min)
         {
             // outside the minimum is zero penulty
             // zero d_min implies anything goes
@@ -331,18 +362,11 @@ namespace Assets.Generation.Gen
             {
                 return 0;
             }
-            // dividing by d0 scales this to the desired radius
-            // (the alternative, of using (d0 - d)^2 also works, but pulls flatter and flatter bits of curve into the area around
-            // d = 0 as r increases, which might make highly-compressed nodes to stable)
-            //double ratio = d / d0;
 
-            // the 2's here scale the maximum (at d == 0) to 1, because we are only using half the curve
-            // (-ve d being impossible) and at zero it would have only reached 0.5 w/o these
             return (d_min - d) * (d_min - d);
-            //return 2 - 2 / (1 + (1 - ratio) * (1 - ratio)); 
         }
 
-        double EdgeEnergy(double d, double d_min, double d_max)
+        public static double EdgeEnergy(double d, double d_min, double d_max)
         {
             Assertion.Assert(d_min <= d_max);
 
@@ -354,20 +378,15 @@ namespace Assets.Generation.Gen
                 return 0;
             }
 
-            // below min we are the left of a squared rectangular hyperbola
-            // the 5 here just pull more of the curve above x = 0, because obvs. we'll never see d < 0
             if (d < d_min)
             {
                 return (d_min - d) * (d_min - d);
             }
-            //return 1 - 1 / (1 + 5 * Math.Pow(d_min - d, 2));
 
-            // below min we are the right of one
             return (d_max - d) * (d_max - d);
-            //return 1 - 1 / (1 + Math.Pow(d_max - d, 2));
         }
 
-        double NodeEdgeEnergy(double d, double d_min)
+        public static double NodeEdgeEnergy(double d, double d_min)
         {
             // outside the minimum attracts no penulty
             // d_min of zero turns this off completely (at least in unit-tests, may never happen elsewhere)
@@ -377,10 +396,6 @@ namespace Assets.Generation.Gen
             }
 
             // for the moment same form as node<->node energy
-
-            // see comments on NodeNodeEnergy above for explanation
-
-            //return 2 - 2 / (1 + (1 - ratio) * (1 - ratio));
             return (d_min - d) * (d_min - d);
         }
 

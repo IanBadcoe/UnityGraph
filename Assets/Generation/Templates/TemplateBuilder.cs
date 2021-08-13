@@ -12,6 +12,7 @@ namespace Assets.Generation.Templates
 
         private Dictionary<string, NodeRecord> m_nodes = new Dictionary<string, NodeRecord>();
         private Dictionary<string, ConnectionRecord> m_connections = new Dictionary<string, ConnectionRecord>();
+        private readonly List<ForceRecord> m_extra_forces = new List<ForceRecord>();
 
         // just to avoid keeping counting
         private int m_num_in_nodes = 0;
@@ -19,15 +20,7 @@ namespace Assets.Generation.Templates
         private int m_num_internal_nodes = 0;
 
 
-        // private final Template.IPostExpand m_post_expand;
-
-        //public TemplateBuilder(string name, string codes)
-        //    : this(name, codes, null)
-        //{
-        //}
-
-        public TemplateBuilder(string name, string codes
-            /*, Template.IPostExpand post_expand*/)
+        public TemplateBuilder(string name, string codes)
         {
             Name = name;
             Codes = codes;
@@ -185,6 +178,14 @@ namespace Assets.Generation.Templates
             }
         }
 
+        internal void ExtraForce(string node1, string node2, float targetDistance, float forceScale)
+        {
+            NodeRecord nr1 = m_nodes[node1];
+            NodeRecord nr2 = m_nodes[node2];
+
+            m_extra_forces.Add(new ForceRecord(targetDistance, nr1, nr2, forceScale));
+        }
+
         public NodeRecord FindNodeRecord(string name)
         {
             if (m_nodes.TryGetValue(name, out NodeRecord ret))
@@ -281,6 +282,11 @@ namespace Assets.Generation.Templates
         public ReadOnlyDictionary<string, ConnectionRecord> GetUnmodifiableConnections()
         {
             return new ReadOnlyDictionary<string, ConnectionRecord>(m_connections);
+        }
+
+        public IReadOnlyList<ForceRecord> GetUnmodifiableExtraForces()
+        {
+            return m_extra_forces;
         }
 
         public int GetNumInNodes()

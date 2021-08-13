@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Assets.Generation.G;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Assets.Generation.Templates
 {
@@ -12,7 +11,8 @@ namespace Assets.Generation.Templates
         public IList<IHMChild> Children { get; }
     }
 
-    public static class HMChildExtensions {
+    public static class HMChildExtensions
+    {
         public static IList<T> ChildrenOfType<T>(this IHMChild child) where T : IHMChild
         {
             return child.Children.OfType<T>().ToList();
@@ -65,8 +65,12 @@ namespace Assets.Generation.Templates
     public class HierarchyMetadata : IHMChild
     {
         HierarchyMetadata m_parent;
-        public HierarchyMetadata Parent {
-            get {
+        private readonly List<Force> m_extra_forces = new List<Force>();
+
+        public HierarchyMetadata Parent
+        {
+            get
+            {
                 return m_parent;
             }
             set
@@ -85,6 +89,11 @@ namespace Assets.Generation.Templates
             }
         }
 
+        internal IReadOnlyList<Force> GetExtraForces()
+        {
+            return m_extra_forces;
+        }
+
         public IList<IHMChild> Children { get; }
 
         public Template Template { get; }
@@ -94,6 +103,11 @@ namespace Assets.Generation.Templates
             Parent = parent;
             Children = new List<IHMChild>();
             Template = template;
+        }
+
+        internal void AddExtraForce(INode n1, INode n2, float targetDist, float forceMultiplier)
+        {
+            m_extra_forces.Add(new Force(n1, n2, targetDist, forceMultiplier));
         }
     }
 }

@@ -17,6 +17,7 @@ namespace Assets.Generation.Templates
 
         private readonly ReadOnlyDictionary<string, NodeRecord> m_nodes;
         private readonly ReadOnlyDictionary<string, ConnectionRecord> m_connections;
+        private readonly IReadOnlyList<ForceRecord> m_extra_forces;
 
         public string Name { get; private set; }
 
@@ -29,6 +30,7 @@ namespace Assets.Generation.Templates
 
             m_nodes = builder.GetUnmodifiableNodes();
             m_connections = builder.GetUnmodifiableConnections();
+            m_extra_forces = builder.GetUnmodifiableExtraForces();
 
             m_num_in_nodes = builder.GetNumInNodes();
             m_num_out_nodes = builder.GetNumOutNodes();
@@ -145,6 +147,7 @@ namespace Assets.Generation.Templates
                     // but now we're done with it
                     graph.RemoveNode(target);
 
+                    ApplyExtraForces(hm, template_to_graph);
                     // ApplyPostExpand(template_to_graph);
 
                     return true;
@@ -152,6 +155,17 @@ namespace Assets.Generation.Templates
             }
 
             return false;
+        }
+
+        private void ApplyExtraForces(HierarchyMetadata hm, Dictionary<NodeRecord, INode> template_to_graph)
+        {
+            foreach (var fr in m_extra_forces)
+            {
+                INode n1 = template_to_graph[fr.Node1];
+                INode n2 = template_to_graph[fr.Node2];
+
+                hm.AddExtraForce(n1, n2, fr.TargetDist, fr.ForceMultiplier);
+            }
         }
 
         private void ApplyConnections(INode node_replacing, Dictionary<NodeRecord, INode> template_to_graph,
