@@ -32,7 +32,7 @@ namespace Assets.Generation.Gen
             m_templates = templates;
             m_config = config;
 
-            m_all_nodes = Graph.GetAllNodes();
+            m_all_nodes = Graph.GetAllNodes().Where(x => x.Codes.Contains("e")).ToList();
         }
 
         public StepperController.StatusReportInner Step(StepperController.Status status)
