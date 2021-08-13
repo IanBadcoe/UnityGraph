@@ -27,25 +27,6 @@ namespace Assets.Generation.GeomRep
             return MakeFromPoints(new Vector2(v1, v2), new Vector2(v3, v4));
         }
 
-        public static Loop MakeRect(float x1, float y1, float x2, float y2)
-        {
-            Assertion.Assert(x1 <= x2);
-            Assertion.Assert(y1 <= y2);
-
-            var c1 = new Vector2(x1, y1);
-            var c2 = new Vector2(x1, y2);
-            var c3 = new Vector2(x2, y2);
-            var c4 = new Vector2(x2, y1);
-
-            return new Loop(
-                new List<Curve> {
-                    MakeFromPoints(c1, c2),
-                    MakeFromPoints(c2, c3),
-                    MakeFromPoints(c3, c4),
-                    MakeFromPoints(c4, c1),
-                });
-        }
-
         public LineCurve(Vector2 position, Vector2 directionCosines, float length)
             : this(position, directionCosines, 0, length)
         {
@@ -190,10 +171,10 @@ namespace Assets.Generation.GeomRep
                 return null;
             }
 
-            float c1_c_start = FindParamForPoint_Clamped(lc2.StartPos, tol);
-            float c1_c_end = FindParamForPoint_Clamped(lc2.EndPos, tol);
-            float c2_c_start = lc2.FindParamForPoint_Clamped(StartPos, tol);
-            float c2_c_end = lc2.FindParamForPoint_Clamped(EndPos, tol);
+            float c1_c_start = FindParamForPoint_Clamped(lc2.StartPos);
+            float c1_c_end = FindParamForPoint_Clamped(lc2.EndPos);
+            float c2_c_start = lc2.FindParamForPoint_Clamped(StartPos);
+            float c2_c_end = lc2.FindParamForPoint_Clamped(EndPos);
 
             float c1_c_lower = Math.Min(c1_c_start, c1_c_end);
             float c1_c_higher = Math.Max(c1_c_start, c1_c_end);

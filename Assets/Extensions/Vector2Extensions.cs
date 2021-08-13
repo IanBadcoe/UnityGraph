@@ -10,6 +10,15 @@ namespace Assets.Extensions
                  + lhs.y * rhs.y;
         }
 
+        // OK, so cross product doesn't exist for 2D vectors, but this is
+        // for angle signs and is effectively promoting the 2D vectors to 3D,
+        // taking the cross product and returning the only component which can be non-zero
+        // e.g. Z
+        public static float Cross(this Vector2 lhs, Vector2 rhs)
+        {
+            return lhs.x * rhs.y - lhs.y * rhs.x;
+        }
+
         public static Vector2 Max(this Vector2 lhs, Vector2 rhs)
         {
             return new Vector2(Mathf.Max(lhs.x, rhs.x), Mathf.Max(lhs.y, rhs.y));

@@ -18,12 +18,12 @@ namespace Assets.Generation.GeomRep
 
         public Vector2 StartPos
         {
-            get => Pos(StartParam);
+            get => ComputePos_Inner(StartParam);
         }
 
         public Vector2 EndPos
         {
-            get => Pos(EndParam);
+            get => ComputePos_Inner(EndParam);
         }
 
         public float ParamRange
@@ -33,9 +33,12 @@ namespace Assets.Generation.GeomRep
 
         // exquisite abstractions
 
-        public Vector2 Pos(float p)
+        public Vector2 Pos(float p, bool clamp_to_param_range)
         {
-            p = ClampToParamRange(p);
+            if (clamp_to_param_range)
+            {
+                p = ClampToParamRange(p);
+            }
 
             return ComputePos_Inner(p);
         }
@@ -64,7 +67,7 @@ namespace Assets.Generation.GeomRep
 
         // differs from the above, in that if the point is off the end of the line, we just return the end-point
         // used for finding coincident portions of coaxial lines
-        public float FindParamForPoint_Clamped(Vector2 pnt, float tol = 1e-5f)
+        public float FindParamForPoint_Clamped(Vector2 pnt)
         {
             float ret = FindParamForPoint_Inner(pnt);
 
@@ -113,7 +116,7 @@ namespace Assets.Generation.GeomRep
 
         public float ParamCoordinateDist(float p1, float p2)
         {
-            return (Pos(p1) - Pos(p2)).magnitude;
+            return (Pos(p1, true) - Pos(p2, true)).magnitude;
         }
 
         private float ClampToParamRange(float p)

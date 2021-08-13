@@ -212,7 +212,7 @@ namespace Assets.Generation.GeomRep
                 return null;
             }
 
-            if (!Util.ClockAwareAngleCompare(EndParam, c_cc.StartParam, 1e-12f))
+            if (!Util.ClockAwareAngleCompare(EndParam, c_cc.StartParam, 1e-5f))
             {
                 return null;
             }

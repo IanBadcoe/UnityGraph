@@ -113,7 +113,7 @@ namespace Assets.Generation.U
 
         public static float Atan2(Vector2 vec)
         {
-            // Unity call these y and x, in tat order, but they have zero at 3 o'clock where I have it at 12 0'clock
+            // Unity call these y and x, in that order, but they have zero at 3 o'clock where I have it at 12 0'clock
             return Mathf.Atan2(vec.x, vec.y);
         }
 
@@ -122,6 +122,24 @@ namespace Assets.Generation.U
             float diff = AngleRange.FixupAngle(Mathf.Abs(a1 - a2));
 
             return diff <= tol || diff >= Mathf.PI * 2 - tol;
+        }
+
+        public static float SignedAngleDifference(Vector2 from, Vector2 to)
+        {
+            Vector2 unit_from = from.normalized;
+            Vector2 unit_to = to.normalized;
+
+            float dot = unit_from.Dot(unit_to);
+            float cross = unit_from.Cross(unit_to);
+
+            float ang = Mathf.Acos(dot);
+            if (cross > 0)
+            {
+                // awkwardly my angles go clockwise...
+                ang = -ang;
+            }
+
+            return ang;
         }
 
         public static T RemoveRandom<T>(ClRand random, List<T> col)

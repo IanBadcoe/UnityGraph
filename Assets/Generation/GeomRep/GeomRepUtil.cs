@@ -129,7 +129,8 @@ namespace Assets.Generation.GeomRep
             // back-calculate params from it above, however line-line is the only intersection that gives
             // direct params so it would be a pain to change the approach for this one case
 
-            return l1.Pos(l1.StartParam + (l1.EndParam - l1.StartParam) * ret.Item1);
+            // also "false" here as we need to return out-of-range values so we know they are off the end above
+            return l1.Pos(l1.StartParam + (l1.EndParam - l1.StartParam) * ret.Item1, false);
         }
 
         private static Tuple<Vector2, Vector2?> LineCircleIntersect(LineCurve l1, CircleCurve c2)
@@ -149,12 +150,13 @@ namespace Assets.Generation.GeomRep
                 return null;
             }
 
-            Vector2 hit1 = l2.Pos(l2.StartParam + (l2.EndParam - l2.StartParam) * ret.Item1);
+            // "false" here as we need to return out-of-range values so we know they are off the end above
+            Vector2 hit1 = l2.Pos(l2.StartParam + (l2.EndParam - l2.StartParam) * ret.Item1, false);
             Vector2? hit2 = null;
 
             if (ret.Item2 != null)
             {
-                hit2 = l2.Pos(l2.StartParam + (l2.EndParam - l2.StartParam) * ret.Item2.Value);
+                hit2 = l2.Pos(l2.StartParam + (l2.EndParam - l2.StartParam) * ret.Item2.Value, false);
             }
 
             return new Tuple<Vector2, Vector2?>(hit1, hit2);
@@ -197,7 +199,7 @@ namespace Assets.Generation.GeomRep
             //       ->  o                     o ->              | -> |
             // FallShort (t1>1,t2>1), Past (t1<0,t2<0), CompletelyInside(t1<0, t2>1)
 
-            float tol = 1e-12f;
+            float tol = 1e-5f;
 
             float? hit1 = null;
             float? hit2 = null;
