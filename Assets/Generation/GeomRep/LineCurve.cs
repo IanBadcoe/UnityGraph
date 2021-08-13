@@ -171,10 +171,10 @@ namespace Assets.Generation.GeomRep
                 return null;
             }
 
-            float c1_c_start = FindParamForPoint_Clamped(lc2.StartPos, tol);
-            float c1_c_end = FindParamForPoint_Clamped(lc2.EndPos, tol);
-            float c2_c_start = lc2.FindParamForPoint_Clamped(StartPos, tol);
-            float c2_c_end = lc2.FindParamForPoint_Clamped(EndPos, tol);
+            float c1_c_start = FindParamForPoint_Clamped(lc2.StartPos);
+            float c1_c_end = FindParamForPoint_Clamped(lc2.EndPos);
+            float c2_c_start = lc2.FindParamForPoint_Clamped(StartPos);
+            float c2_c_end = lc2.FindParamForPoint_Clamped(EndPos);
 
             float c1_c_lower = Math.Min(c1_c_start, c1_c_end);
             float c1_c_higher = Math.Max(c1_c_start, c1_c_end);

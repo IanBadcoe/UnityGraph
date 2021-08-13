@@ -146,7 +146,8 @@ namespace Assets.Generation.GeomRep
                 else
                 {
                     // shift the param range where the curve wants it...
-                    return c.Pos(p + c.StartParam);
+                    // and we already fixed the range
+                    return c.Pos(p + c.StartParam, false);
                 }
             }
 
@@ -224,8 +225,10 @@ namespace Assets.Generation.GeomRep
 
                 while (p < c.ParamRange)
                 {
-                    temp.Add(c.Pos(start_p + p));
+                    temp.Add(c.Pos(start_p + p, false));
 
+                    // wrong for cicles, as their range is in radians, not meters
+                    // should add a "scaled" param for just this purpose
                     p += param_step;
                 }
             }
@@ -260,10 +263,11 @@ namespace Assets.Generation.GeomRep
                     // (ii) that won't get swung around at the end of this curve where the last point (and it's normal)
                     // is from the next curve
                     ret.Add(new Tuple<Vector2, Vector2>(
-                        c.Pos(p),
+                        c.Pos(p, false),
                         -c.Normal(p + param_step / 2))
                     );
 
+                    // see comment on Facet
                     p += param_step;
                 }
             }

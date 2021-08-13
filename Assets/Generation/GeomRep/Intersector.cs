@@ -99,7 +99,7 @@ namespace Assets.Generation.GeomRep
                              ClRand random,
                              UnionType type = UnionType.WantPositive)
         {
-//            ValidateInputs(previously_merged, "previously_merged");
+            ValidatePreviouslyMerged(previously_merged, "previously_merged");
 //            ValidateInputs(to_merge, "ls2");
 
             // any loops in to_merge can be struck off as they will have no effect
@@ -418,7 +418,7 @@ namespace Assets.Generation.GeomRep
             }
         }
 
-        private void ValidateInputs(LoopSet ls, string name)
+        private void ValidatePreviouslyMerged(LoopSet ls, string name)
         {
             for (int i = 0; i < ls.Count; i++)
             {
@@ -434,7 +434,7 @@ namespace Assets.Generation.GeomRep
             }
         }
 
-        private void CheckLoopIntersection(Loop loop, Loop loop2, string name)
+        private static void CheckLoopIntersection(Loop loop, Loop loop2, string name)
         {
             for (int i = 0; i < loop.NumCurves - 1; i++)
             {
@@ -451,15 +451,33 @@ namespace Assets.Generation.GeomRep
                     {
                         throw new ArgumentException("Two copies of the same loop", name);
                     }
-                    else if (GeomRepUtil.CurveCurveIntersect(c1, c2) != null)
+                    else
                     {
-                        throw new ArgumentException("Two loops intersects", name);
+                        var intrs = GeomRepUtil.CurveCurveIntersect(c1, c2);
+
+                        if (intrs != null)
+                        {
+                            foreach (var intr in intrs)
+                            {
+                                // "false" as we expect these already in range
+                                float pd1 = Mathf.Min((c1.Pos(intr.Item1, false) - c1.StartPos).magnitude,
+                                                      (c1.Pos(intr.Item1, false) - c1.EndPos).magnitude);
+                                float pd2 = Mathf.Min((c2.Pos(intr.Item2, false) - c2.StartPos).magnitude,
+                                                      (c2.Pos(intr.Item2, false) - c2.EndPos).magnitude);
+
+                                // intersections at the ends of curves are permitted
+                                if (pd1 > 1e-4f || pd2 > 1e-4f)
+                                {
+                                    throw new ArgumentException("Curves in loop intersect", name);
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
 
-        private void CheckSelfIntersection(Loop loop, string name)
+        private static void CheckSelfIntersection(Loop loop, string name)
         {
             for (int i = 0; i < loop.NumCurves - 1; i++)
             {
@@ -477,11 +495,27 @@ namespace Assets.Generation.GeomRep
                     {
                         throw new ArgumentException("Same curve present twice in loop", name);
                     }
-                    // adjoining curves may intersect, but no others
-                    else if (!c1.Adjoins(c2, 1e-4f)
-                        && GeomRepUtil.CurveCurveIntersect(c1, c2) != null)
+                    else
                     {
-                        throw new ArgumentException("Curves in loop intersect", name);
+                        var intrs = GeomRepUtil.CurveCurveIntersect(c1, c2);
+
+                        if (intrs != null)
+                        {
+                            foreach (var intr in intrs)
+                            {
+                                // "false" as we expect these already in range
+                                float pd1 = Mathf.Min((c1.Pos(intr.Item1, false) - c1.StartPos).magnitude,
+                                                      (c1.Pos(intr.Item1, false) - c1.EndPos).magnitude);
+                                float pd2 = Mathf.Min((c2.Pos(intr.Item2, false) - c2.StartPos).magnitude,
+                                                      (c2.Pos(intr.Item2, false) - c2.EndPos).magnitude);
+
+                                // intersections at the ends of curves are permitted
+                                if (pd1 > 1e-4f || pd2 > 1e-4f)
+                                {
+                                    throw new ArgumentException("Curves in loop intersect", name);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -792,7 +826,7 @@ namespace Assets.Generation.GeomRep
 
                 Vector2 direction = new Vector2(dx, dy);
 
-                Vector2 point = c.Pos(random.NextfloatRange(c.StartParam, c.EndParam));
+                Vector2 point = c.Pos(random.NextfloatRange(c.StartParam, c.EndParam), false);
 
                 Vector2 start = point - direction * diameter;
 

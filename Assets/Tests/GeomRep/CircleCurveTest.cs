@@ -37,14 +37,14 @@ public class CircleCurveTest
         CircleCurve cc = new CircleCurve(new Vector2(), 1);
 
         {
-            Vector2 p = cc.Pos(0);
+            Vector2 p = cc.Pos(0, false);
 
             Assert.AreEqual(0, p.x, 1e-6);
             Assert.AreEqual(1, p.y, 1e-6);
         }
 
         {
-            Vector2 p = cc.Pos(Mathf.PI / 2);
+            Vector2 p = cc.Pos(Mathf.PI / 2, false);
 
             Assert.AreEqual(1, p.x, 1e-6);
             Assert.AreEqual(0, p.y, 1e-6);
