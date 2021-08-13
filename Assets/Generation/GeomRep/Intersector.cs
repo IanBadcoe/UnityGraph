@@ -312,11 +312,9 @@ namespace Assets.Generation.GeomRep
                       endSpliceMap));
             }
 
-            // this would imply _everything_ was internal, which is impossible without
-            // a dimension warp
-            // we can get that, now we're considering -ve top-level curves, they can leave nothing in the
-            // output if we have type == WantPositive (or the reverse for +ve and WantNegative)
-            //Assertion.Assert(ret.Count > 0);
+#if DEBUG
+            ValidatePreviouslyMerged(ret, "ret");
+#endif
 
             return ret;
         }
