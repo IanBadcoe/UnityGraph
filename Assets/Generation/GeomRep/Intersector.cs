@@ -41,12 +41,6 @@ namespace Assets.Generation.GeomRep
             }
         }
 
-        // only non-private for unit-testing
-        [System.Diagnostics.DebuggerDisplay("Loop1 = {Loop1Out}, Loop2 = {Loop2Out}")]
-        public class Splice : List<AnnotatedCurve>
-        {
-        }
-
         // union operation cannot return a mix of positive and negative top-level curves
         // e.g. if you think of a negative curve as something subtracted from a positive curve
         // if we have inputs like this:
@@ -297,7 +291,7 @@ namespace Assets.Generation.GeomRep
             // we do this using the clustered joints, because otherwise very small lines can
             // cause problems where the line is too small to be considered, and that leaves
             // a gap that we would somehow have to detect and compensate for...
-            Dictionary<Curve, Splice> endSpliceMap = MakeEndSpliceMap();
+            Dictionary<Curve, List<AnnotatedCurve>> endSpliceMap = MakeEndSpliceMap();
 
             FindSplices(open, clustered_joints, endSpliceMap);
 
@@ -325,9 +319,9 @@ namespace Assets.Generation.GeomRep
                                 new ReferenceComparer<Curve>());
         }
 
-        public static Dictionary<Curve, Splice> MakeEndSpliceMap()
+        public static Dictionary<Curve, List<AnnotatedCurve>> MakeEndSpliceMap()
         {
-            return new Dictionary<Curve, Splice>(
+            return new Dictionary<Curve, List<AnnotatedCurve>>(
                             new ReferenceComparer<Curve>());
         }
 
@@ -664,7 +658,7 @@ namespace Assets.Generation.GeomRep
 
         Loop ExtractLoop(HashSet<AnnotatedCurve> open,
                          AnnotatedCurve start_ac,
-                         Dictionary<Curve, Splice> endSpliceMap)
+                         Dictionary<Curve, List<AnnotatedCurve>> endSpliceMap)
         {
             AnnotatedCurve curr_ac = start_ac;
 
@@ -679,7 +673,7 @@ namespace Assets.Generation.GeomRep
                 open.Remove(curr_ac);
 
                 // look for a splice that ends this curve
-                endSpliceMap.TryGetValue(c, out Splice splice);
+                endSpliceMap.TryGetValue(c, out List<AnnotatedCurve> splice);
 
                 Assertion.Assert(splice != null);
 
@@ -943,16 +937,16 @@ namespace Assets.Generation.GeomRep
 
         // public for unit-tests
         public void FindSplices(HashSet<AnnotatedCurve> open, HashSet<Vector2> clustered_joints,
-            Dictionary<Curve, Splice> endSpliceMap)
+            Dictionary<Curve, List<AnnotatedCurve>> endSpliceMap)
         {
-            Dictionary<Vector2, Splice> splices = clustered_joints.ToDictionary(x => x, x => new Splice());
+            Dictionary<Vector2, List<AnnotatedCurve>> splices = clustered_joints.ToDictionary(x => x, x => new List<AnnotatedCurve>());
 
             foreach (var c in open)
             {
                 float out_closest_2 = float.MaxValue;
                 float in_closest_2 = float.MaxValue;
-                Splice out_found_splice = null;
-                Splice in_found_splice = null;
+                List<AnnotatedCurve> out_found_splice = null;
+                List<AnnotatedCurve> in_found_splice = null;
 
                 foreach (var j in clustered_joints)
                 {
