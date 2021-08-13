@@ -754,34 +754,18 @@ public class GraphTest
     //    }
     //}
 
-    private void TestCatchArgument(Action action)
-    {
-        bool thrown = false;
-
-        try
-        {
-            action.Invoke();
-        }
-        catch (ArgumentException)
-        {
-            thrown = true;
-        }
-
-        Assert.IsTrue(thrown);
-    }
-
     [Test]
     public void TestConnect_Exceptions()
     {
         Graph g = new Graph();
 
         // cannot Connect two nodes we never neard of
-        TestCatchArgument(() => g.Connect(new Node("", "", "", 0),
+        Assert.Throws<ArgumentException>(() => g.Connect(new Node("", "", "", 0),
               new Node("", "", "", 0), 0, 0, 0, null));
 
         INode n = g.AddNode("n", "x", "y", 10, null);
 
         // cannot Connect a node we know and one we don't
-        TestCatchArgument(() => g.Connect(n, new Node("", "", "", 0), 0, 0, 0, null));
+        Assert.Throws<ArgumentException>(() => g.Connect(n, new Node("", "", "", 0), 0, 0, 0, null));
     }
 }
