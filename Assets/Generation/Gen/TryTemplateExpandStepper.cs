@@ -90,13 +90,6 @@ namespace Assets.Generation.Gen
                 // succeeded in relaxing expanded graph,
                 // look for a first edge to relax
                 case StepperController.Status.StepOutSuccess:
-                    StepperController.StatusReportInner ret = TryLaunchEdgeAdjust();
-
-                    if (ret != null)
-                    {
-                        return ret;
-                    }
-
                     return new StepperController.StatusReportInner(StepperController.Status.StepOutSuccess,
                           null, "No more stressed edges to adjust");
 
@@ -112,37 +105,10 @@ namespace Assets.Generation.Gen
 
         private StepperController.StatusReportInner TryLaunchEdgeAdjust()
         {
-            DirectedEdge e = MostStressedEdge(Graph.GetAllEdges());
-
-            if (e == null)
-            {
-                return null;
-            }
-
-            IStepper child = new EdgeAdjusterStepper(Graph, e, m_config);
+            IStepper child = new EdgeAdjusterStepper(Graph, m_config);
 
             return new StepperController.StatusReportInner(StepperController.Status.StepIn,
                   child, "Adjusting an edge.");
-        }
-
-        // only stresses above 10% are considered
-        private DirectedEdge MostStressedEdge(List<DirectedEdge> edges)
-        {
-            float max_stress = 1.1f;
-            DirectedEdge ret = null;
-
-            foreach (DirectedEdge e in edges)
-            {
-                float stress = e.Length() / e.MaxLength;
-
-                if (stress > max_stress)
-                {
-                    ret = e;
-                    max_stress = stress;
-                }
-            }
-
-            return ret;
         }
     }
 }

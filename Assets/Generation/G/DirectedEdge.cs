@@ -8,7 +8,10 @@ namespace Assets.Generation.G
     {
         public readonly INode Start;
         public readonly INode End;
-        public readonly float MinLength;
+        public float MinLength
+        {
+            get => MaxLength / 2;
+        }
         public readonly float MaxLength;
         public readonly float HalfWidth;
 
@@ -31,7 +34,6 @@ namespace Assets.Generation.G
 
             Start = start;
             End = end;
-            MinLength = min_length;
             MaxLength = max_length;
             HalfWidth = half_width;
             Layout = layout;
