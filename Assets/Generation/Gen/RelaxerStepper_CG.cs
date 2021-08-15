@@ -1,5 +1,4 @@
 ﻿using Assets.Generation.G;
-using Assets.Generation.IoC;
 using Assets.Generation.Stepping;
 using Assets.Generation.Templates;
 using Assets.Generation.U;
@@ -15,14 +14,6 @@ namespace Assets.Generation.Gen
     {
         int GetParams(List<double> pars, int offset);
         int SetParams(double[] array, int offset);
-    }
-
-    internal class RelaxerStepper_CGFactory : IRelaxerFactory
-    {
-        public IStepper MakeRelaxer(IoCContainer ioc_container, Graph g, GeneratorConfig c)
-        {
-            return new RelaxerStepper_CG(ioc_container, g, c, false);
-        }
     }
 
     public class RelaxerStepper_CG : IStepper
@@ -72,7 +63,7 @@ namespace Assets.Generation.Gen
 
         public TerminationCondition Status { get; private set; }
 
-        public RelaxerStepper_CG(IoCContainer ioc_container, Graph g, GeneratorConfig c, bool final)
+        public RelaxerStepper_CG(Graph g, GeneratorConfig c, bool final)
         {
             Graph = g;
             m_config = c;

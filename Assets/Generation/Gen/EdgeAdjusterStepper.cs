@@ -1,33 +1,22 @@
 ﻿using Assets.Generation.G;
 using Assets.Generation.GeomRep;
-using Assets.Generation.IoC;
 using Assets.Generation.Stepping;
 using UnityEngine;
 
 namespace Assets.Generation.Gen
 {
-    internal class EdgeAdjusterStepperFactory : IAdjusterFactory
-    {
-        public IStepper MakeAdjuster(IoCContainer ioc_container, Graph graph, DirectedEdge edge, GeneratorConfig c)
-        {
-            return new EdgeAdjusterStepper(ioc_container, graph, edge, c);
-        }
-    }
-
     internal class EdgeAdjusterStepper : IStepper
     {
         public Graph Graph { get; private set; }
 
         private readonly DirectedEdge m_edge;
         private readonly GeneratorConfig m_config;
-        private readonly IoCContainer m_ioc_container;
 
-        public EdgeAdjusterStepper(IoCContainer ioc_container, Graph graph, DirectedEdge edge, GeneratorConfig config)
+        public EdgeAdjusterStepper(Graph graph, DirectedEdge edge, GeneratorConfig config)
         {
             Graph = graph;
             m_edge = edge;
             m_config = config;
-            m_ioc_container = ioc_container;
         }
 
         public StepperController.StatusReportInner Step(StepperController.Status status)
@@ -37,7 +26,7 @@ namespace Assets.Generation.Gen
                 case StepperController.Status.StepIn:
                     SplitEdge();
 
-                    IStepper child = m_ioc_container.RelaxerFactory.MakeRelaxer(m_ioc_container, Graph, m_config);
+                    IStepper child = new RelaxerStepper_CG(Graph, m_config, false);
 
                     return new StepperController.StatusReportInner(StepperController.Status.StepIn,
                           child, "Relaxing split edge.");

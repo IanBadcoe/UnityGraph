@@ -1,5 +1,4 @@
 ﻿using Assets.Generation.G;
-using Assets.Generation.IoC;
 using Assets.Generation.Stepping;
 using Assets.Generation.Templates;
 using System;
@@ -7,14 +6,6 @@ using System.Collections.Generic;
 
 namespace Assets.Generation.Gen
 {
-    internal class TryTemplateExpandStepperFactory : INodeTemplateExpanderFactory
-    {
-        public IStepper MakeNodeTemplateExpander(IoCContainer ioc_container, Graph g, INode n, Template t, GeneratorConfig c)
-        {
-            return new TryTemplateExpandStepper(ioc_container, g, n, t, c);
-        }
-    }
-
     internal class TryTemplateExpandStepper : IStepper
     {
         public Graph Graph { get; private set; }
@@ -22,7 +13,6 @@ namespace Assets.Generation.Gen
         private readonly INode m_node;
         private readonly Template m_template;
         private readonly GeneratorConfig m_config;
-        private readonly IoCContainer m_ioc_container;
 
         private enum Phase
         {
@@ -32,9 +22,8 @@ namespace Assets.Generation.Gen
 
         private Phase m_phase = Phase.ExpandRelax;
 
-        public TryTemplateExpandStepper(IoCContainer ioc_container, Graph graph, INode node, Template template, GeneratorConfig config)
+        public TryTemplateExpandStepper(Graph graph, INode node, Template template, GeneratorConfig config)
         {
-            m_ioc_container = ioc_container;
             Graph = graph;
             m_node = node;
             m_template = template;
@@ -47,7 +36,7 @@ namespace Assets.Generation.Gen
             {
                 if (m_template.Expand(Graph, m_node, m_config.Rand()))
                 {
-                    IStepper child = m_ioc_container.RelaxerFactory.MakeRelaxer(m_ioc_container, Graph, m_config);
+                    IStepper child = new RelaxerStepper_CG(Graph, m_config, false);
 
                     return new StepperController.StatusReportInner(StepperController.Status.StepIn,
                           child, "Relaxing successful expansion.");
@@ -130,7 +119,7 @@ namespace Assets.Generation.Gen
                 return null;
             }
 
-            IStepper child = m_ioc_container.AdjusterFactory.MakeAdjuster(m_ioc_container, Graph, e, m_config);
+            IStepper child = new EdgeAdjusterStepper(Graph, e, m_config);
 
             return new StepperController.StatusReportInner(StepperController.Status.StepIn,
                   child, "Adjusting an edge.");

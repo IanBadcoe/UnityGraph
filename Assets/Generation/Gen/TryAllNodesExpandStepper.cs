@@ -1,5 +1,4 @@
 ﻿using Assets.Generation.G;
-using Assets.Generation.IoC;
 using Assets.Generation.Stepping;
 using Assets.Generation.Templates;
 using Assets.Generation.U;
@@ -8,26 +7,16 @@ using System.Linq;
 
 namespace Assets.Generation.Gen
 {
-    internal class TryAllNodesExpandStepperFactory : IAllNodesExpanderFactory
-    {
-        public IStepper MakeAllNodesExpander(IoCContainer ioc_container, Graph g, TemplateStore ts, GeneratorConfig c)
-        {
-            return new TryAllNodesExpandStepper(ioc_container, g, ts, c);
-        }
-    }
-
     internal class TryAllNodesExpandStepper : IStepper
     {
         public Graph Graph { get; private set; }
         private readonly TemplateStore m_templates;
         private readonly GeneratorConfig m_config;
-        private readonly IoCContainer m_ioc_container;
 
         private readonly List<INode> m_all_nodes;
 
-        public TryAllNodesExpandStepper(IoCContainer ioc_container, Graph graph, TemplateStore templates, GeneratorConfig config)
+        public TryAllNodesExpandStepper(Graph graph, TemplateStore templates, GeneratorConfig config)
         {
-            m_ioc_container = ioc_container;
             Graph = graph;
             m_templates = templates;
             m_config = config;
@@ -63,8 +52,8 @@ namespace Assets.Generation.Gen
                 templates = templates.Where(t => t.Codes.Contains("e")).ToList();
             }
 
-            IStepper child = m_ioc_container.NodeExpanderFactory.MakeNodeExpander(
-                  m_ioc_container, Graph, node, templates, m_config);
+            IStepper child = new TryAllTemplatesOnOneNodeStepper(
+                  Graph, node, templates, m_config);
 
             return new StepperController.StatusReportInner(StepperController.Status.StepIn,
                   child, "Trying to expand node: " + node.Name);

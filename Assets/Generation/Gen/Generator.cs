@@ -1,6 +1,5 @@
 using Assets.Generation.G;
 using Assets.Generation.GeomRep;
-using Assets.Generation.IoC;
 using Assets.Generation.Stepping;
 using Assets.Generation.Templates;
 using UnityEngine;
@@ -22,8 +21,6 @@ namespace Assets.Generation.Gen
         // need a better way of making and setting these, but while we only have one...
         private readonly TemplateStore Templates = new TemplateStore1();
 
-        private readonly IoCContainer m_ioc_container;
-
         public enum Phase
         {
             GraphExpand,
@@ -42,14 +39,6 @@ namespace Assets.Generation.Gen
             //UnityEngine.Assertion.Assert.raiseExceptions = true;
 
             Graph = graph;
-
-            m_ioc_container = new IoCContainer(
-                new RelaxerStepper_CGFactory(),
-                new TryAllNodesExpandStepperFactory(),
-                new TryAllTemplatesOnOneNodeStepperFactory(),
-                new TryTemplateExpandStepperFactory(),
-                new EdgeAdjusterStepperFactory()
-            );
 
             m_reqSize = req_size;
         }
@@ -83,7 +72,7 @@ namespace Assets.Generation.Gen
         {
             MakeSeed();
 
-            IStepper expander = new ExpandToSizeStepper(m_ioc_container, Graph, m_reqSize, Templates, Config);
+            IStepper expander = new ExpandToSizeStepper(Graph, m_reqSize, Templates, Config);
 
             m_phase = Phase.GraphExpand;
 
@@ -93,7 +82,7 @@ namespace Assets.Generation.Gen
 
         private StepperController.StatusReportInner ExpandDone()
         {
-            IStepper stepper = new RelaxerStepper_CG(m_ioc_container, Graph, Config, true);
+            IStepper stepper = new RelaxerStepper_CG(Graph, Config, true);
 
             m_phase = Phase.FinalRelax;
 

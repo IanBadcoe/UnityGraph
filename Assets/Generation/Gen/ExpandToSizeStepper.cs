@@ -1,5 +1,4 @@
 ﻿using Assets.Generation.G;
-using Assets.Generation.IoC;
 using Assets.Generation.Stepping;
 using Assets.Generation.Templates;
 using System;
@@ -16,12 +15,9 @@ namespace Assets.Generation.Gen
         private readonly GeneratorConfig m_config;
         private readonly int m_orig_size;
 
-        private readonly IoCContainer m_ioc_container;
-
-        public ExpandToSizeStepper(IoCContainer m_ioc_container, Graph graph, int required_size, TemplateStore templates,
+        public ExpandToSizeStepper(Graph graph, int required_size, TemplateStore templates,
                                    GeneratorConfig c)
         {
-            this.m_ioc_container = m_ioc_container;
             Graph = graph;
             m_orig_size = Graph == null ? 0 : Graph.NumNodes();
             m_required_size = required_size;
@@ -45,8 +41,7 @@ namespace Assets.Generation.Gen
 
                     Debug.WriteLine($"Starting expand step, current size: {Graph.NumNodes()}, target: {m_required_size}");
 
-                    IStepper child = m_ioc_container.AllNodesExpanderFactory.MakeAllNodesExpander(
-                            m_ioc_container, Graph, m_templates, m_config);
+                    IStepper child = new TryAllNodesExpandStepper(Graph, m_templates, m_config);
 
                     return new StepperController.StatusReportInner(StepperController.Status.StepIn,
                             child, "More expansion required.");
