@@ -2,6 +2,7 @@ using Assets.Generation.G;
 using Assets.Generation.GeomRep;
 using Assets.Generation.Stepping;
 using Assets.Generation.Templates;
+using System;
 using UnityEngine;
 
 
@@ -25,12 +26,13 @@ namespace Assets.Generation.Gen
         {
             GraphExpand,
             FinalRelax,
+            FinalEdgeAdjust,
             Done
         }
 
         private Phase m_phase = Phase.GraphExpand;
 
-        public bool Pause { get; set; }
+        private float CurrFinalRelaxMoveTarget = -1;
 
         private readonly int m_reqSize;
 
@@ -55,10 +57,27 @@ namespace Assets.Generation.Gen
                     switch (m_phase)
                     {
                         case Phase.GraphExpand:
-                            return ExpandDone();
+                            m_phase = Phase.FinalRelax;
+
+                            return new StepperController.StatusReportInner(StepperController.Status.Iterate,
+                                null, "Running final relaxation...");
 
                         case Phase.FinalRelax:
-                            return FinalRelaxDone();
+                            return FinalRelaxStep();
+
+                        case Phase.FinalEdgeAdjust:
+                            if (CurrFinalRelaxMoveTarget > Config.FinalRelaxationMoveTarget)
+                            {
+                                return FinalEdgeAdjustStep();
+                            }
+
+                            m_phase = Phase.Done;
+
+                            return new StepperController.StatusReportInner(StepperController.Status.Iterate,
+                                null, "Finalising...");
+
+                        case Phase.Done:
+                            return Done();
                     }
                     break;
             }
@@ -80,16 +99,39 @@ namespace Assets.Generation.Gen
                      expander, "engine.Level creation initialised");
         }
 
-        private StepperController.StatusReportInner ExpandDone()
+        private StepperController.StatusReportInner FinalRelaxStep()
         {
-            IStepper stepper = new RelaxerStepper_CG(Graph, Config, Config.FinalRelaxationMoveTarget);
+            if (CurrFinalRelaxMoveTarget == -1)
+            {
+                CurrFinalRelaxMoveTarget = Config.IntermediateRelaxationMoveTarget;
+            }
 
-            m_phase = Phase.FinalRelax;
+            CurrFinalRelaxMoveTarget /= 2;
 
-            return new StepperController.StatusReportInner(StepperController.Status.StepIn, stepper, "Expansion done");
+            if (CurrFinalRelaxMoveTarget < Config.FinalRelaxationMoveTarget)
+            {
+                CurrFinalRelaxMoveTarget = Config.FinalRelaxationMoveTarget;
+            }
+
+            m_phase = Phase.FinalEdgeAdjust;
+
+            IStepper stepper = new RelaxerStepper_CG(Graph, Config, CurrFinalRelaxMoveTarget);
+
+            return new StepperController.StatusReportInner(StepperController.Status.StepIn, stepper, $"Relaxing to {CurrFinalRelaxMoveTarget}");
         }
 
-        private StepperController.StatusReportInner FinalRelaxDone()
+        private StepperController.StatusReportInner FinalEdgeAdjustStep()
+        {
+            IStepper child = new EdgeAdjusterStepper(Graph, Config);
+
+            // we cycle between adjusting edges and relaxing to tighter criteria
+            m_phase = Phase.FinalRelax;
+
+            return new StepperController.StatusReportInner(StepperController.Status.StepIn,
+                  child, "Adjusting edges...");
+        }
+
+        private StepperController.StatusReportInner Done()
         {
             UnionHelper = new UnionHelper();
 
