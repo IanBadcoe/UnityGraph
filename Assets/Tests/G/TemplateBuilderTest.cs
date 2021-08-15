@@ -323,7 +323,7 @@ public class TemplateBuilderTest
 
             try
             {
-                t.Connect(null, "x", 0, 0, 0, null);
+                t.Connect(null, "x", 0, 0, null);
             }
             catch (NullReferenceException)
             {
@@ -340,7 +340,7 @@ public class TemplateBuilderTest
 
             try
             {
-                t.Connect("x", null, 0, 0, 0, null);
+                t.Connect("x", null, 0, 0, null);
             }
             catch (NullReferenceException)
             {
@@ -359,7 +359,7 @@ public class TemplateBuilderTest
 
             try
             {
-                t.Connect("x", "y", 0, 0, 0, null);
+                t.Connect("x", "y", 0, 0, null);
             }
             catch (TemplateBuilder.UnknownNodeException une)
             {
@@ -379,7 +379,7 @@ public class TemplateBuilderTest
 
             try
             {
-                t.Connect("x", "y", 0, 0, 0, null);
+                t.Connect("x", "y", 0, 0, null);
             }
             catch (TemplateBuilder.UnknownNodeException une)
             {
@@ -399,7 +399,7 @@ public class TemplateBuilderTest
 
             try
             {
-                t.Connect("x", "<target>", 0, 0, 0, null);
+                t.Connect("x", "<target>", 0, 0, null);
             }
             catch (ArgumentException)
             {
@@ -418,7 +418,7 @@ public class TemplateBuilderTest
 
             try
             {
-                t.Connect("<target>", "x", 0, 0, 0, null);
+                t.Connect("<target>", "x", 0, 0, null);
             }
             catch (ArgumentException)
             {
@@ -433,14 +433,14 @@ public class TemplateBuilderTest
 
             t.AddNode(NodeRecord.NodeType.In, "a");
             t.AddNode(NodeRecord.NodeType.In, "b");
-            t.Connect("a", "b", 0, 0, 0, null);
+            t.Connect("a", "b", 0, 0, null);
 
             {
                 bool thrown = false;
 
                 try
                 {
-                    t.Connect("a", "b", 1, 2, 3, null);
+                    t.Connect("a", "b", 1, 2, null);
                 }
                 catch (ArgumentException)
                 {
@@ -455,7 +455,7 @@ public class TemplateBuilderTest
 
                 try
                 {
-                    t.Connect("b", "a", 0, 0, 0, null);
+                    t.Connect("b", "a", 0, 0, null);
                 }
                 catch (ArgumentException)
                 {
@@ -481,7 +481,7 @@ public class TemplateBuilderTest
             NodeRecord nra = t.FindNodeRecord("a");
             NodeRecord nrb = t.FindNodeRecord("b");
 
-            t.Connect("a", "b", 1, 2, 3, null);
+            t.Connect("a", "b", 1, 2, null);
 
             Assert.IsNull(t.FindConnectionRecord("b", "a"));
 
@@ -490,9 +490,8 @@ public class TemplateBuilderTest
             Assert.IsNotNull(cr);
             Assert.AreEqual(nra, cr.From);
             Assert.AreEqual(nrb, cr.To);
-            Assert.AreEqual(1, cr.MinLength, 0.0);
-            Assert.AreEqual(2, cr.MaxLength, 0.0);
-            Assert.AreEqual(3, cr.HalfWidth, 0.0);
+            Assert.AreEqual(1, cr.MaxLength, 0.0);
+            Assert.AreEqual(2, cr.HalfWidth, 0.0);
         }
     }
 }

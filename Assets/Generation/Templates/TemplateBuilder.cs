@@ -207,21 +207,8 @@ namespace Assets.Generation.Templates
         }
 
         public void Connect(string from, string to,
-                            float min_length, float max_length,
+                            float max_length,
                             float half_width,
-                            GeomLayout layout)
-        {
-            Connect(from, to,
-                    min_length, max_length,
-                    half_width,
-                    0xffb4b4b4,
-                    layout);
-        }
-
-        public void Connect(string from, string to,
-                            float min_length, float max_length,
-                            float half_width,
-                            uint colour,
                             GeomLayout layout)
         {
             if (from == null)
@@ -271,7 +258,7 @@ namespace Assets.Generation.Templates
 
             m_connections.Add(
                   Template.MakeConnectionName(from, to),
-                  new ConnectionRecord(nrf, nrt, min_length, max_length, half_width, colour, layout));
+                  new ConnectionRecord(nrf, nrt, max_length, half_width, layout));
         }
 
         public ReadOnlyDictionary<string, NodeRecord> GetUnmodifiableNodes()

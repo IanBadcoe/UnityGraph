@@ -189,8 +189,7 @@ namespace Assets.Generation.Templates
                     half_width = existing_width;
                 }
 
-                DirectedEdge de = graph.Connect(nf, nt, cr.MinLength, cr.MaxLength, half_width, cr.Layout);
-                de.Colour = cr.Colour;
+                DirectedEdge de = graph.Connect(nf, nt, cr.MaxLength, half_width, cr.Layout);
             }
         }
 

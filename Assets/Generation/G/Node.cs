@@ -81,12 +81,12 @@ namespace Assets.Generation.G
 
         public bool ConnectsForwards(INode to)
         {
-            return m_connections.Contains(new DirectedEdge(this, to, 0, 0, 0, null));
+            return m_connections.Contains(new DirectedEdge(this, to));
         }
 
         public bool ConnectsBackwards(INode from)
         {
-            return m_connections.Contains(new DirectedEdge(from, this, 0, 0, 0, null));
+            return m_connections.Contains(new DirectedEdge(from, this));
         }
 
         public DirectedEdge Connect(Node n, float min_distance, float max_distance, float width)
@@ -126,8 +126,8 @@ namespace Assets.Generation.G
 
             // simplest just to try removing the forward and reverse edges
             // only the nodes are part of the edge identity
-            m_connections.Remove(new DirectedEdge(this, n, 0, 0, 0, null));
-            m_connections.Remove(new DirectedEdge(n, this, 0, 0, 0, null));
+            m_connections.Remove(new DirectedEdge(this, n));
+            m_connections.Remove(new DirectedEdge(n, this));
 
             n.Disconnect(this);
         }

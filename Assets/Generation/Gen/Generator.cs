@@ -116,8 +116,8 @@ namespace Assets.Generation.Gen
             expander.Position = new Vector2(0, 0);
             end.Position = new Vector2(4, 0);
 
-            Graph.Connect(start, expander, 3.5f, 4.5f, 1, CorridorLayout.Instance);
-            Graph.Connect(expander, end, 3.5f, 4.5f, 1, CorridorLayout.Instance);
+            Graph.Connect(start, expander, 4.5f, 1, CorridorLayout.Instance);
+            Graph.Connect(expander, end, 4.5f, 1, CorridorLayout.Instance);
         }
     }
 }

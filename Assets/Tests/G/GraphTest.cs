@@ -46,7 +46,7 @@ public class GraphTest
 
         INode n = g.AddNode("n", "x", 10, null);
         INode n2 = g.AddNode("n2", "x2", 20, null);
-        g.Connect(n, n2, 0, 0, 0, null);
+        g.Connect(n, n2, 0, 0, null);
 
         Assert.AreEqual(2, g.NumNodes());
         Assert.AreEqual(1, g.NumEdges());
@@ -91,7 +91,7 @@ public class GraphTest
         Assert.IsFalse(n2.Connects(n));
         Assert.AreEqual(0, g.NumEdges());
 
-        Assert.NotNull(g.Connect(n, n2, 1, 2, 3, null));
+        Assert.NotNull(g.Connect(n, n2, 2, 3, null));
         Assert.AreEqual(1, g.NumEdges());
         Assert.IsTrue(n.Connects(n2));
         Assert.IsTrue(n2.Connects(n));
@@ -100,7 +100,7 @@ public class GraphTest
         Assert.IsNotNull(e);
         Assert.AreEqual(n, e.Start);
         Assert.AreEqual(n2, e.End);
-        Assert.AreEqual(1, e.MinLength, 0);
+        Assert.AreEqual(1.5f, e.MinLength, 0);
         Assert.AreEqual(2, e.MaxLength, 0);
         Assert.AreEqual(3, e.HalfWidth, 0);
     }
@@ -128,7 +128,7 @@ public class GraphTest
             Assert.IsFalse(g.Disconnect(n, n2));
         }
 
-        g.Connect(n, n2, 0, 0, 0, null);
+        g.Connect(n, n2, 0, 0, null);
         Assert.AreEqual(1, g.NumEdges());
         Assert.IsTrue(n.Connects(n2));
 
@@ -150,25 +150,25 @@ public class GraphTest
 
         Assert.AreEqual(0, g.NumEdges());
 
-        g.Connect(n, m, 0, 0, 0, null);
+        g.Connect(n, m, 0, 0, null);
 
         Assert.AreEqual(1, g.NumEdges());
-        Assert.IsTrue(g.GetAllEdges().Contains(new DirectedEdge(n, m, 0, 0, 0)));
+        Assert.IsTrue(g.GetAllEdges().Contains(new DirectedEdge(n, m)));
 
-        g.Connect(m, o, 0, 0, 0, null);
+        g.Connect(m, o, 0, 0, null);
 
         Assert.AreEqual(2, g.NumEdges());
-        Assert.IsTrue(g.GetAllEdges().Contains(new DirectedEdge(m, o, 0, 0, 0)));
+        Assert.IsTrue(g.GetAllEdges().Contains(new DirectedEdge(m, o)));
 
-        g.Connect(o, n, 0, 0, 0, null);
+        g.Connect(o, n, 0, 0, null);
 
         Assert.AreEqual(3, g.NumEdges());
-        Assert.IsTrue(g.GetAllEdges().Contains(new DirectedEdge(o, n, 0, 0, 0)));
+        Assert.IsTrue(g.GetAllEdges().Contains(new DirectedEdge(o, n)));
 
         g.Disconnect(n, m);
 
         Assert.AreEqual(2, g.NumEdges());
-        Assert.IsFalse(g.GetAllEdges().Contains(new DirectedEdge(n, m, 0, 0, 0)));
+        Assert.IsFalse(g.GetAllEdges().Contains(new DirectedEdge(n, m)));
     }
 
     [Test]
@@ -310,7 +310,7 @@ public class GraphTest
 
             INode n2 = g.AddNode("", "", 0, null);
 
-            g.Connect(n1, n2, 0, 0, 0, null);
+            g.Connect(n1, n2, 0, 0, null);
 
             GraphRecord gr = new GraphRecord(g);
 
@@ -337,7 +337,7 @@ public class GraphTest
 
             GraphRecord gr = new GraphRecord(g);
 
-            g.Connect(n1, n2, 0, 0, 0, null);
+            g.Connect(n1, n2, 0, 0, null);
             g.Disconnect(n1, n2);
 
             Assert.IsTrue(gr.Compare(g));
@@ -362,7 +362,7 @@ public class GraphTest
 
             GraphRecord gr = new GraphRecord(g);
 
-            g.Connect(n1, n2, 0, 0, 0, null);
+            g.Connect(n1, n2, 0, 0, null);
 
             Assert.IsFalse(gr.Compare(g));
         }
@@ -436,7 +436,7 @@ public class GraphTest
             INode n1 = g.AddNode("", "", 0, null);
             INode n2 = g.AddNode("", "", 0, null);
 
-            g.Connect(n1, n2, 0, 0, 0, null);
+            g.Connect(n1, n2, 0, 0, null);
 
             igr.Restore();
 
@@ -450,7 +450,7 @@ public class GraphTest
             INode n1 = g.AddNode("", "", 0, null);
             INode n2 = g.AddNode("", "", 0, null);
 
-            g.Connect(n1, n2, 0, 0, 0, null);
+            g.Connect(n1, n2, 0, 0, null);
 
             GraphRecord gr = new GraphRecord(g);
 
@@ -494,7 +494,7 @@ public class GraphTest
 
             IGraphRestore igr = g.CreateRestorePoint();
 
-            g.Connect(n1, n2, 0, 0, 0, null);
+            g.Connect(n1, n2, 0, 0, null);
             g.Disconnect(n1, n2);
 
             igr.Restore();
@@ -513,9 +513,9 @@ public class GraphTest
 
             IGraphRestore igr = g.CreateRestorePoint();
 
-            g.Connect(n1, n2, 0, 0, 0, null);
+            g.Connect(n1, n2, 0, 0, null);
             g.Disconnect(n1, n2);
-            g.Connect(n1, n2, 0, 0, 0, null);
+            g.Connect(n1, n2, 0, 0, null);
 
             igr.Restore();
 
@@ -528,14 +528,14 @@ public class GraphTest
 
             INode n1 = g.AddNode("", "", 0, null);
             INode n2 = g.AddNode("", "", 0, null);
-            g.Connect(n1, n2, 0, 0, 0, null);
+            g.Connect(n1, n2, 0, 0, null);
 
             GraphRecord gr = new GraphRecord(g);
 
             IGraphRestore igr = g.CreateRestorePoint();
 
             g.Disconnect(n1, n2);
-            g.Connect(n1, n2, 0, 0, 0, null);
+            g.Connect(n1, n2, 0, 0, null);
 
             igr.Restore();
 
@@ -548,14 +548,14 @@ public class GraphTest
 
             INode n1 = g.AddNode("", "", 0, null);
             INode n2 = g.AddNode("", "", 0, null);
-            g.Connect(n1, n2, 0, 0, 0, null);
+            g.Connect(n1, n2, 0, 0, null);
 
             GraphRecord gr = new GraphRecord(g);
 
             IGraphRestore igr = g.CreateRestorePoint();
 
             g.Disconnect(n1, n2);
-            g.Connect(n1, n2, 0, 0, 0, null);
+            g.Connect(n1, n2, 0, 0, null);
             g.Disconnect(n1, n2);
 
             igr.Restore();
@@ -574,7 +574,7 @@ public class GraphTest
             INode n1 = g.AddNode("", "", 0, null);
             INode n2 = g.AddNode("", "", 0, null);
 
-            g.Connect(n1, n2, 0, 0, 0, null);
+            g.Connect(n1, n2, 0, 0, null);
 
             GraphRecord gr2 = new GraphRecord(g);
 
@@ -583,7 +583,7 @@ public class GraphTest
             INode n3 = g.AddNode("", "", 0, null);
             INode n4 = g.AddNode("", "", 0, null);
 
-            g.Connect(n3, n4, 0, 0, 0, null);
+            g.Connect(n3, n4, 0, 0, null);
 
             Assert.AreEqual(igr2, g.Restore);
 
@@ -612,14 +612,14 @@ public class GraphTest
             INode n1 = g.AddNode("", "", 0, null);
             INode n2 = g.AddNode("", "", 0, null);
 
-            g.Connect(n1, n2, 0, 0, 0, null);
+            g.Connect(n1, n2, 0, 0, null);
 
             IGraphRestore igr2 = g.CreateRestorePoint();
 
             INode n3 = g.AddNode("", "", 0, null);
             INode n4 = g.AddNode("", "", 0, null);
 
-            g.Connect(n3, n4, 0, 0, 0, null);
+            g.Connect(n3, n4, 0, 0, null);
 
             igr1.Restore();
             Assert.IsFalse(igr2.CanBeRestored());
@@ -777,11 +777,11 @@ public class GraphTest
 
         // cannot Connect two nodes we never neard of
         Assert.Throws<ArgumentException>(() => g.Connect(new Node("", "", 0),
-              new Node("", "", 0), 0, 0, 0, null));
+              new Node("", "", 0), 0, 0, null));
 
         INode n = g.AddNode("n", "x", 10, null);
 
         // cannot Connect a node we know and one we don't
-        Assert.Throws<ArgumentException>(() => g.Connect(n, new Node("", "", 0), 0, 0, 0, null));
+        Assert.Throws<ArgumentException>(() => g.Connect(n, new Node("", "", 0), 0, 0, null));
     }
 }

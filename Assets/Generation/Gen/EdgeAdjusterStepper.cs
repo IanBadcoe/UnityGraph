@@ -86,13 +86,10 @@ namespace Assets.Generation.Gen
             Graph.Disconnect(e.Start, e.End);
             // idea of lengths is to force no more length but allow
             // a longer corridor if required
-            DirectedEdge de1 = Graph.Connect(e.Start, c, e.MinLength / 2, e.MaxLength, e.HalfWidth,
+            DirectedEdge de1 = Graph.Connect(e.Start, c, e.MaxLength, e.HalfWidth,
                 CorridorLayout.Instance);
-            DirectedEdge de2 = Graph.Connect(c, e.End, e.MinLength / 2, e.MaxLength, e.HalfWidth,
+            DirectedEdge de2 = Graph.Connect(c, e.End, e.MaxLength, e.HalfWidth,
                 CorridorLayout.Instance);
-
-            de1.Colour = e.Colour;
-            de2.Colour = e.Colour;
 
             return true;
         }
