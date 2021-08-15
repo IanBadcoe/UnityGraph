@@ -82,6 +82,27 @@ namespace Assets.Generation.Templates
             }
 
             {
+                TemplateBuilder tb = new TemplateBuilder("Big triangle", "");
+                tb.AddNode(NodeRecord.NodeType.In, "i");
+                tb.AddNode(NodeRecord.NodeType.Out, "o");
+                tb.AddNode(NodeRecord.NodeType.Internal, "a", false, "<target>", null, null, "", 1f, CircularGeomLayout.Instance);
+                tb.AddNode(NodeRecord.NodeType.Internal, "b", true, "<target>", null, "i", "", 1f, CircularGeomLayout.Instance);
+                tb.AddNode(NodeRecord.NodeType.Internal, "c", true, "<target>", null, "o", "", 1f, CircularGeomLayout.Instance);
+
+                tb.Connect("i", "a", 4.5f, -1, CorridorLayout.Instance);
+                tb.Connect("a", "o", 4.5f, -1, CorridorLayout.Instance);
+                tb.Connect("a", "b", 4.5f, -1, CorridorLayout.Instance);
+                tb.Connect("b", "c", 4.5f, 0.5f, CorridorLayout.Instance);
+                tb.Connect("a", "c", 4.5f, -1, CorridorLayout.Instance);
+
+                tb.ExtraForce("a", "b", 10, 1);
+                tb.ExtraForce("b", "c", 10, 1);
+                tb.ExtraForce("c", "a", 10, 1);
+
+                AddTemplate(tb.Build());
+            }
+
+            {
                 //DoorPostExpand dh = new DoorPostExpand();
 
                 TemplateBuilder tb = new TemplateBuilder("Rotunda", ""/*, dh*/);
