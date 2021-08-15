@@ -45,7 +45,7 @@ namespace Assets.Generation.Gen
         private int m_energy_count = 0;
         private int m_iterations = 0;
 
-        readonly bool Final;
+        readonly float MoveTarget;
 
         public enum TerminationCondition
         {
@@ -63,11 +63,16 @@ namespace Assets.Generation.Gen
 
         public TerminationCondition Status { get; private set; }
 
-        public RelaxerStepper_CG(Graph g, GeneratorConfig c, bool final)
+        public RelaxerStepper_CG(Graph g, GeneratorConfig c)
+            : this(g, c, c.IntermediateRelaxationMoveTarget)
+        {
+        }
+
+        public RelaxerStepper_CG(Graph g, GeneratorConfig c, float move_target_override)
         {
             Graph = g;
             m_config = c;
-            Final = final;
+            MoveTarget = move_target_override;
         }
 
         private void SetUp()
@@ -117,7 +122,7 @@ namespace Assets.Generation.Gen
             alglib.mincgcreatef(m_pars, 1e-4, out opt_state);
             alglib.mincgsuggeststep(opt_state, 1);
             alglib.mincgsetcond(opt_state, 0, 0,
-                Final ? m_config.FinalRelaxationMoveTarget : m_config.IntermediateRelaxationMoveTarget,
+                MoveTarget,
                 MaxIterationsPerStep);
             alglib.mincgsetxrep(opt_state, true);
 

@@ -28,7 +28,7 @@ namespace Assets.Generation.Gen
 
                     // tried leaving relaxation of these for a later relax step, which we will have anyway
                     // but that seemed to take longer...
-                    IStepper child = new RelaxerStepper_CG(Graph, m_config, false);
+                    IStepper child = new RelaxerStepper_CG(Graph, m_config);
 
                     return new StepperController.StatusReportInner(StepperController.Status.StepIn,
                           child, "Relaxing split edge.");

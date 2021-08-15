@@ -82,7 +82,7 @@ namespace Assets.Generation.Gen
 
         private StepperController.StatusReportInner ExpandDone()
         {
-            IStepper stepper = new RelaxerStepper_CG(Graph, Config, true);
+            IStepper stepper = new RelaxerStepper_CG(Graph, Config, Config.FinalRelaxationMoveTarget);
 
             m_phase = Phase.FinalRelax;
 

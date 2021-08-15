@@ -36,7 +36,7 @@ namespace Assets.Generation.Gen
             {
                 if (m_template.Expand(Graph, m_node, m_config.Rand()))
                 {
-                    IStepper child = new RelaxerStepper_CG(Graph, m_config, false);
+                    IStepper child = new RelaxerStepper_CG(Graph, m_config);
 
                     return new StepperController.StatusReportInner(StepperController.Status.StepIn,
                           child, "Relaxing successful expansion.");
