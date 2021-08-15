@@ -21,12 +21,11 @@ namespace Assets.Generation.Templates
         public readonly NodeRecord PositionAwayFrom; // null for none
         public readonly string Codes;                // copied onto node
         public readonly float Radius;
-        public readonly uint Colour;
         public readonly GeomLayout Layout;
 
         public NodeRecord(NodeType type, string name,
               bool nudge, NodeRecord positionOn, NodeRecord positionTowards, NodeRecord positionAwayFrom,
-              string codes, float radius, uint colour,
+              string codes, float radius,
               GeomLayout layout)
         {
             Type = type;
@@ -37,7 +36,6 @@ namespace Assets.Generation.Templates
             PositionAwayFrom = positionAwayFrom;
             Codes = codes;
             Radius = radius;
-            Colour = colour;
             Layout = layout;
         }
     }

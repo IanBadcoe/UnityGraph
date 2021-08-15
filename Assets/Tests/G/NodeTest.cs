@@ -184,17 +184,6 @@ public class NodeTest
     //}
 
     [Test]
-    public void TestSetColour()
-    {
-        Node n1 = new Node("", "", 0);
-
-        Assert.AreEqual(0xff8c8c8c, n1.Colour);
-
-        n1.Colour = 0x12345678;
-        Assert.AreEqual(0x12345678, n1.Colour);
-    }
-
-    [Test]
     public void TestGeomLayout()
     {
         Node n1 = new Node("", "", 0);

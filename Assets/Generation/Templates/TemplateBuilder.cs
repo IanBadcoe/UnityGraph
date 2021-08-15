@@ -28,7 +28,7 @@ namespace Assets.Generation.Templates
             // a dummy entry used to represent the node we are replacing in positioning rules
             m_nodes.Add("<target>", new NodeRecord(NodeRecord.NodeType.Target, "<target>",
                   false, null, null, null,
-                  null, 0, 0, null));
+                  null, 0, null));
 
             // m_post_expand = post_expand;
         }
@@ -77,25 +77,12 @@ namespace Assets.Generation.Templates
         }
 
         // types In and Out ignore all parameters after "name"
-        public void AddNode(NodeRecord.NodeType type, string name, bool nudge,
-              string positionOnName, string positionTowardsName,
-              string positionAwayFromName,
-              string codes, float radius,
-              GeomLayout layout)
-        {
-            AddNode(type, name, nudge,
-                    positionOnName, positionTowardsName, positionAwayFromName,
-                    codes, radius,
-                    layout,
-                    0xff8c8c8c);
-        }
 
         public void AddNode(NodeRecord.NodeType type, string name, bool nudge,
              string positionOnName, string positionTowardsName,
              string positionAwayFromName,
              string codes, float radius,
-             GeomLayout layout,
-             uint colour)
+             GeomLayout layout)
         {
             if (name.Contains("->"))
             {
@@ -161,7 +148,6 @@ namespace Assets.Generation.Templates
             m_nodes.Add(name, new NodeRecord(type, name, nudge,
                   positionOn, positionTowards, positionAwayFrom,
                   codes, radius,
-                  colour,
                   layout));
 
             switch (type)

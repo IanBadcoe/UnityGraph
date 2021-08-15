@@ -52,8 +52,7 @@ namespace Assets.Generation.Templates
                 TemplateBuilder tb = new TemplateBuilder("Tee", "e");
                 tb.AddNode(NodeRecord.NodeType.In, "i");
                 tb.AddNode(NodeRecord.NodeType.Out, "o");
-                tb.AddNode(NodeRecord.NodeType.Internal, "j", false, "<target>", null, null, "", 1f, CircularGeomLayout.Instance,
-                      0xff808040);
+                tb.AddNode(NodeRecord.NodeType.Internal, "j", false, "<target>", null, null, "", 1f, CircularGeomLayout.Instance);
                 tb.AddNode(NodeRecord.NodeType.Internal, "side", true, "<target>", null, null, "e", 2f, CircularGeomLayout.Instance);
 
                 tb.Connect("i", "j", 4.5f, -1, CorridorLayout.Instance);
@@ -67,8 +66,7 @@ namespace Assets.Generation.Templates
                 TemplateBuilder tb = new TemplateBuilder("Loop Tee", "");
                 tb.AddNode(NodeRecord.NodeType.In, "i");
                 tb.AddNode(NodeRecord.NodeType.Out, "o");
-                tb.AddNode(NodeRecord.NodeType.Internal, "j", false, "<target>", null, null, "", 1f, CircularGeomLayout.Instance,
-                      0xff808040);
+                tb.AddNode(NodeRecord.NodeType.Internal, "j", false, "<target>", null, null, "", 1f, CircularGeomLayout.Instance);
                 tb.AddNode(NodeRecord.NodeType.Internal, "side-j", true, "<target>", null, "i", "", 1f, CircularGeomLayout.Instance);
                 tb.AddNode(NodeRecord.NodeType.Internal, "side", true, "<target>", null, "o", "", 4f, CircularGeomLayout.Instance);
 
@@ -90,7 +88,7 @@ namespace Assets.Generation.Templates
                 tb.AddNode(NodeRecord.NodeType.In, "i");
                 tb.AddNode(NodeRecord.NodeType.Internal, "rotunda", false, "<target>",
                       null, null, "", 4f,
-                      FourCircularPillarsGeomLayout.Instance, 0xff802080);
+                      FourCircularPillarsGeomLayout.Instance);
 
                 tb.Connect("i", "rotunda", 4.5f, -1, CorridorLayout.Instance);
 

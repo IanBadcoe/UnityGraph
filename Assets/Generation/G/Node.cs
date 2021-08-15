@@ -23,7 +23,6 @@ namespace Assets.Generation.G
         public float Radius { get; }
 
         public Vector2 Pos { get; set; }
-        public uint Colour { get; set; } = 0xff8c8c8c;
         public Vector2 Position { get; set; }
         public Vector2 Force { get; set; }
 

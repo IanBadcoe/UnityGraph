@@ -85,7 +85,6 @@ namespace Assets.Generation.Templates
                 {
                     INode n = graph.AddNode(nr.Name, nr.Codes, nr.Radius, nr.Layout, hm);
                     template_to_graph.Add(nr, n);
-                    n.Colour = nr.Colour;
                 }
             }
 
