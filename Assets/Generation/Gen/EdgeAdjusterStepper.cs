@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Assets.Generation.Gen
 {
-    internal class EdgeAdjusterStepper : IStepper
+    public class EdgeAdjusterStepper : IStepper
     {
         public Graph Graph { get; private set; }
 

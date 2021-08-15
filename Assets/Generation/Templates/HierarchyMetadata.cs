@@ -89,7 +89,7 @@ namespace Assets.Generation.Templates
             }
         }
 
-        internal IReadOnlyList<Force> GetExtraForces()
+        public IReadOnlyList<Force> GetExtraForces()
         {
             return m_extra_forces;
         }
@@ -105,7 +105,7 @@ namespace Assets.Generation.Templates
             Template = template;
         }
 
-        internal void AddExtraForce(INode n1, INode n2, float targetDist, float forceMultiplier)
+        public void AddExtraForce(INode n1, INode n2, float targetDist, float forceMultiplier)
         {
             m_extra_forces.Add(new Force(n1, n2, targetDist, forceMultiplier));
         }

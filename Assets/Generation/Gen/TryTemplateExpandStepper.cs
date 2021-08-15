@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Assets.Generation.Gen
 {
-    internal class TryTemplateExpandStepper : IStepper
+    public class TryTemplateExpandStepper : IStepper
     {
         public Graph Graph { get; private set; }
 

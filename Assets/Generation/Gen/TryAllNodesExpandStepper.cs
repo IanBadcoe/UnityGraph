@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Assets.Generation.Gen
 {
-    internal class TryAllNodesExpandStepper : IStepper
+    public class TryAllNodesExpandStepper : IStepper
     {
         public Graph Graph { get; private set; }
         private readonly TemplateStore m_templates;
