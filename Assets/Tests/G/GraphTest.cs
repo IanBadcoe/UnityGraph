@@ -100,7 +100,7 @@ public class GraphTest
         Assert.IsNotNull(e);
         Assert.AreEqual(n, e.Start);
         Assert.AreEqual(n2, e.End);
-        Assert.AreEqual(1.5f, e.MinLength, 0);
+        Assert.AreEqual(1, e.MinLength, 0);
         Assert.AreEqual(2, e.MaxLength, 0);
         Assert.AreEqual(3, e.HalfWidth, 0);
     }
