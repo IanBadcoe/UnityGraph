@@ -31,7 +31,7 @@ namespace Assets.Behaviour.Drawing
                     {
                         float len = loop.ParamRange;
 
-                        Vector3[] points = loop.Facet(1);
+                        Vector3[] points = loop.Facet(0.1f);
 
                         var renderer = GameObject.Instantiate(LoopDrawTemplate, transform);
 

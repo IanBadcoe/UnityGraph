@@ -103,7 +103,7 @@ public class GraphUtilTest
 
     Node MakeRadiusNodeAt(float x, float y, float radius)
     {
-        Node ret = new Node("", "", "", radius);
+        Node ret = new Node("", "", radius);
 
         ret.Position = new Vector2(x, y);
 

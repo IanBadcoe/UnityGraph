@@ -37,7 +37,7 @@ namespace Assets.Behaviour.Drawing
             }
         }
 
-        internal void UpdateGeometry(Graph graph)
+        public void UpdateGeometry(Graph graph)
         {
             if (graph == null)
             {

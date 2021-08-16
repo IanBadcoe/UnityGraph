@@ -13,8 +13,8 @@ public class NodeTest
     [Test]
     public void TestNumConnections()
     {
-        Node n1 = new Node("", "", "", 0);
-        Node n2 = new Node("", "", "", 0);
+        Node n1 = new Node("", "", 0);
+        Node n2 = new Node("", "", 0);
 
         Assert.AreEqual(0, n1.NumConnections());
 
@@ -31,8 +31,8 @@ public class NodeTest
     public void TestConnect_Exception()
     {
         {
-            Node n1 = new Node("xxx", "", "", 0);
-            Node n2 = new Node("yyy", "", "", 0);
+            Node n1 = new Node("xxx", "", 0);
+            Node n2 = new Node("yyy", "", 0);
             n1.Connect(n2, 0, 0, 0/*, null */);
 
             bool thrown = false;
@@ -53,8 +53,8 @@ public class NodeTest
         }
 
         {
-            Node n1 = new Node("xxx", "", "", 0);
-            Node n2 = new Node("yyy", "", "", 0);
+            Node n1 = new Node("xxx", "", 0);
+            Node n2 = new Node("yyy", "", 0);
             n1.Connect(n2, 0, 0, 0/*, null*/);
 
             bool thrown = false;
@@ -79,8 +79,8 @@ public class NodeTest
     public void TestGetConnectionTo()
     {
         {
-            Node n1 = new Node("xxx", "", "", 0);
-            Node n2 = new Node("yyy", "", "", 0);
+            Node n1 = new Node("xxx", "", 0);
+            Node n2 = new Node("yyy", "", 0);
             n1.Connect(n2, 0, 0, 0/*, null*/);
 
             DirectedEdge de = n1.GetConnectionTo(n2);
@@ -91,8 +91,8 @@ public class NodeTest
         }
 
         {
-            Node n1 = new Node("xxx", "", "", 0);
-            Node n2 = new Node("yyy", "", "", 0);
+            Node n1 = new Node("xxx", "", 0);
+            Node n2 = new Node("yyy", "", 0);
             n1.Connect(n2, 0, 0, 0/*, null*/);
 
             DirectedEdge de = n1.GetConnectionTo(null);
@@ -100,7 +100,7 @@ public class NodeTest
             Assert.Null(de);
 
             // these are found by node-identity, not name
-            de = n1.GetConnectionTo(new Node("yyy", "", "", 0));
+            de = n1.GetConnectionTo(new Node("yyy", "", 0));
 
             Assert.Null(de);
         }
@@ -110,8 +110,8 @@ public class NodeTest
     public void TestGetConnectionFrom()
     {
         {
-            Node n1 = new Node("xxx", "", "", 0);
-            Node n2 = new Node("yyy", "", "", 0);
+            Node n1 = new Node("xxx", "", 0);
+            Node n2 = new Node("yyy", "", 0);
             n1.Connect(n2, 0, 0, 0/*, null*/);
 
             DirectedEdge de = n2.GetConnectionFrom(n1);
@@ -122,8 +122,8 @@ public class NodeTest
         }
 
         {
-            Node n1 = new Node("xxx", "", "", 0);
-            Node n2 = new Node("yyy", "", "", 0);
+            Node n1 = new Node("xxx", "", 0);
+            Node n2 = new Node("yyy", "", 0);
             n1.Connect(n2, 0, 0, 0/*, null*/);
 
             DirectedEdge de = n1.GetConnectionFrom(null);
@@ -131,7 +131,7 @@ public class NodeTest
             Assert.Null(de);
 
             // these are found by node-identity, not name
-            de = n1.GetConnectionFrom(new Node("xxx", "", "", 0));
+            de = n1.GetConnectionFrom(new Node("xxx", "", 0));
 
             Assert.Null(de);
         }
@@ -140,9 +140,9 @@ public class NodeTest
     [Test]
     public void TestConnects()
     {
-        Node n1 = new Node("", "", "", 0);
-        Node n2 = new Node("", "", "", 0);
-        Node n3 = new Node("", "", "", 0);
+        Node n1 = new Node("", "", 0);
+        Node n2 = new Node("", "", 0);
+        Node n3 = new Node("", "", 0);
 
         n1.Connect(n2, 1, 2, 3/*, null*/);
 
@@ -162,7 +162,7 @@ public class NodeTest
     //[Test]
     //public void testSetName()
     //{
-    //    Node n1 = new Node("", "", "", 0);
+    //    Node n1 = new Node("", 0);
 
     //    Assert.AreEqual("", n1.Name);
 
@@ -184,24 +184,13 @@ public class NodeTest
     //}
 
     [Test]
-    public void TestSetColour()
-    {
-        Node n1 = new Node("", "", "", 0);
-
-        Assert.AreEqual(0xff8c8c8c, n1.Colour);
-
-        n1.Colour = 0x12345678;
-        Assert.AreEqual(0x12345678, n1.Colour);
-    }
-
-    [Test]
     public void TestGeomLayout()
     {
-        Node n1 = new Node("", "", "", 0);
+        Node n1 = new Node("", "", 0);
 
         Assert.IsNull(n1.Layout);
 
-        Node n2 = new Node("", "", "", 0, CircularGeomLayout.Instance);
+        Node n2 = new Node("", "", 0, CircularGeomLayout.Instance);
 
         Assert.AreEqual(CircularGeomLayout.Instance, n2.Layout);
     }

@@ -3,6 +3,7 @@ using Assets.Generation.U;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using UnityEngine;
 
 namespace Assets.Generation.Templates
@@ -16,10 +17,12 @@ namespace Assets.Generation.Templates
 
         private readonly ReadOnlyDictionary<string, NodeRecord> m_nodes;
         private readonly ReadOnlyDictionary<string, ConnectionRecord> m_connections;
+        private readonly IReadOnlyList<ForceRecord> m_extra_forces;
 
         public string Name { get; private set; }
 
         public string Codes { get; private set; }
+        public readonly float ExtraClusterSeparation;
 
         public Template(TemplateBuilder builder)
         {
@@ -28,10 +31,13 @@ namespace Assets.Generation.Templates
 
             m_nodes = builder.GetUnmodifiableNodes();
             m_connections = builder.GetUnmodifiableConnections();
+            m_extra_forces = builder.GetUnmodifiableExtraForces();
 
             m_num_in_nodes = builder.GetNumInNodes();
             m_num_out_nodes = builder.GetNumOutNodes();
             m_num_internal_nodes = builder.GetNumInternalNodes();
+
+            ExtraClusterSeparation = builder.ExtraClusterSeparation;
 
             //m_post_expand = builder.GetPostExpand();
 
@@ -56,6 +62,8 @@ namespace Assets.Generation.Templates
             IReadOnlyList<DirectedEdge> target_in_connections = target.GetInConnections();
             IReadOnlyList<DirectedEdge> target_out_connections = target.GetOutConnections();
 
+            HierarchyMetadata hm = new HierarchyMetadata(target.Parent, this);
+
             if (m_num_in_nodes != target_in_connections.Count)
             {
                 return false;
@@ -78,13 +86,14 @@ namespace Assets.Generation.Templates
             {
                 if (nr.Type == NodeRecord.NodeType.Internal)
                 {
-                    INode n = graph.AddNode(nr.Name, nr.Codes, Name, nr.Radius, nr.Layout);
+                    INode n = graph.AddNode(nr.Name, nr.Codes, nr.Radius, nr.Layout, hm);
                     template_to_graph.Add(nr, n);
-                    n.Colour = nr.Colour;
                 }
             }
 
-            // find nodes for in connections and map to their NodeRecords
+            HashSet<float> existing_corridor_widths = new HashSet<float>();
+
+            // find nodes for in-connections and map to their NodeRecords
             {
                 IEnumerator<DirectedEdge> g_it = target_in_connections.GetEnumerator();
 
@@ -97,11 +106,13 @@ namespace Assets.Generation.Templates
                         INode g_conn = g_it.Current.Start;
 
                         template_to_graph.Add(nr, g_conn);
+
+                        existing_corridor_widths.Add(g_it.Current.HalfWidth);
                     }
                 }
             }
 
-            // find nodes for out connections and map to their NodeRecords
+            // find nodes for out-connections and map to their NodeRecords
             {
                 IEnumerator<DirectedEdge> g_it = target_out_connections.GetEnumerator();
 
@@ -114,11 +125,19 @@ namespace Assets.Generation.Templates
                         INode g_conn = g_it.Current.End;
 
                         template_to_graph.Add(nr, g_conn);
+
+                        existing_corridor_widths.Add(g_it.Current.HalfWidth);
                     }
                 }
             }
 
-            ApplyConnections(target, template_to_graph, graph);
+            if (existing_corridor_widths.Count == 0)
+            {
+                existing_corridor_widths.Add(1);
+            }
+
+            ApplyConnections(target, template_to_graph, graph,
+                Util.RemoveRandom(random, existing_corridor_widths.ToList()));
 
             // make three attempts to position the nodes
             // no point if no random components, but pretty cheap to do...
@@ -130,6 +149,7 @@ namespace Assets.Generation.Templates
                     // but now we're done with it
                     graph.RemoveNode(target);
 
+                    ApplyExtraForces(hm, template_to_graph);
                     // ApplyPostExpand(template_to_graph);
 
                     return true;
@@ -139,8 +159,19 @@ namespace Assets.Generation.Templates
             return false;
         }
 
+        private void ApplyExtraForces(HierarchyMetadata hm, Dictionary<NodeRecord, INode> template_to_graph)
+        {
+            foreach (var fr in m_extra_forces)
+            {
+                INode n1 = template_to_graph[fr.Node1];
+                INode n2 = template_to_graph[fr.Node2];
+
+                hm.AddExtraForce(n1, n2, fr.TargetDist, fr.ForceMultiplier);
+            }
+        }
+
         private void ApplyConnections(INode node_replacing, Dictionary<NodeRecord, INode> template_to_graph,
-                                      Graph graph)
+                                      Graph graph, float existing_width)
         {
             foreach (DirectedEdge e in node_replacing.GetConnections())
             {
@@ -153,8 +184,14 @@ namespace Assets.Generation.Templates
                 INode nf = template_to_graph[cr.From];
                 INode nt = template_to_graph[cr.To];
 
-                DirectedEdge de = graph.Connect(nf, nt, cr.MinLength, cr.MaxLength, cr.HalfWidth, cr.Layout);
-                de.Colour = cr.Colour;
+                float half_width = cr.HalfWidth;
+
+                if (half_width == -1)
+                {
+                    half_width = existing_width;
+                }
+
+                DirectedEdge de = graph.Connect(nf, nt, cr.MaxLength, half_width, cr.Layout);
             }
         }
 

@@ -24,7 +24,7 @@ public class TemplateTest
 
             Graph g = new Graph();
 
-            INode a = g.AddNode("x", "", "", 0, null);
+            INode a = g.AddNode("x", "", 0, null);
             a.Position = new Vector2(-4, 3);
 
             Assert.IsTrue(t.Expand(g, a, new ClRand(1)));
@@ -47,7 +47,7 @@ public class TemplateTest
 
             Graph g = new Graph();
 
-            INode n = g.AddNode("x", "", "", 0, null);
+            INode n = g.AddNode("x", "", 0, null);
             n.Position = new Vector2(-4, 3);
 
             Assert.IsTrue(t.Expand(g, n, new ClRand(1)));
@@ -70,15 +70,15 @@ public class TemplateTest
             tb.AddNode(NodeRecord.NodeType.Internal, "a",
                   false, "in", null, null,
                   "", 0.0f, null);
-            tb.Connect("in", "a", 0, 0, 0, null);
+            tb.Connect("in", "a", 0, 0, null);
 
             Template t = tb.Build();
 
             Graph g = new Graph();
 
-            INode a = g.AddNode("x", "", "", 0, null);
+            INode a = g.AddNode("x", "", 0, null);
             a.Position = new Vector2(-4, 3);
-            INode in_n = g.AddNode("in", "", "", 0, null);
+            INode in_n = g.AddNode("in", "", 0, null);
             in_n.Position = new Vector2(10, 9);
 
             g.Connect(in_n, a, 0, 0, 0, null);
@@ -100,15 +100,15 @@ public class TemplateTest
             tb.AddNode(NodeRecord.NodeType.Internal, "a",
                   true, "in", null, null,
                   "", 0.0f, null);
-            tb.Connect("in", "a", 0, 0, 0, null);
+            tb.Connect("in", "a", 0, 0, null);
 
             Template t = tb.Build();
 
             Graph g = new Graph();
 
-            INode a = g.AddNode("x", "", "", 0, null);
+            INode a = g.AddNode("x", "", 0, null);
             a.Position = new Vector2(-4, 3);
-            INode in_n = g.AddNode("in", "", "", 0, null);
+            INode in_n = g.AddNode("in", "", 0, null);
             in_n.Position = new Vector2(10, 9);
 
             g.Connect(in_n, a, 0, 0, 0, null);
@@ -133,15 +133,15 @@ public class TemplateTest
             tb.AddNode(NodeRecord.NodeType.Internal, "a",
                   false, "<target>", "in", null,
                   "", 0.0f, null);
-            tb.Connect("in", "a", 0, 0, 0, null);
+            tb.Connect("in", "a", 0, 0, null);
 
             Template t = tb.Build();
 
             Graph g = new Graph();
 
-            INode a = g.AddNode("x", "", "", 0, null);
+            INode a = g.AddNode("x", "", 0, null);
             a.Position = new Vector2(-4, 3);
-            INode in_n = g.AddNode("in", "", "", 0, null);
+            INode in_n = g.AddNode("in", "", 0, null);
             in_n.Position = new Vector2(-14, -7);
 
             g.Connect(in_n, a, 0, 0, 0, null);
@@ -165,15 +165,15 @@ public class TemplateTest
             tb.AddNode(NodeRecord.NodeType.Internal, "a",
                   false, "<target>", null, "in",
                   "", 0.0f, null);
-            tb.Connect("in", "a", 0, 0, 0, null);
+            tb.Connect("in", "a", 0, 0, null);
 
             Template t = tb.Build();
 
             Graph g = new Graph();
 
-            INode a = g.AddNode("x", "", "", 0, null);
+            INode a = g.AddNode("x", "", 0, null);
             a.Position = new Vector2(-4, 3);
-            INode in_n = g.AddNode("in", "", "", 0, null);
+            INode in_n = g.AddNode("in", "", 0, null);
             in_n.Position = new Vector2(-14, -7);
 
             g.Connect(in_n, a, 0, 0, 0, null);
@@ -199,17 +199,17 @@ public class TemplateTest
             tb.AddNode(NodeRecord.NodeType.Internal, "a",
                   false, "<target>", "out", "in",
                   "", 0.0f, null);
-            tb.Connect("in", "a", 0, 0, 0, null);
+            tb.Connect("in", "a", 0, 0, null);
 
             Template t = tb.Build();
 
             Graph g = new Graph();
 
-            INode a = g.AddNode("x", "", "", 0, null);
+            INode a = g.AddNode("x", "", 0, null);
             a.Position = new Vector2(10, 10);
-            INode in_n = g.AddNode("in", "", "", 0, null);
+            INode in_n = g.AddNode("in", "", 0, null);
             in_n.Position = new Vector2(20, 10);
-            INode out_n = g.AddNode("out", "", "", 0, null);
+            INode out_n = g.AddNode("out", "", 0, null);
             out_n.Position = new Vector2(10, 20);
 
             g.Connect(in_n, a, 0, 0, 0, null);
@@ -286,16 +286,16 @@ public class TemplateTest
                   false, "<target>", null, null,
                   "", 0, null);
 
-            tb.Connect("in", "x", 0, 0, 0, null);
+            tb.Connect("in", "x", 0, 0, null);
 
             Template t = tb.Build();
 
             Graph g = new Graph();
 
-            INode a = g.AddNode("a", "", "", 0, null);
-            INode b = g.AddNode("b", "", "", 0, null);
-            INode c = g.AddNode("c", "", "", 0, null);
-            INode d = g.AddNode("d", "", "", 0, null);
+            INode a = g.AddNode("a", "", 0, null);
+            INode b = g.AddNode("b", "", 0, null);
+            INode c = g.AddNode("c", "", 0, null);
+            INode d = g.AddNode("d", "", 0, null);
 
             a.Position = new Vector2(10, 0);
             b.Position = new Vector2(-10, 0);
@@ -334,11 +334,11 @@ public class TemplateTest
 
             Graph g = new Graph();
 
-            INode a = g.AddNode("a", "", "", 0, null);
-            INode b = g.AddNode("b", "", "", 0, null);
-            INode c = g.AddNode("c", "", "", 0, null);
-            INode d = g.AddNode("d", "", "", 0, null);
-            INode x = g.AddNode("x", "", "", 0, null);
+            INode a = g.AddNode("a", "", 0, null);
+            INode b = g.AddNode("b", "", 0, null);
+            INode c = g.AddNode("c", "", 0, null);
+            INode d = g.AddNode("d", "", 0, null);
+            INode x = g.AddNode("x", "", 0, null);
 
             {
                 IGraphRestore igr = g.CreateRestorePoint();

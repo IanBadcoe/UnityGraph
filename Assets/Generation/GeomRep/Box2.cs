@@ -84,7 +84,7 @@ namespace Assets.Generation.GeomRep
             return Min == a_obj.Min && Max == a_obj.Max;
         }
 
-        internal Vector3 Centre()
+        public Vector3 Centre()
         {
             return (Min + Max) / 2;
         }

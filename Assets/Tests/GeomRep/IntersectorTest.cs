@@ -263,7 +263,7 @@ public class IntersectorTest
 
             var open = Intersector.MakeOpenSet(forward_annotations_map);
 
-            Dictionary<Curve, Intersector.Splice> endSpliceMap = Intersector.MakeEndSpliceMap();
+            Dictionary<Curve, List<Intersector.AnnotatedCurve>> endSpliceMap = Intersector.MakeEndSpliceMap();
 
             List<Curve> all_curves = curves1.Concat(curves2).ToList();
 
@@ -278,7 +278,7 @@ public class IntersectorTest
             // 2 on the new intersections, with 2 ins and 2 outs
             Assert.AreEqual(6, endSpliceMap.Count);
 
-            HashSet<Intersector.Splice> unique = new HashSet<Intersector.Splice>(endSpliceMap.Values);
+            HashSet<List<Intersector.AnnotatedCurve>> unique = new HashSet<List<Intersector.AnnotatedCurve>>(endSpliceMap.Values);
 
             Assert.AreEqual(4, unique.Count);
 
@@ -322,7 +322,7 @@ public class IntersectorTest
 
             var open = Intersector.MakeOpenSet(forward_annotations_map);
 
-            Dictionary<Curve, Intersector.Splice> endSpliceMap = Intersector.MakeEndSpliceMap();
+            Dictionary<Curve, List<Intersector.AnnotatedCurve>> endSpliceMap = Intersector.MakeEndSpliceMap();
 
             var clustered_joints = m_intersector.ClusterJoints(
                 new HashSet<Vector2>(
@@ -344,11 +344,11 @@ public class IntersectorTest
             // means 10 curves running into a splice
             Assert.AreEqual(12, endSpliceMap.Count);
 
-            HashSet<Intersector.Splice> unique = new HashSet<Intersector.Splice>(endSpliceMap.Values);
+            HashSet<List<Intersector.AnnotatedCurve>> unique = new HashSet<List<Intersector.AnnotatedCurve>>(endSpliceMap.Values);
 
             Assert.AreEqual(8, unique.Count);
 
-            foreach (Intersector.Splice s in unique)
+            foreach (List<Intersector.AnnotatedCurve> s in unique)
             {
                 HashSet<int> loop_nums = new HashSet<int>(s.Select(x => x.LoopNumber));
 
@@ -1099,6 +1099,8 @@ public class IntersectorTest
 
                 // point here is to run all the Unions internal logic/asserts
                 merged = m_intersector.Union(merged, ls2, 1e-5f, new ClRand(1));
+                // any Union output should be good as input to the next stage
+                m_intersector.Union(merged, new LoopSet(), 1e-5f, new ClRand(1));
             }
         }
     }

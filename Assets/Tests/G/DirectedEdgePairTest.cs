@@ -11,11 +11,11 @@ public class DirectedEdgePairTest
     [Test]
     public void TestHashCode()
     {
-        INode n1 = new Node("", "", "", 0);
-        INode n2 = new Node("", "", "", 0);
-        INode n3 = new Node("", "", "", 0);
-        INode n4 = new Node("", "", "", 0);
-        INode n5 = new Node("", "", "", 0);
+        INode n1 = new Node("", "", 0);
+        INode n2 = new Node("", "", 0);
+        INode n3 = new Node("", "", 0);
+        INode n4 = new Node("", "", 0);
+        INode n5 = new Node("", "", 0);
 
         DirectedEdge de1 = new DirectedEdge(n1, n2, 0, 0, 0);
         DirectedEdge de1a = new DirectedEdge(n1, n2, 1, 2, 3);
@@ -52,11 +52,11 @@ public class DirectedEdgePairTest
     [Test]
     public void TestEquals()
     {
-        Node n1 = new Node("", "", "", 0);
-        Node n2 = new Node("", "", "", 0);
-        Node n3 = new Node("", "", "", 0);
-        Node n4 = new Node("", "", "", 0);
-        Node n5 = new Node("", "", "", 0);
+        Node n1 = new Node("", "", 0);
+        Node n2 = new Node("", "", 0);
+        Node n3 = new Node("", "", 0);
+        Node n4 = new Node("", "", 0);
+        Node n5 = new Node("", "", 0);
 
         DirectedEdge de1 = new DirectedEdge(n1, n2, 0, 0, 0);
         DirectedEdge de1a = new DirectedEdge(n1, n2, 1, 2, 3);

@@ -19,6 +19,7 @@ namespace Assets.Generation.Gen
         public float EdgeToNodeForceScale = 1.0f;
         public float EdgeLengthForceScale = 0.01f;
         public float NodeToNodeForceScale = 1.0f;
+        public float ExtraForceScale = 0.02f;
 
         // time steps are scaled down if they would lead to any node moving further than this
         public float RelaxationMaxMove = 1.0f;

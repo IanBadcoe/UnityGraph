@@ -14,25 +14,31 @@ namespace Assets.Generation.G
 
         public readonly GeomLayout Layout;
 
+        // for identity/searching purposes, only start and end count...
+        public DirectedEdge(INode start, INode end)
+            : this(start, end, 0, 0, 0, null)
+        {
+        }
+
         public DirectedEdge(INode start, INode end,
-              float min_length, float max_length,
-              float half_width)
+            float min_length, float max_length,
+            float half_width)
             : this(start, end, min_length, max_length, half_width, null)
         {
         }
 
         public DirectedEdge(INode start, INode end,
-              float min_length, float max_length,
-              float half_width,
-              GeomLayout layout)
+            float min_length, float max_length,
+            float half_width,
+            GeomLayout layout)
         {
             Assertion.Assert(start != null);
             Assertion.Assert(end != null);
 
             Start = start;
             End = end;
-            MinLength = min_length;
             MaxLength = max_length;
+            MinLength = min_length;
             HalfWidth = half_width;
             Layout = layout;
         }
@@ -82,7 +88,5 @@ namespace Assets.Generation.G
         {
             return n == Start || n == End;
         }
-
-        public object Colour { get; internal set; } = 0xff4b4b4b;
     }
 }

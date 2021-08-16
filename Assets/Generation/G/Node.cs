@@ -1,4 +1,5 @@
 ﻿using Assets.Generation.GeomRep;
+using Assets.Generation.Templates;
 using Assets.Generation.U;
 using System;
 using System.Collections.Generic;
@@ -19,31 +20,57 @@ namespace Assets.Generation.G
 
         public string Name { get; }
         public string Codes { get; }
-        public string Template { get; }
         public float Radius { get; }
 
         public Vector2 Pos { get; set; }
-        public uint Colour { get; set; } = 0xff8c8c8c;
         public Vector2 Position { get; set; }
         public Vector2 Force { get; set; }
 
-        public Node(string name, string codes, string template, float rad)
-            : this(name, codes, template, rad, null)
+        HierarchyMetadata m_parent;
+        public HierarchyMetadata Parent
+        {
+            get
+            {
+                return m_parent;
+            }
+            set
+            {
+                if (m_parent != null)
+                {
+                    m_parent.Children.Remove(this);
+                }
+
+                m_parent = value;
+
+                if (m_parent != null)
+                {
+                    m_parent.Children.Add(this);
+                }
+            }
+        }
+
+        public IList<IHMChild> Children { get; }
+
+        public Node(string name, string codes, float rad, HierarchyMetadata parent = null)
+            : this(name, codes, rad, null, parent)
         {
         }
 
-        public Node(string name, string codes, string template, float rad,
-            GeomLayout layout)
+        public Node(string name, string codes, float rad,
+            GeomLayout layout, HierarchyMetadata parent = null)
         {
             Name = name;
             Codes = codes;
-            Template = template;
 
             m_num = s_rand.Next();
 
             Radius = rad;
 
             Layout = layout;
+
+            Parent = parent;
+
+            Children = new List<IHMChild>();
         }
 
         public bool Connects(INode n)
@@ -53,12 +80,12 @@ namespace Assets.Generation.G
 
         public bool ConnectsForwards(INode to)
         {
-            return m_connections.Contains(new DirectedEdge(this, to, 0, 0, 0, null));
+            return m_connections.Contains(new DirectedEdge(this, to));
         }
 
         public bool ConnectsBackwards(INode from)
         {
-            return m_connections.Contains(new DirectedEdge(from, this, 0, 0, 0, null));
+            return m_connections.Contains(new DirectedEdge(from, this));
         }
 
         public DirectedEdge Connect(Node n, float min_distance, float max_distance, float width)
@@ -98,8 +125,8 @@ namespace Assets.Generation.G
 
             // simplest just to try removing the forward and reverse edges
             // only the nodes are part of the edge identity
-            m_connections.Remove(new DirectedEdge(this, n, 0, 0, 0, null));
-            m_connections.Remove(new DirectedEdge(n, this, 0, 0, 0, null));
+            m_connections.Remove(new DirectedEdge(this, n));
+            m_connections.Remove(new DirectedEdge(n, this));
 
             n.Disconnect(this);
         }
@@ -156,6 +183,26 @@ namespace Assets.Generation.G
         public int NumConnections()
         {
             return m_connections.Count;
+        }
+
+        public int GetParams(List<double> list, int offset)
+        {
+            list.Add(Position.x);
+            list.Add(Position.y);
+
+            return 2;
+        }
+
+        public int SetParams(double[] array, int offset)
+        {
+            Position = new Vector2((float)array[offset + 0], (float)array[offset + 1]);
+
+            return 2;
+        }
+
+        public bool IsChildNode(INode n)
+        {
+            return ReferenceEquals(n, this);
         }
     }
 }
