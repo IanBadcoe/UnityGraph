@@ -122,5 +122,22 @@ namespace Assets.Generation.Templates
 
             return false;
         }
+
+        internal float RadiusBoost(INode n2)
+        {
+            float ret = 0;
+
+            if (Parent != null)
+            {
+                ret = Parent.RadiusBoost(n2);
+            }
+
+            if (!IsChildNode(n2))
+            {
+                ret = Math.Max(ret, Template.ExtraClusterSeparation);
+            }
+
+            return ret;
+        }
     }
 }

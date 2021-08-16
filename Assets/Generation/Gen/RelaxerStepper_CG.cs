@@ -280,10 +280,22 @@ namespace Assets.Generation.Gen
 
                     double dist = (n1pos - n2pos).Magnitude;
 
+                    float rad_boost = 0;
+
+                    if (n1.Parent != null)
+                    {
+                        rad_boost = n1.Parent.RadiusBoost(n2);
+                    }
+
+                    if (n2.Parent != null)
+                    {
+                        rad_boost += n2.Parent.RadiusBoost(n1);
+                    }
+
                     float adjusted_radius =
                         Mathf.Min(
                             m_node_dists.GetDist(n1, n2),
-                            n1.Radius + n2.Radius + m_config.RelaxationMinimumSeparation);
+                            n1.Radius + n2.Radius + rad_boost + m_config.RelaxationMinimumSeparation);
 
                     nn_func += NodeNodeEnergy(dist, adjusted_radius);
                 }
