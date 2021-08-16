@@ -9,6 +9,7 @@ namespace Assets.Generation.Templates
     {
         public HierarchyMetadata Parent { get; set; }
         public IList<IHMChild> Children { get; }
+        bool IsChildNode(INode n);
     }
 
     public static class HMChildExtensions
@@ -108,6 +109,18 @@ namespace Assets.Generation.Templates
         public void AddExtraForce(INode n1, INode n2, float targetDist, float forceMultiplier)
         {
             m_extra_forces.Add(new Force(n1, n2, targetDist, forceMultiplier));
+        }
+
+        // can implement this better with some caching...
+        public bool IsChildNode(INode n)
+        {
+            foreach(var c in Children)
+            {
+                if (c.IsChildNode(n))
+                    return true;
+            }
+
+            return false;
         }
     }
 }

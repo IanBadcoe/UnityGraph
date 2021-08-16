@@ -19,6 +19,8 @@ namespace Assets.Generation.Templates
         private int m_num_out_nodes = 0;
         private int m_num_internal_nodes = 0;
 
+        public float ExtraClusterSeparation;
+
 
         public TemplateBuilder(string name, string codes)
         {

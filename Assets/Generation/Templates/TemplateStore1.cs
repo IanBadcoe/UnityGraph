@@ -62,42 +62,44 @@ namespace Assets.Generation.Templates
                 AddTemplate(tb.Build());
             }
 
+            //{
+            //    TemplateBuilder tb = new TemplateBuilder("Loop Tee", "");
+            //    tb.AddNode(NodeRecord.NodeType.In, "i");
+            //    tb.AddNode(NodeRecord.NodeType.Out, "o");
+            //    tb.AddNode(NodeRecord.NodeType.Internal, "j", false, "<target>", null, null, "", 1f, CircularGeomLayout.Instance);
+            //    tb.AddNode(NodeRecord.NodeType.Internal, "side-j", true, "<target>", null, "i", "", 1f, CircularGeomLayout.Instance);
+            //    tb.AddNode(NodeRecord.NodeType.Internal, "side", true, "<target>", null, "o", "", 4f, CircularGeomLayout.Instance);
+
+            //    tb.Connect("i", "j", 4.5f, -1, CorridorLayout.Instance);
+            //    tb.Connect("j", "o", 4.5f, -1, CorridorLayout.Instance);
+            //    tb.Connect("j", "side-j", 4.5f, 0.5f, CorridorLayout.Instance);
+            //    tb.Connect("side-j", "side", 4.5f, 0.5f, CorridorLayout.Instance);
+
+            //    tb.ExtraForce("j", "side", 1, 1);
+            //    tb.ExtraForce("j", "side-j", 15, 1);
+
+            //    AddTemplate(tb.Build());
+            //}
+
             {
-                TemplateBuilder tb = new TemplateBuilder("Loop Tee", "");
+                TemplateBuilder tb = new TemplateBuilder("Triangle", "e");
                 tb.AddNode(NodeRecord.NodeType.In, "i");
                 tb.AddNode(NodeRecord.NodeType.Out, "o");
-                tb.AddNode(NodeRecord.NodeType.Internal, "j", false, "<target>", null, null, "", 1f, CircularGeomLayout.Instance);
-                tb.AddNode(NodeRecord.NodeType.Internal, "side-j", true, "<target>", null, "i", "", 1f, CircularGeomLayout.Instance);
-                tb.AddNode(NodeRecord.NodeType.Internal, "side", true, "<target>", null, "o", "", 4f, CircularGeomLayout.Instance);
-
-                tb.Connect("i", "j", 4.5f, -1, CorridorLayout.Instance);
-                tb.Connect("j", "o", 4.5f, -1, CorridorLayout.Instance);
-                tb.Connect("j", "side-j", 4.5f, 0.5f, CorridorLayout.Instance);
-                tb.Connect("side-j", "side", 4.5f, 0.5f, CorridorLayout.Instance);
-
-                tb.ExtraForce("j", "side", 1, 1);
-                tb.ExtraForce("j", "side-j", 15, 1);
-
-                AddTemplate(tb.Build());
-            }
-
-            {
-                TemplateBuilder tb = new TemplateBuilder("Big triangle", "");
-                tb.AddNode(NodeRecord.NodeType.In, "i");
-                tb.AddNode(NodeRecord.NodeType.Out, "o");
-                tb.AddNode(NodeRecord.NodeType.Internal, "a", false, "<target>", null, null, "", 1f, CircularGeomLayout.Instance);
-                tb.AddNode(NodeRecord.NodeType.Internal, "b", true, "<target>", null, "i", "", 1f, CircularGeomLayout.Instance);
-                tb.AddNode(NodeRecord.NodeType.Internal, "c", true, "<target>", null, "o", "", 1f, CircularGeomLayout.Instance);
+                tb.AddNode(NodeRecord.NodeType.Internal, "a", false, "<target>", null, null, "e", 1f, CircularGeomLayout.Instance);
+                tb.AddNode(NodeRecord.NodeType.Internal, "b", true, "<target>", null, "i", "e", 1f, CircularGeomLayout.Instance);
+                tb.AddNode(NodeRecord.NodeType.Internal, "c", true, "<target>", null, "o", "e", 1f, CircularGeomLayout.Instance);
 
                 tb.Connect("i", "a", 4.5f, -1, CorridorLayout.Instance);
                 tb.Connect("a", "o", 4.5f, -1, CorridorLayout.Instance);
-                tb.Connect("a", "b", 4.5f, -1, CorridorLayout.Instance);
-                tb.Connect("b", "c", 4.5f, 0.5f, CorridorLayout.Instance);
-                tb.Connect("a", "c", 4.5f, -1, CorridorLayout.Instance);
+                tb.Connect("a", "b", 4.5f, 0.3f, CorridorLayout.Instance);
+                tb.Connect("b", "c", 4.5f, 0.3f, CorridorLayout.Instance);
+                tb.Connect("a", "c", 4.5f, 0.3f, CorridorLayout.Instance);
 
-                tb.ExtraForce("a", "b", 10, 1);
-                tb.ExtraForce("b", "c", 10, 1);
-                tb.ExtraForce("c", "a", 10, 1);
+                //tb.ExtraForce("a", "b", 10, 1);
+                //tb.ExtraForce("b", "c", 10, 1);
+                //tb.ExtraForce("c", "a", 10, 1);
+
+                tb.ExtraClusterSeparation = 2;
 
                 AddTemplate(tb.Build());
             }

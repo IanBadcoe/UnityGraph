@@ -22,6 +22,7 @@ namespace Assets.Generation.Templates
         public string Name { get; private set; }
 
         public string Codes { get; private set; }
+        public readonly float ExtraClusterSeparation;
 
         public Template(TemplateBuilder builder)
         {
@@ -35,6 +36,8 @@ namespace Assets.Generation.Templates
             m_num_in_nodes = builder.GetNumInNodes();
             m_num_out_nodes = builder.GetNumOutNodes();
             m_num_internal_nodes = builder.GetNumInternalNodes();
+
+            ExtraClusterSeparation = builder.ExtraClusterSeparation;
 
             //m_post_expand = builder.GetPostExpand();
 

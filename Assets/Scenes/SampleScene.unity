@@ -219,7 +219,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2003294203, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: Config.RandomSeed
-      value: 8
+      value: 73
       objectReference: {fileID: 0}
     - target: {fileID: 2003294203, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: Config.FinalRelaxationMoveTarget

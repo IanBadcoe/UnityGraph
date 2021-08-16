@@ -199,5 +199,10 @@ namespace Assets.Generation.G
 
             return 2;
         }
+
+        public bool IsChildNode(INode n)
+        {
+            return ReferenceEquals(n, this);
+        }
     }
 }
