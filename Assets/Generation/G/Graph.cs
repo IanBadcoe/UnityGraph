@@ -67,8 +67,8 @@ namespace Assets.Generation.G
             m_nodes.Remove(node);
         }
 
-        // mostly use the other form, which assumes min_length = 0.75 * max_length
-        // as that works with the edge adjuster splitting edges > 150% of max_length
+        // mostly use the other form, which assumes min_length = 0.5 * max_length
+        // as that works with the edge adjuster splitting edges > 110% of max_length
         // (they'll not be over compressed afterwards...)
         // unit tests use this one extensively, however, top set min = max for unambiguity
         // in expected length
@@ -98,7 +98,7 @@ namespace Assets.Generation.G
                                     float max_length, float half_width,
                                     GeomLayout layout)
         {
-            return Connect(from, to, max_length * 0.75f, max_length, half_width, layout);
+            return Connect(from, to, max_length * 0.5f, max_length, half_width, layout);
         }
 
         public List<INode> GetAllNodes()

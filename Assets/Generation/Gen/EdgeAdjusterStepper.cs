@@ -52,7 +52,7 @@ namespace Assets.Generation.Gen
         //  so > 150% stressed means we can half it and definitely be zero stress)
         private DirectedEdge MostStressedEdge(List<DirectedEdge> edges)
         {
-            float max_stress = 1.5f;
+            float max_stress = 1.1f;
             DirectedEdge ret = null;
 
             foreach (DirectedEdge e in edges)
@@ -92,6 +92,19 @@ namespace Assets.Generation.Gen
                 CorridorLayout.Instance);
             DirectedEdge de2 = Graph.Connect(c, e.End, e.MaxLength, e.HalfWidth,
                 CorridorLayout.Instance);
+
+            // if we are unambiguously inside some template's output
+            // then the new node is also inside that
+            // (e.g. if Start and End have the same parent, so will we)
+            // otherwise we are randomly assigned to the cluster of one end or the other
+            if (m_config.Rand().Nextfloat() > 0.5f)
+            {
+                c.Parent = e.Start.Parent;
+            }
+            else
+            {
+                c.Parent = e.End.Parent;
+            }
 
             return true;
         }
