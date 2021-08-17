@@ -1,12 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using NUnit.Framework;
-using UnityEngine;
-using UnityEngine.TestTools;
 using Assets.Generation.G;
-using System;
-using Assets.Generation.U;
 using Assets.Generation.Templates;
+using Assets.Generation.U;
+using NUnit.Framework;
+using System;
+using UnityEngine;
 
 public class TemplateTest
 {
@@ -91,8 +88,8 @@ public class TemplateTest
             Assert.AreEqual(new Vector2(10, 9), new_n.Position);
         }
 
-      // an "in" and a replaced node,
-      // place new node offset from the "in"
+        // an "in" and a replaced node,
+        // place new node offset from the "in"
         {
             TemplateBuilder tb = new TemplateBuilder("", "");
 
@@ -124,8 +121,8 @@ public class TemplateTest
             Assert.AreEqual(5, dist, 1e-6);
         }
 
-      // an "in" and a replaced node,
-      // place new node on replaced node but moved towards "in"
+        // an "in" and a replaced node,
+        // place new node on replaced node but moved towards "in"
         {
             TemplateBuilder tb = new TemplateBuilder("", "");
 
@@ -156,8 +153,8 @@ public class TemplateTest
             Assert.AreEqual(new Vector2(-5, 2), new_n.Position);
         }
 
-      // an "in" and a replaced node,
-      // place new node on replaced node but moved away from  "in"
+        // an "in" and a replaced node,
+        // place new node on replaced node but moved away from  "in"
         {
             TemplateBuilder tb = new TemplateBuilder("", "");
 
@@ -188,9 +185,9 @@ public class TemplateTest
             Assert.AreEqual(new Vector2(-3, 4), new_n.Position);
         }
 
-      // an "in", an "out", and a replaced node,
-      // place new node on replaced node but moved away from "in"
-      // and towards "out"
+        // an "in", an "out", and a replaced node,
+        // place new node on replaced node but moved away from "in"
+        // and towards "out"
         {
             TemplateBuilder tb = new TemplateBuilder("", "");
 
@@ -488,7 +485,9 @@ public class TemplateTest
         foreach (Node n in g.GetAllNodes())
         {
             if (n.Name == name)
+            {
                 return n;
+            }
         }
 
         return null;

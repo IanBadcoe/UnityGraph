@@ -1,12 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
-using NUnit.Framework;
-using UnityEngine;
-using UnityEngine.TestTools;
 using Assets.Generation.G;
-using System;
-using Assets.Generation.U;
 using Assets.Generation.GeomRep;
+using NUnit.Framework;
+using System;
 
 public class NodeTest
 {

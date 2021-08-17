@@ -3,8 +3,6 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 public class LineCurveTest
@@ -288,10 +286,11 @@ public class LineCurveTest
                         hy = -hy;
                     }
 
-                    List<LineCurve> lc2s = new List<LineCurve>();
-
-                    lc2s.Add(LineCurve.MakeFromPoints(new Vector2(offset_x, offset_y), new Vector2(hx + offset_x, hy + offset_y)));
-                    lc2s.Add(LineCurve.MakeFromPoints(new Vector2(hx + offset_x, hy + offset_y), new Vector2(offset_x, offset_y)));
+                    List<LineCurve> lc2s = new List<LineCurve>
+                    {
+                        LineCurve.MakeFromPoints(new Vector2(offset_x, offset_y), new Vector2(hx + offset_x, hy + offset_y)),
+                        LineCurve.MakeFromPoints(new Vector2(hx + offset_x, hy + offset_y), new Vector2(offset_x, offset_y))
+                    };
 
                     var expected = lc2s[0].GetNormAndDistDescription();
 
@@ -512,7 +511,7 @@ public class LineCurveTest
             Assert.AreEqual(splits[i], curves[i + 1].StartParam, 1e-4f);
         }
 
-        foreach(var c in curves)
+        foreach (var c in curves)
         {
             var lc = c as LineCurve;
             Assert.IsNotNull(lc);

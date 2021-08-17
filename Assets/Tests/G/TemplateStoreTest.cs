@@ -1,12 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-using NUnit.Framework;
-using UnityEngine;
-using UnityEngine.TestTools;
-using Assets.Generation.G;
-using System;
-using Assets.Generation.U;
 using Assets.Generation.Templates;
+using NUnit.Framework;
+using System.Collections.Generic;
 
 public class TemplateStoreTest
 {

@@ -1,10 +1,5 @@
 ﻿using Assets.Generation.U;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 class AngleRangeTest
@@ -157,7 +152,7 @@ class AngleRangeTest
 
         // if one of the ranges is a full circle
         {
-            var res = new AngleRange(0, Mathf.PI * 2).ClockAwareRangeOverlap(new AngleRange(0, 1), 1e-4f); 
+            var res = new AngleRange(0, Mathf.PI * 2).ClockAwareRangeOverlap(new AngleRange(0, 1), 1e-4f);
 
             Assert.AreEqual(1, res.Count);
             Assert.IsTrue(new AngleRange(0, 1).Equals(res[0], 1e-4f));

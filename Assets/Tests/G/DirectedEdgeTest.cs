@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
+using Assets.Generation.G;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.TestTools;
-using Assets.Generation.G;
 
 public class DirectedEdgeTest
 {
