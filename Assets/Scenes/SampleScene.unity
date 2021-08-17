@@ -219,19 +219,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2003294203, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: Config.RandomSeed
-      value: 31
-      objectReference: {fileID: 0}
-    - target: {fileID: 2003294203, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
-      propertyPath: Config.FinalRelaxationMoveTarget
-      value: 0.05
-      objectReference: {fileID: 0}
-    - target: {fileID: 2003294203, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
-      propertyPath: Config.RelaxationMinimumSeparation
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2003294203, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
-      propertyPath: Config.IntermediateRelaxationMoveTarget
-      value: 0.5
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 6519645942250547586, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: m_RootOrder
@@ -276,6 +264,18 @@ PrefabInstance:
     - target: {fileID: 6519645942250547586, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: Colours.Array.data[0].Colour.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: Colours.Array.data[0].Colour.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: Colours.Array.data[0].Colour.r
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9020293378318520130, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: m_Name

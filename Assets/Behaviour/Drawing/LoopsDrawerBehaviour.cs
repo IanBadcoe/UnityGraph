@@ -12,34 +12,50 @@ namespace Assets.Behaviour.Drawing
         public bool ControlCamera;
         readonly Dictionary<Loop, LineRenderer> RendererMap = new Dictionary<Loop, LineRenderer>();
 
+        private LayerConfigBehaviour LCB;
+
         Camera Camera;
 
         private void Awake()
         {
             Camera = Transform.FindObjectOfType<Camera>();
+            LCB = Transform.FindObjectOfType<LayerConfigBehaviour>();
         }
 
         private void Update()
         {
-            var loops = DP.GetLoops();
+            var loopsets = DP.GetLoops();
 
-            if (loops != null)
+            if (loopsets != null)
             {
-                foreach (Loop loop in loops)
+                foreach (var loopset in loopsets)
                 {
-                    if (!RendererMap.ContainsKey(loop))
+                    string layer = loopset.Key;
+
+                    Color col = new Color(1, 0.5f, 0.5f);
+
+                    if (LCB != null)
                     {
-                        float len = loop.ParamRange;
+                        LCB.ColourDict.TryGetValue(layer, out col);
+                    }
 
-                        Vector3[] points = loop.Facet(0.1f);
+                    foreach (var loop in loopset.Value)
+                    {
+                        if (!RendererMap.ContainsKey(loop))
+                        {
+                            float len = loop.ParamRange;
 
-                        var renderer = GameObject.Instantiate(LoopDrawTemplate, transform);
+                            Vector3[] points = loop.Facet(0.1f);
 
-                        LineRenderer lr = renderer.transform.GetComponent<LineRenderer>();
-                        RendererMap[loop] = lr;
+                            var renderer = GameObject.Instantiate(LoopDrawTemplate, transform);
 
-                        lr.positionCount = points.Length;
-                        lr.SetPositions(points);
+                            LineRenderer lr = renderer.transform.GetComponent<LineRenderer>();
+                            RendererMap[loop] = lr;
+
+                            lr.positionCount = points.Length;
+                            lr.SetPositions(points);
+                            lr.startColor = lr.endColor = col;
+                        }
                     }
                 }
             }
@@ -48,7 +64,7 @@ namespace Assets.Behaviour.Drawing
 
             foreach (Loop loop in RendererMap.Keys)
             {
-                if (loops == null || !loops.Contains(loop))
+                if (loopsets == null || !loopsets.SelectMany(x => x.Value).Contains(loop))
                 {
                     GameObject.Destroy(RendererMap[loop]);
                     to_remove.Add(loop);

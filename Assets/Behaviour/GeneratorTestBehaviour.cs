@@ -15,7 +15,7 @@ namespace Assets.Behaviour
 
         private Generator m_generator;
 
-        public override IReadOnlyList<Loop> GetLoops()
+        public override IReadOnlyDictionary<string, LoopSet> GetLoops()
         {
             if (m_generator != null && m_generator.UnionHelper != null)
             {

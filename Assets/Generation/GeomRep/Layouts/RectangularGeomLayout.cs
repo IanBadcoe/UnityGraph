@@ -12,7 +12,7 @@ namespace Assets.Generation.GeomRep
 
         private CorridorLayout() { }
 
-        public override Loop MakeBaseGeometry(DirectedEdge edge)
+        public override LoopSet MakeGeometry(DirectedEdge edge)
         {
             Vector2 dir = edge.End.Position - edge.Start.Position;
             float length = dir.magnitude;
@@ -44,7 +44,7 @@ namespace Assets.Generation.GeomRep
             Assertion.Assert(curves[2].EndPos.Equals(curves[3].StartPos, 1e-4f));
             Assertion.Assert(curves[3].EndPos.Equals(curves[0].StartPos, 1e-4f));
 
-            return new Loop("floor", curves);
+            return new LoopSet(new Loop("floor", curves));
         }
     }
 }

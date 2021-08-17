@@ -9,19 +9,12 @@ namespace Assets.Generation.GeomRep.Layouts
 
         private CircularPillarGeomLayout() { }
 
-        public override Loop MakeBaseGeometry(INode node)
+        public override LoopSet MakeGeometry(INode node)
         {
-            return new Loop("floor", new CircleCurve(node.Position, node.Radius));
-        }
-
-        public override LoopSet MakeDetailGeometry(INode node)
-        {
-            LoopSet ret = new LoopSet
-            {
-                new Loop("pillar", new CircleCurve(node.Position, node.Radius / 2, RotationDirection.Reverse))
+            return new LoopSet {
+                new Loop("floor", new CircleCurve(node.Position, node.Radius)),
+                new Loop("pillar", new CircleCurve(node.Position, node.Radius / 2))
             };
-
-            return ret;
         }
     }
 
@@ -31,21 +24,17 @@ namespace Assets.Generation.GeomRep.Layouts
 
         private FourCircularPillarsGeomLayout() { }
 
-        public override Loop MakeBaseGeometry(INode node)
-        {
-            return new Loop("floor", new CircleCurve(node.Position, node.Radius));
-        }
-
-        public override LoopSet MakeDetailGeometry(INode node)
+        public override LoopSet MakeGeometry(INode node)
         {
             LoopSet ret = new LoopSet();
+            ret.Add(new Loop("floor", new CircleCurve(node.Position, node.Radius)));
 
             for (int i = 0; i < 4; i++)
             {
                 float ang = Mathf.PI * 2 * i / 4;
                 Vector2 pos = node.Position + new Vector2(Mathf.Sin(ang) * node.Radius / 2, Mathf.Cos(ang) * node.Radius / 2);
 
-                ret.Add(new Loop("pillar", new CircleCurve(pos, node.Radius / 6, RotationDirection.Reverse)));
+                ret.Add(new Loop("decor", new CircleCurve(pos, node.Radius / 6)));
             }
 
             return ret;

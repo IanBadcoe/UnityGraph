@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5915779746768243298}
   - component: {fileID: 921310462}
   - component: {fileID: 2003294203}
+  - component: {fileID: 7384941104995489138}
   m_Layer: 0
   m_Name: Generator
   m_TagString: Untagged
@@ -75,12 +76,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4950fecd6b750b541bad8629df3bfd76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  NodesLimit: 16
   Config:
-    RelaxationMinimumSeparation: 5
+    RelaxationMinimumSeparation: 0.5
     EdgeToNodeForceScale: 1
     EdgeLengthForceScale: 0.01
     NodeToNodeForceScale: 1
+    ExtraForceScale: 0.02
     RelaxationMaxMove: 1
     IntermediateRelaxationMoveTarget: 0.5
-    FinalRelaxationMoveTarget: 0.01
-    RandomSeed: 38
+    FinalRelaxationMoveTarget: 0.05
+    RandomSeed: 31
+--- !u!114 &7384941104995489138
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9020293378318520130}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0dcf4473ac33d854b93f3433ee8a4f54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Colours:
+  - Name: floor
+    Colour: {r: 1, g: 1, b: 1, a: 1}
+  - Name: wall
+    Colour: {r: 0.5377358, g: 0.5377358, b: 0.5377358, a: 1}
+  - Name: water
+    Colour: {r: 0.11525454, g: 0.44856885, b: 0.6603774, a: 1}
+  - Name: decor
+    Colour: {r: 0.509434, g: 0.28900954, b: 0, a: 1}

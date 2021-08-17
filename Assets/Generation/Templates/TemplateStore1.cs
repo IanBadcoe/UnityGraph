@@ -21,38 +21,38 @@ namespace Assets.Generation.Templates
                 AddTemplate(tb.Build());
             }
 
-            {
-                TemplateBuilder tb = new TemplateBuilder("Split Corridor", "e");
-                tb.AddNode(NodeRecord.NodeType.In, "i");
-                tb.AddNode(NodeRecord.NodeType.Out, "o");
-                tb.AddNode(NodeRecord.NodeType.Internal, "e1", true, "<target>", "i", null, "e", 1, CircularGeomLayout.Instance);
-                tb.AddNode(NodeRecord.NodeType.Internal, "e2", true, "<target>", "i", null, "e", 0.5f, CircularGeomLayout.Instance);
+            //{
+            //    TemplateBuilder tb = new TemplateBuilder("Split Corridor", "e");
+            //    tb.AddNode(NodeRecord.NodeType.In, "i");
+            //    tb.AddNode(NodeRecord.NodeType.Out, "o");
+            //    tb.AddNode(NodeRecord.NodeType.Internal, "e1", true, "<target>", "i", null, "e", 1, CircularGeomLayout.Instance);
+            //    tb.AddNode(NodeRecord.NodeType.Internal, "e2", true, "<target>", "i", null, "e", 0.5f, CircularGeomLayout.Instance);
 
-                tb.Connect("i", "e1", 4.5f, -1, CorridorLayout.Instance);
-                tb.Connect("e1", "o", 4.5f, -1, CorridorLayout.Instance);
-                tb.Connect("i", "e2", 4.5f, 0.5f, CorridorLayout.Instance);
-                tb.Connect("e2", "o", 4.5f, 0.5f, CorridorLayout.Instance);
+            //    tb.Connect("i", "e1", 4.5f, -1, CorridorLayout.Instance);
+            //    tb.Connect("e1", "o", 4.5f, -1, CorridorLayout.Instance);
+            //    tb.Connect("i", "e2", 4.5f, 0.5f, CorridorLayout.Instance);
+            //    tb.Connect("e2", "o", 4.5f, 0.5f, CorridorLayout.Instance);
 
-                AddTemplate(tb.Build());
-            }
+            //    AddTemplate(tb.Build());
+            //}
 
-            {
-                TemplateBuilder tb = new TemplateBuilder("Extend Dead-end", "e");
-                tb.AddNode(NodeRecord.NodeType.In, "i");
-                tb.AddNode(NodeRecord.NodeType.Internal, "e1", false, "<target>", "i", null, "e", 1f, CircularGeomLayout.Instance);
-                tb.AddNode(NodeRecord.NodeType.Internal, "e2", false, "<target>", null, "i", "e", 2f, CircularGeomLayout.Instance);
+            //{
+            //    TemplateBuilder tb = new TemplateBuilder("Extend Dead-end", "e");
+            //    tb.AddNode(NodeRecord.NodeType.In, "i");
+            //    tb.AddNode(NodeRecord.NodeType.Internal, "e1", false, "<target>", "i", null, "e", 1f, CircularGeomLayout.Instance);
+            //    tb.AddNode(NodeRecord.NodeType.Internal, "e2", false, "<target>", null, "i", "e", 2f, CircularGeomLayout.Instance);
 
-                tb.Connect("i", "e1", 4.5f, -1, CorridorLayout.Instance);
-                tb.Connect("e1", "e2", 4.5f, -1, CorridorLayout.Instance);
+            //    tb.Connect("i", "e1", 4.5f, -1, CorridorLayout.Instance);
+            //    tb.Connect("e1", "e2", 4.5f, -1, CorridorLayout.Instance);
 
-                AddTemplate(tb.Build());
-            }
+            //    AddTemplate(tb.Build());
+            //}
 
             {
                 TemplateBuilder tb = new TemplateBuilder("Tee", "e");
                 tb.AddNode(NodeRecord.NodeType.In, "i");
                 tb.AddNode(NodeRecord.NodeType.Out, "o");
-                tb.AddNode(NodeRecord.NodeType.Internal, "j", false, "<target>", null, null, "", 1f, CircularGeomLayout.Instance);
+                tb.AddNode(NodeRecord.NodeType.Internal, "j", false, "<target>", null, null, "e", 1f, CircularGeomLayout.Instance);
                 tb.AddNode(NodeRecord.NodeType.Internal, "side", true, "<target>", null, null, "e", 2f, CircularGeomLayout.Instance);
 
                 tb.Connect("i", "j", 4.5f, -1, CorridorLayout.Instance);
@@ -81,28 +81,28 @@ namespace Assets.Generation.Templates
             //    AddTemplate(tb.Build());
             //}
 
-            {
-                TemplateBuilder tb = new TemplateBuilder("Triangle", "e");
-                tb.AddNode(NodeRecord.NodeType.In, "i");
-                tb.AddNode(NodeRecord.NodeType.Out, "o");
-                tb.AddNode(NodeRecord.NodeType.Internal, "a", false, "<target>", null, null, "e", 1f, CircularGeomLayout.Instance);
-                tb.AddNode(NodeRecord.NodeType.Internal, "b", true, "<target>", null, "i", "e", 1f, CircularGeomLayout.Instance);
-                tb.AddNode(NodeRecord.NodeType.Internal, "c", true, "<target>", null, "o", "e", 1f, CircularGeomLayout.Instance);
+            //{
+            //    TemplateBuilder tb = new TemplateBuilder("Triangle", "e");
+            //    tb.AddNode(NodeRecord.NodeType.In, "i");
+            //    tb.AddNode(NodeRecord.NodeType.Out, "o");
+            //    tb.AddNode(NodeRecord.NodeType.Internal, "a", false, "<target>", null, null, "e", 1f, CircularGeomLayout.Instance);
+            //    tb.AddNode(NodeRecord.NodeType.Internal, "b", true, "<target>", null, "i", "e", 1f, CircularGeomLayout.Instance);
+            //    tb.AddNode(NodeRecord.NodeType.Internal, "c", true, "<target>", null, "o", "e", 1f, CircularGeomLayout.Instance);
 
-                tb.Connect("i", "a", 4.5f, -1, CorridorLayout.Instance);
-                tb.Connect("a", "o", 4.5f, -1, CorridorLayout.Instance);
-                tb.Connect("a", "b", 4.5f, 0.3f, CorridorLayout.Instance);
-                tb.Connect("b", "c", 4.5f, 0.3f, CorridorLayout.Instance);
-                tb.Connect("a", "c", 4.5f, 0.3f, CorridorLayout.Instance);
+            //    tb.Connect("i", "a", 4.5f, -1, CorridorLayout.Instance);
+            //    tb.Connect("a", "o", 4.5f, -1, CorridorLayout.Instance);
+            //    tb.Connect("a", "b", 4.5f, 0.3f, CorridorLayout.Instance);
+            //    tb.Connect("b", "c", 4.5f, 0.3f, CorridorLayout.Instance);
+            //    tb.Connect("a", "c", 4.5f, 0.3f, CorridorLayout.Instance);
 
-                //tb.ExtraForce("a", "b", 10, 1);
-                //tb.ExtraForce("b", "c", 10, 1);
-                //tb.ExtraForce("c", "a", 10, 1);
+            //    //tb.ExtraForce("a", "b", 10, 1);
+            //    //tb.ExtraForce("b", "c", 10, 1);
+            //    //tb.ExtraForce("c", "a", 10, 1);
 
-                tb.ExtraClusterSeparation = 2;
+            //    tb.ExtraClusterSeparation = 2;
 
-                AddTemplate(tb.Build());
-            }
+            //    AddTemplate(tb.Build());
+            //}
 
             {
                 //DoorPostExpand dh = new DoorPostExpand();

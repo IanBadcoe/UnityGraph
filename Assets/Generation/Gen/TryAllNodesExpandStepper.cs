@@ -44,13 +44,18 @@ namespace Assets.Generation.Gen
 
             List<Template> templates = m_templates.GetTemplatesCopy();
 
-            // if this was our last chance at a node, take only templates that expand further
-            // (could also allow those that expand enough, but that would involve copying the
-            // required size down here...
-            if (m_all_nodes.Count == 0)
-            {
-                templates = templates.Where(t => t.Codes.Contains("e")).ToList();
-            }
+            // we need something like this, but this is too crude
+            // probably we need to favour expand templates until large enough, then switch
+            // to "refine" ones
+            //
+            // or even N arbitrary phases
+            //// if this was our last chance at a node, take only templates that expand further
+            //// (could also allow those that expand enough, but that would involve copying the
+            //// required size down here...
+            //if (m_all_nodes.Count == 0)
+            //{
+            //    templates = templates.Where(t => t.Codes.Contains("e")).ToList();
+            //}
 
             IStepper child = new TryAllTemplatesOnOneNodeStepper(
                   Graph, node, templates, m_config);

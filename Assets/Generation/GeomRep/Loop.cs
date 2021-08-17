@@ -12,14 +12,14 @@ namespace Assets.Generation.GeomRep
     public class Loop : EqualityBase
     {
         private readonly List<Curve> m_curves = new List<Curve>();
-        private readonly float m_param_range;
-        private readonly string m_layer;
+        public readonly float ParamRange;
+        public readonly string Layer;
 
         // only used in unit-tests atm
         public Loop(string layer)
         {
-            m_param_range = 0;
-            m_layer = layer;
+            ParamRange = 0;
+            Layer = layer;
         }
 
         public Loop(string layer, Curve c)
@@ -27,7 +27,7 @@ namespace Assets.Generation.GeomRep
         {
             m_curves.Add(c);
 
-            m_param_range = c.EndParam - c.StartParam;
+            ParamRange = c.EndParam - c.StartParam;
 
             Vector2 s = c.StartPos;
             Vector2 e = c.EndPos;
@@ -62,7 +62,7 @@ namespace Assets.Generation.GeomRep
                 prev = curr;
             }
 
-            m_param_range = range;
+            ParamRange = range;
         }
 
         public static Loop MakeRect(float x1, float y1, float x2, float y2, string layer = "")
@@ -121,12 +121,7 @@ namespace Assets.Generation.GeomRep
                 ret.Insert(0, c.Reversed());
             }
 
-            return new Loop(m_layer, ret);
-        }
-
-        public float ParamRange
-        {
-            get => m_param_range;
+            return new Loop(Layer, ret);
         }
 
         public Vector2? ComputePos(float p)
