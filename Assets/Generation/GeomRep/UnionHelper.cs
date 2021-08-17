@@ -50,7 +50,7 @@ namespace Assets.Generation.GeomRep
                 Loop l = m_base_loops[0];
                 LoopSet ls = new LoopSet(l);
 
-                m_merged_loops = m_intersector.Union(m_merged_loops, ls, 1e-5f, r);
+                m_merged_loops = m_intersector.Union(m_merged_loops, ls, 1e-5f, r, "floor");
 
                 Assertion.Assert(m_merged_loops != null);
 
@@ -63,7 +63,7 @@ namespace Assets.Generation.GeomRep
             {
                 LoopSet ls = m_detail_loop_sets[0];
 
-                m_merged_loops = m_intersector.Union(m_merged_loops, ls, 1e-6f, r);
+                m_merged_loops = m_intersector.Union(m_merged_loops, ls, 1e-6f, r, "pillar");
 
                 Assertion.Assert(m_merged_loops != null);
 

@@ -13,14 +13,17 @@ namespace Assets.Generation.GeomRep
     {
         private readonly List<Curve> m_curves = new List<Curve>();
         private readonly float m_param_range;
+        private readonly string m_layer;
 
         // only used in unit-tests atm
-        public Loop()
+        public Loop(string layer)
         {
             m_param_range = 0;
+            m_layer = layer;
         }
 
-        public Loop(Curve c)
+        public Loop(string layer, Curve c)
+            : this(layer)
         {
             m_curves.Add(c);
 
@@ -35,65 +38,8 @@ namespace Assets.Generation.GeomRep
             }
         }
 
-        public static Loop MakeRect(float x1, float y1, float x2, float y2)
-        {
-            Assertion.Assert(x1 <= x2);
-            Assertion.Assert(y1 <= y2);
-
-            var c1 = new Vector2(x1, y1);
-            var c2 = new Vector2(x1, y2);
-            var c3 = new Vector2(x2, y2);
-            var c4 = new Vector2(x2, y1);
-
-            return new Loop(
-                new List<Curve> {
-                    LineCurve.MakeFromPoints(c1, c2),
-                    LineCurve.MakeFromPoints(c2, c3),
-                    LineCurve.MakeFromPoints(c3, c4),
-                    LineCurve.MakeFromPoints(c4, c1),
-                });
-        }
-
-        public static Loop MakePolygon(IEnumerable<Vector2> pnts, RotationDirection polarity)
-        {
-            Vector2 prev = pnts.Last();
-
-            List<Curve> curves = new List<Curve>();
-
-            foreach (var curr in pnts)
-            {
-                curves.Add(LineCurve.MakeFromPoints(prev, curr));
-
-                prev = curr;
-            }
-
-            Loop ret = new Loop(curves);
-
-            RotationDirection actual_rotation = GeomRepUtil.GetPolygonDirection(ret);
-
-            if (polarity != RotationDirection.DontCare
-                && actual_rotation != RotationDirection.DontCare
-                && polarity != actual_rotation)
-            {
-                ret = ret.Reversed();
-            }
-
-            return ret;
-        }
-
-        public Loop Reversed()
-        {
-            List<Curve> ret = new List<Curve>();
-
-            foreach (var c in m_curves)
-            {
-                ret.Insert(0, c.Reversed());
-            }
-
-            return new Loop(ret);
-        }
-
-        public Loop(IEnumerable<Curve> curves)
+        public Loop(string layer, IEnumerable<Curve> curves)
+            : this(layer)
         {
             m_curves.AddRange(curves);
 
@@ -117,6 +63,65 @@ namespace Assets.Generation.GeomRep
             }
 
             m_param_range = range;
+        }
+
+        public static Loop MakeRect(float x1, float y1, float x2, float y2, string layer = "")
+        {
+            Assertion.Assert(x1 <= x2);
+            Assertion.Assert(y1 <= y2);
+
+            var c1 = new Vector2(x1, y1);
+            var c2 = new Vector2(x1, y2);
+            var c3 = new Vector2(x2, y2);
+            var c4 = new Vector2(x2, y1);
+
+            return new Loop(
+                layer,
+                new List<Curve> {
+                    LineCurve.MakeFromPoints(c1, c2),
+                    LineCurve.MakeFromPoints(c2, c3),
+                    LineCurve.MakeFromPoints(c3, c4),
+                    LineCurve.MakeFromPoints(c4, c1),
+                });
+        }
+
+        public static Loop MakePolygon(IEnumerable<Vector2> pnts, RotationDirection polarity, string layer = "")
+        {
+            Vector2 prev = pnts.Last();
+
+            List<Curve> curves = new List<Curve>();
+
+            foreach (var curr in pnts)
+            {
+                curves.Add(LineCurve.MakeFromPoints(prev, curr));
+
+                prev = curr;
+            }
+
+            Loop ret = new Loop(layer, curves);
+
+            RotationDirection actual_rotation = GeomRepUtil.GetPolygonDirection(ret);
+
+            if (polarity != RotationDirection.DontCare
+                && actual_rotation != RotationDirection.DontCare
+                && polarity != actual_rotation)
+            {
+                ret = ret.Reversed();
+            }
+
+            return ret;
+        }
+
+        public Loop Reversed()
+        {
+            List<Curve> ret = new List<Curve>();
+
+            foreach (var c in m_curves)
+            {
+                ret.Insert(0, c.Reversed());
+            }
+
+            return new Loop(m_layer, ret);
         }
 
         public float ParamRange

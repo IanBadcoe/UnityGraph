@@ -57,7 +57,7 @@ namespace Assets.Behaviour
 
             if (test_rand.Nextfloat() > 0.5f)
             {
-                ret.Add(new Loop(new CircleCurve(
+                ret.Add(new Loop("", new CircleCurve(
                     test_rand.Nextpos(0, 10),
                     test_rand.Nextfloat() * 2 + 0.1f,
                     test_rand.Nextfloat() > 0.5f ? RotationDirection.Forwards : RotationDirection.Reverse)));
@@ -69,7 +69,7 @@ namespace Assets.Behaviour
                 Vector2 p3 = test_rand.Nextpos(0, 10);
 
                 // triangles cannot be self-intersecting
-                Loop loop = new Loop(new List<Curve>{
+                Loop loop = new Loop("", new List<Curve>{
                     LineCurve.MakeFromPoints(p1, p2),
                     LineCurve.MakeFromPoints(p2, p3),
                     LineCurve.MakeFromPoints(p3, p1),

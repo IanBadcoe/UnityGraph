@@ -44,7 +44,7 @@ namespace Assets.Generation.GeomRep
             Assertion.Assert(curves[2].EndPos.Equals(curves[3].StartPos, 1e-4f));
             Assertion.Assert(curves[3].EndPos.Equals(curves[0].StartPos, 1e-4f));
 
-            return new Loop(curves);
+            return new Loop("floor", curves);
         }
     }
 }

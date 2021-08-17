@@ -10,7 +10,7 @@ namespace Assets.Generation.GeomRep
 
         public override Loop MakeBaseGeometry(INode node)
         {
-            return new Loop(new CircleCurve(node.Position, node.Radius));
+            return new Loop("floor", new CircleCurve(node.Position, node.Radius));
         }
     }
 }

@@ -11,14 +11,14 @@ namespace Assets.Generation.GeomRep.Layouts
 
         public override Loop MakeBaseGeometry(INode node)
         {
-            return new Loop(new CircleCurve(node.Position, node.Radius));
+            return new Loop("floor", new CircleCurve(node.Position, node.Radius));
         }
 
         public override LoopSet MakeDetailGeometry(INode node)
         {
             LoopSet ret = new LoopSet
             {
-                new Loop(new CircleCurve(node.Position, node.Radius / 2, RotationDirection.Reverse))
+                new Loop("pillar", new CircleCurve(node.Position, node.Radius / 2, RotationDirection.Reverse))
             };
 
             return ret;
@@ -33,7 +33,7 @@ namespace Assets.Generation.GeomRep.Layouts
 
         public override Loop MakeBaseGeometry(INode node)
         {
-            return new Loop(new CircleCurve(node.Position, node.Radius));
+            return new Loop("floor", new CircleCurve(node.Position, node.Radius));
         }
 
         public override LoopSet MakeDetailGeometry(INode node)
@@ -45,7 +45,7 @@ namespace Assets.Generation.GeomRep.Layouts
                 float ang = Mathf.PI * 2 * i / 4;
                 Vector2 pos = node.Position + new Vector2(Mathf.Sin(ang) * node.Radius / 2, Mathf.Cos(ang) * node.Radius / 2);
 
-                ret.Add(new Loop(new CircleCurve(pos, node.Radius / 6, RotationDirection.Reverse)));
+                ret.Add(new Loop("pillar", new CircleCurve(pos, node.Radius / 6, RotationDirection.Reverse)));
             }
 
             return ret;

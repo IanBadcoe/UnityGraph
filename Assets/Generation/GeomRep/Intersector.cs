@@ -90,8 +90,15 @@ namespace Assets.Generation.GeomRep
         }
 
         public LoopSet Union(LoopSet previously_merged, LoopSet to_merge, float tol,
+                             ClRand random, string layer)
+        {
+            return Union(previously_merged, to_merge, tol,
+                random, UnionType.WantPositive, layer);
+        }
+
+        public LoopSet Union(LoopSet previously_merged, LoopSet to_merge, float tol,
                              ClRand random,
-                             UnionType type = UnionType.WantPositive)
+                             UnionType type = UnionType.WantPositive, string layer = "")
         {
             ValidatePreviouslyMerged(previously_merged, "previously_merged");
             //            ValidateInputs(to_merge, "ls2");
@@ -163,8 +170,8 @@ namespace Assets.Generation.GeomRep
                     SplitCurvesAtCoincidences(alc1, alc2, 1e-4f);
 #if DEBUG
                     // has a side effect of checking that the loops are still loops
-                    new Loop(alc1);
-                    new Loop(alc2);
+                    new Loop("", alc1);
+                    new Loop("", alc2);
 #endif
                 }
             }
@@ -303,7 +310,8 @@ namespace Assets.Generation.GeomRep
                 ret.Add(ExtractLoop(
                       open,
                       ac_current,
-                      endSpliceMap));
+                      endSpliceMap,
+                      layer));
             }
 
 #if DEBUG
@@ -658,7 +666,8 @@ namespace Assets.Generation.GeomRep
 
         Loop ExtractLoop(HashSet<AnnotatedCurve> open,
                          AnnotatedCurve start_ac,
-                         Dictionary<Curve, List<AnnotatedCurve>> endSpliceMap)
+                         Dictionary<Curve, List<AnnotatedCurve>> endSpliceMap,
+                         string layer)
         {
             AnnotatedCurve curr_ac = start_ac;
 
@@ -737,7 +746,7 @@ namespace Assets.Generation.GeomRep
             // this merges those back together
             TidyLoop(found_curves);
 
-            return new Loop(found_curves);
+            return new Loop(layer, found_curves);
         }
 
         private void TidyLoop(List<Curve> curves)
