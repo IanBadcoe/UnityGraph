@@ -1,7 +1,3 @@
-using Assets.Generation.G;
-using Assets.Generation.Gen;
-using Assets.Generation.GeomRep;
-using Assets.Generation.Stepping;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -25,7 +21,7 @@ namespace Assets.Behaviour
         {
             ColourDict = new Dictionary<string, Color>();
 
-            foreach(var ent in Colours)
+            foreach (var ent in Colours)
             {
                 ColourDict[ent.Name] = ent.Colour;
             }

@@ -24,7 +24,9 @@ namespace Assets.Generation.Gen
             {
                 case StepperController.Status.StepIn:
                     while (SplitEdge())
+                    {
                         ;
+                    }
 
                     // tried leaving relaxation of these for a later relax step, which we will have anyway
                     // but that seemed to take longer...

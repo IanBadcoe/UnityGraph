@@ -1,6 +1,5 @@
 ﻿using Assets.Generation.G;
 using Assets.Generation.Gen;
-using System;
 
 namespace Assets.Generation.Templates
 {

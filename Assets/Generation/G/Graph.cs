@@ -43,7 +43,7 @@ namespace Assets.Generation.G
                 return false;
             }
 
-            Node node = (Node)Node;
+            Node node = Node;
 
             if (Restore != null)
             {
@@ -125,7 +125,7 @@ namespace Assets.Generation.G
         {
             Assertion.Assert(!m_edges.Contains(e));
 
-            DirectedEdge real_edge = ((Node)e.Start).Connect((Node)e.End, e.MinLength, e.MaxLength, e.HalfWidth,
+            DirectedEdge real_edge = e.Start.Connect(e.End, e.MinLength, e.MaxLength, e.HalfWidth,
                   e.Layout);
 
             m_edges.Add(real_edge);
@@ -159,8 +159,8 @@ namespace Assets.Generation.G
 
         private void DisconnectInner(DirectedEdge e)
         {
-            Node n_from = (Node)e.Start;
-            Node n_to = (Node)e.End;
+            Node n_from = e.Start;
+            Node n_to = e.End;
 
             n_from.Disconnect(n_to);
 
@@ -170,7 +170,7 @@ namespace Assets.Generation.G
 
         public bool Contains(Node node)
         {
-            return m_nodes.Contains((Node)node);
+            return m_nodes.Contains(node);
         }
 
         public bool Contains(DirectedEdge edge)

@@ -114,10 +114,12 @@ namespace Assets.Generation.Templates
         // can implement this better with some caching...
         public bool IsChildNode(Node n)
         {
-            foreach(var c in Children)
+            foreach (var c in Children)
             {
                 if (c.IsChildNode(n))
+                {
                     return true;
+                }
             }
 
             return false;

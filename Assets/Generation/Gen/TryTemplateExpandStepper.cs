@@ -2,7 +2,6 @@
 using Assets.Generation.Stepping;
 using Assets.Generation.Templates;
 using System;
-using System.Collections.Generic;
 
 namespace Assets.Generation.Gen
 {

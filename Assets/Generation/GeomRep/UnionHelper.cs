@@ -10,7 +10,7 @@ namespace Assets.Generation.GeomRep
     public class UnionHelper
     {
         private readonly List<Loop> m_loops = new List<Loop>();
-        private Dictionary<string, LoopSet> m_merged_loop_sets = new Dictionary<string, LoopSet>();
+        private readonly Dictionary<string, LoopSet> m_merged_loop_sets = new Dictionary<string, LoopSet>();
 
         private Box2 m_bounds;
         private Vector2 m_start_pos;
@@ -37,9 +37,8 @@ namespace Assets.Generation.GeomRep
                 Loop l = m_loops[0];
                 string layer = l.Layer;
 
-                LoopSet merged_layer_loops;
 
-                if (!m_merged_loop_sets.TryGetValue(layer, out merged_layer_loops))
+                if (!m_merged_loop_sets.TryGetValue(layer, out LoopSet merged_layer_loops))
                 {
                     merged_layer_loops = new LoopSet();
                 }
