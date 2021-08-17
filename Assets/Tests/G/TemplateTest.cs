@@ -41,7 +41,7 @@ public class TemplateTest
 
             tb.AddNode(NodeRecord.NodeType.Internal, "a",
                   true, "<target>", null, null,
-                  "", 0.0f, null);
+                  "", 0, 0, null);
 
             Template t = tb.Build();
 
@@ -69,7 +69,7 @@ public class TemplateTest
             tb.AddNode(NodeRecord.NodeType.In, "in");
             tb.AddNode(NodeRecord.NodeType.Internal, "a",
                   false, "in", null, null,
-                  "", 0.0f, null);
+                  "", 0, 0, null);
             tb.Connect("in", "a", 0, 0, null);
 
             Template t = tb.Build();
@@ -99,7 +99,7 @@ public class TemplateTest
             tb.AddNode(NodeRecord.NodeType.In, "in");
             tb.AddNode(NodeRecord.NodeType.Internal, "a",
                   true, "in", null, null,
-                  "", 0.0f, null);
+                  "", 0, 0, null);
             tb.Connect("in", "a", 0, 0, null);
 
             Template t = tb.Build();
@@ -132,7 +132,7 @@ public class TemplateTest
             tb.AddNode(NodeRecord.NodeType.In, "in");
             tb.AddNode(NodeRecord.NodeType.Internal, "a",
                   false, "<target>", "in", null,
-                  "", 0.0f, null);
+                  "", 0, 0, null);
             tb.Connect("in", "a", 0, 0, null);
 
             Template t = tb.Build();
@@ -164,7 +164,7 @@ public class TemplateTest
             tb.AddNode(NodeRecord.NodeType.In, "in");
             tb.AddNode(NodeRecord.NodeType.Internal, "a",
                   false, "<target>", null, "in",
-                  "", 0.0f, null);
+                  "", 0, 0, null);
             tb.Connect("in", "a", 0, 0, null);
 
             Template t = tb.Build();
@@ -198,7 +198,7 @@ public class TemplateTest
             tb.AddNode(NodeRecord.NodeType.Out, "out");
             tb.AddNode(NodeRecord.NodeType.Internal, "a",
                   false, "<target>", "out", "in",
-                  "", 0.0f, null);
+                  "", 0, 0, null);
             tb.Connect("in", "a", 0, 0, null);
 
             Template t = tb.Build();
@@ -284,7 +284,7 @@ public class TemplateTest
             tb.AddNode(NodeRecord.NodeType.In, "in");
             tb.AddNode(NodeRecord.NodeType.Internal, "x",
                   false, "<target>", null, null,
-                  "", 0, null);
+                  "", 0, 0, null);
 
             tb.Connect("in", "x", 0, 0, null);
 
@@ -328,7 +328,7 @@ public class TemplateTest
             tb.AddNode(NodeRecord.NodeType.Out, "out");
             tb.AddNode(NodeRecord.NodeType.Internal, "x",
                   false, "<target>", null, null,
-                  "", 0, null);
+                  "", 0, 0, null);
 
             Template t = tb.Build();
 
@@ -457,7 +457,7 @@ public class TemplateTest
             TemplateBuilder tb = new TemplateBuilder("", "");
             tb.AddNode(NodeRecord.NodeType.Internal, "internal",
                   false, "<target>", null, null,
-                  "", 0, null);
+                  "", 0, 0, null);
 
             Template t = tb.Build();
 
@@ -469,10 +469,10 @@ public class TemplateTest
             TemplateBuilder tb = new TemplateBuilder("", "");
             tb.AddNode(NodeRecord.NodeType.Internal, "internal",
                   false, "<target>", null, null,
-                  "", 0, null);
+                  "", 0, 0, null);
             tb.AddNode(NodeRecord.NodeType.Internal, "internal2",
                   false, "<target>", null, null,
-                  "", 0, null);
+                  "", 0, 0, null);
 
             Template t = tb.Build();
 

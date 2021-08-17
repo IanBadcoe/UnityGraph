@@ -215,11 +215,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2003294203, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: NodesLimit
-      value: 16
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2003294203, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: Config.RandomSeed
-      value: 30
+      value: 31
       objectReference: {fileID: 0}
     - target: {fileID: 6519645942250547586, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: m_RootOrder
@@ -276,6 +276,46 @@ PrefabInstance:
     - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: Colours.Array.data[0].Colour.r
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: Colours.Array.data[0].Cuts.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: Colours.Array.data[1].Cuts.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: Colours.Array.data[2].Cuts.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: Colours.Array.data[3].Cuts.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: Colours.Array.data[0].Cuts.Array.data[0]
+      value: wall
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: Colours.Array.data[1].Cuts.Array.data[0]
+      value: floor
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: Colours.Array.data[2].Cuts.Array.data[0]
+      value: floor
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: Colours.Array.data[2].Cuts.Array.data[1]
+      value: wall
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: Colours.Array.data[3].Cuts.Array.data[0]
+      value: floor
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: Colours.Array.data[3].Cuts.Array.data[1]
+      value: water
       objectReference: {fileID: 0}
     - target: {fileID: 9020293378318520130, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: m_Name

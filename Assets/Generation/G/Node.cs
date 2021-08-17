@@ -22,6 +22,7 @@ namespace Assets.Generation.G
         public string Name { get; }
         public string Codes { get; }
         public float Radius { get; }
+        public float WallThickness { get; }
 
         public Vector2 Pos { get; set; }
         public Vector2 Position { get; set; }
@@ -52,12 +53,13 @@ namespace Assets.Generation.G
 
         public IList<IHMChild> Children { get; }
 
-        public Node(string name, string codes, float rad, HierarchyMetadata parent = null)
-            : this(name, codes, rad, null, parent)
+        public Node(string name, string codes, float rad, float wall_thickness = 0, HierarchyMetadata parent = null)
+            : this(name, codes, rad, wall_thickness, null, parent)
         {
         }
 
-        public Node(string name, string codes, float rad,
+        public Node(string name, string codes,
+            float rad, float wall_thickness,
             GeomLayout layout, HierarchyMetadata parent = null)
         {
             Name = name;
@@ -66,6 +68,7 @@ namespace Assets.Generation.G
             m_num = s_rand.Next();
 
             Radius = rad;
+            WallThickness = wall_thickness;     // zero means no wall
 
             Layout = layout;
 
@@ -89,13 +92,8 @@ namespace Assets.Generation.G
             return m_connections.Contains(new DirectedEdge(from, this));
         }
 
-        public DirectedEdge Connect(Node n, float min_distance, float max_distance, float width)
-        {
-            return Connect(n, min_distance, max_distance, width, null);
-        }
-
         public DirectedEdge Connect(Node n, float min_distance, float max_distance, float width,
-              GeomLayout layout)
+              GeomLayout layout = null, float wall_thickness = 0)
         {
             // cannot multiply connect the same node, forwards or backwards
             if (Connects(n))
@@ -104,7 +102,7 @@ namespace Assets.Generation.G
                       "' to '" + n.Name + "'");
             }
 
-            DirectedEdge e = new DirectedEdge(this, n, min_distance, max_distance, width, layout);
+            DirectedEdge e = new DirectedEdge(this, n, min_distance, max_distance, width, wall_thickness, layout);
 
             Connect(e);
             n.Connect(e);

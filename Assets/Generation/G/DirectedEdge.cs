@@ -11,26 +11,20 @@ namespace Assets.Generation.G
         public readonly float MinLength;
         public readonly float MaxLength;
         public readonly float HalfWidth;
+        public readonly float WallThickness;
 
         public readonly GeomLayout Layout;
 
         // for identity/searching purposes, only start and end count...
         public DirectedEdge(Node start, Node end)
-            : this(start, end, 0, 0, 0, null)
+            : this(start, end, 0, 0, 0)
         {
         }
 
         public DirectedEdge(Node start, Node end,
             float min_length, float max_length,
-            float half_width)
-            : this(start, end, min_length, max_length, half_width, null)
-        {
-        }
-
-        public DirectedEdge(Node start, Node end,
-            float min_length, float max_length,
-            float half_width,
-            GeomLayout layout)
+            float half_width, float wall_thickness = 0,
+            GeomLayout layout = null)
         {
             Assertion.Assert(start != null);
             Assertion.Assert(end != null);
@@ -40,6 +34,7 @@ namespace Assets.Generation.G
             MaxLength = max_length;
             MinLength = min_length;
             HalfWidth = half_width;
+            WallThickness = wall_thickness;
             Layout = layout;
         }
 

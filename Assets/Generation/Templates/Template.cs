@@ -81,17 +81,8 @@ namespace Assets.Generation.Templates
                 { FindNodeRecord("<target>"), target }
             };
 
-            // create nodes for each we are adding and map to their NodeRecords
-            foreach (NodeRecord nr in m_nodes.Values)
-            {
-                if (nr.Type == NodeRecord.NodeType.Internal)
-                {
-                    Node n = graph.AddNode(nr.Name, nr.Codes, nr.Radius, nr.Layout, hm);
-                    template_to_graph.Add(nr, n);
-                }
-            }
-
             HashSet<float> existing_corridor_widths = new HashSet<float>();
+            HashSet<float> existing_wall_thicknesses = new HashSet<float>();
 
             // find nodes for in-connections and map to their NodeRecords
             {
@@ -108,6 +99,7 @@ namespace Assets.Generation.Templates
                         template_to_graph.Add(nr, g_conn);
 
                         existing_corridor_widths.Add(g_it.Current.HalfWidth);
+                        existing_wall_thicknesses.Add(g_it.Current.WallThickness);
                     }
                 }
             }
@@ -127,6 +119,7 @@ namespace Assets.Generation.Templates
                         template_to_graph.Add(nr, g_conn);
 
                         existing_corridor_widths.Add(g_it.Current.HalfWidth);
+                        existing_wall_thicknesses.Add(g_it.Current.WallThickness);
                     }
                 }
             }
@@ -136,8 +129,34 @@ namespace Assets.Generation.Templates
                 existing_corridor_widths.Add(1);
             }
 
+            if (existing_wall_thicknesses.Count == 0)
+            {
+                existing_wall_thicknesses.Add(0);
+            }
+
+            float chosen_existing_wall_thickness = Util.RemoveRandom(random, existing_wall_thicknesses.ToList());
+
+            // create nodes for each we are adding and map to their NodeRecords
+            foreach (NodeRecord nr in m_nodes.Values)
+            {
+                if (nr.Type == NodeRecord.NodeType.Internal)
+                {
+                    float wall_thickness = nr.WallThickness;
+
+                    if (wall_thickness == -1)
+                    {
+                        wall_thickness = chosen_existing_wall_thickness;
+                    }
+
+                    Node n = graph.AddNode(nr.Name, nr.Codes, nr.Radius, wall_thickness, nr.Layout);
+                    template_to_graph.Add(nr, n);
+                }
+            }
+
             ApplyConnections(target, template_to_graph, graph,
-                Util.RemoveRandom(random, existing_corridor_widths.ToList()));
+                Util.RemoveRandom(random, existing_corridor_widths.ToList()),
+                chosen_existing_wall_thickness
+            );
 
             // make three attempts to position the nodes
             // no point if no random components, but pretty cheap to do...
@@ -171,7 +190,7 @@ namespace Assets.Generation.Templates
         }
 
         private void ApplyConnections(Node node_replacing, Dictionary<NodeRecord, Node> template_to_graph,
-                                      Graph graph, float existing_width)
+                                      Graph graph, float existing_width, float existing_wall_thickness)
         {
             foreach (DirectedEdge e in node_replacing.GetConnections())
             {
@@ -191,7 +210,14 @@ namespace Assets.Generation.Templates
                     half_width = existing_width;
                 }
 
-                DirectedEdge de = graph.Connect(nf, nt, cr.MaxLength, half_width, cr.Layout);
+                float wall_thickness = cr.WallThickness;
+
+                if (wall_thickness == -1)
+                {
+                    wall_thickness = existing_wall_thickness;
+                }
+
+                DirectedEdge de = graph.Connect(nf, nt, cr.MaxLength, half_width, cr.Layout, wall_thickness);
             }
         }
 

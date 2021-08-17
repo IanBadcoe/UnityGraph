@@ -17,9 +17,15 @@ namespace Assets.Generation.G
         public GraphRestore Restore { get; private set; }
 
         public Node AddNode(string name, string codes, float rad,
-                             GeomLayout layout, HierarchyMetadata parent = null)
+                            GeomLayout layout, HierarchyMetadata parent = null)
         {
-            Node n = new Node(name, codes, rad, layout, parent);
+            return AddNode(name, codes, rad, 0, layout, parent);
+        }
+
+        public Node AddNode(string name, string codes, float rad, float wall_thickness,
+                            GeomLayout layout, HierarchyMetadata parent = null)
+        {
+            Node n = new Node(name, codes, rad, wall_thickness, layout, parent);
 
             if (Restore != null)
             {
@@ -74,7 +80,7 @@ namespace Assets.Generation.G
         // in expected length
         public DirectedEdge Connect(Node from, Node to,
                                     float min_length, float max_length, float half_width,
-                                    GeomLayout layout)
+                                    GeomLayout layout = null, float wall_thickness = 0)
         {
             if (from == to
                   || !Contains(from)
@@ -84,7 +90,7 @@ namespace Assets.Generation.G
                 throw new ArgumentException();
             }
 
-            DirectedEdge temp = new DirectedEdge(from, to, min_length, max_length, half_width, layout);
+            DirectedEdge temp = new DirectedEdge(from, to, min_length, max_length, half_width, wall_thickness, layout);
 
             if (Restore != null)
             {
@@ -96,9 +102,9 @@ namespace Assets.Generation.G
 
         public DirectedEdge Connect(Node from, Node to,
                                     float max_length, float half_width,
-                                    GeomLayout layout)
+                                    GeomLayout layout = null, float wall_thickness = 0)
         {
-            return Connect(from, to, max_length * 0.5f, max_length, half_width, layout);
+            return Connect(from, to, max_length * 0.5f, max_length, half_width, layout, wall_thickness);
         }
 
         public List<Node> GetAllNodes()
@@ -126,7 +132,7 @@ namespace Assets.Generation.G
             Assertion.Assert(!m_edges.Contains(e));
 
             DirectedEdge real_edge = e.Start.Connect(e.End, e.MinLength, e.MaxLength, e.HalfWidth,
-                  e.Layout);
+                  e.Layout, e.WallThickness);
 
             m_edges.Add(real_edge);
 

@@ -10,8 +10,15 @@ namespace Assets.Generation.GeomRep
 
         public override LoopSet MakeGeometry(Node node)
         {
+            if (node.WallThickness > 0)
+            {
+                return new LoopSet {
+                    new Loop("wall", new CircleCurve(node.Position, node.Radius)),
+                    new Loop("floor", new CircleCurve(node.Position, node.Radius - node.WallThickness))
+                };
+            }
+
             return new LoopSet {
-                new Loop("wall", new CircleCurve(node.Position, node.Radius)),
                 new Loop("floor", new CircleCurve(node.Position, node.Radius))
             };
         }
