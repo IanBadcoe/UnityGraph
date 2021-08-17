@@ -16,10 +16,16 @@ namespace Assets.Generation.G
 
         public GraphRestore Restore { get; private set; }
 
-        public INode AddNode(string name, string codes, float rad,
-                             GeomLayout layout, HierarchyMetadata parent = null)
+        public Node AddNode(string name, string codes, float rad,
+                            GeomLayout layout, HierarchyMetadata parent = null)
         {
-            Node n = new Node(name, codes, rad, layout, parent);
+            return AddNode(name, codes, rad, 0, layout, parent);
+        }
+
+        public Node AddNode(string name, string codes, float rad, float wall_thickness,
+                            GeomLayout layout, HierarchyMetadata parent = null)
+        {
+            Node n = new Node(name, codes, rad, wall_thickness, layout, parent);
 
             if (Restore != null)
             {
@@ -31,19 +37,19 @@ namespace Assets.Generation.G
             return n;
         }
 
-        public bool RemoveNode(INode inode)
+        public bool RemoveNode(Node Node)
         {
-            if (!Contains(inode))
+            if (!Contains(Node))
             {
                 return false;
             }
 
-            if (inode.GetConnections().Count > 0)
+            if (Node.GetConnections().Count > 0)
             {
                 return false;
             }
 
-            Node node = (Node)inode;
+            Node node = Node;
 
             if (Restore != null)
             {
@@ -72,9 +78,9 @@ namespace Assets.Generation.G
         // (they'll not be over compressed afterwards...)
         // unit tests use this one extensively, however, top set min = max for unambiguity
         // in expected length
-        public DirectedEdge Connect(INode from, INode to,
+        public DirectedEdge Connect(Node from, Node to,
                                     float min_length, float max_length, float half_width,
-                                    GeomLayout layout)
+                                    GeomLayout layout = null, float wall_thickness = 0)
         {
             if (from == to
                   || !Contains(from)
@@ -84,7 +90,7 @@ namespace Assets.Generation.G
                 throw new ArgumentException();
             }
 
-            DirectedEdge temp = new DirectedEdge(from, to, min_length, max_length, half_width, layout);
+            DirectedEdge temp = new DirectedEdge(from, to, min_length, max_length, half_width, wall_thickness, layout);
 
             if (Restore != null)
             {
@@ -94,16 +100,16 @@ namespace Assets.Generation.G
             return ConnectInner(temp);
         }
 
-        public DirectedEdge Connect(INode from, INode to,
+        public DirectedEdge Connect(Node from, Node to,
                                     float max_length, float half_width,
-                                    GeomLayout layout)
+                                    GeomLayout layout = null, float wall_thickness = 0)
         {
-            return Connect(from, to, max_length * 0.5f, max_length, half_width, layout);
+            return Connect(from, to, max_length * 0.5f, max_length, half_width, layout, wall_thickness);
         }
 
-        public List<INode> GetAllNodes()
+        public List<Node> GetAllNodes()
         {
-            return m_nodes.ToList<INode>();
+            return m_nodes.ToList<Node>();
         }
 
         public List<DirectedEdge> GetAllEdges()
@@ -125,15 +131,15 @@ namespace Assets.Generation.G
         {
             Assertion.Assert(!m_edges.Contains(e));
 
-            DirectedEdge real_edge = ((Node)e.Start).Connect((Node)e.End, e.MinLength, e.MaxLength, e.HalfWidth,
-                  e.Layout);
+            DirectedEdge real_edge = e.Start.Connect(e.End, e.MinLength, e.MaxLength, e.HalfWidth,
+                  e.Layout, e.WallThickness);
 
             m_edges.Add(real_edge);
 
             return real_edge;
         }
 
-        public bool Disconnect(INode from, INode to)
+        public bool Disconnect(Node from, Node to)
         {
             if (!Contains(from) || !Contains(to))
             {
@@ -159,8 +165,8 @@ namespace Assets.Generation.G
 
         private void DisconnectInner(DirectedEdge e)
         {
-            Node n_from = (Node)e.Start;
-            Node n_to = (Node)e.End;
+            Node n_from = e.Start;
+            Node n_to = e.End;
 
             n_from.Disconnect(n_to);
 
@@ -168,9 +174,9 @@ namespace Assets.Generation.G
             m_edges.Remove(e);
         }
 
-        public bool Contains(INode node)
+        public bool Contains(Node node)
         {
-            return m_nodes.Contains((Node)node);
+            return m_nodes.Contains(node);
         }
 
         public bool Contains(DirectedEdge edge)
@@ -182,7 +188,7 @@ namespace Assets.Generation.G
         {
             Box2 ret = Box2.Empty;
 
-            foreach (INode n in m_nodes)
+            foreach (Node n in m_nodes)
             {
                 Vector2 rad_box = new Vector2(n.Radius, n.Radius);
 
@@ -218,9 +224,9 @@ namespace Assets.Generation.G
             private sealed class NodePos
             {
                 public readonly Vector2 Pos;
-                public readonly INode N;
+                public readonly Node N;
 
-                public NodePos(INode n, Vector2 pos)
+                public NodePos(Node n, Vector2 pos)
                 {
                     Pos = pos;
                     N = n;

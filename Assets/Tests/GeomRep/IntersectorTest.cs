@@ -598,7 +598,7 @@ public class IntersectorTest
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
 
-            Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
+            Loop l1 = new Loop("", new CircleCurve(new Vector2(), 1));
             ls1.Add(l1);
 
             LoopSet ret = m_intersector.Union(ls1, ls2, 1e-5f, new ClRand(1));
@@ -613,7 +613,7 @@ public class IntersectorTest
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
 
-            Loop l2 = new Loop(new CircleCurve(new Vector2(), 1));
+            Loop l2 = new Loop("", new CircleCurve(new Vector2(), 1));
             ls2.Add(l2);
 
             LoopSet ret = m_intersector.Union(ls1, ls2, 1e-5f, new ClRand(1));
@@ -628,10 +628,10 @@ public class IntersectorTest
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
 
-            Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
+            Loop l1 = new Loop("", new CircleCurve(new Vector2(), 1));
             ls1.Add(l1);
 
-            Loop l2 = new Loop(new CircleCurve(new Vector2(), 1));
+            Loop l2 = new Loop("", new CircleCurve(new Vector2(), 1));
             ls2.Add(l2);
 
             // paranoia
@@ -649,10 +649,10 @@ public class IntersectorTest
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
 
-            Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
+            Loop l1 = new Loop("", new CircleCurve(new Vector2(), 1));
             ls1.Add(l1);
 
-            Loop l2 = new Loop(new CircleCurve(new Vector2(1, 0), 1));
+            Loop l2 = new Loop("", new CircleCurve(new Vector2(1, 0), 1));
             ls2.Add(l2);
 
             LoopSet ret = m_intersector.Union(ls1, ls2, 1e-5f, new ClRand(1));
@@ -699,13 +699,13 @@ public class IntersectorTest
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
 
-            Loop l1a = new Loop(new CircleCurve(new Vector2(), 1));
-            Loop l1b = new Loop(new CircleCurve(new Vector2(), 0.3f, RotationDirection.Reverse));
+            Loop l1a = new Loop("", new CircleCurve(new Vector2(), 1));
+            Loop l1b = new Loop("", new CircleCurve(new Vector2(), 0.3f, RotationDirection.Reverse));
             ls1.Add(l1a);
             ls1.Add(l1b);
 
-            Loop l2a = new Loop(new CircleCurve(new Vector2(1, 0), 1));
-            Loop l2b = new Loop(new CircleCurve(new Vector2(1, 0), 0.3f, RotationDirection.Reverse));
+            Loop l2a = new Loop("", new CircleCurve(new Vector2(1, 0), 1));
+            Loop l2b = new Loop("", new CircleCurve(new Vector2(1, 0), 0.3f, RotationDirection.Reverse));
             ls2.Add(l2a);
             ls2.Add(l2b);
 
@@ -724,10 +724,10 @@ public class IntersectorTest
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
 
-            Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
+            Loop l1 = new Loop("", new CircleCurve(new Vector2(), 1));
             ls1.Add(l1);
 
-            Loop l2 = new Loop(new CircleCurve(new Vector2(2, 0), 1));
+            Loop l2 = new Loop("", new CircleCurve(new Vector2(2, 0), 1));
             ls2.Add(l2);
 
             LoopSet ret = m_intersector.Union(ls1, ls2, 1e-5f, new ClRand(1));
@@ -774,10 +774,10 @@ public class IntersectorTest
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
 
-            Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
+            Loop l1 = new Loop("", new CircleCurve(new Vector2(), 1));
             ls1.Add(l1);
 
-            Loop l2 = new Loop(new CircleCurve(new Vector2(2, 0), 1));
+            Loop l2 = new Loop("", new CircleCurve(new Vector2(2, 0), 1));
             ls2.Add(l2);
 
             LoopSet ret = m_intersector.Union(ls2, ls1, 1e-5f, new ClRand(1));
@@ -823,10 +823,10 @@ public class IntersectorTest
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
 
-            Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
+            Loop l1 = new Loop("", new CircleCurve(new Vector2(), 1));
             ls1.Add(l1);
 
-            Loop l2 = new Loop(new CircleCurve(new Vector2(0.5f, 0), 0.5f, RotationDirection.Reverse));
+            Loop l2 = new Loop("", new CircleCurve(new Vector2(0.5f, 0), 0.5f, RotationDirection.Reverse));
             ls2.Add(l2);
 
             LoopSet ret = m_intersector.Union(ls1, ls2, 1e-5f, new ClRand(1));
@@ -926,7 +926,7 @@ public class IntersectorTest
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
 
-            Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
+            Loop l1 = new Loop("", new CircleCurve(new Vector2(), 1));
             ls1.Add(l1);
             ls2.Add(l1);
 
@@ -942,9 +942,9 @@ public class IntersectorTest
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
 
-            Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
+            Loop l1 = new Loop("", new CircleCurve(new Vector2(), 1));
             ls1.Add(l1);
-            Loop l2 = new Loop(new CircleCurve(new Vector2(1, 0), 1));
+            Loop l2 = new Loop("", new CircleCurve(new Vector2(1, 0), 1));
             ls2.Add(l2);
 
             Intersector i = new IntersectorDummy1();
@@ -959,10 +959,10 @@ public class IntersectorTest
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
 
-            Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
+            Loop l1 = new Loop("", new CircleCurve(new Vector2(), 1));
             ls1.Add(l1);
 
-            Loop l2 = new Loop(new CircleCurve(new Vector2(0.5f, 0), 1));
+            Loop l2 = new Loop("", new CircleCurve(new Vector2(0.5f, 0), 1));
             ls2.Add(l2);
 
             Intersector i = new IntersectorDummy2();
@@ -986,10 +986,10 @@ public class IntersectorTest
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
 
-            Loop l1 = new Loop(new CircleCurve(new Vector2(), 1));
+            Loop l1 = new Loop("", new CircleCurve(new Vector2(), 1));
             ls1.Add(l1);
 
-            Loop l2 = new Loop(new CircleCurve(new Vector2(0.5f, 0), 1));
+            Loop l2 = new Loop("", new CircleCurve(new Vector2(0.5f, 0), 1));
             ls2.Add(l2);
 
             Intersector i = new IntersectorDummy3();
@@ -1111,7 +1111,7 @@ public class IntersectorTest
 
         if (test_rand.Nextfloat() > 0.5f)
         {
-            ret.Add(new Loop(new CircleCurve(
+            ret.Add(new Loop("", new CircleCurve(
                 test_rand.Nextpos(0, 10),
                 test_rand.Nextfloat() * 2 + 0.1f,
                 test_rand.Nextfloat() > 0.5f ? RotationDirection.Forwards : RotationDirection.Reverse)));
@@ -1123,7 +1123,7 @@ public class IntersectorTest
             Vector2 p3 = test_rand.Nextpos(0, 10);
 
             // triangles cannot be self-intersecting
-            Loop loop = new Loop(new List<Curve>{
+            Loop loop = new Loop("", new List<Curve>{
                 LineCurve.MakeFromPoints(p1, p2),
                 LineCurve.MakeFromPoints(p2, p3),
                 LineCurve.MakeFromPoints(p3, p1),
@@ -1216,7 +1216,7 @@ public class IntersectorTest
         LoopSet p4f = new LoopSet(Loop.MakePolygon(p4, RotationDirection.Forwards));
         LoopSet p4r = new LoopSet(Loop.MakePolygon(p4, RotationDirection.Reverse));
 
-        LoopSet circ = new LoopSet(new Loop(new CircleCurve(new Vector2(0, 0), 1)));
+        LoopSet circ = new LoopSet(new Loop("", new CircleCurve(new Vector2(0, 0), 1)));
 
         {
             LoopSet merged = m_intersector.Union(circ, p1f, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
@@ -1302,14 +1302,14 @@ public class IntersectorTest
             Vector2 p2 = new Vector2(1, 0);
 
             LoopSet ls1 = new LoopSet(
-                new Loop(new List<Curve>
+                new Loop("", new List<Curve>
                 {
                     LineCurve.MakeFromPoints(p1, p2),
                     LineCurve.MakeFromPoints(p2, p1),
                 }));
 
             LoopSet ls1r = new LoopSet(
-                new Loop(new List<Curve>
+                new Loop("", new List<Curve>
                 {
                     LineCurve.MakeFromPoints(p2, p1),
                     LineCurve.MakeFromPoints(p1, p2),
@@ -1337,7 +1337,7 @@ public class IntersectorTest
             // p1 -> p3 -> p2 -> p4 -> p1
 
             LoopSet ls1 = new LoopSet(
-                new Loop(new List<Curve>
+                new Loop("", new List<Curve>
                 {
                     LineCurve.MakeFromPoints(p1, p3),
                     LineCurve.MakeFromPoints(p3, p2),
@@ -1373,7 +1373,7 @@ public class IntersectorTest
             // p1 -> p3 -> p2 -> p4 -> p3 -> p2 -> p1
 
             LoopSet ls1 = new LoopSet(
-                new Loop(new List<Curve>
+                new Loop("", new List<Curve>
                 {
                     LineCurve.MakeFromPoints(p1, p2),
                     LineCurve.MakeFromPoints(p2, p3),
@@ -1496,8 +1496,8 @@ public class IntersectorTest
             // two opposite circles should disappear
             LoopSet ls1 = new LoopSet(
                 new List<Loop> {
-                    new Loop(new CircleCurve(new Vector2(), 1, RotationDirection.Forwards)),
-                    new Loop(new CircleCurve(new Vector2(), 1, RotationDirection.Reverse)),
+                    new Loop("", new CircleCurve(new Vector2(), 1, RotationDirection.Forwards)),
+                    new Loop("", new CircleCurve(new Vector2(), 1, RotationDirection.Reverse)),
                 }
             );
 

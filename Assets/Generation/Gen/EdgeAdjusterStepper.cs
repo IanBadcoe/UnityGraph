@@ -24,7 +24,9 @@ namespace Assets.Generation.Gen
             {
                 case StepperController.Status.StepIn:
                     while (SplitEdge())
+                    {
                         ;
+                    }
 
                     // tried leaving relaxation of these for a later relax step, which we will have anyway
                     // but that seemed to take longer...
@@ -78,7 +80,7 @@ namespace Assets.Generation.Gen
                 return false;
             }
 
-            INode c = Graph.AddNode("c", "",
+            Node c = Graph.AddNode("c", "",
                 e.HalfWidth, CircularGeomLayout.Instance);
 
             Vector2 mid = (e.Start.Position + e.End.Position) / 2;

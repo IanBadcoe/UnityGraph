@@ -8,9 +8,19 @@ namespace Assets.Generation.GeomRep
 
         private CircularGeomLayout() { }
 
-        public override Loop MakeBaseGeometry(INode node)
+        public override LoopSet MakeGeometry(Node node)
         {
-            return new Loop(new CircleCurve(node.Position, node.Radius));
+            if (node.WallThickness > 0)
+            {
+                return new LoopSet {
+                    new Loop("wall", new CircleCurve(node.Position, node.Radius)),
+                    new Loop("floor", new CircleCurve(node.Position, node.Radius - node.WallThickness))
+                };
+            }
+
+            return new LoopSet {
+                new Loop("floor", new CircleCurve(node.Position, node.Radius))
+            };
         }
     }
 }

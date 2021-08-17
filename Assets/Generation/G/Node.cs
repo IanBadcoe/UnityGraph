@@ -1,4 +1,5 @@
-﻿using Assets.Generation.GeomRep;
+﻿using Assets.Generation.Gen;
+using Assets.Generation.GeomRep;
 using Assets.Generation.Templates;
 using Assets.Generation.U;
 using System;
@@ -9,7 +10,7 @@ using UnityEngine;
 namespace Assets.Generation.G
 {
     [System.Diagnostics.DebuggerDisplay("Name = {Name}")]
-    public class Node : INode
+    public class Node : IRelaxationParamSource, IHMChild
     {
         private readonly int m_num;
         private readonly HashSet<DirectedEdge> m_connections = new HashSet<DirectedEdge>();
@@ -21,6 +22,7 @@ namespace Assets.Generation.G
         public string Name { get; }
         public string Codes { get; }
         public float Radius { get; }
+        public float WallThickness { get; }
 
         public Vector2 Pos { get; set; }
         public Vector2 Position { get; set; }
@@ -51,12 +53,13 @@ namespace Assets.Generation.G
 
         public IList<IHMChild> Children { get; }
 
-        public Node(string name, string codes, float rad, HierarchyMetadata parent = null)
-            : this(name, codes, rad, null, parent)
+        public Node(string name, string codes, float rad, float wall_thickness = 0, HierarchyMetadata parent = null)
+            : this(name, codes, rad, wall_thickness, null, parent)
         {
         }
 
-        public Node(string name, string codes, float rad,
+        public Node(string name, string codes,
+            float rad, float wall_thickness,
             GeomLayout layout, HierarchyMetadata parent = null)
         {
             Name = name;
@@ -65,6 +68,7 @@ namespace Assets.Generation.G
             m_num = s_rand.Next();
 
             Radius = rad;
+            WallThickness = wall_thickness;     // zero means no wall
 
             Layout = layout;
 
@@ -73,28 +77,23 @@ namespace Assets.Generation.G
             Children = new List<IHMChild>();
         }
 
-        public bool Connects(INode n)
+        public bool Connects(Node n)
         {
             return ConnectsForwards(n) || ConnectsBackwards(n);
         }
 
-        public bool ConnectsForwards(INode to)
+        public bool ConnectsForwards(Node to)
         {
             return m_connections.Contains(new DirectedEdge(this, to));
         }
 
-        public bool ConnectsBackwards(INode from)
+        public bool ConnectsBackwards(Node from)
         {
             return m_connections.Contains(new DirectedEdge(from, this));
         }
 
-        public DirectedEdge Connect(Node n, float min_distance, float max_distance, float width)
-        {
-            return Connect(n, min_distance, max_distance, width, null);
-        }
-
         public DirectedEdge Connect(Node n, float min_distance, float max_distance, float width,
-              GeomLayout layout)
+              GeomLayout layout = null, float wall_thickness = 0)
         {
             // cannot multiply connect the same node, forwards or backwards
             if (Connects(n))
@@ -103,7 +102,7 @@ namespace Assets.Generation.G
                       "' to '" + n.Name + "'");
             }
 
-            DirectedEdge e = new DirectedEdge(this, n, min_distance, max_distance, width, layout);
+            DirectedEdge e = new DirectedEdge(this, n, min_distance, max_distance, width, wall_thickness, layout);
 
             Connect(e);
             n.Connect(e);
@@ -131,7 +130,7 @@ namespace Assets.Generation.G
             n.Disconnect(this);
         }
 
-        public DirectedEdge GetConnectionTo(INode to)
+        public DirectedEdge GetConnectionTo(Node to)
         {
             foreach (DirectedEdge e in m_connections)
             {
@@ -144,7 +143,7 @@ namespace Assets.Generation.G
             return null;
         }
 
-        public DirectedEdge GetConnectionFrom(INode from)
+        public DirectedEdge GetConnectionFrom(Node from)
         {
             foreach (DirectedEdge e in m_connections)
             {
@@ -200,7 +199,7 @@ namespace Assets.Generation.G
             return 2;
         }
 
-        public bool IsChildNode(INode n)
+        public bool IsChildNode(Node n)
         {
             return ReferenceEquals(n, this);
         }

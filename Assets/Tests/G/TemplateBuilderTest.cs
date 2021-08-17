@@ -88,7 +88,7 @@ public class TemplateBuilderTest
 
             t.AddNode(NodeRecord.NodeType.Internal, "n1",
                   true, "In", "Out", null,
-                  "xx", 3.0f, CircularGeomLayout.Instance);
+                  "xx", 3.0f, 1.0f, CircularGeomLayout.Instance);
 
             NodeRecord nr = t.FindNodeRecord("n1");
 
@@ -102,6 +102,7 @@ public class TemplateBuilderTest
             Assert.AreEqual("In", nr.PositionOn.Name);
             Assert.AreEqual("Out", nr.PositionTowards.Name);
             Assert.AreEqual(3.0, nr.Radius, 0.0);
+            Assert.AreEqual(1.0, nr.WallThickness, 0.0);
             Assert.AreEqual("xx", nr.Codes);
             Assert.AreEqual(CircularGeomLayout.Instance, nr.Layout);
         }
@@ -114,7 +115,7 @@ public class TemplateBuilderTest
 
             t.AddNode(NodeRecord.NodeType.Internal, "n1",
                   true, "In", null, "Out",
-                  "xx", 3.0f, null);
+                  "xx", 3.0f, -1, null);
 
             NodeRecord nr = t.FindNodeRecord("n1");
 
@@ -128,6 +129,7 @@ public class TemplateBuilderTest
             Assert.AreEqual("In", nr.PositionOn.Name);
             Assert.AreEqual("Out", nr.PositionAwayFrom.Name);
             Assert.AreEqual(3.0, nr.Radius, 0.0);
+            Assert.AreEqual(-1.0, nr.WallThickness, 0.0);
             Assert.AreEqual("xx", nr.Codes);
             Assert.AreEqual(null, nr.Layout);
         }
@@ -239,7 +241,7 @@ public class TemplateBuilderTest
             {
                 t.AddNode(NodeRecord.NodeType.Internal, "n1",
                       true, "q", null, null,
-                      "", 0.0f, null);
+                      "", 0, 0, null);
             }
             catch (TemplateBuilder.UnknownNodeException une)
             {
@@ -260,7 +262,7 @@ public class TemplateBuilderTest
             {
                 t.AddNode(NodeRecord.NodeType.Internal, "n1",
                       true, "<target>", "qq", null,
-                      "", 0.0f, null);
+                      "", 0, 0, null);
             }
             catch (TemplateBuilder.UnknownNodeException une)
             {
@@ -281,7 +283,7 @@ public class TemplateBuilderTest
             {
                 t.AddNode(NodeRecord.NodeType.Internal, "n1",
                       true, "<target>", null, "qqq",
-                      "", 0.0f, null);
+                      "", 0, 0, null);
             }
             catch (TemplateBuilder.UnknownNodeException une)
             {
@@ -302,7 +304,7 @@ public class TemplateBuilderTest
             {
                 t.AddNode(NodeRecord.NodeType.Internal, "x",
                       false, null, null, null,
-                      "", 0, null);
+                      "", 0, 0, null);
             }
             catch (NullReferenceException)
             {

@@ -9,19 +9,21 @@ namespace Assets.Generation.GeomRep.Layouts
 
         private CircularPillarGeomLayout() { }
 
-        public override Loop MakeBaseGeometry(INode node)
+        public override LoopSet MakeGeometry(Node node)
         {
-            return new Loop(new CircleCurve(node.Position, node.Radius));
-        }
-
-        public override LoopSet MakeDetailGeometry(INode node)
-        {
-            LoopSet ret = new LoopSet
+            if (node.WallThickness > 0)
             {
-                new Loop(new CircleCurve(node.Position, node.Radius / 2, RotationDirection.Reverse))
-            };
+                return new LoopSet {
+                    new Loop("wall", new CircleCurve(node.Position, node.Radius)),
+                    new Loop("floor", new CircleCurve(node.Position, node.Radius - node.WallThickness)),
+                    new Loop("pillar", new CircleCurve(node.Position, (node.Radius - node.WallThickness) / 2))
+                };
+            }
 
-            return ret;
+            return new LoopSet {
+                new Loop("floor", new CircleCurve(node.Position, node.Radius)),
+                new Loop("pillar", new CircleCurve(node.Position, node.Radius / 2))
+            };
         }
     }
 
@@ -31,21 +33,27 @@ namespace Assets.Generation.GeomRep.Layouts
 
         private FourCircularPillarsGeomLayout() { }
 
-        public override Loop MakeBaseGeometry(INode node)
-        {
-            return new Loop(new CircleCurve(node.Position, node.Radius));
-        }
-
-        public override LoopSet MakeDetailGeometry(INode node)
+        public override LoopSet MakeGeometry(Node node)
         {
             LoopSet ret = new LoopSet();
+
+            float effective_radius = node.Radius;
+
+            if (node.WallThickness > 0)
+            {
+                effective_radius -= node.WallThickness;
+                ret.Add(new Loop("wall", new CircleCurve(node.Position, node.Radius)));
+            }
+
+            ret.Add(new Loop("floor", new CircleCurve(node.Position, effective_radius)));
+            ret.Add(new Loop("water", new CircleCurve(node.Position, effective_radius / 2)));
 
             for (int i = 0; i < 4; i++)
             {
                 float ang = Mathf.PI * 2 * i / 4;
-                Vector2 pos = node.Position + new Vector2(Mathf.Sin(ang) * node.Radius / 2, Mathf.Cos(ang) * node.Radius / 2);
+                Vector2 pos = node.Position + new Vector2(Mathf.Sin(ang) * effective_radius / 2, Mathf.Cos(ang) * effective_radius / 2);
 
-                ret.Add(new Loop(new CircleCurve(pos, node.Radius / 6, RotationDirection.Reverse)));
+                ret.Add(new Loop("decor", new CircleCurve(pos, effective_radius / 6)));
             }
 
             return ret;

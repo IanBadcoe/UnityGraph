@@ -23,11 +23,11 @@
 //    {
 //        Graph g = new Graph();
 
-//        INode n1 = g.AddNode("n1", "", "", 0, null);
-//        INode n2 = g.AddNode("n2", "", "", 0, null);
-//        INode n3 = g.AddNode("n3", "", "", 0, null);
-//        INode n4 = g.AddNode("n4", "", "", 0, null);
-//        INode n5 = g.AddNode("n5", "", "", 0, null);
+//        Node n1 = g.AddNode("n1", "", "", 0, null);
+//        Node n2 = g.AddNode("n2", "", "", 0, null);
+//        Node n3 = g.AddNode("n3", "", "", 0, null);
+//        Node n4 = g.AddNode("n4", "", "", 0, null);
+//        Node n5 = g.AddNode("n5", "", "", 0, null);
 
 //        // place them non-overlapping and separated in both dimensions
 //        n1.Position = new Vector2(0, 0);
@@ -82,9 +82,9 @@
 //    {
 //        Graph g = new Graph();
 
-//        INode n1 = g.AddNode("n1", "", "", 0, null);
-//        INode n2 = g.AddNode("n2", "", "", 0, null);
-//        INode n3 = g.AddNode("n3", "", "", 0, null);
+//        Node n1 = g.AddNode("n1", "", "", 0, null);
+//        Node n2 = g.AddNode("n2", "", "", 0, null);
+//        Node n3 = g.AddNode("n3", "", "", 0, null);
 
 //        // place them non-overlapping and separated in both dimensions
 //        n1.Position = new Vector2(0, 0);
@@ -128,8 +128,8 @@
 //    {
 //        Graph g = new Graph();
 
-//        INode n1 = g.AddNode("n1", "", "", 10.0f, null);
-//        INode n2 = g.AddNode("n2", "", "", 10.0f, null);
+//        Node n1 = g.AddNode("n1", "", "", 10.0f, null);
+//        Node n2 = g.AddNode("n2", "", "", 10.0f, null);
 
 //        n1.Position = new Vector2(0, 0);
 //        n2.Position = new Vector2(-100, 0);
@@ -163,8 +163,8 @@
 //    {
 //        Graph g = new Graph();
 
-//        INode n1 = g.AddNode("n1", "", "", 10.0f, null);
-//        INode n2 = g.AddNode("n2", "", "", 10.0f, null);
+//        Node n1 = g.AddNode("n1", "", "", 10.0f, null);
+//        Node n2 = g.AddNode("n2", "", "", 10.0f, null);
 
 //        n1.Position = new Vector2(0, 0);
 //        n2.Position = new Vector2(-1, 0);
@@ -198,10 +198,10 @@
 //    {
 //        Graph g = new Graph();
 
-//        INode n1 = g.AddNode("edge1start", "", "", 10.0f, null);
-//        INode n2 = g.AddNode("edge1end", "", "", 10.0f, null);
-//        INode n3 = g.AddNode("edge2start", "", "", 10.0f, null);
-//        INode n4 = g.AddNode("edge2end", "", "", 10.0f, null);
+//        Node n1 = g.AddNode("edge1start", "", "", 10.0f, null);
+//        Node n2 = g.AddNode("edge1end", "", "", 10.0f, null);
+//        Node n3 = g.AddNode("edge2start", "", "", 10.0f, null);
+//        Node n4 = g.AddNode("edge2end", "", "", 10.0f, null);
 
 //        n1.Position = new Vector2(0, 0);
 //        n2.Position = new Vector2(0, 20);
@@ -244,10 +244,10 @@
 //    {
 //        Graph g = new Graph();
 
-//        INode n1 = g.AddNode("edge1start", "", "", 10.0f, null);
-//        INode n2 = g.AddNode("edge1end", "", "", 10.0f, null);
-//        INode n3 = g.AddNode("edge2start", "", "", 10.0f, null);
-//        INode n4 = g.AddNode("edge2end", "", "", 10.0f, null);
+//        Node n1 = g.AddNode("edge1start", "", "", 10.0f, null);
+//        Node n2 = g.AddNode("edge1end", "", "", 10.0f, null);
+//        Node n3 = g.AddNode("edge2start", "", "", 10.0f, null);
+//        Node n4 = g.AddNode("edge2end", "", "", 10.0f, null);
 
 //        n1.Position = new Vector2(0, 0);
 //        n2.Position = new Vector2(0, 20);
@@ -290,9 +290,9 @@
 //    {
 //        Graph g = new Graph();
 
-//        INode n1 = g.AddNode("edge1start", "", "", 0.0f, null);
-//        INode n2 = g.AddNode("edge1end", "", "", 0.0f, null);
-//        INode n3 = g.AddNode("node", "", "", 10.0f, null);
+//        Node n1 = g.AddNode("edge1start", "", "", 0.0f, null);
+//        Node n2 = g.AddNode("edge1end", "", "", 0.0f, null);
+//        Node n3 = g.AddNode("node", "", "", 10.0f, null);
 
 //        // edge long enough that there is no n1->n3 or n2->n3 interaction
 //        n1.Position = new Vector2(0, 0);
@@ -332,10 +332,10 @@
 //    {
 //        Graph g = new Graph();
 
-//        INode n1 = g.AddNode("edge1start", "", "", 10.0f, null);
-//        INode n2 = g.AddNode("edge1end", "", "", 10.0f, null);
-//        INode n3 = g.AddNode("edge2start", "", "", 10.0f, null);
-//        INode n4 = g.AddNode("edge2end", "", "", 10.0f, null);
+//        Node n1 = g.AddNode("edge1start", "", "", 10.0f, null);
+//        Node n2 = g.AddNode("edge1end", "", "", 10.0f, null);
+//        Node n3 = g.AddNode("edge2start", "", "", 10.0f, null);
+//        Node n4 = g.AddNode("edge2end", "", "", 10.0f, null);
 
 //        // two clearly crossing edges
 //        n1.Position = new Vector2(0, -100);
@@ -376,9 +376,9 @@
 //        {
 //            Graph g = new Graph();
 
-//            INode n1 = g.AddNode("edgesstart", "", "", 10.0f, null);
-//            INode n2 = g.AddNode("edgesmiddle", "", "", 10.0f, null);
-//            INode n3 = g.AddNode("edgesend", "", "", 10.0f, null);
+//            Node n1 = g.AddNode("edgesstart", "", "", 10.0f, null);
+//            Node n2 = g.AddNode("edgesmiddle", "", "", 10.0f, null);
+//            Node n3 = g.AddNode("edgesend", "", "", 10.0f, null);
 
 //            // zero length edge and a non-zero one attached at one end that will separate
 //            // the overlying nodes
@@ -415,9 +415,9 @@
 //        {
 //            Graph g = new Graph();
 
-//            INode n1 = g.AddNode("edgestart", "", "", 10.0f, null);
-//            INode n2 = g.AddNode("edgeend", "", "", 10.0f, null);
-//            INode n3 = g.AddNode("node", "", "", 10.0f, null);
+//            Node n1 = g.AddNode("edgestart", "", "", 10.0f, null);
+//            Node n2 = g.AddNode("edgeend", "", "", 10.0f, null);
+//            Node n3 = g.AddNode("node", "", "", 10.0f, null);
 
 //            // two zero separation nodes and an edge attached to one that will separate
 //            // the overlying nodes
@@ -454,8 +454,8 @@
 //    public void TestAdjoiningEdgeOverridesRadii()
 //    {
 //        Graph g = new Graph();
-//        INode n1 = g.AddNode("n1", "", "", 100, null);
-//        INode n2 = g.AddNode("n2", "", "", 100, null);
+//        Node n1 = g.AddNode("n1", "", "", 100, null);
+//        Node n2 = g.AddNode("n2", "", "", 100, null);
 
 //        // place them non-overlapping and separated in both dimensions
 //        n1.Position = new Vector2(0, 0);
@@ -490,11 +490,11 @@
 //    public void TestNonAdjoiningEdgesOverrideRadii()
 //    {
 //        Graph g = new Graph();
-//        INode n1 = g.AddNode("n1", "", "", 6, null);
-//        INode n2 = g.AddNode("n2", "", "", 0, null);
-//        INode n3 = g.AddNode("n3", "", "", 0, null);
-//        INode n4 = g.AddNode("n4", "", "", 0, null);
-//        INode n5 = g.AddNode("n5", "", "", 0, null);
+//        Node n1 = g.AddNode("n1", "", "", 6, null);
+//        Node n2 = g.AddNode("n2", "", "", 0, null);
+//        Node n3 = g.AddNode("n3", "", "", 0, null);
+//        Node n4 = g.AddNode("n4", "", "", 0, null);
+//        Node n5 = g.AddNode("n5", "", "", 0, null);
 
 //        // place them non-overlapping and separated in both dimensions
 //        n1.Position = new Vector2(0, 0);
@@ -543,8 +543,8 @@
 //    {
 //        {
 //            Graph g = new Graph();
-//            INode n1 = g.AddNode("n1", "", "", 10.0f, null);
-//            INode n2 = g.AddNode("n2", "", "", 10.0f, null);
+//            Node n1 = g.AddNode("n1", "", "", 10.0f, null);
+//            Node n2 = g.AddNode("n2", "", "", 10.0f, null);
 
 //            n1.Position = new Vector2(0, 0);
 //            n2.Position = new Vector2(-1, 0);
@@ -579,9 +579,9 @@
 //        {
 //            Graph g = new Graph();
 
-//            INode n1 = g.AddNode("edge1start", "", "", 10.0f, null);
-//            INode n2 = g.AddNode("edge1end", "", "", 10.0f, null);
-//            INode n3 = g.AddNode("node", "", "", 10.0f, null);
+//            Node n1 = g.AddNode("edge1start", "", "", 10.0f, null);
+//            Node n2 = g.AddNode("edge1end", "", "", 10.0f, null);
+//            Node n3 = g.AddNode("node", "", "", 10.0f, null);
 
 //            // edge long enough that there is no n1->n3 or n2->n3 interaction
 //            n1.Position = new Vector2(0, 0);

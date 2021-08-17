@@ -12,7 +12,7 @@ namespace Assets.Generation.GeomRep
 
         private CorridorLayout() { }
 
-        public override Loop MakeBaseGeometry(DirectedEdge edge)
+        public override LoopSet MakeGeometry(DirectedEdge edge)
         {
             Vector2 dir = edge.End.Position - edge.Start.Position;
             float length = dir.magnitude;
@@ -24,12 +24,35 @@ namespace Assets.Generation.GeomRep
             // -- that causes awkward numerical precision problems in the curve-curve intersection routines
             // which can throw out the union operation
             float actual_half_width = edge.HalfWidth * 0.99f;
+
+            if (edge.WallThickness > 0)
+            {
+                List<Curve> wall_curves = MakeRect(edge.Start.Position, edge.End.Position, dir, length, width_dir, actual_half_width);
+                List<Curve> floor_curves = MakeRect(edge.Start.Position, edge.End.Position, dir, length, width_dir, actual_half_width - edge.WallThickness);
+
+                return new LoopSet {
+                    new Loop("wall", wall_curves),
+                    new Loop("floor", floor_curves)
+                };
+            }
+            else
+            {
+                List<Curve> floor_curves = MakeRect(edge.Start.Position, edge.End.Position, dir, length, width_dir, actual_half_width);
+
+                return new LoopSet {
+                    new Loop("floor", floor_curves)
+                };
+            }
+        }
+
+        private static List<Curve> MakeRect(Vector2 start, Vector2 end, Vector2 dir, float length, Vector2 width_dir, float actual_half_width)
+        {
             Vector2 half_width = width_dir * actual_half_width;
 
-            Vector2 start_left = edge.Start.Position + half_width;
-            Vector2 start_right = edge.Start.Position - half_width;
-            Vector2 end_left = edge.End.Position + half_width;
-            Vector2 end_right = edge.End.Position - half_width;
+            Vector2 start_left = start + half_width;
+            Vector2 start_right = start - half_width;
+            Vector2 end_left = end + half_width;
+            Vector2 end_right = end - half_width;
 
             List<Curve> curves = new List<Curve>
             {
@@ -38,13 +61,7 @@ namespace Assets.Generation.GeomRep
                 new LineCurve(end_right, -dir, length),
                 new LineCurve(start_right, width_dir, actual_half_width * 2)
             };
-
-            Assertion.Assert(curves[0].EndPos.Equals(curves[1].StartPos, 1e-4f));
-            Assertion.Assert(curves[1].EndPos.Equals(curves[2].StartPos, 1e-4f));
-            Assertion.Assert(curves[2].EndPos.Equals(curves[3].StartPos, 1e-4f));
-            Assertion.Assert(curves[3].EndPos.Equals(curves[0].StartPos, 1e-4f));
-
-            return new Loop(curves);
+            return curves;
         }
     }
 }

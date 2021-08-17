@@ -2,7 +2,6 @@
 using Assets.Generation.Stepping;
 using Assets.Generation.Templates;
 using System;
-using System.Collections.Generic;
 
 namespace Assets.Generation.Gen
 {
@@ -10,7 +9,7 @@ namespace Assets.Generation.Gen
     {
         public Graph Graph { get; private set; }
 
-        private readonly INode m_node;
+        private readonly Node m_node;
         private readonly Template m_template;
         private readonly GeneratorConfig m_config;
 
@@ -22,7 +21,7 @@ namespace Assets.Generation.Gen
 
         private Phase m_phase = Phase.ExpandRelax;
 
-        public TryTemplateExpandStepper(Graph graph, INode node, Template template, GeneratorConfig config)
+        public TryTemplateExpandStepper(Graph graph, Node node, Template template, GeneratorConfig config)
         {
             Graph = graph;
             m_node = node;

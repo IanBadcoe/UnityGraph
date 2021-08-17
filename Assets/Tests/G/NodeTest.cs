@@ -190,7 +190,7 @@ public class NodeTest
 
         Assert.IsNull(n1.Layout);
 
-        Node n2 = new Node("", "", 0, CircularGeomLayout.Instance);
+        Node n2 = new Node("", "", 0, 0, CircularGeomLayout.Instance);
 
         Assert.AreEqual(CircularGeomLayout.Instance, n2.Layout);
     }

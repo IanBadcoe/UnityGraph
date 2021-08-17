@@ -2,7 +2,6 @@ using Assets.Generation.G;
 using Assets.Generation.GeomRep;
 using Assets.Generation.Stepping;
 using Assets.Generation.Templates;
-using System;
 using UnityEngine;
 
 
@@ -150,9 +149,9 @@ namespace Assets.Generation.Gen
 
         private void MakeSeed()
         {
-            INode start = Graph.AddNode("Start", "<", 3f, CircularGeomLayout.Instance);
-            INode expander = Graph.AddNode("engine.StepperController", "e", 1f, CircularGeomLayout.Instance);
-            INode end = Graph.AddNode("End", ">", 3f, CircularGeomLayout.Instance);
+            Node start = Graph.AddNode("Start", "<", 3f, CircularGeomLayout.Instance);
+            Node expander = Graph.AddNode("engine.StepperController", "e", 1f, CircularGeomLayout.Instance);
+            Node end = Graph.AddNode("End", ">", 3f, CircularGeomLayout.Instance);
 
             start.Position = new Vector2(0, -4);
             expander.Position = new Vector2(0, 0);

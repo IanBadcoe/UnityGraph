@@ -57,7 +57,7 @@ namespace Assets.Generation.Templates
             return m_nodes[name];
         }
 
-        public bool Expand(Graph graph, INode target, ClRand random)
+        public bool Expand(Graph graph, Node target, ClRand random)
         {
             IReadOnlyList<DirectedEdge> target_in_connections = target.GetInConnections();
             IReadOnlyList<DirectedEdge> target_out_connections = target.GetOutConnections();
@@ -76,22 +76,13 @@ namespace Assets.Generation.Templates
 
             // here we might check codes, if we haven't already
 
-            Dictionary<NodeRecord, INode> template_to_graph = new Dictionary<NodeRecord, INode>
+            Dictionary<NodeRecord, Node> template_to_graph = new Dictionary<NodeRecord, Node>
             {
                 { FindNodeRecord("<target>"), target }
             };
 
-            // create nodes for each we are adding and map to their NodeRecords
-            foreach (NodeRecord nr in m_nodes.Values)
-            {
-                if (nr.Type == NodeRecord.NodeType.Internal)
-                {
-                    INode n = graph.AddNode(nr.Name, nr.Codes, nr.Radius, nr.Layout, hm);
-                    template_to_graph.Add(nr, n);
-                }
-            }
-
             HashSet<float> existing_corridor_widths = new HashSet<float>();
+            HashSet<float> existing_wall_thicknesses = new HashSet<float>();
 
             // find nodes for in-connections and map to their NodeRecords
             {
@@ -103,11 +94,12 @@ namespace Assets.Generation.Templates
                     {
                         g_it.MoveNext();
 
-                        INode g_conn = g_it.Current.Start;
+                        Node g_conn = g_it.Current.Start;
 
                         template_to_graph.Add(nr, g_conn);
 
                         existing_corridor_widths.Add(g_it.Current.HalfWidth);
+                        existing_wall_thicknesses.Add(g_it.Current.WallThickness);
                     }
                 }
             }
@@ -122,11 +114,12 @@ namespace Assets.Generation.Templates
                     {
                         g_it.MoveNext();
 
-                        INode g_conn = g_it.Current.End;
+                        Node g_conn = g_it.Current.End;
 
                         template_to_graph.Add(nr, g_conn);
 
                         existing_corridor_widths.Add(g_it.Current.HalfWidth);
+                        existing_wall_thicknesses.Add(g_it.Current.WallThickness);
                     }
                 }
             }
@@ -136,8 +129,34 @@ namespace Assets.Generation.Templates
                 existing_corridor_widths.Add(1);
             }
 
+            if (existing_wall_thicknesses.Count == 0)
+            {
+                existing_wall_thicknesses.Add(0);
+            }
+
+            float chosen_existing_wall_thickness = Util.RemoveRandom(random, existing_wall_thicknesses.ToList());
+
+            // create nodes for each we are adding and map to their NodeRecords
+            foreach (NodeRecord nr in m_nodes.Values)
+            {
+                if (nr.Type == NodeRecord.NodeType.Internal)
+                {
+                    float wall_thickness = nr.WallThickness;
+
+                    if (wall_thickness == -1)
+                    {
+                        wall_thickness = chosen_existing_wall_thickness;
+                    }
+
+                    Node n = graph.AddNode(nr.Name, nr.Codes, nr.Radius, wall_thickness, nr.Layout);
+                    template_to_graph.Add(nr, n);
+                }
+            }
+
             ApplyConnections(target, template_to_graph, graph,
-                Util.RemoveRandom(random, existing_corridor_widths.ToList()));
+                Util.RemoveRandom(random, existing_corridor_widths.ToList()),
+                chosen_existing_wall_thickness
+            );
 
             // make three attempts to position the nodes
             // no point if no random components, but pretty cheap to do...
@@ -159,19 +178,19 @@ namespace Assets.Generation.Templates
             return false;
         }
 
-        private void ApplyExtraForces(HierarchyMetadata hm, Dictionary<NodeRecord, INode> template_to_graph)
+        private void ApplyExtraForces(HierarchyMetadata hm, Dictionary<NodeRecord, Node> template_to_graph)
         {
             foreach (var fr in m_extra_forces)
             {
-                INode n1 = template_to_graph[fr.Node1];
-                INode n2 = template_to_graph[fr.Node2];
+                Node n1 = template_to_graph[fr.Node1];
+                Node n2 = template_to_graph[fr.Node2];
 
                 hm.AddExtraForce(n1, n2, fr.TargetDist, fr.ForceMultiplier);
             }
         }
 
-        private void ApplyConnections(INode node_replacing, Dictionary<NodeRecord, INode> template_to_graph,
-                                      Graph graph, float existing_width)
+        private void ApplyConnections(Node node_replacing, Dictionary<NodeRecord, Node> template_to_graph,
+                                      Graph graph, float existing_width, float existing_wall_thickness)
         {
             foreach (DirectedEdge e in node_replacing.GetConnections())
             {
@@ -181,8 +200,8 @@ namespace Assets.Generation.Templates
             // apply new connections
             foreach (ConnectionRecord cr in m_connections.Values)
             {
-                INode nf = template_to_graph[cr.From];
-                INode nt = template_to_graph[cr.To];
+                Node nf = template_to_graph[cr.From];
+                Node nt = template_to_graph[cr.To];
 
                 float half_width = cr.HalfWidth;
 
@@ -191,12 +210,19 @@ namespace Assets.Generation.Templates
                     half_width = existing_width;
                 }
 
-                DirectedEdge de = graph.Connect(nf, nt, cr.MaxLength, half_width, cr.Layout);
+                float wall_thickness = cr.WallThickness;
+
+                if (wall_thickness == -1)
+                {
+                    wall_thickness = existing_wall_thickness;
+                }
+
+                DirectedEdge de = graph.Connect(nf, nt, cr.MaxLength, half_width, cr.Layout, wall_thickness);
             }
         }
 
         private bool TryPositions(Graph graph,
-                             Dictionary<NodeRecord, INode> template_to_graph,
+                             Dictionary<NodeRecord, Node> template_to_graph,
                              ClRand rand)
         {
             // position new nodes relative to known nodes
@@ -204,7 +230,7 @@ namespace Assets.Generation.Templates
             {
                 if (nr.Type == NodeRecord.NodeType.Internal)
                 {
-                    INode positionOn = template_to_graph[nr.PositionOn];
+                    Node positionOn = template_to_graph[nr.PositionOn];
 
                     Vector2 pos = positionOn.Position;
                     Vector2 towards_step = new Vector2();
@@ -212,7 +238,7 @@ namespace Assets.Generation.Templates
 
                     if (nr.PositionTowards != null)
                     {
-                        INode positionTowards = template_to_graph[nr.PositionTowards];
+                        Node positionTowards = template_to_graph[nr.PositionTowards];
 
                         Vector2 d = positionTowards.Position - pos;
 
@@ -221,7 +247,7 @@ namespace Assets.Generation.Templates
 
                     if (nr.PositionAwayFrom != null)
                     {
-                        INode positionAwayFrom = template_to_graph[nr.PositionAwayFrom];
+                        Node positionAwayFrom = template_to_graph[nr.PositionAwayFrom];
 
                         Vector2 d = positionAwayFrom.Position - pos;
 
@@ -239,7 +265,7 @@ namespace Assets.Generation.Templates
                         pos = pos + new Vector2(Mathf.Sin(angle) * 5, Mathf.Cos(angle) * 5);
                     }
 
-                    INode n = template_to_graph[nr];
+                    Node n = template_to_graph[nr];
 
                     n.Position = pos;
                 }
@@ -253,7 +279,7 @@ namespace Assets.Generation.Templates
             return from + "->" + to;
         }
 
-        //private void ApplyPostExpand(Dictionary<NodeRecord, INode> template_to_graph)
+        //private void ApplyPostExpand(Dictionary<NodeRecord, Node> template_to_graph)
         //{
         //    if (m_post_expand == null)
         //        return;

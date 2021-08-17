@@ -25,7 +25,7 @@ namespace Assets.Generation.Gen
         private readonly GeneratorConfig m_config;
         alglib.mincgstate opt_state;
 
-        private List<INode> m_nodes;
+        private List<Node> m_nodes;
         private List<DirectedEdge> m_edges;
         private List<Force> m_extra_forces;
 
@@ -272,7 +272,7 @@ namespace Assets.Generation.Gen
                 int n1_idx = m_source2pars_idx[n1];
                 Vector2D n1pos = new Vector2D(pars[n1_idx], pars[n1_idx + 1]);
 
-                for( int j = i + 1; j < m_nodes.Count; j++)
+                for (int j = i + 1; j < m_nodes.Count; j++)
                 {
                     var n2 = m_nodes[j];
                     int n2_idx = m_source2pars_idx[n2];
@@ -344,7 +344,7 @@ namespace Assets.Generation.Gen
                 }
             }
 
-            foreach(var f in m_extra_forces)
+            foreach (var f in m_extra_forces)
             {
                 int n1_idx = m_source2pars_idx[f.N1];
                 int n2_idx = m_source2pars_idx[f.N2];

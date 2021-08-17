@@ -30,7 +30,7 @@ namespace Assets.Generation.Templates
             // a dummy entry used to represent the node we are replacing in positioning rules
             m_nodes.Add("<target>", new NodeRecord(NodeRecord.NodeType.Target, "<target>",
                   false, null, null, null,
-                  null, 0, null));
+                  null, 0, 0, null));
 
             // m_post_expand = post_expand;
         }
@@ -75,7 +75,7 @@ namespace Assets.Generation.Templates
         {
             AddNode(type, name, false,
                     "<target>", null, null,
-                    "", 0f, null);
+                    "", 0, 0, null);
         }
 
         // types In and Out ignore all parameters after "name"
@@ -83,7 +83,7 @@ namespace Assets.Generation.Templates
         public void AddNode(NodeRecord.NodeType type, string name, bool nudge,
              string positionOnName, string positionTowardsName,
              string positionAwayFromName,
-             string codes, float radius,
+             string codes, float radius, float wall_thickness,
              GeomLayout layout)
         {
             if (name.Contains("->"))
@@ -149,7 +149,7 @@ namespace Assets.Generation.Templates
 
             m_nodes.Add(name, new NodeRecord(type, name, nudge,
                   positionOn, positionTowards, positionAwayFrom,
-                  codes, radius,
+                  codes, radius, wall_thickness,
                   layout));
 
             switch (type)
@@ -197,7 +197,8 @@ namespace Assets.Generation.Templates
         public void Connect(string from, string to,
                             float max_length,
                             float half_width,
-                            GeomLayout layout)
+                            GeomLayout layout,
+                            float wall_thickness = 0)
         {
             if (from == null)
             {
@@ -246,7 +247,7 @@ namespace Assets.Generation.Templates
 
             m_connections.Add(
                   Template.MakeConnectionName(from, to),
-                  new ConnectionRecord(nrf, nrt, max_length, half_width, layout));
+                  new ConnectionRecord(nrf, nrt, max_length, half_width, wall_thickness, layout));
         }
 
         public ReadOnlyDictionary<string, NodeRecord> GetUnmodifiableNodes()
