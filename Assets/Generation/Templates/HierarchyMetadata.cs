@@ -9,7 +9,7 @@ namespace Assets.Generation.Templates
     {
         public HierarchyMetadata Parent { get; set; }
         public IList<IHMChild> Children { get; }
-        bool IsChildNode(INode n);
+        bool IsChildNode(Node n);
     }
 
     public static class HMChildExtensions
@@ -106,13 +106,13 @@ namespace Assets.Generation.Templates
             Template = template;
         }
 
-        public void AddExtraForce(INode n1, INode n2, float targetDist, float forceMultiplier)
+        public void AddExtraForce(Node n1, Node n2, float targetDist, float forceMultiplier)
         {
             m_extra_forces.Add(new Force(n1, n2, targetDist, forceMultiplier));
         }
 
         // can implement this better with some caching...
-        public bool IsChildNode(INode n)
+        public bool IsChildNode(Node n)
         {
             foreach(var c in Children)
             {
@@ -123,7 +123,7 @@ namespace Assets.Generation.Templates
             return false;
         }
 
-        internal float RadiusBoost(INode n2)
+        internal float RadiusBoost(Node n2)
         {
             float ret = 0;
 

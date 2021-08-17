@@ -13,7 +13,7 @@ namespace Assets.Generation.Gen
         private readonly TemplateStore m_templates;
         private readonly GeneratorConfig m_config;
 
-        private readonly List<INode> m_all_nodes;
+        private readonly List<Node> m_all_nodes;
 
         public TryAllNodesExpandStepper(Graph graph, TemplateStore templates, GeneratorConfig config)
         {
@@ -40,7 +40,7 @@ namespace Assets.Generation.Gen
                       null, "All nodes failed to expand");
             }
 
-            INode node = Util.RemoveRandom<INode>(m_config.Rand(), m_all_nodes);
+            Node node = Util.RemoveRandom<Node>(m_config.Rand(), m_all_nodes);
 
             List<Template> templates = m_templates.GetTemplatesCopy();
 

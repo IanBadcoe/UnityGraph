@@ -8,9 +8,10 @@ namespace Assets.Generation.GeomRep
 
         private CircularGeomLayout() { }
 
-        public override LoopSet MakeGeometry(INode node)
+        public override LoopSet MakeGeometry(Node node)
         {
             return new LoopSet {
+                new Loop("wall", new CircleCurve(node.Position, node.Radius)),
                 new Loop("floor", new CircleCurve(node.Position, node.Radius))
             };
         }

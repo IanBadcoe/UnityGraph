@@ -1,4 +1,5 @@
-﻿using Assets.Generation.GeomRep;
+﻿using Assets.Generation.Gen;
+using Assets.Generation.GeomRep;
 using Assets.Generation.Templates;
 using Assets.Generation.U;
 using System;
@@ -9,7 +10,7 @@ using UnityEngine;
 namespace Assets.Generation.G
 {
     [System.Diagnostics.DebuggerDisplay("Name = {Name}")]
-    public class Node : INode
+    public class Node : IRelaxationParamSource, IHMChild
     {
         private readonly int m_num;
         private readonly HashSet<DirectedEdge> m_connections = new HashSet<DirectedEdge>();
@@ -73,17 +74,17 @@ namespace Assets.Generation.G
             Children = new List<IHMChild>();
         }
 
-        public bool Connects(INode n)
+        public bool Connects(Node n)
         {
             return ConnectsForwards(n) || ConnectsBackwards(n);
         }
 
-        public bool ConnectsForwards(INode to)
+        public bool ConnectsForwards(Node to)
         {
             return m_connections.Contains(new DirectedEdge(this, to));
         }
 
-        public bool ConnectsBackwards(INode from)
+        public bool ConnectsBackwards(Node from)
         {
             return m_connections.Contains(new DirectedEdge(from, this));
         }
@@ -131,7 +132,7 @@ namespace Assets.Generation.G
             n.Disconnect(this);
         }
 
-        public DirectedEdge GetConnectionTo(INode to)
+        public DirectedEdge GetConnectionTo(Node to)
         {
             foreach (DirectedEdge e in m_connections)
             {
@@ -144,7 +145,7 @@ namespace Assets.Generation.G
             return null;
         }
 
-        public DirectedEdge GetConnectionFrom(INode from)
+        public DirectedEdge GetConnectionFrom(Node from)
         {
             foreach (DirectedEdge e in m_connections)
             {
@@ -200,7 +201,7 @@ namespace Assets.Generation.G
             return 2;
         }
 
-        public bool IsChildNode(INode n)
+        public bool IsChildNode(Node n)
         {
             return ReferenceEquals(n, this);
         }

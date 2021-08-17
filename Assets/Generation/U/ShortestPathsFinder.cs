@@ -15,17 +15,17 @@ namespace Assets.Generation.U
     //
     class ShortestPathFinder
     {
-        Dictionary<Tuple<INode, INode>, float> dists;
+        Dictionary<Tuple<Node, Node>, float> dists;
 
-        void SetDist(INode a, INode b, float dist)
+        void SetDist(Node a, Node b, float dist)
         {
-            dists[new Tuple<INode, INode>(a, b)] = dist;
-            dists[new Tuple<INode, INode>(b, a)] = dist;
+            dists[new Tuple<Node, Node>(a, b)] = dist;
+            dists[new Tuple<Node, Node>(b, a)] = dist;
         }
 
-        public float GetDist(INode a, INode b)
+        public float GetDist(Node a, Node b)
         {
-            var key = new Tuple<INode, INode>(a, b);
+            var key = new Tuple<Node, Node>(a, b);
 
             if (dists.ContainsKey(key))
             {
@@ -35,15 +35,15 @@ namespace Assets.Generation.U
             return float.MaxValue;
         }
 
-        public Dictionary<Tuple<INode, INode>, float> FindPathLengths(Graph g, Func<DirectedEdge, float> get_edge_length)
+        public Dictionary<Tuple<Node, Node>, float> FindPathLengths(Graph g, Func<DirectedEdge, float> get_edge_length)
         {
-            dists = new Dictionary<Tuple<INode, INode>, float>();
+            dists = new Dictionary<Tuple<Node, Node>, float>();
 
             // could fill the whole matrix with summed radii (or zero for the diagonal)
             // except that we'd need to add in the minimum separation and if we ever get >1 value for that
             // it would be a pain, so ATM easier to consider only paths here and min those with radii + minimum separation
             // at point of use
-            foreach (INode n in g.GetAllNodes())
+            foreach (Node n in g.GetAllNodes())
             {
                 SetDist(n, n, 0);
             }
@@ -55,11 +55,11 @@ namespace Assets.Generation.U
                 SetDist(de.Start, de.End, len);
             }
 
-            foreach (INode nk in g.GetAllNodes())
+            foreach (Node nk in g.GetAllNodes())
             {
-                foreach (INode ni in g.GetAllNodes())
+                foreach (Node ni in g.GetAllNodes())
                 {
-                    foreach (INode nj in g.GetAllNodes())
+                    foreach (Node nj in g.GetAllNodes())
                     {
                         SetDist(ni, nj, Mathf.Min(GetDist(ni, nj), GetDist(ni, nk) + GetDist(nk, nj)));
                     }

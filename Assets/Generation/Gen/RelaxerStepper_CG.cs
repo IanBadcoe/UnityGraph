@@ -25,7 +25,7 @@ namespace Assets.Generation.Gen
         private readonly GeneratorConfig m_config;
         alglib.mincgstate opt_state;
 
-        private List<INode> m_nodes;
+        private List<Node> m_nodes;
         private List<DirectedEdge> m_edges;
         private List<Force> m_extra_forces;
 

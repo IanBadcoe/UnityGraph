@@ -6,8 +6,8 @@ namespace Assets.Generation.G
     [System.Diagnostics.DebuggerDisplay("Start = {Start}, End = {End}, Min = {MinLength}, Max = {MaxLength}")]
     public class DirectedEdge : EqualityBase
     {
-        public readonly INode Start;
-        public readonly INode End;
+        public readonly Node Start;
+        public readonly Node End;
         public readonly float MinLength;
         public readonly float MaxLength;
         public readonly float HalfWidth;
@@ -15,19 +15,19 @@ namespace Assets.Generation.G
         public readonly GeomLayout Layout;
 
         // for identity/searching purposes, only start and end count...
-        public DirectedEdge(INode start, INode end)
+        public DirectedEdge(Node start, Node end)
             : this(start, end, 0, 0, 0, null)
         {
         }
 
-        public DirectedEdge(INode start, INode end,
+        public DirectedEdge(Node start, Node end,
             float min_length, float max_length,
             float half_width)
             : this(start, end, min_length, max_length, half_width, null)
         {
         }
 
-        public DirectedEdge(INode start, INode end,
+        public DirectedEdge(Node start, Node end,
             float min_length, float max_length,
             float half_width,
             GeomLayout layout)
@@ -65,7 +65,7 @@ namespace Assets.Generation.G
             return Start == e.Start && End == e.End;
         }
 
-        public INode OtherNode(INode n)
+        public Node OtherNode(Node n)
         {
             if (n == Start)
             {
@@ -84,7 +84,7 @@ namespace Assets.Generation.G
             return (End.Position - Start.Position).magnitude;
         }
 
-        public bool Connects(INode n)
+        public bool Connects(Node n)
         {
             return n == Start || n == End;
         }

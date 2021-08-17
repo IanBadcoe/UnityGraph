@@ -24,12 +24,12 @@ public class TemplateTest
 
             Graph g = new Graph();
 
-            INode a = g.AddNode("x", "", 0, null);
+            Node a = g.AddNode("x", "", 0, null);
             a.Position = new Vector2(-4, 3);
 
             Assert.IsTrue(t.Expand(g, a, new ClRand(1)));
             Assert.AreEqual(1, g.NumNodes());
-            INode new_n = g.GetAllNodes()[0];
+            Node new_n = g.GetAllNodes()[0];
             Assert.AreEqual("a", new_n.Name);
             Assert.AreEqual(new Vector2(-4, 3), new_n.Position);
         }
@@ -47,12 +47,12 @@ public class TemplateTest
 
             Graph g = new Graph();
 
-            INode n = g.AddNode("x", "", 0, null);
+            Node n = g.AddNode("x", "", 0, null);
             n.Position = new Vector2(-4, 3);
 
             Assert.IsTrue(t.Expand(g, n, new ClRand(1)));
             Assert.AreEqual(1, g.NumNodes());
-            INode new_n = g.GetAllNodes()[0];
+            Node new_n = g.GetAllNodes()[0];
             Assert.AreEqual("a", new_n.Name);
 
             // we offset by 5 in a ClRand direction
@@ -76,9 +76,9 @@ public class TemplateTest
 
             Graph g = new Graph();
 
-            INode a = g.AddNode("x", "", 0, null);
+            Node a = g.AddNode("x", "", 0, null);
             a.Position = new Vector2(-4, 3);
-            INode in_n = g.AddNode("in", "", 0, null);
+            Node in_n = g.AddNode("in", "", 0, null);
             in_n.Position = new Vector2(10, 9);
 
             g.Connect(in_n, a, 0, 0, 0, null);
@@ -86,7 +86,7 @@ public class TemplateTest
             Assert.IsTrue(t.Expand(g, a, new ClRand(1)));
             Assert.AreEqual(2, g.NumNodes());
             Assert.IsNotNull(FindNode(g, "in"));
-            INode new_n = FindNode(g, "a");
+            Node new_n = FindNode(g, "a");
             Assert.IsNotNull(new_n != null);
             Assert.AreEqual(new Vector2(10, 9), new_n.Position);
         }
@@ -106,9 +106,9 @@ public class TemplateTest
 
             Graph g = new Graph();
 
-            INode a = g.AddNode("x", "", 0, null);
+            Node a = g.AddNode("x", "", 0, null);
             a.Position = new Vector2(-4, 3);
-            INode in_n = g.AddNode("in", "", 0, null);
+            Node in_n = g.AddNode("in", "", 0, null);
             in_n.Position = new Vector2(10, 9);
 
             g.Connect(in_n, a, 0, 0, 0, null);
@@ -116,7 +116,7 @@ public class TemplateTest
             Assert.IsTrue(t.Expand(g, a, new ClRand(1)));
             Assert.AreEqual(2, g.NumNodes());
             Assert.IsNotNull(FindNode(g, "in"));
-            INode new_n = FindNode(g, "a");
+            Node new_n = FindNode(g, "a");
             Assert.IsNotNull(new_n != null);
 
             // we offset by 5 in a ClRand direction
@@ -139,9 +139,9 @@ public class TemplateTest
 
             Graph g = new Graph();
 
-            INode a = g.AddNode("x", "", 0, null);
+            Node a = g.AddNode("x", "", 0, null);
             a.Position = new Vector2(-4, 3);
-            INode in_n = g.AddNode("in", "", 0, null);
+            Node in_n = g.AddNode("in", "", 0, null);
             in_n.Position = new Vector2(-14, -7);
 
             g.Connect(in_n, a, 0, 0, 0, null);
@@ -149,7 +149,7 @@ public class TemplateTest
             Assert.IsTrue(t.Expand(g, a, new ClRand(1)));
             Assert.AreEqual(2, g.NumNodes());
             Assert.IsNotNull(FindNode(g, "in"));
-            INode new_n = FindNode(g, "a");
+            Node new_n = FindNode(g, "a");
             Assert.IsNotNull(new_n != null);
 
             // position on replaced node but 10% of the way towards "in"
@@ -171,9 +171,9 @@ public class TemplateTest
 
             Graph g = new Graph();
 
-            INode a = g.AddNode("x", "", 0, null);
+            Node a = g.AddNode("x", "", 0, null);
             a.Position = new Vector2(-4, 3);
-            INode in_n = g.AddNode("in", "", 0, null);
+            Node in_n = g.AddNode("in", "", 0, null);
             in_n.Position = new Vector2(-14, -7);
 
             g.Connect(in_n, a, 0, 0, 0, null);
@@ -181,7 +181,7 @@ public class TemplateTest
             Assert.IsTrue(t.Expand(g, a, new ClRand(1)));
             Assert.AreEqual(2, g.NumNodes());
             Assert.IsNotNull(FindNode(g, "in"));
-            INode new_n = FindNode(g, "a");
+            Node new_n = FindNode(g, "a");
             Assert.IsNotNull(new_n != null);
 
             // position on replaced node but 10% of the way towards "in"
@@ -205,11 +205,11 @@ public class TemplateTest
 
             Graph g = new Graph();
 
-            INode a = g.AddNode("x", "", 0, null);
+            Node a = g.AddNode("x", "", 0, null);
             a.Position = new Vector2(10, 10);
-            INode in_n = g.AddNode("in", "", 0, null);
+            Node in_n = g.AddNode("in", "", 0, null);
             in_n.Position = new Vector2(20, 10);
-            INode out_n = g.AddNode("out", "", 0, null);
+            Node out_n = g.AddNode("out", "", 0, null);
             out_n.Position = new Vector2(10, 20);
 
             g.Connect(in_n, a, 0, 0, 0, null);
@@ -218,7 +218,7 @@ public class TemplateTest
             Assert.IsTrue(t.Expand(g, a, new ClRand(1)));
             Assert.AreEqual(3, g.NumNodes());
             Assert.IsNotNull(FindNode(g, "in"));
-            INode new_n = FindNode(g, "a");
+            Node new_n = FindNode(g, "a");
             Assert.IsNotNull(new_n != null);
 
             // position on replaced node but 10% of the way away from "in"
@@ -230,7 +230,7 @@ public class TemplateTest
     //    class PostExpandReporter implements Template.IPostExpand
     //    {
     //        @Override
-    //      public void AfterExpand(INode n)
+    //      public void AfterExpand(Node n)
     //    {
     //        AfterExpandCount++;
     //        AfterExpandAfterDone = DoneCount > 0;
@@ -263,7 +263,7 @@ public class TemplateTest
 
     //        Graph g = new Graph();
 
-    //        INode a = g.AddNode("x", "", "", 0);
+    //        Node a = g.AddNode("x", "", "", 0);
 
     //        Assert.IsTrue(t.Expand(g, a, new ClRand(1)));
 
@@ -292,10 +292,10 @@ public class TemplateTest
 
             Graph g = new Graph();
 
-            INode a = g.AddNode("a", "", 0, null);
-            INode b = g.AddNode("b", "", 0, null);
-            INode c = g.AddNode("c", "", 0, null);
-            INode d = g.AddNode("d", "", 0, null);
+            Node a = g.AddNode("a", "", 0, null);
+            Node b = g.AddNode("b", "", 0, null);
+            Node c = g.AddNode("c", "", 0, null);
+            Node d = g.AddNode("d", "", 0, null);
 
             a.Position = new Vector2(10, 0);
             b.Position = new Vector2(-10, 0);
@@ -334,11 +334,11 @@ public class TemplateTest
 
             Graph g = new Graph();
 
-            INode a = g.AddNode("a", "", 0, null);
-            INode b = g.AddNode("b", "", 0, null);
-            INode c = g.AddNode("c", "", 0, null);
-            INode d = g.AddNode("d", "", 0, null);
-            INode x = g.AddNode("x", "", 0, null);
+            Node a = g.AddNode("a", "", 0, null);
+            Node b = g.AddNode("b", "", 0, null);
+            Node c = g.AddNode("c", "", 0, null);
+            Node d = g.AddNode("d", "", 0, null);
+            Node x = g.AddNode("x", "", 0, null);
 
             {
                 IGraphRestore igr = g.CreateRestorePoint();
@@ -483,9 +483,9 @@ public class TemplateTest
 
     // finds first node of required name, unit tests keep this unique
     // but that isn't a requirement of graphs generally
-    private static INode FindNode(Graph g, String name)
+    private static Node FindNode(Graph g, String name)
     {
-        foreach (INode n in g.GetAllNodes())
+        foreach (Node n in g.GetAllNodes())
         {
             if (n.Name == name)
                 return n;

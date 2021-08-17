@@ -58,7 +58,7 @@ namespace Assets.Generation.GeomRep
 
         public void GenerateGeometry(Graph graph)
         {
-            foreach (INode n in graph.GetAllNodes())
+            foreach (Node n in graph.GetAllNodes())
             {
                 GeomLayout gl = n.Layout;
 
@@ -83,7 +83,7 @@ namespace Assets.Generation.GeomRep
                 }
             }
 
-            INode start = graph.GetAllNodes().Where(
+            Node start = graph.GetAllNodes().Where(
                   n => n.Name == "Start").FirstOrDefault();
 
             if (start != null)

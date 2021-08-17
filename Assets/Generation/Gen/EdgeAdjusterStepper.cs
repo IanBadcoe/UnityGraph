@@ -78,7 +78,7 @@ namespace Assets.Generation.Gen
                 return false;
             }
 
-            INode c = Graph.AddNode("c", "",
+            Node c = Graph.AddNode("c", "",
                 e.HalfWidth, CircularGeomLayout.Instance);
 
             Vector2 mid = (e.Start.Position + e.End.Position) / 2;

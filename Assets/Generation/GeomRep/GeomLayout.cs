@@ -5,7 +5,7 @@ namespace Assets.Generation.GeomRep
     abstract public class GeomLayout
     {
         // one +ve loop that cuts the outer envelope of the space the node or edge will occupy
-        public virtual LoopSet MakeGeometry(INode node)
+        public virtual LoopSet MakeGeometry(Node node)
         {
             return null;
         }

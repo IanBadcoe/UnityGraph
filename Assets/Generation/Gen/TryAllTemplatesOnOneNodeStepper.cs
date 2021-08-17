@@ -10,11 +10,11 @@ namespace Assets.Generation.Gen
     {
         public Graph Graph { get; private set; }
 
-        private readonly INode m_node;
+        private readonly Node m_node;
         private readonly List<Template> m_templates;
         private readonly GeneratorConfig m_config;
 
-        public TryAllTemplatesOnOneNodeStepper(Graph graph, INode node, List<Template> templates, GeneratorConfig config)
+        public TryAllTemplatesOnOneNodeStepper(Graph graph, Node node, List<Template> templates, GeneratorConfig config)
         {
             Graph = graph;
             m_node = node;

@@ -9,7 +9,7 @@ namespace Assets.Generation.GeomRep.Layouts
 
         private CircularPillarGeomLayout() { }
 
-        public override LoopSet MakeGeometry(INode node)
+        public override LoopSet MakeGeometry(Node node)
         {
             return new LoopSet {
                 new Loop("floor", new CircleCurve(node.Position, node.Radius)),
@@ -24,7 +24,7 @@ namespace Assets.Generation.GeomRep.Layouts
 
         private FourCircularPillarsGeomLayout() { }
 
-        public override LoopSet MakeGeometry(INode node)
+        public override LoopSet MakeGeometry(Node node)
         {
             LoopSet ret = new LoopSet();
             ret.Add(new Loop("floor", new CircleCurve(node.Position, node.Radius)));
