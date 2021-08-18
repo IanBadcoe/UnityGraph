@@ -1,11 +1,10 @@
 ﻿using Assets.Generation.GeomRep;
+using Assets.Extensions;
 using Assets.Generation.U;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 public class CircleCurveTest
@@ -14,25 +13,14 @@ public class CircleCurveTest
     public void TestCtor()
     {
         Assert.Throws<ArgumentException>(() => new CircleCurve(new Vector2(), -1));
-
-        {
-            CircleCurve cc = new CircleCurve(new Vector2(), 1, 0, Mathf.PI * 3);
-
-            // automatically converted down to equivalent angle with only one turn
-            Assert.AreEqual(Mathf.PI, cc.EndParam, 1e-6);
-        }
-
-        {
-            CircleCurve cc = new CircleCurve(new Vector2(), 1, Mathf.PI * 3, Mathf.PI * 4);
-
-            // automatically converted down to equivalent angle with only one turn
-            Assert.AreEqual(Mathf.PI, cc.StartParam, 1e-6);
-            Assert.AreEqual(2 * Mathf.PI, cc.EndParam, 1e-6);
-        }
+        Assert.Throws<ArgumentException>(() => new CircleCurve(new Vector2(), 1, 0, 3 * Mathf.PI));
+        // may not need the direction, but for the moment will let me find ctors that need fixing
+        Assert.Throws<ArgumentException>(() => new CircleCurve(new Vector2(), 1, 0, 1, RotationDirection.Reverse));
+        Assert.Throws<ArgumentException>(() => new CircleCurve(new Vector2(), 1, 1, 0, RotationDirection.Forwards));
     }
 
     [Test]
-    public void TestComputePos()
+    public void TestPos()
     {
         CircleCurve cc = new CircleCurve(new Vector2(), 1);
 
@@ -44,7 +32,7 @@ public class CircleCurveTest
         }
 
         {
-            Vector2 p = cc.Pos(Mathf.PI / 2, false);
+            Vector2 p = cc.Pos(0.25f, false);
 
             Assert.AreEqual(1, p.x, 1e-6);
             Assert.AreEqual(0, p.y, 1e-6);
@@ -97,19 +85,20 @@ public class CircleCurveTest
         {
             float? p = cc.FindParamForPoint(new Vector2(1, 0));
 
-            Assert.AreEqual(Mathf.PI / 2, p, 1e-6);
+            Assert.AreEqual(0.25f, p, 1e-6);
         }
 
         {
             float? p = ccr.FindParamForPoint(new Vector2(0, 1));
 
-            Assert.AreEqual(0, p, 1e-6);
+            // we're exacly on the join, so zero or one are good
+            Assert.IsTrue(Math.Min(Math.Abs(p.Value - 1), Math.Abs(p.Value)) < 1e-6f);
         }
 
         {
             float? p = ccr.FindParamForPoint(new Vector2(1, 0));
 
-            Assert.AreEqual(3 * Mathf.PI / 2, p, 1e-6);
+            Assert.AreEqual(0.75f, p, 1e-6);
         }
 
         // we allow the point to be off the curve
@@ -124,35 +113,54 @@ public class CircleCurveTest
             CircleCurve cch = new CircleCurve(new Vector2(), 1, Mathf.PI / 2, 3 * Mathf.PI / 2);
 
             Assert.IsNull(cch.FindParamForPoint(new Vector2(0, 1)));
-            Assert.AreEqual(Mathf.PI, cch.FindParamForPoint(new Vector2(0, -1)), 1E-6f);
+            Assert.AreEqual(0.5f, cch.FindParamForPoint(new Vector2(0, -1)), 1E-6f);
+        }
+
+        // but not off the end of the params (reversed)
+        {
+            CircleCurve cch = new CircleCurve(new Vector2(), 1, 3 * Mathf.PI / 2, Mathf.PI / 2);
+
+            Assert.IsNull(cch.FindParamForPoint(new Vector2(0, 1)));
+            Assert.AreEqual(0.5f, cch.FindParamForPoint(new Vector2(0, -1)), 1E-6f);
         }
     }
 
     [Test]
-    public void TestCloneWithChangedParams()
+    public void TestCloneWithChangedExtents()
     {
         {
             CircleCurve cc = new CircleCurve(new Vector2(5, 6), 7);
 
-            CircleCurve ccb = (CircleCurve)cc.CloneWithChangedParams(Mathf.PI / 2, 3 * Mathf.PI / 2);
+            // trying to clone a curve with the opposite direction not supported
+            // (could add if ever required)
+            //
+            // but might be confusing, because these are _params_ so forward and backward curves expect them in the
+            // same order (0.75, 0.25) would give you a reverse of _whatever_ the input was
+            Assert.Throws<ArgumentException>(() => cc.CloneWithChangedExtents(0.75f, 0.25f));
+        }
+
+        {
+            CircleCurve cc = new CircleCurve(new Vector2(5, 6), 7);
+
+            CircleCurve ccb = (CircleCurve)cc.CloneWithChangedExtents(0.25f, 0.75f);
             Assert.AreEqual(5, ccb.Position.x, 1e-6);
             Assert.AreEqual(6, ccb.Position.y, 1e-6);
             Assert.AreEqual(7, ccb.Radius, 1e-6);
             Assert.AreEqual(RotationDirection.Forwards, ccb.Rotation);
-            Assert.AreEqual(Mathf.PI / 2, ccb.StartParam, 1e-6);
-            Assert.AreEqual(3 * Mathf.PI / 2, ccb.EndParam, 1e-6);
+            Assert.AreEqual(Mathf.PI / 2, ccb.AngleRange.Start, 1e-6);
+            Assert.AreEqual(3 * Mathf.PI / 2, ccb.AngleRange.End, 1e-6);
         }
 
         {
             CircleCurve cc = new CircleCurve(new Vector2(5, 6), 7, RotationDirection.Reverse);
 
-            CircleCurve ccb = (CircleCurve)cc.CloneWithChangedParams(Mathf.PI / 2, 3 * Mathf.PI / 2);
+            CircleCurve ccb = (CircleCurve)cc.CloneWithChangedExtents(0.25f, 0.75f);
             Assert.AreEqual(5, ccb.Position.x, 1e-6);
             Assert.AreEqual(6, ccb.Position.y, 1e-6);
             Assert.AreEqual(7, ccb.Radius, 1e-6);
             Assert.AreEqual(RotationDirection.Reverse, ccb.Rotation);
-            Assert.AreEqual(Mathf.PI / 2, ccb.StartParam, 1e-6);
-            Assert.AreEqual(3 * Mathf.PI / 2, ccb.EndParam, 1e-6);
+            Assert.AreEqual(3 * Mathf.PI / 2, ccb.AngleRange.Start, 1e-6);
+            Assert.AreEqual(Mathf.PI / 2, ccb.AngleRange.End, 1e-6);
         }
     }
 
@@ -170,12 +178,23 @@ public class CircleCurveTest
     [Test]
     public void TestTangent()
     {
-        CircleCurve cc = new CircleCurve(new Vector2(), 1);
+        {
+            CircleCurve cc = new CircleCurve(new Vector2(), 1);
 
-        Assert.IsTrue((new Vector2(1, 0) - cc.Tangent(0.0f)).magnitude < 1e-5f);
-        Assert.IsTrue((new Vector2(0, -1) - cc.Tangent(Mathf.PI / 2)).magnitude < 1e-5f);
-        Assert.IsTrue((new Vector2(-1, 0) - cc.Tangent(Mathf.PI)).magnitude < 1e-5f);
-        Assert.IsTrue((new Vector2(0, 1) - cc.Tangent(3 * Mathf.PI / 2)).magnitude < 1e-5f);
+            Assert.IsTrue((new Vector2(1, 0) - cc.Tangent(0.0f)).magnitude < 1e-5f);
+            Assert.IsTrue((new Vector2(0, -1) - cc.Tangent(0.25f)).magnitude < 1e-5f);
+            Assert.IsTrue((new Vector2(-1, 0) - cc.Tangent(0.5f)).magnitude < 1e-5f);
+            Assert.IsTrue((new Vector2(0, 1) - cc.Tangent(0.75f)).magnitude < 1e-5f);
+        }
+
+        {
+            CircleCurve cc = new CircleCurve(new Vector2(), 1, RotationDirection.Reverse);
+
+            Assert.IsTrue((new Vector2(-1, 0) - cc.Tangent(0.0f)).magnitude < 1e-5f);
+            Assert.IsTrue((new Vector2(0, -1) - cc.Tangent(0.25f)).magnitude < 1e-5f);
+            Assert.IsTrue((new Vector2(1, 0) - cc.Tangent(0.5f)).magnitude < 1e-5f);
+            Assert.IsTrue((new Vector2(0, 1) - cc.Tangent(0.75f)).magnitude < 1e-5f);
+        }
     }
 
     [Test]
@@ -191,13 +210,24 @@ public class CircleCurveTest
             Assert.AreEqual(new Vector2(), cm.Position);
             Assert.AreEqual(1, cm.Radius, 0);
             Assert.AreEqual(RotationDirection.Forwards, cm.Rotation);
-            Assert.AreEqual(0, cm.StartParam, 0);
-            Assert.AreEqual(2 * Mathf.PI, cm.EndParam, 0);
+            Assert.AreEqual(0, cm.AngleRange.Start, 0);
+            Assert.AreEqual(2 * Mathf.PI, cm.AngleRange.End, 0);
+
+            // we don't care about presentation order
+            cm = (CircleCurve)cc2.Merge(cc1);
+
+            Assert.IsNotNull(cm);
+            Assert.AreEqual(new Vector2(), cm.Position);
+            Assert.AreEqual(1, cm.Radius, 0);
+            Assert.AreEqual(RotationDirection.Forwards, cm.Rotation);
+            // except in this case we think the break is in a different place
+            Assert.AreEqual(Mathf.PI, cm.AngleRange.Start, 0);
+            Assert.AreEqual(3 * Mathf.PI, cm.AngleRange.End, 0);
         }
 
         {
-            CircleCurve cc1 = new CircleCurve(new Vector2(), 1, 0, Mathf.PI, RotationDirection.Reverse);
-            CircleCurve cc2 = new CircleCurve(new Vector2(), 1, Mathf.PI, 2 * Mathf.PI, RotationDirection.Reverse);
+            CircleCurve cc1 = new CircleCurve(new Vector2(), 1, Mathf.PI, 0, RotationDirection.Reverse);
+            CircleCurve cc2 = new CircleCurve(new Vector2(), 1, 2 * Mathf.PI, Mathf.PI, RotationDirection.Reverse);
 
             CircleCurve cm = (CircleCurve)cc1.Merge(cc2);
 
@@ -205,13 +235,23 @@ public class CircleCurveTest
             Assert.AreEqual(new Vector2(), cm.Position);
             Assert.AreEqual(1, cm.Radius, 0);
             Assert.AreEqual(RotationDirection.Reverse, cm.Rotation);
-            Assert.AreEqual(0, cm.StartParam, 0);
-            Assert.AreEqual(2 * Mathf.PI, cm.EndParam, 0);
+            Assert.AreEqual(3 * Mathf.PI, cm.AngleRange.Start, 0);
+            Assert.AreEqual(Mathf.PI, cm.AngleRange.End, 0);
+
+            cm = (CircleCurve)cc2.Merge(cc1);
+
+            Assert.IsNotNull(cm);
+            Assert.AreEqual(new Vector2(), cm.Position);
+            Assert.AreEqual(1, cm.Radius, 0);
+            Assert.AreEqual(RotationDirection.Reverse, cm.Rotation);
+            // except in this case we think the break is in a different place
+            Assert.AreEqual(2 * Mathf.PI, cm.AngleRange.Start, 0);
+            Assert.AreEqual(0, cm.AngleRange.End, 0);
         }
 
         {
             CircleCurve cc1 = new CircleCurve(new Vector2(), 1, 0, Mathf.PI, RotationDirection.Forwards);
-            CircleCurve cc2 = new CircleCurve(new Vector2(), 1, Mathf.PI, 2 * Mathf.PI, RotationDirection.Reverse);
+            CircleCurve cc2 = new CircleCurve(new Vector2(), 1, 2 * Mathf.PI, Mathf.PI, RotationDirection.Reverse);
 
             CircleCurve cm = (CircleCurve)cc1.Merge(cc2);
 
@@ -237,8 +277,8 @@ public class CircleCurveTest
         }
 
         {
-            CircleCurve cc1 = new CircleCurve(new Vector2(), 1, 0, Mathf.PI);
-            CircleCurve cc2 = new CircleCurve(new Vector2(), 1, 3 * Mathf.PI / 2, 2 * Mathf.PI);
+            CircleCurve cc1 = new CircleCurve(new Vector2(), 1, 0, 1);
+            CircleCurve cc2 = new CircleCurve(new Vector2(), 1, 1.5f, 2);
 
             CircleCurve cm = (CircleCurve)cc1.Merge(cc2);
 
@@ -270,18 +310,31 @@ public class CircleCurveTest
         CircleCurve cc2 = new CircleCurve(new Vector2(), 3, 0, 2 * Mathf.PI);
 
         Assert.AreEqual(Mathf.PI, cc1.Length, 1e-6);
-        Assert.AreEqual(2 * Mathf.PI* 3, cc2.Length, 1e-6);
+        Assert.AreEqual(2 * Mathf.PI * 3, cc2.Length, 1e-6);
     }
 
     [Test]
-    public void TestComputeNormal()
+    public void TestNormal()
     {
-        CircleCurve cc1 = new CircleCurve(new Vector2(), 1, 0, Mathf.PI);
+        {
+            CircleCurve cc1 = new CircleCurve(new Vector2(), 1, 0, Mathf.PI * 2);
 
-        Assert.IsTrue((new Vector2(0, 1) - cc1.Normal(0)).magnitude < 1e-6);
-        Assert.IsTrue((new Vector2(1, 0) - cc1.Normal(Mathf.PI / 2)).magnitude < 1e-6);
-        Assert.IsTrue((new Vector2(0, -1) - cc1.Normal(Mathf.PI)).magnitude < 1e-6);
-        Assert.IsTrue((new Vector2(-1, 0) - cc1.Normal(3 * Mathf.PI / 2)).magnitude < 1e-6);
+            Assert.IsTrue(new Vector2(0, 1).Equals(cc1.Normal(0), 1e-5f));
+            Assert.IsTrue(new Vector2(1, 0).Equals(cc1.Normal(0.25f), 1e-5f));
+            Assert.IsTrue(new Vector2(0, -1).Equals(cc1.Normal(0.5f), 1e-5f));
+            Assert.IsTrue(new Vector2(-1, 0).Equals(cc1.Normal(0.75f), 1e-5f));
+            Assert.IsTrue(new Vector2(0, 1).Equals(cc1.Normal(1), 1e-5f));
+        }
+
+        {
+            CircleCurve cc1 = new CircleCurve(new Vector2(), 1, Mathf.PI / 4, 5 * Mathf.PI / 4);
+
+            Assert.IsTrue(new Vector2(1, 1).normalized.Equals(cc1.Normal(0), 1e-5f));
+            Assert.IsTrue(new Vector2(1, 0).Equals(cc1.Normal(0.25f), 1e-5f));
+            Assert.IsTrue(new Vector2(1, -1).normalized.Equals(cc1.Normal(0.5f), 1e-5f));
+            Assert.IsTrue(new Vector2(0, -1).Equals(cc1.Normal(0.75f), 1e-5f));
+            Assert.IsTrue(new Vector2(-1, -1).normalized.Equals(cc1.Normal(1), 1e-5f));
+        }
     }
 
     [Test]
@@ -290,65 +343,83 @@ public class CircleCurveTest
         {
             CircleCurve cc1 = new CircleCurve(new Vector2(), 1, 0, Mathf.PI / 2);
             Assert.IsTrue(cc1.WithinParams(0, 1e-6f));
-            Assert.IsTrue(cc1.WithinParams(Mathf.PI / 2, 1e-6f));
-            Assert.IsFalse(cc1.WithinParams(Mathf.PI, 1e-6f));
+            Assert.IsTrue(cc1.WithinParams(1, 1e-6f));
+            Assert.IsFalse(cc1.WithinParams(2, 1e-6f));
             Assert.IsFalse(cc1.WithinParams(-1, 1e-6f));
         }
 
         {
             CircleCurve cc1 = new CircleCurve(new Vector2(), 1, 0, 2 * Mathf.PI);
             Assert.IsTrue(cc1.WithinParams(0, 1e-6f));
-            Assert.IsTrue(cc1.WithinParams(Mathf.PI / 2, 1e-6f));
-            Assert.IsTrue(cc1.WithinParams(Mathf.PI, 1e-6f));
+            Assert.IsTrue(cc1.WithinParams(1, 1e-6f));
+            // ugh, these numbers are not really "within params"
+            // but they are "interpretable as params" as with a full circle we can seamlessly run off either end
+            Assert.IsTrue(cc1.WithinParams(2, 1e-6f));
             Assert.IsTrue(cc1.WithinParams(-1, 1e-6f));
         }
 
         {
             CircleCurve cc1 = new CircleCurve(new Vector2(), 1, 3 * Mathf.PI / 2, 5 * Mathf.PI / 2);
             Assert.IsTrue(cc1.WithinParams(0, 1e-6f));
-            Assert.IsTrue(cc1.WithinParams(Mathf.PI / 2, 1e-6f));
-            Assert.IsFalse(cc1.WithinParams(Mathf.PI, 1e-6f));
-            Assert.IsTrue(cc1.WithinParams(-1, 1e-6f));
-        }
-
-        {
-            CircleCurve cc1 = new CircleCurve(new Vector2(), 1, 0, Mathf.PI / 2, RotationDirection.Reverse);
-            Assert.IsTrue(cc1.WithinParams(0, 1e-6f));
-            Assert.IsTrue(cc1.WithinParams(Mathf.PI / 2, 1e-6f));
-            Assert.IsFalse(cc1.WithinParams(Mathf.PI, 1e-6f));
+            Assert.IsTrue(cc1.WithinParams(1, 1e-6f));
+            Assert.IsFalse(cc1.WithinParams(2, 1e-6f));
             Assert.IsFalse(cc1.WithinParams(-1, 1e-6f));
         }
 
         {
-            CircleCurve cc1 = new CircleCurve(new Vector2(), 1, 0, 2 * Mathf.PI, RotationDirection.Reverse);
+            CircleCurve cc1 = new CircleCurve(new Vector2(), 1, Mathf.PI / 2, 0, RotationDirection.Reverse);
             Assert.IsTrue(cc1.WithinParams(0, 1e-6f));
-            Assert.IsTrue(cc1.WithinParams(Mathf.PI / 2, 1e-6f));
-            Assert.IsTrue(cc1.WithinParams(Mathf.PI, 1e-6f));
+            Assert.IsTrue(cc1.WithinParams(1, 1e-6f));
+            Assert.IsFalse(cc1.WithinParams(2, 1e-6f));
+            Assert.IsFalse(cc1.WithinParams(-1, 1e-6f));
+        }
+
+        {
+            CircleCurve cc1 = new CircleCurve(new Vector2(), 1, 2 * Mathf.PI, 0, RotationDirection.Reverse);
+            Assert.IsTrue(cc1.WithinParams(0, 1e-6f));
+            Assert.IsTrue(cc1.WithinParams(1, 1e-6f));
+            // ugh, these numbers are not really "within params"
+            // but they are "interpretable as params" as with a full circle we can seamlessly run off either end
+            Assert.IsTrue(cc1.WithinParams(2, 1e-6f));
             Assert.IsTrue(cc1.WithinParams(-1, 1e-6f));
         }
 
         {
-            CircleCurve cc1 = new CircleCurve(new Vector2(), 1, 3 * Mathf.PI / 2, 5 * Mathf.PI / 2,
+            CircleCurve cc1 = new CircleCurve(new Vector2(), 1, 5 * Mathf.PI / 2, 3 * Mathf.PI / 2,
                   RotationDirection.Reverse);
             Assert.IsTrue(cc1.WithinParams(0, 1e-6f));
-            Assert.IsTrue(cc1.WithinParams(Mathf.PI / 2, 1e-6f));
-            Assert.IsFalse(cc1.WithinParams(Mathf.PI, 1e-6f));
-            Assert.IsTrue(cc1.WithinParams(-1, 1e-6f));
+            Assert.IsTrue(cc1.WithinParams(1, 1e-6f));
+            Assert.IsFalse(cc1.WithinParams(2, 1e-6f));
+            Assert.IsFalse(cc1.WithinParams(-1, 1e-6f));
         }
     }
 
     [Test]
     public void TestIsCyclic()
     {
-        CircleCurve cc1 = new CircleCurve(new Vector2(), 1, 0, 2 * Mathf.PI);
-        CircleCurve cc2 = new CircleCurve(new Vector2(), 1, 0, 2 * Mathf.PI, RotationDirection.Reverse);
-        CircleCurve cc3 = new CircleCurve(new Vector2(), 1, Mathf.PI, 3 * Mathf.PI);
-        CircleCurve cc4 = new CircleCurve(new Vector2(), 1, 0, 3 * Mathf.PI / 2);
+        {
+            CircleCurve cc1 = new CircleCurve(new Vector2(), 1, 0, 2 * Mathf.PI);
+            CircleCurve cc2 = new CircleCurve(new Vector2(), 1, 2 * Mathf.PI, 0, RotationDirection.Reverse);
+            CircleCurve cc3 = new CircleCurve(new Vector2(), 1, Mathf.PI, 3 * Mathf.PI);
+            CircleCurve cc4 = new CircleCurve(new Vector2(), 1, 3 * Mathf.PI, Mathf.PI);
 
-        Assert.IsTrue(cc1.IsCyclic);
-        Assert.IsTrue(cc2.IsCyclic);
-        Assert.IsTrue(cc3.IsCyclic);
-        Assert.IsFalse(cc4.IsCyclic);
+            Assert.IsTrue(cc1.IsCyclic);
+            Assert.IsTrue(cc2.IsCyclic);
+            Assert.IsTrue(cc3.IsCyclic);
+            Assert.IsTrue(cc4.IsCyclic);
+        }
+
+        {
+            CircleCurve cc1 = new CircleCurve(new Vector2(), 1, 0.1f, 2 * Mathf.PI);
+            CircleCurve cc2 = new CircleCurve(new Vector2(), 1, 2 * Mathf.PI, 0.1f, RotationDirection.Reverse);
+            CircleCurve cc3 = new CircleCurve(new Vector2(), 1, Mathf.PI + 0.1f, 3 * Mathf.PI);
+            CircleCurve cc4 = new CircleCurve(new Vector2(), 1, 3 * Mathf.PI, Mathf.PI + 0.1f);
+
+            Assert.IsFalse(cc1.IsCyclic);
+            Assert.IsFalse(cc2.IsCyclic);
+            Assert.IsFalse(cc3.IsCyclic);
+            Assert.IsFalse(cc4.IsCyclic);
+        }
     }
 
     [Test]
@@ -369,7 +440,7 @@ public class CircleCurveTest
         CircleCurve cc5 = new CircleCurve(pos, 1, 1, 2);
 
         CircleCurve cc6 = new CircleCurve(pos, 1, 1, 5);
-        CircleCurve cc7 = new CircleCurve(pos, 1, 4, 2);
+        CircleCurve cc7 = new CircleCurve(pos, 1, -2, 2);
 
         // let's just check each partial circle against the full one
         {
@@ -488,8 +559,8 @@ public class CircleCurveTest
             Assert.IsNotNull(curves.Item1);
             Assert.IsNotNull(curves.Item2);
 
-            CheckCurveSplit(cc6, new List<float> { 2, 4 }, curves.Item1);
-            CheckCurveSplit(cc7, new List<float> { 5, 1 }, curves.Item2);
+            CheckCurveSplit(cc6, new List<float> { 2, Mathf.PI * 2 - 2 }, curves.Item1);
+            CheckCurveSplit(cc7, new List<float> { 5, Mathf.PI * 2 + 1 }, curves.Item2);
         }
 
         // ----
@@ -533,7 +604,7 @@ public class CircleCurveTest
             Assert.IsNotNull(curves.Item1);
             Assert.IsNull(curves.Item2);
 
-            CheckCurveSplit(cc1r, new List<float> { 1, 3 }, curves.Item1);
+            CheckCurveSplit(cc1r, new List<float> { 3, 1 }, curves.Item1);
         }
 
         {
@@ -611,7 +682,7 @@ public class CircleCurveTest
             Assert.IsNotNull(curves.Item1);
             Assert.IsNull(curves.Item2);
 
-            CheckCurveSplit(cc4r, new List<float> { 1, 2 }, curves.Item1);
+            CheckCurveSplit(cc4r, new List<float> { 2, 1 }, curves.Item1);
         }
 
         // ranges that sum to > 360 can generate two splits in both curves
@@ -622,8 +693,8 @@ public class CircleCurveTest
             Assert.IsNotNull(curves.Item1);
             Assert.IsNotNull(curves.Item2);
 
-            CheckCurveSplit(cc6r, new List<float> { 2, 4 }, curves.Item1);
-            CheckCurveSplit(cc7, new List<float> { 5, 1 }, curves.Item2);
+            CheckCurveSplit(cc6r, new List<float> { Mathf.PI * 2 - 2, 2 }, curves.Item1);
+            CheckCurveSplit(cc7, new List<float> { 5, Mathf.PI * 2 + 1 }, curves.Item2);
         }
 
         // midnight-crossing cases
@@ -646,7 +717,7 @@ public class CircleCurveTest
                 Assert.IsNotNull(curves.Item1);
                 Assert.IsNull(curves.Item2);
 
-                CheckCurveSplit(cc1mc, new List<float> { cc2mc.EndParam }, curves.Item1);
+                CheckCurveSplit(cc1mc, new List<float> { cc2mc.AngleRange.End }, curves.Item1);
             }
 
             // ranges overlapping at the end split both curves
@@ -657,8 +728,8 @@ public class CircleCurveTest
                 Assert.IsNotNull(curves.Item1);
                 Assert.IsNotNull(curves.Item2);
 
-                CheckCurveSplit(cc2mc, new List<float> { cc3mc.StartParam }, curves.Item1);
-                CheckCurveSplit(cc3mc, new List<float> { cc2mc.EndParam }, curves.Item2);
+                CheckCurveSplit(cc2mc, new List<float> { cc3mc.AngleRange.Start }, curves.Item1);
+                CheckCurveSplit(cc3mc, new List<float> { cc2mc.AngleRange.End }, curves.Item2);
             }
 
             {
@@ -668,7 +739,7 @@ public class CircleCurveTest
                 Assert.IsNull(curves.Item1);
                 Assert.IsNotNull(curves.Item2);
 
-                CheckCurveSplit(cc4mc, new List<float> { cc5mc.StartParam, cc5mc.EndParam }, curves.Item2);
+                CheckCurveSplit(cc4mc, new List<float> { cc5mc.AngleRange.Start, cc5mc.AngleRange.End }, curves.Item2);
             }
 
             var cc1mcr = cc1mc.Reversed() as CircleCurve;
@@ -683,7 +754,7 @@ public class CircleCurveTest
                 Assert.IsNotNull(curves.Item1);
                 Assert.IsNull(curves.Item2);
 
-                CheckCurveSplit(cc1mcr, new List<float> { cc2mc.EndParam }, curves.Item1);
+                CheckCurveSplit(cc1mcr, new List<float> { cc2mc.AngleRange.End }, curves.Item1);
             }
 
             // ranges overlapping at the end split both curves
@@ -694,8 +765,8 @@ public class CircleCurveTest
                 Assert.IsNotNull(curves.Item1);
                 Assert.IsNotNull(curves.Item2);
 
-                CheckCurveSplit(cc2mc, new List<float> { cc3mcr.StartParam }, curves.Item1);
-                CheckCurveSplit(cc3mcr, new List<float> { cc2mc.EndParam }, curves.Item2);
+                CheckCurveSplit(cc2mc, new List<float> { cc3mcr.AngleRange.End }, curves.Item1);
+                CheckCurveSplit(cc3mcr, new List<float> { cc2mc.AngleRange.End }, curves.Item2);
             }
 
             {
@@ -705,7 +776,7 @@ public class CircleCurveTest
                 Assert.IsNull(curves.Item1);
                 Assert.IsNotNull(curves.Item2);
 
-                CheckCurveSplit(cc4mc, new List<float> { cc5mcr.StartParam, cc5mcr.EndParam }, curves.Item2);
+                CheckCurveSplit(cc4mc, new List<float> { cc5mcr.AngleRange.End, cc5mcr.AngleRange.Start }, curves.Item2);
             }
 
         }
@@ -713,20 +784,22 @@ public class CircleCurveTest
 
     private CircleCurve RotatedAnticlockwise(CircleCurve cc, float radians)
     {
-        return new CircleCurve(cc.Position, cc.Radius, cc.StartParam + radians, cc.EndParam + radians, cc.Rotation);
+        return new CircleCurve(cc.Position, cc.Radius, cc.AngleRange.Start + radians, cc.AngleRange.End + radians, cc.Rotation);
     }
 
-    private void CheckCurveSplit(CircleCurve input, List<float> splits, IList<Curve> curves)
+    private void CheckCurveSplit(CircleCurve input, List<float> splits, IList<Curve> in_curves)
     {
+        var curves = in_curves.Cast<CircleCurve>().ToList();
+
         Assert.AreEqual(splits.Count + 1, curves.Count);
 
-        Assert.IsTrue(Util.ClockAwareAngleCompare(input.StartParam, curves[0].StartParam, 1e-4f));
-        Assert.IsTrue(Util.ClockAwareAngleCompare(input.EndParam, curves.Last().EndParam, 1e-4f));
+        Assert.IsTrue(Util.ClockAwareAngleCompare(input.AngleRange.Start, curves[0].AngleRange.Start, 1e-4f));
+        Assert.IsTrue(Util.ClockAwareAngleCompare(input.AngleRange.End, curves.Last().AngleRange.End, 1e-4f));
 
         for (int i = 0; i < splits.Count; i++)
         {
-            Assert.IsTrue(Util.ClockAwareAngleCompare(splits[i], curves[i].EndParam, 1e-4f));
-            Assert.IsTrue(Util.ClockAwareAngleCompare(splits[i], curves[i + 1].StartParam, 1e-4f));
+            Assert.IsTrue(Util.ClockAwareAngleCompare(splits[i], curves[i].AngleRange.End, 1e-4f));
+            Assert.IsTrue(Util.ClockAwareAngleCompare(splits[i], curves[i + 1].AngleRange.Start, 1e-4f));
         }
 
         foreach (var c in curves)

@@ -1,11 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
+using Assets.Generation.G;
+using Assets.Generation.U;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.TestTools;
-using Assets.Generation.G;
-using System;
-using Assets.Generation.U;
 
 public class GraphUtilTest
 {
@@ -103,9 +99,10 @@ public class GraphUtilTest
 
     Node MakeRadiusNodeAt(float x, float y, float radius)
     {
-        Node ret = new Node("", "", radius);
-
-        ret.Position = new Vector2(x, y);
+        Node ret = new Node("", "", radius)
+        {
+            Position = new Vector2(x, y)
+        };
 
         return ret;
     }

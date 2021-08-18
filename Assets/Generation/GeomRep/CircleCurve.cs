@@ -31,9 +31,6 @@ namespace Assets.Generation.GeomRep
     [System.Diagnostics.DebuggerDisplay("Pos = {Position}, From = {StartPos}, To = {EndPos}, Dir = {Rotation}")]
     public class CircleCurve : Curve
     {
-        public override float StartParam { get => AngleRange.Start; }
-        public override float EndParam { get => AngleRange.End; }
-
         readonly public AngleRange AngleRange;
         readonly public Vector2 Position;
         readonly public float Radius;
@@ -48,13 +45,14 @@ namespace Assets.Generation.GeomRep
 
         public CircleCurve(Vector2 position, float radius,
                            float start_angle, float end_angle)
-            : this(position, radius, start_angle, end_angle, RotationDirection.Forwards)
+            : this(position, radius, new AngleRange(start_angle, end_angle),
+                  new AngleRange(start_angle, end_angle).Direction)
         {
         }
 
         public CircleCurve(Vector2 position, float radius,
                            RotationDirection rotation)
-            : this(position, radius, 0, Mathf.PI * 2, rotation)
+            : this(position, radius, new AngleRange(rotation), rotation)
         {
         }
 
@@ -66,8 +64,15 @@ namespace Assets.Generation.GeomRep
         }
 
         public CircleCurve(Vector2 position, float radius,
+                   AngleRange angle_range)
+            : this(position, radius, angle_range, angle_range.Direction)
+        {
+        }
+
+        public CircleCurve(Vector2 position, float radius,
                            AngleRange angle_range,
                            RotationDirection rotation)
+            : base(0, 1)
         {
             AngleRange = angle_range;
 
@@ -87,16 +92,44 @@ namespace Assets.Generation.GeomRep
             {
                 throw new ArgumentException("-ve or zero radius");
             }
+
+            if (rotation != angle_range.Direction && angle_range.Direction != RotationDirection.DontCare)
+            {
+                throw new ArgumentException("Inconsistent circle direction");
+            }
+
+            if (Mathf.Abs(AngleRange.Range) > Mathf.PI * 2) {
+                throw new ArgumentException("More than a full turn in a circle");
+            }
+        }
+
+        public float ParamToAngle(float param)
+        {
+            return AngleRange.Range * param + AngleRange.Start;
+        }
+
+        // just does the scaling, doesn't worry if we're within range
+        public float AngleToParam(float angle)
+        {
+            if (AngleRange.Range != 0)
+            {
+                return (angle - AngleRange.Start) / AngleRange.Range;
+            }
+
+            // if the range is zero, all we can say is are we at the one point or not...
+            if (Mathf.Abs(angle - AngleRange.Start) < 1e-4f)
+            {
+                return 0;
+            }
+
+            return -1;
         }
 
         protected override Vector2 ComputePos_Inner(float param)
         {
-            if (Rotation == RotationDirection.Forwards)
-            {
-                return Position + new Vector2(Mathf.Sin(param), Mathf.Cos(param)) * Radius;
-            }
+            float angle = ParamToAngle(param);
 
-            return Position + new Vector2(Mathf.Sin(-param), Mathf.Cos(-param)) * Radius;
+            return Position + new Vector2(Mathf.Sin(angle), Mathf.Cos(angle)) * Radius;
         }
 
         public override int GetHashCode()
@@ -141,25 +174,14 @@ namespace Assets.Generation.GeomRep
 
             float ang = Util.Atan2(relative);
 
-            if (Rotation == RotationDirection.Reverse)
-            {
-                ang = -ang;
-            }
+            ang = AngleRange.FixAngleForRange(ang);
 
-            // atan2 returns between -pi and + pi
-            // we use 0 -> 2pi
-            // BUT, we also require EndParam > StartParam
-            while (ang < StartParam)
-            {
-                ang += 2 * Mathf.PI;
-            }
-
-            return ang;
+            return AngleToParam(ang);
         }
 
-        public override Curve CloneWithChangedParams(float start, float end)
+        public override Curve CloneWithChangedExtents(float start, float end)
         {
-            return new CircleCurve(Position, Radius, start, end, Rotation);
+            return new CircleCurve(Position, Radius, ParamToAngle(start), ParamToAngle(end), Rotation);
         }
 
         public override Box2 BoundingArea
@@ -175,12 +197,16 @@ namespace Assets.Generation.GeomRep
 
         public override Vector2 Tangent(float param)
         {
+            float angle = ParamToAngle(param);
+
+            var tang = new Vector2(Mathf.Cos(angle), -Mathf.Sin(angle));
+
             if (Rotation == RotationDirection.Reverse)
             {
-                return new Vector2(-Mathf.Cos(-param), Mathf.Sin(-param));
+                tang = -tang;
             }
 
-            return new Vector2(Mathf.Cos(param), -Mathf.Sin(param));
+            return tang;
         }
 
         public override Curve Merge(Curve c_after)
@@ -212,22 +238,29 @@ namespace Assets.Generation.GeomRep
                 return null;
             }
 
-            if (!Util.ClockAwareAngleCompare(EndParam, c_cc.StartParam, 1e-5f))
+            if (Util.ClockAwareAngleCompare(AngleRange.End, c_cc.AngleRange.Start, 1e-5f))
             {
-                return null;
+                return new CircleCurve(Position, Radius, AngleRange.Start, AngleRange.End + c_cc.AngleRange.Range, Rotation);
             }
 
-            return new CircleCurve(Position, Radius, StartParam, c_cc.EndParam, Rotation);
+            if (Util.ClockAwareAngleCompare(AngleRange.Start, c_cc.AngleRange.End, 1e-5f))
+            {
+                return new CircleCurve(Position, Radius, c_cc.AngleRange.Start, c_cc.AngleRange.End + AngleRange.Range, Rotation);
+            }
+
+            return null;
         }
 
         public override float Length
         {
-            get => Radius * (EndParam - StartParam);
+            get => Radius * AngleRange.Length;
         }
 
-        public override Vector2 Normal(float p)
+        public override Vector2 Normal(float param)
         {
-            Vector2 normal = new Vector2(Mathf.Sin(p), Mathf.Cos(p));
+            float angle = ParamToAngle(param);
+
+            Vector2 normal = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle));
 
             if (Rotation == RotationDirection.Reverse)
             {
@@ -239,31 +272,22 @@ namespace Assets.Generation.GeomRep
 
         public override bool WithinParams(float p, float tol)
         {
+            // a bit ugh, as out of range values are not really "within params"
+            // but they are "interprettable as a param" since a full circle can seamlessly
+            // run off either end
+            //
+            // maybe add an "allow_cyclic" flag (and ignore in LineCurve)?
             if (IsCyclic)
             {
                 return true;
             }
 
-            // we've fixed start param to lie between 0 and 2pi
-            // and end param to be < 2pi above that
-            // so if we are below start param and we step up one full turn
-            // that either takes us right past end param (because we were too high)
-            // or it takes us past it because we were too low and shouldn't have stepped up
-            // or it leaves us below end param in which case we are in range
-            if (p < StartParam)
-            {
-                p += Mathf.PI * 2;
-            }
-
-            return p < EndParam + tol;
+            return p > StartParam - tol && p < EndParam + tol;
         }
 
         public override Curve Reversed()
         {
-            // start and end remain the same way around for a reversed circle
-            // we just flip the "Rotation" field to say we mean the other direction
-            return new CircleCurve(Position, Radius, StartParam, EndParam,
-                Rotation.Invert());
+            return new CircleCurve(Position, Radius, AngleRange.Reversed());
         }
 
         public override Tuple<IList<Curve>, IList<Curve>> SplitCoincidentCurves(Curve c2, float tol)
@@ -323,25 +347,23 @@ namespace Assets.Generation.GeomRep
             return new Tuple<IList<Curve>, IList<Curve>>(ret1, ret2);
         }
 
-        private static void ConditionalSplitCurveList(float tol, IList<Curve> curve_list, float split_param)
+        private static void ConditionalSplitCurveList(float tol, IList<Curve> curve_list, float split_angle)
         {
             for (int i = 0; i < curve_list.Count; i++)
             {
-                Curve c = curve_list[i];
+                CircleCurve c = curve_list[i] as CircleCurve;
 
                 // we have to be on the same rotation around the clock
-                split_param = AngleRange.FixupAngleRelative(c.StartParam, split_param);
+                split_angle = c.AngleRange.FixAngleForRange(split_angle);
 
                 // negative tolerance requires us to be significantly within, e.g. not just on the endpoint
-                // "WithinParams is not suitable here, because what we really mean in this case is
-                // whether we are significantly away from an existing end
-                // and full circles have everything "within params" but still have theoretical ends
-                // which we do not need to split if we hit them...
-                //if (c.WithinParams(split_param, -tol))
-                if (split_param > c.StartParam + tol && split_param < c.EndParam - tol)
+                // and ignore cyclic, because what we are looking for here is not hitting the break,
+                // rather than just falling in range
+                if (c.AngleRange.InRange(split_angle, false, -tol))
                 {
-                    curve_list[i] = c.CloneWithChangedParams(c.StartParam, split_param);
-                    curve_list.Insert(i + 1, c.CloneWithChangedParams(split_param, c.EndParam));
+                    float split_param = c.AngleToParam(split_angle);
+                    curve_list[i] = c.CloneWithChangedExtents(0, split_param);
+                    curve_list.Insert(i + 1, c.CloneWithChangedExtents(split_param, 1));
 
                     // we really ought to hit only one curve with one split-point
                     return;
