@@ -41,6 +41,15 @@ namespace Assets.Generation.GeomRep
             }
         }
 
+        // 
+        public LoopSet Cut(LoopSet to_cut, LoopSet cut_by, float tol, ClRand random, string layer)
+        {
+            // assuming cut_by has no outer -ve curves (which it shouldn't have if it is the output of a previous union)
+            // removing cut_by from cut is the same as unioning with the inverse
+
+            return Union(to_cut, cut_by.Reversed(), tol, random, layer);
+        }
+
         // union operation cannot return a mix of positive and negative top-level curves
         // e.g. if you think of a negative curve as something subtracted from a positive curve
         // if we have inputs like this:

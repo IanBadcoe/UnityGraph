@@ -1,3 +1,4 @@
+using Assets.Behaviour;
 using Assets.Generation.G;
 using Assets.Generation.GeomRep;
 using Assets.Generation.Stepping;
@@ -21,6 +22,8 @@ namespace Assets.Generation.Gen
         // need a better way of making and setting these, but while we only have one...
         private readonly TemplateStore Templates = new TemplateStore1();
 
+        private readonly LayerConfigBehaviour LCB;
+
         public enum Phase
         {
             GraphExpand,
@@ -35,13 +38,16 @@ namespace Assets.Generation.Gen
 
         private readonly int m_reqSize;
 
-        public Generator(Graph graph, int req_size)
+        public Generator(Graph graph, int req_size,
+            LayerConfigBehaviour lcb)
         {
             //UnityEngine.Assertion.Assert.raiseExceptions = true;
 
             Graph = graph;
 
             m_reqSize = req_size;
+
+            LCB = lcb;
         }
 
         public StepperController.StatusReportInner Step(StepperController.Status status)
@@ -136,10 +142,7 @@ namespace Assets.Generation.Gen
 
             UnionHelper.GenerateGeometry(Graph);
 
-            while (!UnionHelper.UnionOne(Config.Rand()))
-            {
-                ;
-            }
+            UnionHelper.UnionAll(Config.Rand(), LCB);
 
             m_phase = Phase.Done;
 
