@@ -49,7 +49,7 @@ namespace Assets.Generation.GeomRep
 
             foreach (Curve curr in m_curves)
             {
-                range += curr.EndParam - curr.StartParam;
+                range += curr.ParamRange;
 
                 Vector2 c_start = curr.StartPos;
                 Vector2 p_end = prev.EndPos;

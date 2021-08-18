@@ -41,11 +41,11 @@ public class LineCurveTest
     }
 
     [Test]
-    public void TestCloneWithChangedParams()
+    public void TestCloneWithChangedExtents()
     {
         LineCurve lc = new LineCurve(new Vector2(), new Vector2(1, 0), 5);
 
-        LineCurve lc2 = (LineCurve)lc.CloneWithChangedParams(2, 4);
+        LineCurve lc2 = (LineCurve)lc.CloneWithChangedExtents(2, 4);
 
         Assert.IsNotNull(lc2);
         Assert.AreEqual(2, lc2.StartParam, 0);
@@ -96,12 +96,16 @@ public class LineCurveTest
         }
 
         {
-            // does not work other way around, we need to supply the following curve to the followed
-            // (could easily make that work, however, but current usage always knows the order...
+            // or the other way around
             Curve c = new LineCurve(new Vector2(0, 0), new Vector2(1, 0), 5, 10);
             LineCurve lc3 = (LineCurve)c.Merge(lc);
 
-            Assert.IsNull(lc3);
+            Assert.IsNotNull(lc3);
+            Assert.AreEqual(new Vector2(), lc3.Position);
+            Assert.AreEqual(new Vector2(1, 0), lc3.Direction);
+            Assert.AreEqual(10, lc3.Length, 0);
+            Assert.AreEqual(0, lc3.StartParam, 0);
+            Assert.AreEqual(10, lc3.EndParam, 0);
         }
 
         {
@@ -129,6 +133,10 @@ public class LineCurveTest
         {
             Curve c = new CircleCurve(new Vector2(0, 0), 5, Mathf.PI / 2, 3 * Mathf.PI / 2);
             LineCurve lc3 = (LineCurve)lc.Merge(c);
+
+            Assert.IsNull(lc3);
+
+            lc3 = (LineCurve)c.Merge(lc);
 
             Assert.IsNull(lc3);
         }
