@@ -1032,8 +1032,8 @@ namespace Assets.Generation.GeomRep
                             {
                                 any_splits = true;
 
-                                Curve c1split1 = c1.CloneWithChangedParams(c1.StartParam, split_points.Item1);
-                                Curve c1split2 = c1.CloneWithChangedParams(split_points.Item1, c1.EndParam);
+                                Curve c1split1 = c1.CloneWithChangedExtents(c1.StartParam, split_points.Item1);
+                                Curve c1split2 = c1.CloneWithChangedExtents(split_points.Item1, c1.EndParam);
 
                                 working_loop1[i] = c1split1;
                                 working_loop1.Insert(i + 1, c1split2);
@@ -1061,8 +1061,8 @@ namespace Assets.Generation.GeomRep
                             {
                                 any_splits = true;
 
-                                Curve c2split1 = c2.CloneWithChangedParams(c2.StartParam, split_points.Item2);
-                                Curve c2split2 = c2.CloneWithChangedParams(split_points.Item2, c2.EndParam);
+                                Curve c2split1 = c2.CloneWithChangedExtents(c2.StartParam, split_points.Item2);
+                                Curve c2split2 = c2.CloneWithChangedExtents(split_points.Item2, c2.EndParam);
 
                                 working_loop2[j] = c2split1;
                                 working_loop2.Insert(j + 1, c2split2);

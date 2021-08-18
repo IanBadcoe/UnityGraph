@@ -1,12 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
-using NUnit.Framework;
-using UnityEngine;
-using UnityEngine.TestTools;
 using Assets.Generation.G;
-using System;
 using Assets.Generation.GeomRep;
 using Assets.Generation.Templates;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 public class GraphTest
 {
@@ -221,43 +219,61 @@ public class GraphTest
         public bool Compare(Graph g)
         {
             if (m_nodes.Count != g.NumNodes())
+            {
                 return false;
+            }
 
             if (!m_nodes.SetEquals(new HashSet<Node>(g.GetAllNodes())))
+            {
                 return false;
+            }
 
             if (m_edges.Count != g.NumEdges())
+            {
                 return false;
+            }
 
             if (!m_edges.SetEquals(new HashSet<DirectedEdge>(g.GetAllEdges())))
+            {
                 return false;
+            }
 
             foreach (Node n in g.GetAllNodes())
             {
                 if (n.Position != m_positions[n])
+                {
                     return false;
+                }
 
                 if (n.Parent != m_metas[n])
+                {
                     return false;
+                }
 
                 foreach (DirectedEdge e in n.GetConnections())
                 {
                     if (!m_edges.Contains(e))
+                    {
                         return false;
+                    }
                 }
             }
 
             // check that the nodes know about the connections
             foreach (DirectedEdge e in m_edges)
             {
-                Node start = (Node)e.Start;
-                Node end = (Node)e.End;
+                Node start = e.Start;
+                Node end = e.End;
 
                 if (!start.ConnectsForwards(end))
+                {
                     return false;
+                }
 
                 if (!end.ConnectsBackwards(start))
+                {
                     return false;
+                }
             }
 
             return true;

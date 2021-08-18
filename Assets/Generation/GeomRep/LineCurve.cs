@@ -10,9 +10,6 @@ namespace Assets.Generation.GeomRep
     [System.Diagnostics.DebuggerDisplay("From = {StartPos}, To = {EndPos}")]
     public class LineCurve : Curve
     {
-        public override float StartParam { get; }
-        public override float EndParam { get; }
-
         public readonly Vector2 Position;
         public readonly Vector2 Direction;
 
@@ -33,9 +30,8 @@ namespace Assets.Generation.GeomRep
         }
 
         public LineCurve(Vector2 position, Vector2 directionCosines, float start, float end)
+            : base(start, end)
         {
-            StartParam = start;
-            EndParam = end;
             Position = position;
             Direction = directionCosines;
 
@@ -62,7 +58,7 @@ namespace Assets.Generation.GeomRep
             return par;
         }
 
-        public override Curve CloneWithChangedParams(float start, float end)
+        public override Curve CloneWithChangedExtents(float start, float end)
         {
             return new LineCurve(Position, Direction, start, end);
         }
@@ -91,19 +87,23 @@ namespace Assets.Generation.GeomRep
 
             LineCurve c_lc = (LineCurve)c_after;
 
-            // could also look if they merge the other way around, but current usage knows
-            // the expected order, so no need yet...
-            if ((EndPos - c_lc.StartPos).sqrMagnitude > 1e-6f)
-            {
-                return null;
-            }
 
             if (Direction != c_lc.Direction)
             {
                 return null;
             }
 
-            return new LineCurve(Position, Direction, StartParam, EndParam + c_lc.ParamRange);
+            if ((EndPos - c_lc.StartPos).sqrMagnitude <= 1e-5f)
+            {
+                return new LineCurve(Position, Direction, StartParam, EndParam + c_lc.ParamRange);
+            }
+
+            if ((StartPos - c_lc.EndPos).sqrMagnitude <= 1e-5f)
+            {
+                return new LineCurve(c_lc.Position, Direction, c_lc.StartParam, c_lc.EndParam + ParamRange);
+            }
+
+            return null;
         }
 
         public override float Length
@@ -221,8 +221,8 @@ namespace Assets.Generation.GeomRep
                 // whether we are significantly away from an existing end
                 if (split_param > c.StartParam + tol && split_param < c.EndParam - tol)
                 {
-                    curve_list[i] = c.CloneWithChangedParams(c.StartParam, split_param);
-                    curve_list.Insert(i + 1, c.CloneWithChangedParams(split_param, c.EndParam));
+                    curve_list[i] = c.CloneWithChangedExtents(c.StartParam, split_param);
+                    curve_list.Insert(i + 1, c.CloneWithChangedExtents(split_param, c.EndParam));
 
                     // we really ought to hit only one curve with one split-point
                     return;
