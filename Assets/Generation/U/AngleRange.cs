@@ -171,44 +171,52 @@ namespace Assets.Generation.U
 
             // special cases, if either range is a whole circle, then the return is just the other range
             // (awkward to work that out with the below code...)
+            //
+            // EXCEPT (warning: awkward matter of definitions) if the two ranges are:
+            // 0 -> 2PI and PI -> 3PI, then returning either single representation can be misleading
+            // (e.g. when we use this for splitting curves at their "conincident portions" we actually need the end
+            //  of the overlap projected onto each curve, and for this case those are 0 and PI,
+            //  so here we allow adding both, but if they are the same one will get removed before we
+            //  return.  And if we leave both in, that will give us both splitpoints)
+
             if (a.IsCyclic)
             {
                 ret.Add(b);
-
-                return ret;
             }
 
             if (b.IsCyclic)
             {
                 ret.Add(a);
-
-                return ret;
             }
 
+            if (!a.IsCyclic && !b.IsCyclic)
             {
-                // rotate angles by whole turns so that b_start is >= a_start
-                // (both ends are already > their resp. start)
-                float b_start_r = FixupAngleRelative(a.Start, b.Start);
-                // shift b.End by the same amount
-                float b_end_r = b.End + b_start_r - b.Start;
 
-                if (b_start_r + tol < a.End)
                 {
-                    ret.Add(new AngleRange(
-                        b_start_r, Math.Min(a.End, b_end_r)));
+                    // rotate angles by whole turns so that b_start is >= a_start
+                    // (both ends are already > their resp. start)
+                    float b_start_r = FixupAngleRelative(a.Start, b.Start);
+                    // shift b.End by the same amount
+                    float b_end_r = b.End + b_start_r - b.Start;
+
+                    if (b_start_r + tol < a.End)
+                    {
+                        ret.Add(new AngleRange(
+                            b_start_r, Math.Min(a.End, b_end_r)));
+                    }
                 }
-            }
 
-            {
-                // rotate angles by whole turns so that both ends are >= their starts,
-                // and a_start is > b_start
-                float a_start_r = FixupAngleRelative(b.Start, a.Start);
-                float a_end_r = a.End + a_start_r - a.Start;
-
-                if (a_start_r + tol < b.End)
                 {
-                    ret.Add(new AngleRange(
-                        a_start_r, Math.Min(b.End, a_end_r)));
+                    // rotate angles by whole turns so that both ends are >= their starts,
+                    // and a_start is > b_start
+                    float a_start_r = FixupAngleRelative(b.Start, a.Start);
+                    float a_end_r = a.End + a_start_r - a.Start;
+
+                    if (a_start_r + tol < b.End)
+                    {
+                        ret.Add(new AngleRange(
+                            a_start_r, Math.Min(b.End, a_end_r)));
+                    }
                 }
             }
 

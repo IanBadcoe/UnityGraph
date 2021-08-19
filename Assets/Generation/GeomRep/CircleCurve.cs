@@ -135,6 +135,7 @@ namespace Assets.Generation.GeomRep
         public override int GetHashCode()
         {
             return base.GetHashCode_Inner() * 17
+                  ^ AngleRange.GetHashCode() * 93
                   ^ Position.GetHashCode() * 31
                   ^ Radius.GetHashCode() * 11
                   ^ (Rotation == RotationDirection.Forwards ? 1 : 0);
