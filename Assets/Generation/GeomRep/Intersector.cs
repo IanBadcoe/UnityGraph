@@ -1275,7 +1275,9 @@ namespace Assets.Generation.GeomRep
                         c1 = ret.Item1[0];
                     }
 
-                    ValidateEndSpliceMap(endSpliceMap, working_loop1.Concat(working_loop2).ToList());
+#if DEBUG
+                    ValidateEndSpliceMap(endSpliceMap, working_loop2.Concat(working_loop2).ToList());
+#endif
 
                     if (ret.Item2 != null)
                     {
@@ -1316,7 +1318,9 @@ namespace Assets.Generation.GeomRep
                         c2 = ret.Item2[0];
                     }
 
-                    ValidateEndSpliceMap(endSpliceMap, working_loop1.Concat(working_loop2).ToList());
+#if DEBUG
+                    ValidateEndSpliceMap(endSpliceMap, working_loop2.Concat(working_loop2).ToList());
+#endif
                 }
             }
 
@@ -1349,7 +1353,9 @@ namespace Assets.Generation.GeomRep
                 }
             }
 
-            ValidateEndSpliceMap(endSpliceMap, working_loop1.Concat(working_loop2).ToList());
+#if DEBUG
+            ValidateEndSpliceMap(endSpliceMap, working_loop2.Concat(working_loop2).ToList());
+#endif
 
             return any_found;
         }
