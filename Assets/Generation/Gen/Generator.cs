@@ -29,6 +29,7 @@ namespace Assets.Generation.Gen
             GraphExpand,
             FinalRelax,
             FinalEdgeAdjust,
+            Geometry,
             Done
         }
 
@@ -76,13 +77,16 @@ namespace Assets.Generation.Gen
                                 return FinalEdgeAdjustStep();
                             }
 
-                            m_phase = Phase.Done;
+                            m_phase = Phase.Geometry;
 
                             return new StepperController.StatusReportInner(StepperController.Status.Iterate,
                                 null, "Finalising...");
 
+                        case Phase.Geometry:
+                            return GenerateGeometry();
+
                         case Phase.Done:
-                            return Done();
+                            break;
                     }
                     break;
             }
@@ -136,15 +140,15 @@ namespace Assets.Generation.Gen
                   child, "Adjusting edges...");
         }
 
-        private StepperController.StatusReportInner Done()
+        private StepperController.StatusReportInner GenerateGeometry()
         {
+            m_phase = Phase.Done;
+
             UnionHelper = new UnionHelper();
 
             UnionHelper.GenerateGeometry(Graph);
 
             UnionHelper.UnionAll(Config.Rand(), LCB);
-
-            m_phase = Phase.Done;
 
             return new StepperController.StatusReportInner(StepperController.Status.StepOutSuccess,
                         null, "Geometry merged.");
