@@ -135,7 +135,12 @@ public class IntersectorTest
             cc2
         };
 
-        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
+        var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+        m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+        m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
 
         // we cut each curve twice, technically we could anneal the original curve across its
         // join at 2PI -> 0.0 but we don't currently try anything clever like that
@@ -174,7 +179,12 @@ public class IntersectorTest
             cc2
         };
 
-        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
+        var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+        m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+        m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
 
         Assert.AreEqual(2, curves1.Count);
         Assert.AreEqual(2, curves2.Count);
@@ -207,7 +217,12 @@ public class IntersectorTest
             cc2
         };
 
-        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
+        var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+        m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+        m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
 
         Assert.AreEqual(1, curves1.Count);
         Assert.AreEqual(1, curves2.Count);
@@ -237,7 +252,12 @@ public class IntersectorTest
             cc2
         };
 
-        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
+        var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+        m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+        m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
 
         Assert.AreEqual(1, curves1.Count);
         Assert.AreEqual(2, curves2.Count);
@@ -265,7 +285,12 @@ public class IntersectorTest
             curves2.Add(cc2);
         }
 
-        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
+        var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+        m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+        m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
 
         Assert.AreEqual(6, curves1.Count);
 
@@ -276,133 +301,6 @@ public class IntersectorTest
                 ((CircleCurve)curves1[i]).AngleRange.End,
                 ((CircleCurve)curves1[next_i]).AngleRange.Start, 1e-5f));
             Assert.IsTrue(curves1[i].EndPos.Equals(curves1[next_i].StartPos, 1e-5f));
-        }
-    }
-
-    [Test]
-    public void TestFindSplices()
-    {
-        {
-            Curve cc1 = new CircleCurve(new Vector2(), 1);
-            Curve cc2 = new CircleCurve(new Vector2(1, 0), 1);
-
-            List<Curve> curves1 = new List<Curve>
-            {
-                cc1
-            };
-
-            List<Curve> curves2 = new List<Curve>
-            {
-                cc2
-            };
-
-            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
-
-            Dictionary<Curve, Intersector.AnnotatedCurve> forward_annotations_map = Intersector.MakeForwardAnnotationsMap();
-
-            m_intersector.BuildAnnotationChains(curves1, 1,
-                  forward_annotations_map);
-
-            m_intersector.BuildAnnotationChains(curves2, 2,
-                  forward_annotations_map);
-
-            var open = Intersector.MakeOpenSet(forward_annotations_map);
-
-            Dictionary<Curve, List<Intersector.AnnotatedCurve>> endSpliceMap = Intersector.MakeEndSpliceMap();
-
-            List<Curve> all_curves = curves1.Concat(curves2).ToList();
-
-            var clustered_joints = m_intersector.ClusterJoints(
-                new HashSet<Vector2>(
-                    all_curves.SelectMany(c => new List<Vector2> { c.StartPos, c.EndPos })), 1e-4f);
-
-            m_intersector.FindSplices(open, clustered_joints, endSpliceMap);
-
-            // four splices:
-            // 2 on the 12 o'clock original breaks in the two curves with one in and one out
-            // 2 on the new intersections, with 2 ins and 2 outs
-            Assert.AreEqual(6, endSpliceMap.Count);
-
-            HashSet<List<Intersector.AnnotatedCurve>> unique = new HashSet<List<Intersector.AnnotatedCurve>>(endSpliceMap.Values);
-
-            Assert.AreEqual(4, unique.Count);
-
-            foreach (var c in all_curves)
-            {
-                Assert.IsTrue(endSpliceMap.Keys.Contains(c));
-
-                foreach (var c2 in endSpliceMap[c])
-                {
-                    // everything in our endSpliceMap should start very close to our end...
-                    Assert.IsTrue((c.EndPos - c2.Curve.StartPos).magnitude < 1.5e-4f);
-                }
-            }
-        }
-
-        {
-            Curve cc1 = new CircleCurve(new Vector2(), 1);
-            Curve cc2 = new CircleCurve(new Vector2(1, 0), 1);
-            Loop l3 = Loop.MakeRect(0.5f, -2, 3, 2);
-
-            List<Curve> curves1 = new List<Curve> { cc1 };
-
-            List<Curve> curves2 = new List<Curve> { cc2 };
-
-            List<Curve> curves3 = l3.Curves.ToList();
-
-            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
-            m_intersector.SplitCurvesAtIntersections(curves1, curves3, 1e-5f);
-            m_intersector.SplitCurvesAtIntersections(curves2, curves3, 1e-5f);
-
-            Dictionary<Curve, Intersector.AnnotatedCurve> forward_annotations_map = Intersector.MakeForwardAnnotationsMap();
-
-            m_intersector.BuildAnnotationChains(curves1, 1,
-                  forward_annotations_map);
-
-            m_intersector.BuildAnnotationChains(curves2, 2,
-                  forward_annotations_map);
-
-            m_intersector.BuildAnnotationChains(curves3, 3,
-                  forward_annotations_map);
-
-            var open = Intersector.MakeOpenSet(forward_annotations_map);
-
-            Dictionary<Curve, List<Intersector.AnnotatedCurve>> endSpliceMap = Intersector.MakeEndSpliceMap();
-
-            var clustered_joints = m_intersector.ClusterJoints(
-                new HashSet<Vector2>(
-                    curves1
-                        .Concat(curves2)
-                        .Concat(curves3)
-                        .SelectMany(c => new List<Vector2> { c.StartPos, c.EndPos })),
-                1e-4f);
-
-            Assert.AreEqual(8, clustered_joints.Count);
-
-            m_intersector.FindSplices(open, clustered_joints, endSpliceMap);
-
-            // eight splices:
-            // 2 on the 12 o'clock original breaks in the two curves with one in and one out
-            // 4 around the rectangle with one in and one out
-            // 2 on the new intersections, with 3 ins and 3 outs
-
-            // means 10 curves running into a splice
-            Assert.AreEqual(12, endSpliceMap.Count);
-
-            HashSet<List<Intersector.AnnotatedCurve>> unique = new HashSet<List<Intersector.AnnotatedCurve>>(endSpliceMap.Values);
-
-            Assert.AreEqual(8, unique.Count);
-
-            foreach (List<Intersector.AnnotatedCurve> s in unique)
-            {
-                HashSet<int> loop_nums = new HashSet<int>(s.Select(x => x.LoopNumber));
-
-                // each loop should feature up to once in each splice
-                Assert.AreEqual(s.Select(x => x.LoopNumber).Count(), loop_nums.Count);
-
-                // the way we laid this out, there are no splices where two things meet, just 1 or 3
-                Assert.IsTrue(loop_nums.Count == 1 || loop_nums.Count == 3);
-            }
         }
     }
 
@@ -1943,6 +1841,685 @@ public class IntersectorTest
             Assert.IsTrue(ret.Contains(new Vector2(0.5f, 0.5f)));
             Assert.IsTrue(ret.Contains(new Vector2(10.5f, 0.5f)));
             Assert.IsTrue(ret.Contains(new Vector2(0.5f, 10.5f)));
+        }
+    }
+
+    [Test]
+    public void TestSplitCurvesAtIntersections_SpliceMap()
+    {
+        {
+            // circles miss
+            Curve cc1 = new CircleCurve(new Vector2(), 1);
+            Curve cc2 = new CircleCurve(new Vector2(3, 0), 1);
+
+            List<Curve> curves1 = new List<Curve>
+            {
+                cc1
+            };
+
+            List<Curve> curves2 = new List<Curve>
+            {
+                cc2
+            };
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
+
+            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+        }
+
+        {
+            // circles meet at two points
+            Curve cc1 = new CircleCurve(new Vector2(), 1);
+            Curve cc2 = new CircleCurve(new Vector2(1, 0), 1);
+
+            List<Curve> curves1 = new List<Curve>
+            {
+                cc1
+            };
+
+            List<Curve> curves2 = new List<Curve>
+            {
+                cc2
+            };
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
+
+            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+        }
+
+        {
+            // circles meet at one point
+            Curve cc1 = new CircleCurve(new Vector2(), 1);
+            Curve cc2 = new CircleCurve(new Vector2(2, 0), 1);
+
+            List<Curve> curves1 = new List<Curve>
+            {
+                cc1
+            };
+
+            List<Curve> curves2 = new List<Curve>
+            {
+                cc2
+            };
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
+
+            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+        }
+
+        {
+            // circles meet at one point and it hits the join in one
+            Curve cc1 = new CircleCurve(new Vector2(), 1);
+            Curve cc2 = new CircleCurve(new Vector2(0, 2), 1);
+
+            List<Curve> curves1 = new List<Curve>
+            {
+                cc1
+            };
+
+            List<Curve> curves2 = new List<Curve>
+            {
+                cc2
+            };
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
+
+            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+        }
+
+        {
+            // as above, but other way around
+            Curve cc1 = new CircleCurve(new Vector2(), 1);
+            Curve cc2 = new CircleCurve(new Vector2(0, 2), 1);
+
+            List<Curve> curves1 = new List<Curve>
+            {
+                cc1
+            };
+
+            List<Curve> curves2 = new List<Curve>
+            {
+                cc2
+            };
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtIntersections(curves2, curves1, 1e-5f, endSpliceMap);
+
+            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+        }
+
+        {
+            // circles meet at one point and it hits the join in both
+            Curve cc1 = new CircleCurve(new Vector2(), 1);
+            Curve cc2 = new CircleCurve(new Vector2(0, 2), 1, Mathf.PI, Mathf.PI * 3);
+
+            List<Curve> curves1 = new List<Curve>
+            {
+                cc1
+            };
+
+            List<Curve> curves2 = new List<Curve>
+            {
+                cc2
+            };
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
+
+            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+        }
+
+        {
+            // all splits hit existing gaps
+            // circles meet at one point and it hits the join in both
+            Curve cc1 = new CircleCurve(new Vector2(), 1, 0, Mathf.PI);
+            Curve cc2 = new CircleCurve(new Vector2(0, 2), 1, Mathf.PI, Mathf.PI * 2);
+
+            List<Curve> curves1 = new List<Curve>
+            {
+                cc1, cc2
+            };
+
+            List<Curve> curves2 = Loop.MakeRect(0, -1, 2, 1).Curves.ToList();
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
+
+            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+        }
+
+        {
+            // figure 8 shape with another line hitting the cross over:
+            //
+            // +---+
+            // |   |
+            // +---+---+
+            //     |   |
+            //     +---+
+            //
+            // lines not crossing in middle, case
+
+            List<Curve> curves1 = new List<Curve>
+            {
+                new LineCurve(new Vector2(0, 0), new Vector2(1, 0), 1),
+                new LineCurve(new Vector2(1, 0), new Vector2(0, -1), 1),
+                new LineCurve(new Vector2(1, -1), new Vector2(-1, 0), 1),
+                new LineCurve(new Vector2(0, -1), new Vector2(0, 1), 1),
+                new LineCurve(new Vector2(0, 0), new Vector2(-1, 0), 1),
+                new LineCurve(new Vector2(-1, 0), new Vector2(0, 1), 1),
+                new LineCurve(new Vector2(-1, 1), new Vector2(1, 0), 1),
+                new LineCurve(new Vector2(0, 1), new Vector2(0, -1), 1),
+            };
+
+            new Loop("", curves1);
+
+            List<Curve> curves2 = new List<Curve>
+            {
+                new LineCurve(new Vector2(-3, -3), new Vector2(1, 1).normalized, Mathf.Sqrt(72)),
+                new LineCurve(new Vector2(3, 3), new Vector2(1, -1).normalized, Mathf.Sqrt(72)),
+                new LineCurve(new Vector2(9, -3), new Vector2(-1, -1).normalized, Mathf.Sqrt(72)),
+                new LineCurve(new Vector2(3, -9), new Vector2(-1, 1).normalized, Mathf.Sqrt(72)),
+            };
+
+            new Loop("", curves2);
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
+
+            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+        }
+    }
+
+    private void ValidateSpliceMap(Dictionary<Curve, Intersector.Splice> endSpliceMap,
+        IList<Curve> allCurves)
+    {
+        int size = allCurves.Count;
+
+        Assert.AreEqual(size, endSpliceMap.Count);
+
+        Dictionary<Curve, int> forward_counts = new Dictionary<Curve, int>(
+            new Intersector.ReferenceComparer<Curve>());
+        Dictionary<Curve, int> backward_counts = new Dictionary<Curve, int>(
+            new Intersector.ReferenceComparer<Curve>());
+
+        foreach(var c in allCurves)
+        {
+            Assert.IsTrue(endSpliceMap.ContainsKey(c));
+        }
+
+        foreach (var c in endSpliceMap.Keys)
+        {
+            Assert.IsTrue(endSpliceMap[c].BackwardLinks.Contains(c));
+        }
+
+        foreach (var c in endSpliceMap.Values.SelectMany(x => x.ForwardLinks))
+        {
+            forward_counts[c] = 0;
+        }
+
+        foreach (var c in endSpliceMap.Values.SelectMany(x => x.BackwardLinks))
+        {
+            backward_counts[c] = 0;
+        }
+
+        Assert.AreEqual(size, forward_counts.Count);
+        Assert.AreEqual(size, backward_counts.Count);
+
+        var hfk = new HashSet<Curve>(forward_counts.Keys,
+            new Intersector.ReferenceComparer<Curve>());
+        var hbk = new HashSet<Curve>(backward_counts.Keys,
+            new Intersector.ReferenceComparer<Curve>());
+
+        Assert.IsTrue(hfk.SetEquals(hbk));
+
+        // looking at _unique_ splices, each curve should enter and exit exactly one
+        foreach (var splice in endSpliceMap.Values.Distinct())
+        {
+            Assert.AreEqual(splice.ForwardLinks.Count, splice.BackwardLinks.Count);
+
+            foreach(var c in splice.ForwardLinks)
+            {
+                Assert.IsTrue(endSpliceMap.ContainsKey(c));
+
+                forward_counts[c]++;
+            }
+
+            foreach (var c in splice.BackwardLinks)
+            {
+                Assert.IsTrue(endSpliceMap.ContainsKey(c));
+
+                backward_counts[c]++;
+            }
+        }
+
+        foreach(var c in forward_counts.Keys)
+        {
+            Assert.AreEqual(1, forward_counts[c]);
+            Assert.AreEqual(1, backward_counts[c]);
+        }
+    }
+
+    [Test]
+    public void TestSplitCoincidentCurves()
+    {
+        {
+            // two circles, breaking in the same place
+            List<Curve> curves1 = new List<Curve>
+            {
+                new CircleCurve(new Vector2(), 1)
+            };
+
+            List<Curve> curves2 = new List<Curve>
+            {
+                new CircleCurve(new Vector2(), 1)
+            };
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+
+            Assert.AreEqual(1, curves1.Count);
+            Assert.AreEqual(1, curves2.Count);
+        }
+
+        {
+            // two circles, breaking different places
+            List<Curve> curves1 = new List<Curve>
+            {
+                new CircleCurve(new Vector2(), 1)
+            };
+
+            List<Curve> curves2 = new List<Curve>
+            {
+                new CircleCurve(new Vector2(), 1, Mathf.PI, Mathf.PI * 3)
+            };
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+
+            Assert.AreEqual(2, curves1.Count);
+            Assert.AreEqual(2, curves2.Count);
+
+            var left1 = curves1.OrderBy(x => x.Pos(0.5f, false).x).First() as CircleCurve;
+            var left2 = curves2.OrderBy(x => x.Pos(0.5f, false).x).First() as CircleCurve;
+            var right1 = curves1.OrderBy(x => x.Pos(0.5f, false).x).Last() as CircleCurve;
+            var right2 = curves2.OrderBy(x => x.Pos(0.5f, false).x).Last() as CircleCurve;
+
+            Assert.IsTrue(left1.Equals(left2, 1e-5f));
+            Assert.IsTrue(right1.Equals(right2, 1e-5f));
+        }
+
+        {
+            // two circles, one in two pieces
+            List<Curve> curves1 = new List<Curve>
+            {
+                new CircleCurve(new Vector2(), 1)
+            };
+
+            List<Curve> curves2 = new List<Curve>
+            {
+                new CircleCurve(new Vector2(), 1, 0, Mathf.PI),
+                new CircleCurve(new Vector2(), 1, Mathf.PI, Mathf.PI * 2)
+            };
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+
+            Assert.AreEqual(2, curves1.Count);
+            Assert.AreEqual(2, curves2.Count);
+
+            var left1 = curves1.OrderBy(x => x.Pos(0.5f, false).x).First() as CircleCurve;
+            var left2 = curves2.OrderBy(x => x.Pos(0.5f, false).x).First() as CircleCurve;
+            var right1 = curves1.OrderBy(x => x.Pos(0.5f, false).x).Last() as CircleCurve;
+            var right2 = curves2.OrderBy(x => x.Pos(0.5f, false).x).Last() as CircleCurve;
+
+            Assert.IsTrue(left1.Equals(left2, 1e-5f));
+            Assert.IsTrue(right1.Equals(right2, 1e-5f));
+        }
+
+        for(int i = 0; i < 6; i++)
+        {
+            // two circles, one in three pieces
+            // (requiring the other to be split twice for one segment of the first)
+            List<Curve> curves1 = new List<Curve>
+            {
+                new CircleCurve(new Vector2(), 1)
+            };
+
+            List<Curve> curves2 = new List<Curve>
+            {
+                new CircleCurve(new Vector2(), 1, 0, Mathf.PI - 1),
+                new CircleCurve(new Vector2(), 1, Mathf.PI - 1, Mathf.PI + 1),
+                new CircleCurve(new Vector2(), 1, Mathf.PI + 1, Mathf.PI * 2),
+            };
+
+            // the order of presentation might matter here, so try all cyclic permutations
+            curves2 = curves2.Skip(i % 3).Concat(curves2).Take(3).ToList();
+
+            if (i >= 3)
+            {
+                var temp = curves1;
+                curves1 = curves2;
+                curves2 = temp;
+            }
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+
+            Assert.AreEqual(3, curves1.Count);
+            Assert.AreEqual(3, curves2.Count);
+
+            var left1 = curves1.OrderBy(x => x.Pos(0.5f, false).x).First() as CircleCurve;
+            var left2 = curves2.OrderBy(x => x.Pos(0.5f, false).x).First() as CircleCurve;
+            var mid1 = curves2.OrderBy(x => x.Pos(0.5f, false).x).Skip(1).First() as CircleCurve;
+            var mid2 = curves2.OrderBy(x => x.Pos(0.5f, false).x).Skip(1).First() as CircleCurve;
+            var right1 = curves1.OrderBy(x => x.Pos(0.5f, false).x).Last() as CircleCurve;
+            var right2 = curves2.OrderBy(x => x.Pos(0.5f, false).x).Last() as CircleCurve;
+
+            Assert.IsTrue(left1.Equals(left2, 1e-5f));
+            Assert.IsTrue(mid1.Equals(mid2, 1e-5f));
+            Assert.IsTrue(right1.Equals(right2, 1e-5f));
+        }
+
+        {
+            // two rectangles, aligned along one edge
+            List<Curve> curves1 = Loop.MakeRect(0, 0, 1, 1).Curves.ToList();
+
+            List<Curve> curves2 = Loop.MakeRect(0, 1, 1, 2).Curves.ToList();
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+
+            Assert.AreEqual(4, curves1.Count);
+            Assert.AreEqual(4, curves2.Count);
+        }
+
+        {
+            // two rectangles, offset along one edge
+            List<Curve> curves1 = Loop.MakeRect(0, 0, 1, 1).Curves.ToList();
+
+            List<Curve> curves2 = Loop.MakeRect(0.5f, 1, 1.5f, 2).Curves.ToList();
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+
+            Assert.AreEqual(5, curves1.Count);
+            Assert.AreEqual(5, curves2.Count);
+        }
+
+        {
+            // two rectangles, offset (other way) along one edge
+            List<Curve> curves1 = Loop.MakeRect(0, 0, 1, 1).Curves.ToList();
+
+            List<Curve> curves2 = Loop.MakeRect(-0.5f, 1, 0.5f, 2).Curves.ToList();
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+
+            Assert.AreEqual(5, curves1.Count);
+            Assert.AreEqual(5, curves2.Count);
+        }
+
+        {
+            // two rectangles, touching on one edge, one inside in both directions
+            List<Curve> curves1 = Loop.MakeRect(0, 0, 1, 1).Curves.ToList();
+
+            List<Curve> curves2 = Loop.MakeRect(0.25f, 1, 0.75f, 2).Curves.ToList();
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+
+            Assert.AreEqual(6, curves1.Count);
+            Assert.AreEqual(4, curves2.Count);
+        }
+
+        {
+            // two rectangles, one inside the other and smaller on one axis
+            List<Curve> curves1 = Loop.MakeRect(0, 0, 1, 1).Curves.ToList();
+
+            List<Curve> curves2 = Loop.MakeRect(0.25f, 0, 0.75f, 1).Curves.ToList();
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+
+            Assert.AreEqual(8, curves1.Count);
+            Assert.AreEqual(4, curves2.Count);
+        }
+    }
+
+    [Test]
+    public void TestSplitCoincidentCurves_SpliceMap()
+    {
+        {
+            // two circles, breaking different places
+            List<Curve> curves1 = new List<Curve>
+            {
+                new CircleCurve(new Vector2(), 1)
+            };
+
+            List<Curve> curves2 = new List<Curve>
+            {
+                new CircleCurve(new Vector2(), 1, Mathf.PI, Mathf.PI * 3)
+            };
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+
+            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+        }
+
+        {
+            // two circles, one in two pieces
+            List<Curve> curves1 = new List<Curve>
+            {
+                new CircleCurve(new Vector2(), 1)
+            };
+
+            List<Curve> curves2 = new List<Curve>
+            {
+                new CircleCurve(new Vector2(), 1, 0, Mathf.PI),
+                new CircleCurve(new Vector2(), 1, Mathf.PI, Mathf.PI * 2)
+            };
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+
+            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+        }
+
+        for (int i = 0; i < 6; i++)
+        {
+            // two circles, one in three pieces
+            // (requiring the other to be split twice for one segment of the first)
+            List<Curve> curves1 = new List<Curve>
+            {
+                new CircleCurve(new Vector2(), 1)
+            };
+
+            List<Curve> curves2 = new List<Curve>
+            {
+                new CircleCurve(new Vector2(), 1, 0, Mathf.PI - 1),
+                new CircleCurve(new Vector2(), 1, Mathf.PI - 1, Mathf.PI + 1),
+                new CircleCurve(new Vector2(), 1, Mathf.PI + 1, Mathf.PI * 2),
+            };
+
+            // the order of presentation might matter here, so try all cyclic permutations
+            curves2 = curves2.Skip(i % 3).Concat(curves2).Take(3).ToList();
+
+            if (i >= 3)
+            {
+                var temp = curves1;
+                curves1 = curves2;
+                curves2 = temp;
+            }
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+
+            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+        }
+
+        {
+            // two rectangles, aligned along one edge
+            List<Curve> curves1 = Loop.MakeRect(0, 0, 1, 1).Curves.ToList();
+
+            List<Curve> curves2 = Loop.MakeRect(0, 1, 1, 2).Curves.ToList();
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+
+            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+        }
+
+        {
+            // two rectangles, offset along one edge
+            List<Curve> curves1 = Loop.MakeRect(0, 0, 1, 1).Curves.ToList();
+
+            List<Curve> curves2 = Loop.MakeRect(0.5f, 1, 1.5f, 2).Curves.ToList();
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+
+            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+        }
+
+        {
+            // two rectangles, offset (other way) along one edge
+            List<Curve> curves1 = Loop.MakeRect(0, 0, 1, 1).Curves.ToList();
+
+            List<Curve> curves2 = Loop.MakeRect(-0.5f, 1, 0.5f, 2).Curves.ToList();
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+
+            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+        }
+
+        {
+            // two rectangles, touching on one edge, one inside in both directions
+            List<Curve> curves1 = Loop.MakeRect(0, 0, 1, 1).Curves.ToList();
+
+            List<Curve> curves2 = Loop.MakeRect(0.25f, 1, 0.75f, 2).Curves.ToList();
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+
+            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+        }
+
+        {
+            // two rectangles, one inside the other and smaller on one axis
+            List<Curve> curves1 = Loop.MakeRect(0, 0, 1, 1).Curves.ToList();
+
+            List<Curve> curves2 = Loop.MakeRect(0.25f, 0, 0.75f, 1).Curves.ToList();
+
+            var endSpliceMap = Intersector.MakeEndSpliceMap();
+
+            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
+            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+
+            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
         }
     }
 
