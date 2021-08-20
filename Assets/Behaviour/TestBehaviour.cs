@@ -10,11 +10,14 @@ namespace Assets.Behaviour
         Dictionary<string, LoopSet> m_loops = new Dictionary<string, LoopSet>();
         public int TestNum = 62;
         public int ShapeNum = 0;
-        public int StepControl = 0;
+        public int StepControl = -1;
+        public List<int> SkipShapes = new List<int>();
+        public bool NeedSetup = true;
 
         ClRand test_rand;
         Intersector intersector = new Intersector();
         LoopSet merged = new LoopSet();
+        LoopSet[] lss = new LoopSet[5];
 
         public override IReadOnlyDictionary<string, LoopSet> GetLoops()
         {
@@ -24,28 +27,40 @@ namespace Assets.Behaviour
         private void Update()
         {
             switch (StepControl) {
+                case -1:
+                    test_rand = new ClRand(TestNum);
+
+                    int j = 0;
+
+                    for(int i = 0; i < 5; i++) {
+                        var ls = RandShapeLoop(test_rand);
+
+                        if (SkipShapes == null || !SkipShapes.Contains(i))
+                        {
+                            lss[j] = ls;
+                            m_loops[$"T{j}"] = ls;
+                            j++;
+                        }
+                    }
+
+                    StepControl++;
+
+                    break;
+
                 case 0:
                     break;
 
                 case 1:
+                    StepControl++;
+
                     try
                     {
-                        // let us jump straight to a given test
-                        if (ShapeNum == 0)
-                        {
-                            test_rand = new ClRand(TestNum);
-                        }
-
-                        LoopSet ls2 = RandShapeLoop(test_rand);
-
-                        m_loops[$"T{ShapeNum}"] = ls2;
-
                         // point here is to run all the Unions internal logic/asserts
-                        merged = intersector.Union(merged, ls2, 1e-5f, new ClRand(1));
-
-                        m_loops["Merged"] = merged;
+                        merged = intersector.Union(merged, lss[ShapeNum], 1e-5f, new ClRand(1));
 
                         ShapeNum++;
+
+                        m_loops["Merged"] = merged;
                     }
                     catch (LoopDisplayException lde)
                     {
@@ -54,7 +69,6 @@ namespace Assets.Behaviour
                         m_loops["T1"] = new LoopSet { lde.Loop2 };
                     }
 
-                    StepControl++;
                     break;
 
                 default:
