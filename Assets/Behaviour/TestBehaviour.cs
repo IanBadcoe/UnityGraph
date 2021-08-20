@@ -8,41 +8,64 @@ namespace Assets.Behaviour
     class TestBehaviour : DataProvider
     {
         Dictionary<string, LoopSet> m_loops = new Dictionary<string, LoopSet>();
+        public int TestNum = 62;
+        public int ShapeNum = 0;
+        public int StepControl = 0;
+
+        ClRand test_rand;
+        Intersector intersector = new Intersector();
+        LoopSet merged = new LoopSet();
 
         public override IReadOnlyDictionary<string, LoopSet> GetLoops()
         {
             return m_loops;
         }
 
-        private void Start()
+        private void Update()
         {
-            try
-            {
-                const int NumShapes = 5;
+            switch (StepControl) {
+                case 0:
+                    break;
 
-                int i = 62;
+                case 1:
+                    try
+                    {
+                        // let us jump straight to a given test
+                        if (ShapeNum == 0)
+                        {
+                            test_rand = new ClRand(TestNum);
+                        }
 
-                Intersector intersector = new Intersector();
+                        LoopSet ls2 = RandShapeLoop(test_rand);
 
-                // let us jump straight to a given test
-                ClRand test_rand = new ClRand(i);
+                        m_loops[$"T{ShapeNum}"] = ls2;
 
-                LoopSet merged = new LoopSet();
+                        // point here is to run all the Unions internal logic/asserts
+                        merged = intersector.Union(merged, ls2, 1e-5f, new ClRand(1));
 
-                for (int j = 0; j < NumShapes; j++)
-                {
-                    LoopSet ls2 = RandShapeLoop(test_rand);
+                        m_loops["Merged"] = merged;
 
-                    // point here is to run all the Unions internal logic/asserts
-                    merged = intersector.Union(merged, ls2, 1e-5f, new ClRand(1));
-                }
+                        ShapeNum++;
+                    }
+                    catch (LoopDisplayException lde)
+                    {
+                        m_loops.Clear();
+                        m_loops["T0"] = new LoopSet { lde.Loop1 };
+                        m_loops["T1"] = new LoopSet { lde.Loop2 };
+                    }
 
-                m_loops["wall"] = merged;
-            }
-            catch (LoopDisplayException lde)
-            {
-                m_loops["wall"] = new LoopSet { lde.Loop1 };
-                m_loops["water"] = new LoopSet { lde.Loop2 };
+                    StepControl++;
+                    break;
+
+                default:
+                    StepControl++;
+
+                    if (StepControl == 30)
+                    {
+                        StepControl = 0;
+                    }
+
+                    break;
             }
         }
 
