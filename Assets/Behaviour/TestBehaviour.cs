@@ -1,81 +1,118 @@
-﻿namespace Assets.Behaviour
+﻿using Assets.Generation.GeomRep;
+using Assets.Generation.U;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Assets.Behaviour
 {
     class TestBehaviour : DataProvider
     {
-        //    List<Loop> m_loops;
+        Dictionary<string, LoopSet> m_loops = new Dictionary<string, LoopSet>();
+        public int TestNum = 62;
+        public int ShapeNum = 0;
+        public int StepControl = -1;
+        public List<int> SkipShapes = new List<int>();
+        public bool NeedSetup = true;
 
-        //    public override IReadOnlyDictionary<string, LoopSet> GetLoops()
-        //    {
-        //        return m_loops;
-        //    }
+        ClRand test_rand;
+        Intersector intersector = new Intersector();
+        LoopSet merged = new LoopSet();
+        LoopSet[] lss = new LoopSet[5];
 
-        //    private void Start()
-        //    {
-        //        try
-        //        {
-        //            const int NumShapes = 5;
+        public override IReadOnlyDictionary<string, LoopSet> GetLoops()
+        {
+            return m_loops;
+        }
 
-        //            int i = 996;
+        private void Update()
+        {
+            switch (StepControl) {
+                case -1:
+                    test_rand = new ClRand(TestNum);
 
-        //            Intersector intersector = new Intersector();
+                    int j = 0;
 
-        //            // let us jump straight to a given test
-        //            ClRand test_rand = new ClRand(i);
+                    for(int i = 0; i < 5; i++) {
+                        var ls = RandShapeLoop(test_rand);
 
-        //            LoopSet merged = new LoopSet();
+                        if (SkipShapes == null || !SkipShapes.Contains(i))
+                        {
+                            lss[j] = ls;
+                            m_loops[$"T{j}"] = ls;
+                            j++;
+                        }
+                    }
 
-        //            for (int j = 0; j < NumShapes; j++)
-        //            {
-        //                LoopSet ls2 = RandShapeLoop(test_rand);
+                    StepControl++;
 
-        //                if (j == 0 || j == 4)
-        //                {
-        //                    // point here is to run all the Unions internal logic/asserts
-        //                    merged = intersector.Union(merged, ls2, 1e-5f, new ClRand(1));
-        //                }
-        //            }
+                    break;
 
-        //            m_loops = merged;
-        //        }
-        //        catch (LoopDisplayException lde)
-        //        {
-        //            m_loops = new List<Loop>()
-        //            {
-        //                lde.Loop1, lde.Loop2
-        //            };
-        //        }
-        //    }
+                case 0:
+                    break;
 
-        //    private LoopSet RandShapeLoop(ClRand test_rand)
-        //    {
-        //        LoopSet ret = new LoopSet();
+                case 1:
+                    StepControl++;
 
-        //        if (test_rand.Nextfloat() > 0.5f)
-        //        {
-        //            ret.Add(new Loop("", new CircleCurve(
-        //                test_rand.Nextpos(0, 10),
-        //                test_rand.Nextfloat() * 2 + 0.1f,
-        //                test_rand.Nextfloat() > 0.5f ? RotationDirection.Forwards : RotationDirection.Reverse)));
-        //        }
-        //        else
-        //        {
-        //            Vector2 p1 = test_rand.Nextpos(0, 10);
-        //            Vector2 p2 = test_rand.Nextpos(0, 10);
-        //            Vector2 p3 = test_rand.Nextpos(0, 10);
+                    try
+                    {
+                        // point here is to run all the Unions internal logic/asserts
+                        merged = intersector.Union(merged, lss[ShapeNum], 1e-5f, new ClRand(1));
 
-        //            // triangles cannot be self-intersecting
-        //            Loop loop = new Loop("", new List<Curve>{
-        //                LineCurve.MakeFromPoints(p1, p2),
-        //                LineCurve.MakeFromPoints(p2, p3),
-        //                LineCurve.MakeFromPoints(p3, p1),
-        //            });
+                        ShapeNum++;
 
-        //            float dist = GeomRepUtil.DistFromLine(p1, p2, p3);
+                        m_loops["Merged"] = merged;
+                    }
+                    catch (LoopDisplayException lde)
+                    {
+                        m_loops.Clear();
+                        m_loops["T0"] = new LoopSet { lde.Loop1 };
+                        m_loops["T1"] = new LoopSet { lde.Loop2 };
+                    }
 
-        //            ret.Add(loop);
-        //        }
+                    break;
 
-        //        return ret;
-        //    }
+                default:
+                    StepControl++;
+
+                    if (StepControl == 30)
+                    {
+                        StepControl = 0;
+                    }
+
+                    break;
+            }
+        }
+
+        private LoopSet RandShapeLoop(ClRand test_rand)
+        {
+            LoopSet ret = new LoopSet();
+
+            if (test_rand.Nextfloat() > 0.5f)
+            {
+                ret.Add(new Loop("", new CircleCurve(
+                    test_rand.Nextpos(0, 10),
+                    test_rand.Nextfloat() * 2 + 0.1f,
+                    test_rand.Nextfloat() > 0.5f ? RotationDirection.Forwards : RotationDirection.Reverse)));
+            }
+            else
+            {
+                Vector2 p1 = test_rand.Nextpos(0, 10);
+                Vector2 p2 = test_rand.Nextpos(0, 10);
+                Vector2 p3 = test_rand.Nextpos(0, 10);
+
+                // triangles cannot be self-intersecting
+                Loop loop = new Loop("", new List<Curve>{
+                        LineCurve.MakeFromPoints(p1, p2),
+                        LineCurve.MakeFromPoints(p2, p3),
+                        LineCurve.MakeFromPoints(p3, p1),
+                    });
+
+                float dist = GeomRepUtil.DistFromLine(p1, p2, p3);
+
+                ret.Add(loop);
+            }
+
+            return ret;
+        }
     }
 }

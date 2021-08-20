@@ -1,0 +1,23 @@
+Union																								tol = 1e-5 or 1e-4
+- ValidatePreviouslyMerged
+-- *							<- is a curve's intersection at either end				0.1mm
+- RemoveIdenticalLoops			<- *identity*											0
+- SplitCurvesAtIntersections																		tol = 5e-4
+-- SplitCurveAtIntersections																		tol = 5e-4
+---CurveCurveIntersect			<- scan off end of curve a little for intersections		1cm
+----WithinParams				<- ditto												ditto
+-- *							<- are we significantly away from an existing end		0.5mm		(tol)
+-- *							<- or from a split we are already adding				0.5mm		(tol)
+- SplitCurvesAtCoincidences																			tol = 1e-4
+-- SplitCurveAtCoincidences																			tol = 1e-4
+--- SplitCoincidentCurves																			tol = 1e-4
+--- (CircleCurve version)
+----                            <- are we the same curve								0.1mm		(tol)			(!!)
+---- ClockAwareRangeOverlap		<- do angle ranges overlap by this much 				0.1rads		(tol)			(!!)
+---- ConditionalSplitCurveList  <- is split point away from ends						0.1rads		(tol)			(!!)
+--- (LineCurve version)
+----                            <- are we the same curve								0.1mm		(tol)			(!!)
+---- ConditionalSplitCurveList  <- is split point away from ends						0.1mm		(tol)			(!!)
+- ClusterJoints																						tol = 1e-4
+-- 								<- are two points in the same centroid					0.1mm		(tol)
+- RemoveUnwantedCurves

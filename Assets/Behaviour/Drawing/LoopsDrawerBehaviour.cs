@@ -10,7 +10,9 @@ namespace Assets.Behaviour.Drawing
         public DataProvider DP;
         public GameObject LoopDrawTemplate;
         public bool ControlCamera;
-        readonly Dictionary<Loop, LineRenderer> RendererMap = new Dictionary<Loop, LineRenderer>();
+        readonly Dictionary<Loop, LineRenderer> RendererMap =
+            new Dictionary<Loop, LineRenderer>(
+                new Intersector.ReferenceComparer<Loop>());
 
         private LayerConfigBehaviour LCB;
 
@@ -33,10 +35,13 @@ namespace Assets.Behaviour.Drawing
                     string layer = loopset.Key;
 
                     Color col = new Color(1, 0.5f, 0.5f);
+                    int draw_priority = 0;
 
                     if (LCB != null)
                     {
                         LCB.ColourDict.TryGetValue(layer, out col);
+                        LCB.PriorityDict.TryGetValue(layer, out draw_priority);
+
                     }
 
                     foreach (var loop in loopset.Value)
@@ -55,6 +60,7 @@ namespace Assets.Behaviour.Drawing
                             lr.positionCount = points.Length;
                             lr.SetPositions(points);
                             lr.startColor = lr.endColor = col;
+                            lr.sortingOrder = draw_priority;
                         }
                     }
                 }
