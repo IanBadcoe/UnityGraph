@@ -17,7 +17,7 @@ namespace Assets.Behaviour.Drawing
 
         Camera Camera;
         // ideally we would abstract drawing away into some base class that Generator would implement
-        // but all the nodes and edges would need to be appropriately based-classed as well (nodes have INode but that
+        // but all the nodes and edges would need to be appropriately based-classed as well (nodes have Node but that
         // is for the reverse purpose, of abstracting the non-positional properties, and probably has drifted away from that
         // by now, anyway...)
         public DataProvider DP;
@@ -37,7 +37,7 @@ namespace Assets.Behaviour.Drawing
             }
         }
 
-        internal void UpdateGeometry(Graph graph)
+        public void UpdateGeometry(Graph graph)
         {
             if (graph == null)
             {
@@ -46,7 +46,7 @@ namespace Assets.Behaviour.Drawing
 
             Dictionary<object, GameObject> n_dict = new Dictionary<object, GameObject>();
 
-            foreach (INode node in graph.GetAllNodes())
+            foreach (Node node in graph.GetAllNodes())
             {
 
                 if (AllDrawers.TryGetValue(node, out GameObject drawer))

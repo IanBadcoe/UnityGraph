@@ -7,24 +7,22 @@ namespace Assets.Generation.Templates
     {
         public readonly NodeRecord From;
         public readonly NodeRecord To;
-        public readonly float MinLength;
         public readonly float MaxLength;
         public readonly float HalfWidth;
-        public readonly uint Colour;
+        public readonly float WallThickness;
         public readonly GeomLayout Layout;
 
         public ConnectionRecord(NodeRecord from, NodeRecord to,
-                         float min_length, float max_length,
+                         float max_length,
                          float half_width,
-                         uint colour,
+                         float wall_thickness,
                          GeomLayout layout)
         {
             From = from;
             To = to;
-            MinLength = min_length;
             MaxLength = max_length;
             HalfWidth = half_width;
-            Colour = colour;
+            WallThickness = wall_thickness;
             Layout = layout;
         }
     }

@@ -1,33 +1,21 @@
 ﻿using Assets.Generation.G;
 using Assets.Generation.GeomRep;
-using Assets.Generation.IoC;
 using Assets.Generation.Stepping;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Generation.Gen
 {
-    internal class EdgeAdjusterStepperFactory : IAdjusterFactory
-    {
-        public IStepper MakeAdjuster(IoCContainer ioc_container, Graph graph, DirectedEdge edge, GeneratorConfig c)
-        {
-            return new EdgeAdjusterStepper(ioc_container, graph, edge, c);
-        }
-    }
-
-    internal class EdgeAdjusterStepper : IStepper
+    public class EdgeAdjusterStepper : IStepper
     {
         public Graph Graph { get; private set; }
 
-        private readonly DirectedEdge m_edge;
         private readonly GeneratorConfig m_config;
-        private readonly IoCContainer m_ioc_container;
 
-        public EdgeAdjusterStepper(IoCContainer ioc_container, Graph graph, DirectedEdge edge, GeneratorConfig config)
+        public EdgeAdjusterStepper(Graph graph, GeneratorConfig config)
         {
             Graph = graph;
-            m_edge = edge;
             m_config = config;
-            m_ioc_container = ioc_container;
         }
 
         public StepperController.StatusReportInner Step(StepperController.Status status)
@@ -35,9 +23,14 @@ namespace Assets.Generation.Gen
             switch (status)
             {
                 case StepperController.Status.StepIn:
-                    SplitEdge();
+                    while (SplitEdge())
+                    {
+                        ;
+                    }
 
-                    IStepper child = m_ioc_container.RelaxerFactory.MakeRelaxer(m_ioc_container, Graph, m_config);
+                    // tried leaving relaxation of these for a later relax step, which we will have anyway
+                    // but that seemed to take longer...
+                    IStepper child = new RelaxerStepper_CG(Graph, m_config);
 
                     return new StepperController.StatusReportInner(StepperController.Status.StepIn,
                           child, "Relaxing split edge.");
@@ -56,25 +49,66 @@ namespace Assets.Generation.Gen
             throw new System.NotSupportedException();
         }
 
-        private void SplitEdge()
+        // only stresses above 50% are considered
+        // (min length of an edge is 75% max length
+        //  so > 150% stressed means we can half it and definitely be zero stress)
+        private DirectedEdge MostStressedEdge(List<DirectedEdge> edges)
         {
-            INode c = Graph.AddNode("c", "", "EdgeExtend",
-                  m_edge.HalfWidth, CircularGeomLayout.Instance);
+            float max_stress = 1.1f;
+            DirectedEdge ret = null;
 
-            Vector2 mid = (m_edge.Start.Position + m_edge.End.Position) / 2;
+            foreach (DirectedEdge e in edges)
+            {
+                float stress = e.Length() / e.MaxLength;
+
+                if (stress > max_stress)
+                {
+                    ret = e;
+                    max_stress = stress;
+                }
+            }
+
+            return ret;
+        }
+
+        private bool SplitEdge()
+        {
+            DirectedEdge e = MostStressedEdge(Graph.GetAllEdges());
+
+            if (e == null)
+            {
+                return false;
+            }
+
+            Node c = Graph.AddNode("c", "",
+                e.HalfWidth, CircularGeomLayout.Instance);
+
+            Vector2 mid = (e.Start.Position + e.End.Position) / 2;
 
             c.Position = mid;
 
-            Graph.Disconnect(m_edge.Start, m_edge.End);
+            Graph.Disconnect(e.Start, e.End);
             // idea of lengths is to force no more length but allow
             // a longer corridor if required
-            DirectedEdge de1 = Graph.Connect(m_edge.Start, c, m_edge.MinLength / 2, m_edge.MaxLength, m_edge.HalfWidth,
+            DirectedEdge de1 = Graph.Connect(e.Start, c, e.MaxLength, e.HalfWidth,
                 CorridorLayout.Instance);
-            DirectedEdge de2 = Graph.Connect(c, m_edge.End, m_edge.MinLength / 2, m_edge.MaxLength, m_edge.HalfWidth,
+            DirectedEdge de2 = Graph.Connect(c, e.End, e.MaxLength, e.HalfWidth,
                 CorridorLayout.Instance);
 
-            de1.Colour = m_edge.Colour;
-            de2.Colour = m_edge.Colour;
+            // if we are unambiguously inside some template's output
+            // then the new node is also inside that
+            // (e.g. if Start and End have the same parent, so will we)
+            // otherwise we are randomly assigned to the cluster of one end or the other
+            if (m_config.Rand().Nextfloat() > 0.5f)
+            {
+                c.Parent = e.Start.Parent;
+            }
+            else
+            {
+                c.Parent = e.End.Parent;
+            }
+
+            return true;
         }
     }
 }

@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
+using Assets.Generation.G;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.TestTools;
-using Assets.Generation.G;
 
 public class DirectedEdgeTest
 {
@@ -28,8 +25,8 @@ public class DirectedEdgeTest
     public void TestHashCode()
     {
         {
-            INode n1 = new Node("a", "1", "a1", 0);
-            INode n2 = new Node("b", "2", "a2", 1);
+            Node n1 = new Node("a", "1", 0);
+            Node n2 = new Node("b", "2", 1);
 
             DirectedEdge e1 = new DirectedEdge(n1, n2, 0, 0, 0);
             DirectedEdge e2 = new DirectedEdge(n1, n2, 1, 2, 3);
@@ -39,9 +36,9 @@ public class DirectedEdgeTest
         }
 
         {
-            INode n1 = new Node("a", "1", "a1", 0);
-            INode n2 = new Node("b", "2", "a2", 1);
-            INode n3 = new Node("c", "3", "a3", 2);
+            Node n1 = new Node("a", "1", 0);
+            Node n2 = new Node("b", "2", 1);
+            Node n3 = new Node("c", "3", 2);
 
             DirectedEdge e1 = new DirectedEdge(n1, n2, 0, 0, 0);
             DirectedEdge e2 = new DirectedEdge(n1, n3, 0, 0, 0);
@@ -53,8 +50,8 @@ public class DirectedEdgeTest
         }
 
         {
-            INode n1 = new Node("a", "1", "a1", 0);
-            INode n2 = new Node("b", "2", "a2", 1);
+            Node n1 = new Node("a", "1", 0);
+            Node n2 = new Node("b", "2", 1);
 
             DirectedEdge e1 = new DirectedEdge(n1, n2, 0, 0, 0);
             DirectedEdge e2 = new DirectedEdge(n2, n1, 0, 0, 0);
@@ -67,10 +64,10 @@ public class DirectedEdgeTest
     [Test]
     public void TestEquals()
     {
-        INode n1 = new Node("a", "1", "a1", 0);
-        INode n2 = new Node("b", "2", "a2", 1);
-        INode n3 = new Node("a", "1", "a1", 0);
-        INode n4 = new Node("b", "2", "a2", 1);
+        Node n1 = new Node("a", "1", 0);
+        Node n2 = new Node("b", "2", 1);
+        Node n3 = new Node("a", "1", 0);
+        Node n4 = new Node("b", "2", 1);
 
         DirectedEdge e1 = new DirectedEdge(n1, n2, 0, 0, 0);
 
@@ -87,9 +84,9 @@ public class DirectedEdgeTest
     [Test]
     public void TestOtherNode()
     {
-        INode n1 = new Node("a", "1", "a1", 0);
-        INode n2 = new Node("b", "2", "a2", 1);
-        INode n3 = new Node("a", "1", "a1", 0);
+        Node n1 = new Node("a", "1", 0);
+        Node n2 = new Node("b", "2", 1);
+        Node n3 = new Node("a", "1", 0);
 
         DirectedEdge e1 = new DirectedEdge(n1, n2, 0, 0, 0);
 
@@ -103,8 +100,8 @@ public class DirectedEdgeTest
     [Test]
     public void TestLength()
     {
-        INode n1 = new Node("a", "1", "a1", 0);
-        INode n2 = new Node("b", "2", "a2", 1);
+        Node n1 = new Node("a", "1", 0);
+        Node n2 = new Node("b", "2", 1);
 
         DirectedEdge e1 = new DirectedEdge(n1, n2, 0, 0, 0);
 
@@ -118,9 +115,9 @@ public class DirectedEdgeTest
     [Test]
     public void TestConnects()
     {
-        INode n1 = new Node("a", "1", "a1", 0);
-        INode n2 = new Node("b", "2", "a2", 1);
-        INode n3 = new Node("a", "1", "a1", 0);
+        Node n1 = new Node("a", "1", 0);
+        Node n2 = new Node("b", "2", 1);
+        Node n3 = new Node("a", "1", 0);
 
         DirectedEdge e1 = new DirectedEdge(n1, n2, 0, 0, 0);
 

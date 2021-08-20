@@ -12,19 +12,22 @@ namespace Assets.Generation.GeomRep
     public class Loop : EqualityBase
     {
         private readonly List<Curve> m_curves = new List<Curve>();
-        private readonly float m_param_range;
+        public readonly float ParamRange;
+        public readonly string Layer;
 
         // only used in unit-tests atm
-        public Loop()
+        public Loop(string layer)
         {
-            m_param_range = 0;
+            ParamRange = 0;
+            Layer = layer;
         }
 
-        public Loop(Curve c)
+        public Loop(string layer, Curve c)
+            : this(layer)
         {
             m_curves.Add(c);
 
-            m_param_range = c.EndParam - c.StartParam;
+            ParamRange = c.EndParam - c.StartParam;
 
             Vector2 s = c.StartPos;
             Vector2 e = c.EndPos;
@@ -35,7 +38,34 @@ namespace Assets.Generation.GeomRep
             }
         }
 
-        public static Loop MakeRect(float x1, float y1, float x2, float y2)
+        public Loop(string layer, IEnumerable<Curve> curves)
+            : this(layer)
+        {
+            m_curves.AddRange(curves);
+
+            float range = 0.0f;
+
+            Curve prev = m_curves[m_curves.Count - 1];
+
+            foreach (Curve curr in m_curves)
+            {
+                range += curr.ParamRange;
+
+                Vector2 c_start = curr.StartPos;
+                Vector2 p_end = prev.EndPos;
+
+                if (!c_start.Equals(p_end, 1e-4f))
+                {
+                    throw new ArgumentException("Curves do not form a closed loop");
+                }
+
+                prev = curr;
+            }
+
+            ParamRange = range;
+        }
+
+        public static Loop MakeRect(float x1, float y1, float x2, float y2, string layer = "")
         {
             Assertion.Assert(x1 <= x2);
             Assertion.Assert(y1 <= y2);
@@ -46,6 +76,7 @@ namespace Assets.Generation.GeomRep
             var c4 = new Vector2(x2, y1);
 
             return new Loop(
+                layer,
                 new List<Curve> {
                     LineCurve.MakeFromPoints(c1, c2),
                     LineCurve.MakeFromPoints(c2, c3),
@@ -54,7 +85,7 @@ namespace Assets.Generation.GeomRep
                 });
         }
 
-        public static Loop MakePolygon(IEnumerable<Vector2> pnts, RotationDirection polarity)
+        public static Loop MakePolygon(IEnumerable<Vector2> pnts, RotationDirection polarity, string layer = "")
         {
             Vector2 prev = pnts.Last();
 
@@ -67,7 +98,7 @@ namespace Assets.Generation.GeomRep
                 prev = curr;
             }
 
-            Loop ret = new Loop(curves);
+            Loop ret = new Loop(layer, curves);
 
             RotationDirection actual_rotation = GeomRepUtil.GetPolygonDirection(ret);
 
@@ -90,38 +121,7 @@ namespace Assets.Generation.GeomRep
                 ret.Insert(0, c.Reversed());
             }
 
-            return new Loop(ret);
-        }
-
-        public Loop(IEnumerable<Curve> curves)
-        {
-            m_curves.AddRange(curves);
-
-            float range = 0.0f;
-
-            Curve prev = m_curves[m_curves.Count - 1];
-
-            foreach (Curve curr in m_curves)
-            {
-                range += curr.EndParam - curr.StartParam;
-
-                Vector2 c_start = curr.StartPos;
-                Vector2 p_end = prev.EndPos;
-
-                if (!c_start.Equals(p_end, 1e-4f))
-                {
-                    throw new ArgumentException("Curves do not form a closed loop");
-                }
-
-                prev = curr;
-            }
-
-            m_param_range = range;
-        }
-
-        public float ParamRange
-        {
-            get => m_param_range;
+            return new Loop(Layer, ret);
         }
 
         public Vector2? ComputePos(float p)
@@ -227,8 +227,6 @@ namespace Assets.Generation.GeomRep
                 {
                     temp.Add(c.Pos(start_p + p, false));
 
-                    // wrong for cicles, as their range is in radians, not meters
-                    // should add a "scaled" param for just this purpose
                     p += param_step;
                 }
             }
@@ -267,7 +265,6 @@ namespace Assets.Generation.GeomRep
                         -c.Normal(p + param_step / 2))
                     );
 
-                    // see comment on Facet
                     p += param_step;
                 }
             }

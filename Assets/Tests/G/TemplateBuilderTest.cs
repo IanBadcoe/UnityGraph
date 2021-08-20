@@ -1,13 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
-using NUnit.Framework;
-using UnityEngine;
-using UnityEngine.TestTools;
-using Assets.Generation.G;
-using System;
-using Assets.Generation.U;
-using Assets.Generation.Templates;
 using Assets.Generation.GeomRep;
+using Assets.Generation.Templates;
+using NUnit.Framework;
+using System;
 
 public class TemplateBuilderTest
 {
@@ -88,7 +82,7 @@ public class TemplateBuilderTest
 
             t.AddNode(NodeRecord.NodeType.Internal, "n1",
                   true, "In", "Out", null,
-                  "xx", 3.0f, CircularGeomLayout.Instance);
+                  "xx", 3.0f, 1.0f, CircularGeomLayout.Instance);
 
             NodeRecord nr = t.FindNodeRecord("n1");
 
@@ -102,6 +96,7 @@ public class TemplateBuilderTest
             Assert.AreEqual("In", nr.PositionOn.Name);
             Assert.AreEqual("Out", nr.PositionTowards.Name);
             Assert.AreEqual(3.0, nr.Radius, 0.0);
+            Assert.AreEqual(1.0, nr.WallThickness, 0.0);
             Assert.AreEqual("xx", nr.Codes);
             Assert.AreEqual(CircularGeomLayout.Instance, nr.Layout);
         }
@@ -114,7 +109,7 @@ public class TemplateBuilderTest
 
             t.AddNode(NodeRecord.NodeType.Internal, "n1",
                   true, "In", null, "Out",
-                  "xx", 3.0f, null);
+                  "xx", 3.0f, -1, null);
 
             NodeRecord nr = t.FindNodeRecord("n1");
 
@@ -128,6 +123,7 @@ public class TemplateBuilderTest
             Assert.AreEqual("In", nr.PositionOn.Name);
             Assert.AreEqual("Out", nr.PositionAwayFrom.Name);
             Assert.AreEqual(3.0, nr.Radius, 0.0);
+            Assert.AreEqual(-1.0, nr.WallThickness, 0.0);
             Assert.AreEqual("xx", nr.Codes);
             Assert.AreEqual(null, nr.Layout);
         }
@@ -239,7 +235,7 @@ public class TemplateBuilderTest
             {
                 t.AddNode(NodeRecord.NodeType.Internal, "n1",
                       true, "q", null, null,
-                      "", 0.0f, null);
+                      "", 0, 0, null);
             }
             catch (TemplateBuilder.UnknownNodeException une)
             {
@@ -260,7 +256,7 @@ public class TemplateBuilderTest
             {
                 t.AddNode(NodeRecord.NodeType.Internal, "n1",
                       true, "<target>", "qq", null,
-                      "", 0.0f, null);
+                      "", 0, 0, null);
             }
             catch (TemplateBuilder.UnknownNodeException une)
             {
@@ -281,7 +277,7 @@ public class TemplateBuilderTest
             {
                 t.AddNode(NodeRecord.NodeType.Internal, "n1",
                       true, "<target>", null, "qqq",
-                      "", 0.0f, null);
+                      "", 0, 0, null);
             }
             catch (TemplateBuilder.UnknownNodeException une)
             {
@@ -302,7 +298,7 @@ public class TemplateBuilderTest
             {
                 t.AddNode(NodeRecord.NodeType.Internal, "x",
                       false, null, null, null,
-                      "", 0, null);
+                      "", 0, 0, null);
             }
             catch (NullReferenceException)
             {
@@ -323,7 +319,7 @@ public class TemplateBuilderTest
 
             try
             {
-                t.Connect(null, "x", 0, 0, 0, null);
+                t.Connect(null, "x", 0, 0, null);
             }
             catch (NullReferenceException)
             {
@@ -340,7 +336,7 @@ public class TemplateBuilderTest
 
             try
             {
-                t.Connect("x", null, 0, 0, 0, null);
+                t.Connect("x", null, 0, 0, null);
             }
             catch (NullReferenceException)
             {
@@ -359,7 +355,7 @@ public class TemplateBuilderTest
 
             try
             {
-                t.Connect("x", "y", 0, 0, 0, null);
+                t.Connect("x", "y", 0, 0, null);
             }
             catch (TemplateBuilder.UnknownNodeException une)
             {
@@ -379,7 +375,7 @@ public class TemplateBuilderTest
 
             try
             {
-                t.Connect("x", "y", 0, 0, 0, null);
+                t.Connect("x", "y", 0, 0, null);
             }
             catch (TemplateBuilder.UnknownNodeException une)
             {
@@ -399,7 +395,7 @@ public class TemplateBuilderTest
 
             try
             {
-                t.Connect("x", "<target>", 0, 0, 0, null);
+                t.Connect("x", "<target>", 0, 0, null);
             }
             catch (ArgumentException)
             {
@@ -418,7 +414,7 @@ public class TemplateBuilderTest
 
             try
             {
-                t.Connect("<target>", "x", 0, 0, 0, null);
+                t.Connect("<target>", "x", 0, 0, null);
             }
             catch (ArgumentException)
             {
@@ -433,14 +429,14 @@ public class TemplateBuilderTest
 
             t.AddNode(NodeRecord.NodeType.In, "a");
             t.AddNode(NodeRecord.NodeType.In, "b");
-            t.Connect("a", "b", 0, 0, 0, null);
+            t.Connect("a", "b", 0, 0, null);
 
             {
                 bool thrown = false;
 
                 try
                 {
-                    t.Connect("a", "b", 1, 2, 3, null);
+                    t.Connect("a", "b", 1, 2, null);
                 }
                 catch (ArgumentException)
                 {
@@ -455,7 +451,7 @@ public class TemplateBuilderTest
 
                 try
                 {
-                    t.Connect("b", "a", 0, 0, 0, null);
+                    t.Connect("b", "a", 0, 0, null);
                 }
                 catch (ArgumentException)
                 {
@@ -481,7 +477,7 @@ public class TemplateBuilderTest
             NodeRecord nra = t.FindNodeRecord("a");
             NodeRecord nrb = t.FindNodeRecord("b");
 
-            t.Connect("a", "b", 1, 2, 3, null);
+            t.Connect("a", "b", 1, 2, null);
 
             Assert.IsNull(t.FindConnectionRecord("b", "a"));
 
@@ -490,9 +486,8 @@ public class TemplateBuilderTest
             Assert.IsNotNull(cr);
             Assert.AreEqual(nra, cr.From);
             Assert.AreEqual(nrb, cr.To);
-            Assert.AreEqual(1, cr.MinLength, 0.0);
-            Assert.AreEqual(2, cr.MaxLength, 0.0);
-            Assert.AreEqual(3, cr.HalfWidth, 0.0);
+            Assert.AreEqual(1, cr.MaxLength, 0.0);
+            Assert.AreEqual(2, cr.HalfWidth, 0.0);
         }
     }
 }

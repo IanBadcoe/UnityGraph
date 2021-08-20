@@ -5,7 +5,7 @@ namespace Assets.Behaviour.Drawing
 {
     public class CircleDrawerBehaviour : MonoBehaviour
     {
-        public INode Node { get; set; }
+        public Node Node { get; set; }
 
         LineRenderer Renderer;
 

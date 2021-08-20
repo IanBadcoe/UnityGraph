@@ -8,13 +8,19 @@ namespace Assets.Generation.GeomRep
 {
     public abstract class Curve : EqualityBase
     {
-        public abstract float StartParam { get; }
-        public abstract float EndParam { get; }
+        public readonly float StartParam;
+        public readonly float EndParam;
 
         public abstract Box2 BoundingArea { get; }
 
         // geometric length between start and end params
         public abstract float Length { get; }
+
+        protected Curve(float startParam, float endParam)
+        {
+            StartParam = startParam;
+            EndParam = endParam;
+        }
 
         public Vector2 StartPos
         {
@@ -81,7 +87,13 @@ namespace Assets.Generation.GeomRep
         // this can return values off the end of our param range, but the caller checks that
         protected abstract float FindParamForPoint_Inner(Vector2 pnt);
 
-        public abstract Curve CloneWithChangedParams(float start, float end);
+        // for a LineCurve this changes the extents along the line in space
+        // and also changes the params (since the params reflect distances from StartPos, and we don't move
+        // StartPos (we could that that, and in theory everything would still work...)
+        //
+        // for a CircleCurve params are always mapped to 0 -> 1, so this doesn't change the params
+        // it just alters the angles they map to
+        public abstract Curve CloneWithChangedExtents(float start_param, float end_param);
 
         public abstract Curve Merge(Curve c_after);
 
@@ -121,7 +133,7 @@ namespace Assets.Generation.GeomRep
 
         private float ClampToParamRange(float p)
         {
-            return Mathf.Min(Mathf.Max(p, StartParam), EndParam);
+            return Mathf.Clamp(p, StartParam, EndParam);
         }
 
         protected abstract Vector2 ComputePos_Inner(float param);

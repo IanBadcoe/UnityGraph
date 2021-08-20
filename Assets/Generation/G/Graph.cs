@@ -1,4 +1,5 @@
 ﻿using Assets.Generation.GeomRep;
+using Assets.Generation.Templates;
 using Assets.Generation.U;
 using System;
 using System.Collections.Generic;
@@ -15,10 +16,16 @@ namespace Assets.Generation.G
 
         public GraphRestore Restore { get; private set; }
 
-        public INode AddNode(string name, string codes, string template, float rad,
-                             GeomLayout layout)
+        public Node AddNode(string name, string codes, float rad,
+                            GeomLayout layout, HierarchyMetadata parent = null)
         {
-            Node n = new Node(name, codes, template, rad, layout);
+            return AddNode(name, codes, rad, 0, layout, parent);
+        }
+
+        public Node AddNode(string name, string codes, float rad, float wall_thickness,
+                            GeomLayout layout, HierarchyMetadata parent = null)
+        {
+            Node n = new Node(name, codes, rad, wall_thickness, layout, parent);
 
             if (Restore != null)
             {
@@ -30,24 +37,26 @@ namespace Assets.Generation.G
             return n;
         }
 
-        public bool RemoveNode(INode inode)
+        public bool RemoveNode(Node Node)
         {
-            if (!Contains(inode))
+            if (!Contains(Node))
             {
                 return false;
             }
 
-            if (inode.GetConnections().Count > 0)
+            if (Node.GetConnections().Count > 0)
             {
                 return false;
             }
 
-            Node node = (Node)inode;
+            Node node = Node;
 
             if (Restore != null)
             {
                 Restore.RemoveNode(node);
             }
+            // restore has made a note of this and will restore if we undo
+            node.Parent = null;
 
             RemoveNodeInner(node);
 
@@ -64,9 +73,14 @@ namespace Assets.Generation.G
             m_nodes.Remove(node);
         }
 
-        public DirectedEdge Connect(INode from, INode to,
+        // mostly use the other form, which assumes min_length = 0.5 * max_length
+        // as that works with the edge adjuster splitting edges > 110% of max_length
+        // (they'll not be over compressed afterwards...)
+        // unit tests use this one extensively, however, top set min = max for unambiguity
+        // in expected length
+        public DirectedEdge Connect(Node from, Node to,
                                     float min_length, float max_length, float half_width,
-                                    GeomLayout layout)
+                                    GeomLayout layout = null, float wall_thickness = 0)
         {
             if (from == to
                   || !Contains(from)
@@ -76,7 +90,7 @@ namespace Assets.Generation.G
                 throw new ArgumentException();
             }
 
-            DirectedEdge temp = new DirectedEdge(from, to, min_length, max_length, half_width, layout);
+            DirectedEdge temp = new DirectedEdge(from, to, min_length, max_length, half_width, wall_thickness, layout);
 
             if (Restore != null)
             {
@@ -86,9 +100,16 @@ namespace Assets.Generation.G
             return ConnectInner(temp);
         }
 
-        public List<INode> GetAllNodes()
+        public DirectedEdge Connect(Node from, Node to,
+                                    float max_length, float half_width,
+                                    GeomLayout layout = null, float wall_thickness = 0)
         {
-            return m_nodes.ToList<INode>();
+            return Connect(from, to, max_length * 0.5f, max_length, half_width, layout, wall_thickness);
+        }
+
+        public List<Node> GetAllNodes()
+        {
+            return m_nodes.ToList<Node>();
         }
 
         public List<DirectedEdge> GetAllEdges()
@@ -110,15 +131,15 @@ namespace Assets.Generation.G
         {
             Assertion.Assert(!m_edges.Contains(e));
 
-            DirectedEdge real_edge = ((Node)e.Start).Connect((Node)e.End, e.MinLength, e.MaxLength, e.HalfWidth,
-                  e.Layout);
+            DirectedEdge real_edge = e.Start.Connect(e.End, e.MinLength, e.MaxLength, e.HalfWidth,
+                  e.Layout, e.WallThickness);
 
             m_edges.Add(real_edge);
 
             return real_edge;
         }
 
-        public bool Disconnect(INode from, INode to)
+        public bool Disconnect(Node from, Node to)
         {
             if (!Contains(from) || !Contains(to))
             {
@@ -144,8 +165,8 @@ namespace Assets.Generation.G
 
         private void DisconnectInner(DirectedEdge e)
         {
-            Node n_from = (Node)e.Start;
-            Node n_to = (Node)e.End;
+            Node n_from = e.Start;
+            Node n_to = e.End;
 
             n_from.Disconnect(n_to);
 
@@ -153,9 +174,9 @@ namespace Assets.Generation.G
             m_edges.Remove(e);
         }
 
-        public bool Contains(INode node)
+        public bool Contains(Node node)
         {
-            return m_nodes.Contains((Node)node);
+            return m_nodes.Contains(node);
         }
 
         public bool Contains(DirectedEdge edge)
@@ -167,7 +188,7 @@ namespace Assets.Generation.G
         {
             Box2 ret = Box2.Empty;
 
-            foreach (INode n in m_nodes)
+            foreach (Node n in m_nodes)
             {
                 Vector2 rad_box = new Vector2(n.Radius, n.Radius);
 
@@ -203,9 +224,9 @@ namespace Assets.Generation.G
             private sealed class NodePos
             {
                 public readonly Vector2 Pos;
-                public readonly INode N;
+                public readonly Node N;
 
-                public NodePos(INode n, Vector2 pos)
+                public NodePos(Node n, Vector2 pos)
                 {
                     Pos = pos;
                     N = n;
@@ -214,7 +235,7 @@ namespace Assets.Generation.G
 
             private readonly Graph m_graph;
             private readonly List<Node> m_nodes_added = new List<Node>();
-            private readonly List<Node> m_nodes_removed = new List<Node>();
+            private readonly Dictionary<Node, HierarchyMetadata> m_nodes_removed = new Dictionary<Node, HierarchyMetadata>();
             private readonly List<NodePos> m_positions = new List<NodePos>();
             private readonly Dictionary<DirectedEdge, RestoreAction> m_connections = new Dictionary<DirectedEdge, RestoreAction>();
             public GraphRestore ChainFrom { get; }
@@ -284,8 +305,11 @@ namespace Assets.Generation.G
                 m_nodes_added.ForEach(n => m_graph.RemoveNodeInner(n));
 
                 // put back anything we removed
-                m_nodes_removed.ForEach(n => m_graph.AddNodeInner(n));
-
+                foreach (var key in m_nodes_removed.Keys)
+                {
+                    m_graph.AddNodeInner(key);
+                    key.Parent = m_nodes_removed[key];
+                }
                 // which means we must be able to restore the original connections
                 foreach (var e in m_connections.Keys)
                 {
@@ -347,7 +371,9 @@ namespace Assets.Generation.G
             {
                 if (!m_nodes_added.Remove(node))
                 {
-                    m_nodes_removed.Add(node);
+                    // the caller needs to disconnect the parent, but if we undo,
+                    // we need to put it back
+                    m_nodes_removed[node] = node.Parent;
                 }
             }
 

@@ -12,22 +12,17 @@ namespace Assets.Generation.Templates
 
         private Dictionary<string, NodeRecord> m_nodes = new Dictionary<string, NodeRecord>();
         private Dictionary<string, ConnectionRecord> m_connections = new Dictionary<string, ConnectionRecord>();
+        private readonly List<ForceRecord> m_extra_forces = new List<ForceRecord>();
 
         // just to avoid keeping counting
         private int m_num_in_nodes = 0;
         private int m_num_out_nodes = 0;
         private int m_num_internal_nodes = 0;
 
+        public float ExtraClusterSeparation;
 
-        // private final Template.IPostExpand m_post_expand;
 
-        //public TemplateBuilder(string name, string codes)
-        //    : this(name, codes, null)
-        //{
-        //}
-
-        public TemplateBuilder(string name, string codes
-            /*, Template.IPostExpand post_expand*/)
+        public TemplateBuilder(string name, string codes)
         {
             Name = name;
             Codes = codes;
@@ -80,29 +75,16 @@ namespace Assets.Generation.Templates
         {
             AddNode(type, name, false,
                     "<target>", null, null,
-                    "", 0f, null);
+                    "", 0, 0, null);
         }
 
         // types In and Out ignore all parameters after "name"
-        public void AddNode(NodeRecord.NodeType type, string name, bool nudge,
-              string positionOnName, string positionTowardsName,
-              string positionAwayFromName,
-              string codes, float radius,
-              GeomLayout layout)
-        {
-            AddNode(type, name, nudge,
-                    positionOnName, positionTowardsName, positionAwayFromName,
-                    codes, radius,
-                    layout,
-                    0xff8c8c8c);
-        }
 
         public void AddNode(NodeRecord.NodeType type, string name, bool nudge,
              string positionOnName, string positionTowardsName,
              string positionAwayFromName,
-             string codes, float radius,
-             GeomLayout layout,
-             uint colour)
+             string codes, float radius, float wall_thickness,
+             GeomLayout layout)
         {
             if (name.Contains("->"))
             {
@@ -167,8 +149,7 @@ namespace Assets.Generation.Templates
 
             m_nodes.Add(name, new NodeRecord(type, name, nudge,
                   positionOn, positionTowards, positionAwayFrom,
-                  codes, radius,
-                  colour,
+                  codes, radius, wall_thickness,
                   layout));
 
             switch (type)
@@ -183,6 +164,14 @@ namespace Assets.Generation.Templates
                     m_num_internal_nodes++;
                     break;
             }
+        }
+
+        internal void ExtraForce(string node1, string node2, float targetDistance, float forceScale)
+        {
+            NodeRecord nr1 = m_nodes[node1];
+            NodeRecord nr2 = m_nodes[node2];
+
+            m_extra_forces.Add(new ForceRecord(targetDistance, nr1, nr2, forceScale));
         }
 
         public NodeRecord FindNodeRecord(string name)
@@ -206,22 +195,10 @@ namespace Assets.Generation.Templates
         }
 
         public void Connect(string from, string to,
-                            float min_length, float max_length,
+                            float max_length,
                             float half_width,
-                            GeomLayout layout)
-        {
-            Connect(from, to,
-                    min_length, max_length,
-                    half_width,
-                    0xffb4b4b4,
-                    layout);
-        }
-
-        public void Connect(string from, string to,
-                            float min_length, float max_length,
-                            float half_width,
-                            uint colour,
-                            GeomLayout layout)
+                            GeomLayout layout,
+                            float wall_thickness = 0)
         {
             if (from == null)
             {
@@ -270,7 +247,7 @@ namespace Assets.Generation.Templates
 
             m_connections.Add(
                   Template.MakeConnectionName(from, to),
-                  new ConnectionRecord(nrf, nrt, min_length, max_length, half_width, colour, layout));
+                  new ConnectionRecord(nrf, nrt, max_length, half_width, wall_thickness, layout));
         }
 
         public ReadOnlyDictionary<string, NodeRecord> GetUnmodifiableNodes()
@@ -281,6 +258,11 @@ namespace Assets.Generation.Templates
         public ReadOnlyDictionary<string, ConnectionRecord> GetUnmodifiableConnections()
         {
             return new ReadOnlyDictionary<string, ConnectionRecord>(m_connections);
+        }
+
+        public IReadOnlyList<ForceRecord> GetUnmodifiableExtraForces()
+        {
+            return m_extra_forces;
         }
 
         public int GetNumInNodes()

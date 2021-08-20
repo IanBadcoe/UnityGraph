@@ -69,8 +69,8 @@ namespace Assets.Generation.G
             return new IntersectionResult(edge1, edge2, p.Item1, p.Item2);
         }
 
-        public static Tuple<float, float> EdgeIntersect(INode edge1Start, INode edge1End,
-                                                          INode edge2Start, INode edge2End)
+        public static Tuple<float, float> EdgeIntersect(Node edge1Start, Node edge1End,
+                                                          Node edge2Start, Node edge2End)
         {
             Assertion.Assert(edge1Start != null);
             Assertion.Assert(edge1End != null);

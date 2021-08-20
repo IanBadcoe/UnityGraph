@@ -130,7 +130,7 @@ namespace Assets.Generation.GeomRep
             // direct params so it would be a pain to change the approach for this one case
 
             // also "false" here as we need to return out-of-range values so we know they are off the end above
-            return l1.Pos(l1.StartParam + (l1.EndParam - l1.StartParam) * ret.Item1, false);
+            return l1.Pos(l1.StartParam + l1.ParamRange * ret.Item1, false);
         }
 
         private static Tuple<Vector2, Vector2?> LineCircleIntersect(LineCurve l1, CircleCurve c2)
@@ -151,12 +151,12 @@ namespace Assets.Generation.GeomRep
             }
 
             // "false" here as we need to return out-of-range values so we know they are off the end above
-            Vector2 hit1 = l2.Pos(l2.StartParam + (l2.EndParam - l2.StartParam) * ret.Item1, false);
+            Vector2 hit1 = l2.Pos(l2.StartParam + l2.ParamRange * ret.Item1, false);
             Vector2? hit2 = null;
 
             if (ret.Item2 != null)
             {
-                hit2 = l2.Pos(l2.StartParam + (l2.EndParam - l2.StartParam) * ret.Item2.Value, false);
+                hit2 = l2.Pos(l2.StartParam + l2.ParamRange * ret.Item2.Value, false);
             }
 
             return new Tuple<Vector2, Vector2?>(hit1, hit2);
