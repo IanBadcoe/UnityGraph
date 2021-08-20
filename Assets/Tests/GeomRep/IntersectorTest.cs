@@ -1028,46 +1028,30 @@ public class IntersectorTest
         }
     }
 
-    // this works but quite erratically,
-    // generally it will fail in Intersector.ExtractLoop where it asserts:
-    //                 Assertion.Assert(splice.Contains(start_ac)
-    //                    || splice.Where(x => open.Contains(x)).Any());
-    // because the allocation of splices to loop ends has messed up
-    //
-    // I think if I go over to assigning splices as:
-    // 1) add them to all input curves
-    // 2) as we split curves add new splices and adjust existing ones
-    //
-    // (it may be necessary to track forward and reverse splice connections to do this
-    //  or if not to do it, to assert all is well)
-    //
-    // then the splices will stop messing up
-    // but not my priority right now
-    // 
-    //[Test]
-    //public void TestRandomUnions()
-    //{
-    //    const int NumTests = 1000;
-    //    const int NumShapes = 5;
+    [Test]
+    public void TestRandomUnions()
+    {
+        const int NumTests = 1000;
+        const int NumShapes = 5;
 
-    //    for (int i = 0; i < NumTests; i++)
-    //    {
-    //        // let us jump straight to a given test
-    //        ClRand test_rand = new ClRand(i);
+        for (int i = 0; i < NumTests; i++)
+        {
+            // let us jump straight to a given test
+            ClRand test_rand = new ClRand(i);
 
-    //        LoopSet merged = new LoopSet();
+            LoopSet merged = new LoopSet();
 
-    //        for (int j = 0; j < NumShapes; j++)
-    //        {
-    //            LoopSet ls2 = RandShapeLoop(test_rand);
+            for (int j = 0; j < NumShapes; j++)
+            {
+                LoopSet ls2 = RandShapeLoop(test_rand);
 
-    //            // point here is to run all the Unions internal logic/asserts
-    //            merged = m_intersector.Union(merged, ls2, 1e-5f, new ClRand(1));
-    //            // any Union output should be good as input to the next stage
-    //            m_intersector.Union(merged, new LoopSet(), 1e-5f, new ClRand(1));
-    //        }
-    //    }
-    //}
+                // point here is to run all the Unions internal logic/asserts
+                merged = m_intersector.Union(merged, ls2, 1e-5f, new ClRand(1));
+                // any Union output should be good as input to the next stage
+                m_intersector.Union(merged, new LoopSet(), 1e-5f, new ClRand(1));
+            }
+        }
+    }
 
     private LoopSet RandShapeLoop(ClRand test_rand)
     {

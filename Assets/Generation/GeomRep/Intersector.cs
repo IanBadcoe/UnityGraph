@@ -1119,14 +1119,24 @@ namespace Assets.Generation.GeomRep
                                 // we're not adding a splice, but our end-splice is now merged with joint
                                 joint.ForwardLinks.AddRange(c2_to.ForwardLinks);
                                 joint.BackwardLinks.AddRange(c2_to.BackwardLinks);
-                                endSpliceMap[c2] = joint;
+
+                                // there can be other curves using our old splice, and they all need swapping to the new one
+                                foreach (var c in c2_to.BackwardLinks)
+                                {
+                                    endSpliceMap[c] = joint;
+                                }
                             }
                             else if (any_splits)
                             {
                                 // we're not adding a splice, but our start-splice is now merged with joint
                                 joint.ForwardLinks.AddRange(c2_from.ForwardLinks);
                                 joint.BackwardLinks.AddRange(c2_from.BackwardLinks);
-                                endSpliceMap[c2_prev] = joint;
+
+                                // there can be other curves using our old splice, and they all need swapping to the new one
+                                foreach (var c in c2_from.BackwardLinks)
+                                {
+                                    endSpliceMap[c] = joint;
+                                }
                             }
 
 #if DEBUG
@@ -1338,8 +1348,7 @@ namespace Assets.Generation.GeomRep
                     var spl2 = endSpliceMap[c2];
                     var p2 = c2.EndPos;
 
-                    // following SplitCurvesAtIntersections, the two curves can already share splices
-                    // so don't try to merge anything that is already the same item :-)
+                    // don't try to merge anything that is already the same item :-)
                     if (ReferenceEquals(spl1, spl2))
                         continue;
 
@@ -1348,7 +1357,11 @@ namespace Assets.Generation.GeomRep
                         spl1.ForwardLinks.AddRange(spl2.ForwardLinks);
                         spl1.BackwardLinks.AddRange(spl2.BackwardLinks);
 
-                        endSpliceMap[c2] = spl1;
+                        // there can be other curves using our old splice, and they all need swapping to the new one
+                        foreach (var c in spl2.BackwardLinks)
+                        {
+                            endSpliceMap[c] = spl1;
+                        }
                     }
                 }
             }
