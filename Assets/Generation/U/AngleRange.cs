@@ -249,14 +249,19 @@ namespace Assets.Generation.U
         {
             float min = Math.Min(Start, End);
 
-            // step down until we're definitely below our range, then step up one, which either puts us in the range
-            // or off the other end
+            // step down until we're definitely below our range, then step up again until we are just above,
+            // which either puts us in the range or off the other end
             while (ang >= min - tol)
             {
                 ang -= Mathf.PI * 2;
             }
 
-            return ang + Mathf.PI * 2;
+            while (ang < min - tol)
+            {
+                ang += Mathf.PI * 2;
+            }
+
+            return ang;
         }
 
         public bool InRange(float angle, bool consider_cyclic = true, float tol = 1e-5f)
