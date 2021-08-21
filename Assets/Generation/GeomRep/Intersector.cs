@@ -1017,7 +1017,11 @@ namespace Assets.Generation.GeomRep
 
                         // we intersect with a broad tolerance, because if we split the occasional curve that is off the end
                         // of another one, it should not be a problem, but not splitting a curve we should will be a problem
-                        List<Tuple<float, float>> ret = GeomRepUtil.CurveCurveIntersect(c1, c2, 0.01f);
+                        //
+                        // PREVIOUS NO LONGER TRUE as we now rely on the detection of intersections to know when
+                        // two curves should be added to the same Splice, and adding the wrong curves to the same splice
+                        // might be bad??
+                        List<Tuple<float, float>> ret = GeomRepUtil.CurveCurveIntersect(c1, c2, 1e-5f);
 
                         if (ret == null)
                         {
