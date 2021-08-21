@@ -11,7 +11,11 @@ namespace Assets.Behaviour
         {
             public string Name;
             public Color Colour;
+            public int DrawPriority;
         }
+
+        public Dictionary<string, Color> ColourDict;
+        public Dictionary<string, int> PriorityDict;
 
         public LayerMaterial[] Colours;
 
@@ -45,15 +49,15 @@ namespace Assets.Behaviour
 
         public LayerCut[] CutSequence;
 
-        public Dictionary<string, Color> ColourDict;
-
         private void Start()
         {
             ColourDict = new Dictionary<string, Color>();
+            PriorityDict = new Dictionary<string, int>();
 
             foreach (var ent in Colours)
             {
                 ColourDict[ent.Name] = ent.Colour;
+                PriorityDict[ent.Name] = ent.DrawPriority;
             }
         }
     }

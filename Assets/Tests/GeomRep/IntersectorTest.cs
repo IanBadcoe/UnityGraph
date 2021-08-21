@@ -832,7 +832,7 @@ public class IntersectorTest
         public override bool RemoveUnwantedCurves(
             float tol, ClRand ClRand,
             Dictionary<Curve, AnnotatedCurve> forward_annotations_map, HashSet<Curve> all_curves,
-            HashSet<AnnotatedCurve> open, HashSet<Vector2> curve_joints, float diameter,
+            HashSet<Curve> open, HashSet<Vector2> curve_joints, float diameter,
             UnionType type)
         {
             return false;
@@ -1043,7 +1043,11 @@ public class IntersectorTest
     //
     // then the splices will stop messing up
     // but not my priority right now
-    // 
+    //
+    // OK, WORKS MUCH BETTER NOW, but now fails when very small curves are generated
+    //
+    // NEEDS THAT REVIEW OF TOLERANCE HANDLING to try and come up with a consistent/stable scheme for
+    // getting round numerical limitations...
     //[Test]
     //public void TestRandomUnions()
     //{

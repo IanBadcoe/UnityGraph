@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 450379233}
   - component: {fileID: 450379232}
   - component: {fileID: 450379231}
+  - component: {fileID: 450379234}
   m_Layer: 0
   m_Name: Test
   m_TagString: Untagged
@@ -168,6 +169,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49a4b3f7939ef1b4ba3747e3260a1f77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TestNum: 307
+  ShapeNum: 0
+  StepControl: -1
+  SkipShapes: 010000000400000000000000
+  NeedSetup: 1
 --- !u!4 &450379233
 Transform:
   m_ObjectHideFlags: 0
@@ -182,6 +188,37 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &450379234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 450379230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0dcf4473ac33d854b93f3433ee8a4f54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Colours:
+  - Name: T0
+    Colour: {r: 0.6117647, g: 0, b: 0, a: 1}
+    DrawPriority: 0
+  - Name: T1
+    Colour: {r: 0.6117647, g: 0, b: 0.5321031, a: 1}
+    DrawPriority: 0
+  - Name: T2
+    Colour: {r: 0.17396487, g: 0, b: 0.6117647, a: 1}
+    DrawPriority: 0
+  - Name: T3
+    Colour: {r: 0, g: 0.3117201, b: 0.6117647, a: 1}
+    DrawPriority: 0
+  - Name: T4
+    Colour: {r: 0, g: 0.6117647, b: 0.5208675, a: 1}
+    DrawPriority: 0
+  - Name: Merged
+    Colour: {r: 1, g: 0.97984564, b: 0.7783019, a: 0.5647059}
+    DrawPriority: 1
 --- !u!1 &1086256364
 GameObject:
   m_ObjectHideFlags: 0

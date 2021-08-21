@@ -174,6 +174,8 @@ namespace Assets.Generation.GeomRep
                 h *= 3;
             }
 
+            h ^= Layer.GetHashCode();
+
             // m_param_range is derivative from the curves
             // so not required in hash
 
