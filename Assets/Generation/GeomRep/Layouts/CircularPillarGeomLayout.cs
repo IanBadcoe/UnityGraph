@@ -36,7 +36,6 @@ namespace Assets.Generation.GeomRep.Layouts
         public override LoopSet MakeGeometry(Node node)
         {
             LoopSet ret = new LoopSet();
-
             float effective_radius = node.Radius;
 
             if (node.WallThickness > 0)
