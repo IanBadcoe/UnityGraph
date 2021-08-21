@@ -47,6 +47,14 @@ namespace Assets.Generation.GeomRep
             public List<Curve> BackwardLinks = new List<Curve>();
         }
 
+        public LoopSet Cut(LoopSet to_cut, LoopSet cut_by, float tol, ClRand random, string layer)
+        {
+            // assuming cut_by has no outer -ve curves (which it shouldn't have if it is the output of a previous union)
+            // removing cut_by from cut is the same as unioning with the inverse
+
+            return Union(to_cut, cut_by.Reversed(), tol, random, layer);
+        }
+
         // union operation cannot return a mix of positive and negative top-level curves
         // e.g. if you think of a negative curve as something subtracted from a positive curve
         // if we have inputs like this:
@@ -343,19 +351,13 @@ namespace Assets.Generation.GeomRep
 
         public void SetupInitialSplices(IList<Curve> loop, Dictionary<Curve, Splice> endSpliceMap)
         {
-//            Dictionary<Vector2, Splice> location_map = new Dictionary<Vector2, Splice>();
-
             var prev = loop.Last();
 
             foreach(var curr in loop)
             {
                 Splice splice;
                 
-                //if (!location_map.TryGetValue(curr.EndPos, out splice))
-                //{
-                    splice = new Splice();
-                //    location_map[curr.EndPos]
-                //}
+                splice = new Splice();
 
                 splice.ForwardLinks.Add(curr);
                 splice.BackwardLinks.Add(prev);
@@ -1015,7 +1017,11 @@ namespace Assets.Generation.GeomRep
 
                         // we intersect with a broad tolerance, because if we split the occasional curve that is off the end
                         // of another one, it should not be a problem, but not splitting a curve we should will be a problem
-                        List<Tuple<float, float>> ret = GeomRepUtil.CurveCurveIntersect(c1, c2, 0.01f);
+                        //
+                        // PREVIOUS NO LONGER TRUE as we now rely on the detection of intersections to know when
+                        // two curves should be added to the same Splice, and adding the wrong curves to the same splice
+                        // might be bad??
+                        List<Tuple<float, float>> ret = GeomRepUtil.CurveCurveIntersect(c1, c2, 1e-5f);
 
                         if (ret == null)
                         {

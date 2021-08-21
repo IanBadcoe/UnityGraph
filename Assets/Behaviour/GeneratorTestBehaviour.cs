@@ -15,6 +15,13 @@ namespace Assets.Behaviour
 
         private Generator m_generator;
 
+        LayerConfigBehaviour LCB;
+
+        private void Awake()
+        {
+            LCB = Transform.FindObjectOfType<LayerConfigBehaviour>();
+        }
+
         public override IReadOnlyDictionary<string, LoopSet> GetLoops()
         {
             if (m_generator != null && m_generator.UnionHelper != null)
@@ -39,7 +46,7 @@ namespace Assets.Behaviour
         {
             Graph graph = new Graph();
 
-            m_generator = new Generator(graph, NodesLimit)
+            m_generator = new Generator(graph, NodesLimit, LCB)
             {
                 Config = Config
             };
