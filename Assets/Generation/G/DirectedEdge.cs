@@ -15,6 +15,19 @@ namespace Assets.Generation.G
 
         public readonly GeomLayout Layout;
 
+        public static DirectedEdge Exemplar = new DirectedEdge();
+
+        private DirectedEdge()
+        {
+            // default corridor, only for use as "Exemplar" above
+            // no-one else is allowed null Start/End
+            MaxLength = 1;
+            MinLength = 1;
+            HalfWidth = 1;
+            WallThickness = 0.1f;
+            Layout = CorridorLayout.Instance;
+        }
+
         // for identity/searching purposes, only start and end count...
         public DirectedEdge(Node start, Node end)
             : this(start, end, 0, 0, 0)
