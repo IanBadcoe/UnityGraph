@@ -64,6 +64,21 @@ namespace Assets.Generation.GeomRep
 
         public void GenerateGeometry(Graph graph)
         {
+            // process edges first, because we want any -ve features of nodes to be able to cut the ends of them
+            // e.g. an island in a lake of fire should cut the rect for the fire river coming in from the edge
+            // and processing that second achieves that
+            foreach (DirectedEdge de in graph.GetAllEdges())
+            {
+                GeomLayout gl = de.Layout;
+
+                LoopSet loops = gl.MakeGeometry(de);
+
+                if (loops != null)
+                {
+                    AddLoops(loops);
+                }
+            }
+
             foreach (Node n in graph.GetAllNodes())
             {
                 GeomLayout gl = n.Layout;
@@ -71,18 +86,6 @@ namespace Assets.Generation.GeomRep
                 LoopSet loops = gl.MakeGeometry(n);
 
                 // can have node with no geometry...  at least in unit-tests
-                if (loops != null)
-                {
-                    AddLoops(loops);
-                }
-            }
-
-            foreach (DirectedEdge de in graph.GetAllEdges())
-            {
-                GeomLayout gl = de.Layout;
-
-                LoopSet loops = gl.MakeGeometry(de);
-
                 if (loops != null)
                 {
                     AddLoops(loops);
