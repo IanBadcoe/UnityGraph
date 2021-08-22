@@ -896,22 +896,21 @@ namespace Assets.Generation.GeomRep
                 {
                     Curve c_start = ret[i];
 
-                    // on first two passes, look for a non-strippable LineCurves to merge
+                    // on first two passes (forward and backwards), look for a non-strippable LineCurves to merge
                     // any following tiny curves into
                     //
                     // (have not worked out if there is a way to do that with CircleCurves, maybe
                     //  by fitting a new circle to the orig start, changed end and orig mid-point
                     //  but that would move the centre and I am concerned the new circle would no-longer overlay
                     //  other circles it is supposed to, of course, that could be a problem with lines too...)
-                    if (!(c_start is LineCurve) || c_start.Length < lim && q != 2)
+                    if ((!(c_start is LineCurve) || c_start.Length < lim) && q != 2)
                     {
                         continue;
                     }
 
-                    // second time through l
-                    if (q == 2
-                        && c_start is LineCurve 
-                        && c_start.Length >= lim)
+                    // third time through look for any length of linecurve or tiny
+                    // circlecurves (previous merge products will still be ignored)
+                    if (!(c_start is LineCurve) && c_start.Length > lim && q != 2)
                     {
                         continue;
                     }
