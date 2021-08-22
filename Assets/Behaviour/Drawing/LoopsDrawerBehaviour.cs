@@ -30,6 +30,11 @@ namespace Assets.Behaviour.Drawing
 
             if (loopsets != null)
             {
+                foreach (var cd in GameObject.FindGameObjectsWithTag("WIP"))
+                {
+                    Destroy(cd);
+                }
+
                 foreach (var loopset in loopsets)
                 {
                     string layer = loopset.Key;
