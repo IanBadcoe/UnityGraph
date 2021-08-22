@@ -334,12 +334,17 @@ namespace Assets.Generation.GeomRep
                 Curve ac_current = open.First();
 
                 // take a loop that is part of the perimeter
-                ret.Add(ExtractLoop(
-                      open,
-                      ac_current,
-                      endSpliceMap,
-                      forward_annotations_map,
-                      layer));
+                Loop loop = ExtractLoop(
+                                      open,
+                                      ac_current,
+                                      endSpliceMap,
+                                      forward_annotations_map,
+                                      layer);
+
+                if (loop != null)
+                {
+                    ret.Add(loop);
+                }
             }
 
 #if DEBUG
@@ -794,7 +799,17 @@ namespace Assets.Generation.GeomRep
             // this merges those back together
             TidyLoop(found_curves);
 
-            return new Loop(layer, found_curves);
+            // this cannot impact any previous algorithms with precision problems
+            // so free to strip curves down to quite a broad limit, and given we're drawing stuff
+            // on a scale metres (maybe down to 10cm) feel happy stripping 1cm and smaller features
+            IList<Curve> reduced_curves = RemoveTinyCurves(found_curves, 1e-2f);
+
+            if (reduced_curves == null)
+            {
+                return null;
+            }
+
+            return new Loop(layer, reduced_curves);
         }
 
         private void TidyLoop(List<Curve> curves)
@@ -838,6 +853,139 @@ namespace Assets.Generation.GeomRep
                     c_prev = c_here;
                 }
             }
+        }
+
+
+        // strip-out adjoining sequences of curves where
+        // length of each curve < lim
+        // total dist from start to end of stripped section < lim
+        public IList<Curve> RemoveTinyCurves(List<Curve> curves, float lim)
+        {
+            IList<Curve> ret = curves.ToList();
+
+            bool all_tiny = true;
+
+            if (curves.Aggregate(0.0f, (x, y) => x + y.Length) < lim)
+            {
+                return null;
+            }
+
+            if (curves.Count == 1)
+            {
+                return curves;
+            }
+
+            // run this three times:
+            // forwards and backwards on even and odd passes
+            //
+            // Passes 0 - 1: we look for non-strippable curves to merge adjoining curves into
+            //
+            // Pass 2: then we take arbitrary start points and hope to merge curves up to lim
+            // (no need to reverse that as the choice of start point is "arbitrary"
+            //
+            // If literally everything is minute we'll end up with one zero-length curve (technically a "loop" :-))
+            // and return false
+            //
+            // if we end up with a line (two LineCurves), we can also return false as that is useless
+
+            HashSet<Curve> inserted = new HashSet<Curve>();
+
+            for (int q = 0; q <= 2; q++)
+            {
+                for (int i = 0; i < ret.Count; i++)
+                {
+                    Curve c_start = ret[i];
+
+                    // on first two passes, look for a non-strippable LineCurves to merge
+                    // any following tiny curves into
+                    //
+                    // (have not worked out if there is a way to do that with CircleCurves, maybe
+                    //  by fitting a new circle to the orig start, changed end and orig mid-point
+                    //  but that would move the centre and I am concerned the new circle would no-longer overlay
+                    //  circles)
+                    if (!(c_start is LineCurve) || c_start.Length < lim && q != 2)
+                    {
+                        continue;
+                    }
+
+                    // second time through l
+                    if (q == 2
+                        && c_start is LineCurve 
+                        && c_start.Length >= lim)
+                    {
+                        continue;
+                    }
+
+                    // we don't want to keep adding to a line we already extended
+                    if (inserted.Contains(c_start))
+                    {
+                        continue;
+                    }
+
+                    all_tiny = false;
+
+                    List<Curve> found = new List<Curve>();
+
+                    for (int j = 1; j < ret.Count; j++)
+                    {
+                        Curve c_end = ret[(i + j) % ret.Count];
+
+                        if (c_end.Length >= lim)
+                        {
+                            break;
+                        }
+                        else if ((c_start.EndPos - c_end.EndPos).sqrMagnitude >= lim * lim)
+                        {
+                            break;
+                        }
+
+                        found.Add(c_end);
+                    }
+
+                    if (found.Count > 0)
+                    {
+                        // very hard to use a index-based loop here as range to delete may cross end of "ret"
+                        foreach (var c in found)
+                        {
+                            ret.Remove(c);
+                        }
+
+                        // because of cyclic permutation, we may have removed curves before i
+                        // so fix that up
+                        i = ret.IndexOf(c_start);
+                        ret.RemoveAt(i);
+
+                        var replacement_c = LineCurve.MakeFromPoints(c_start.StartPos, found.Last().EndPos);
+
+                        ret.Insert(i, replacement_c);
+
+                        inserted.Add(replacement_c);
+                        inserted.Add(replacement_c.Reversed());
+                    }
+                }
+
+                if (q < 2)
+                {
+                    if (all_tiny && q == 0)
+                    {
+                        // no point running the reverse pass if the forward pass found no big curves
+                        q = 1;
+                    }
+                    else
+                    {
+                        ret = new Loop("", ret).Reversed().Curves.ToList();
+                    }
+                }
+            }
+
+            if (ret.Count > 1
+                || ret.Cast<CircleCurve>().Any()
+                || Mathf.Abs(GeomRepUtil.SignedPolygonArea(ret)) > 1e-5f)
+            {
+                return ret;
+            }
+
+            return null;
         }
 
         // this is an interval in the sense that CrossingNumber describes the conditions on the

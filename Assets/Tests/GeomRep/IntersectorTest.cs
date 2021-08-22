@@ -1028,6 +1028,128 @@ public class IntersectorTest
         }
     }
 
+    [Test]
+    public void TestRemoveTinyCurves()
+    {
+        {
+            // discard a whole tiny circle
+            var loop = new List<Curve>
+            {
+                new CircleCurve(new Vector2(), 0.1f)
+            };
+
+            Assert.IsNull(m_intersector.RemoveTinyCurves(loop, 1));
+
+            var ret = m_intersector.RemoveTinyCurves(loop, 0.1f);
+
+            Assert.IsNotNull(ret);
+            Assert.AreEqual(1, ret.Count);
+            Assert.AreEqual(loop[0], ret[0]);
+        }
+
+        {
+            // discard a whole tiny rect
+            var loop = Loop.MakeRect(0, 0, 0.1f, 0.1f).Curves.ToList();
+
+            Assert.IsNull(m_intersector.RemoveTinyCurves(loop, 1));
+
+            var ret = m_intersector.RemoveTinyCurves(loop, 0.1f);
+
+            Assert.IsNotNull(ret);
+            Assert.AreEqual(4, ret.Count);
+            Assert.IsTrue(loop.SequenceEqual(ret));
+        }
+
+        {
+            Vector2 pos = new Vector2();
+
+            var loop = new List<Curve>()
+            {
+                BuildPolyStepwise(ref pos, new Vector2(0, 1)),
+                BuildPolyStepwise(ref pos, new Vector2(1, 0)),
+                BuildPolyStepwise(ref pos, new Vector2(0, -1)),
+            };
+
+            var ps = new Vector2(1, 0);
+            var dir = new Vector2(-1, 0);
+
+            for (int i = 0; i < 100; i++)
+            {
+                loop.Add(BuildPolyStepwise(ref pos, new Vector2(-0.01f, 0)));
+            }
+
+            new Loop("", loop);
+
+            var ret = m_intersector.RemoveTinyCurves(loop, 0.1f);
+
+            Assert.IsNotNull(ret);
+            Assert.IsTrue(ret.Count < 103);
+            // all we can do is assert that we increased the minimum
+            Assert.IsTrue(ret.Select(x => x.Length).Min() > 0.01f);
+        }
+
+        {
+            Vector2 pos = new Vector2();
+
+            var loop = new List<Curve>()
+            {
+                BuildPolyStepwise(ref pos, new Vector2(0, 0.01f)),
+                BuildPolyStepwise(ref pos, new Vector2(0, 1)),
+                BuildPolyStepwise(ref pos, new Vector2(0, 0.01f)),
+                BuildPolyStepwise(ref pos, new Vector2(0.01f, 0)),
+                BuildPolyStepwise(ref pos, new Vector2(1, 0)),
+                BuildPolyStepwise(ref pos, new Vector2(0.01f, 0)),
+                BuildPolyStepwise(ref pos, new Vector2(0, -0.01f)),
+                BuildPolyStepwise(ref pos, new Vector2(0, -1)),
+                BuildPolyStepwise(ref pos, new Vector2(0, -0.01f)),
+                BuildPolyStepwise(ref pos, new Vector2(-0.01f, 0)),
+                BuildPolyStepwise(ref pos, new Vector2(-1, 0)),
+                BuildPolyStepwise(ref pos, new Vector2(-0.01f, 0)),
+            };
+
+            new Loop("", loop);
+
+            var ret = m_intersector.RemoveTinyCurves(loop, 0.1f);
+
+            Assert.IsNotNull(ret);
+            Assert.IsTrue(ret.Count == 4);
+            // all we should have arrived very close to a unit square
+            Assert.IsTrue(ret.Select(x => x.Length).Min() > 0.9f);
+        }
+
+        {
+            // polygonize a circle built from many small bits (in real usage, curve merging would
+            // join the circle parts if they were from identical circles...)
+
+            var loop = new List<Curve>();
+
+            for (int i = 0; i < 100; i++)
+            {
+                loop.Add(new CircleCurve(new Vector2(0, 0), 1, 2 * Mathf.PI * i / 100, 2 * Mathf.PI * (i + 1) / 100));
+            }
+
+            new Loop("", loop);
+
+            var ret = m_intersector.RemoveTinyCurves(loop, 0.1f);
+
+            Assert.IsNotNull(ret);
+            Assert.IsTrue(ret.Count < 100);
+            // all we can do is assert that we increased the minimum
+            Assert.IsTrue(ret.Select(x => x.Length).Min() > 2 * Mathf.PI / 100);
+        }
+    }
+
+    private Curve BuildPolyStepwise(ref Vector2 curr_pos, Vector2 step)
+    {
+        var next_pos = curr_pos + step;
+
+        Curve ret = LineCurve.MakeFromPoints(curr_pos, next_pos);
+
+        curr_pos = next_pos;
+
+        return ret;
+    }
+
     // this works but quite erratically,
     // generally it will fail in Intersector.ExtractLoop where it asserts:
     //                 Assertion.Assert(splice.Contains(start_ac)
