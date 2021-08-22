@@ -152,6 +152,21 @@ namespace Assets.Generation.U
             return ret;
         }
 
+        public static T RemoveRandomOrDefault<T>(ClRand random, IList<T> col, T _default)
+        {
+            if (col.Count == 0)
+            {
+                return _default;
+            }
+
+            int which = (int)(random.Nextfloat() * col.Count);
+
+            var ret = col[which];
+            col.RemoveAt(which);
+
+            return ret;
+        }
+
         public class NEDRet
         {
             public readonly float Dist;
