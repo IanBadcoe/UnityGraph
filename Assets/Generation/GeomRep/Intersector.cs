@@ -902,7 +902,7 @@ namespace Assets.Generation.GeomRep
                     // (have not worked out if there is a way to do that with CircleCurves, maybe
                     //  by fitting a new circle to the orig start, changed end and orig mid-point
                     //  but that would move the centre and I am concerned the new circle would no-longer overlay
-                    //  circles)
+                    //  other circles it is supposed to, of course, that could be a problem with lines too...)
                     if (!(c_start is LineCurve) || c_start.Length < lim && q != 2)
                     {
                         continue;
