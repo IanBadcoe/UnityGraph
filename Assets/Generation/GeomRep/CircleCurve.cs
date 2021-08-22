@@ -97,10 +97,6 @@ namespace Assets.Generation.GeomRep
             {
                 throw new ArgumentException("Inconsistent circle direction");
             }
-
-            if (Mathf.Abs(AngleRange.Range) > Mathf.PI * 2) {
-                throw new ArgumentException("More than a full turn in a circle");
-            }
         }
 
         public float ParamToAngle(float param)

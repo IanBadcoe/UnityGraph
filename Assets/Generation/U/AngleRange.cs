@@ -69,14 +69,13 @@ namespace Assets.Generation.U
             switch(Direction)
             {
                 case RotationDirection.Forwards:
-                    Start = FixupAngle(Start);
-                    End = FixupEndAngle(Start, End);
+                    FixupAngles(ref Start, ref End);
                     break;
                 case RotationDirection.Reverse:
-                    End = FixupAngle(End);
-                    Start = FixupEndAngle(End, Start);
+                    FixupAngles(ref End, ref Start);
                     break;
                 case RotationDirection.DontCare:
+                    // only happens if Start == End anyway
                     Start = End = FixupAngle(Start);
                     break;
             }
@@ -132,17 +131,29 @@ namespace Assets.Generation.U
         //
         // (end angles have the special property that they can be > PI * 2 in order to make them
         //  greater than the start angle)
-        public static float FixupEndAngle(float start_angle, float end_angle)
+        public static void FixupAngles(ref float start_angle, ref float end_angle)
         {
+            float diff = end_angle - start_angle;
+
+            // if precision slips mean end angle ends up slightly more that 2PI greater than
+            // start angle, we end up with them almost equal
+            if (diff > Mathf.PI * 2)
+            {
+                diff = Mathf.PI * 2;
+            }
+            else if (diff < -Mathf.PI * 2)
+            {
+                diff = -Mathf.PI * 2;
+            }
+
             start_angle = FixupAngle(start_angle);
-            end_angle = FixupAngle(end_angle);
+
+            end_angle = start_angle + diff;
 
             while (end_angle <= start_angle)
             {
                 end_angle += Mathf.PI * 2;
             }
-
-            return end_angle;
         }
 
         // the difference between this and the previous is this makes no assumptions about what range
