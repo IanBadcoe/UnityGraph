@@ -1,4 +1,5 @@
-﻿using Assets.Generation.G;
+﻿using Assets.Behaviour;
+using Assets.Generation.G;
 using Assets.Generation.U;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,9 +31,9 @@ namespace Assets.Generation.GeomRep
         }
 
         // returns true when all complete
-        public bool UnionOne(ClRand r)
+        public void UnionAll(ClRand r, LayerConfigBehaviour lcb)
         {
-            if (m_loops.Count > 0)
+            while (m_loops.Count > 0)
             {
                 Loop l = m_loops[0];
                 string layer = l.Layer;
@@ -48,15 +49,36 @@ namespace Assets.Generation.GeomRep
                 Assertion.Assert(m_merged_loop_sets[layer] != null);
 
                 m_loops.RemoveAt(0);
-
-                return false;
             }
 
-            return true;
+            foreach(var cut_desc in lcb.CutSequence)
+            {
+                if (m_merged_loop_sets.TryGetValue(cut_desc.CutBy, out LoopSet cut_by)
+                    && m_merged_loop_sets.TryGetValue(cut_desc.Cut, out LoopSet cut))
+                {
+                    m_merged_loop_sets[cut_desc.Cut] =
+                        m_intersector.Cut(cut, cut_by, 1e-5f, r, cut_desc.Cut);
+                }
+            }
         }
 
         public void GenerateGeometry(Graph graph)
         {
+            // process edges first, because we want any -ve features of nodes to be able to cut the ends of them
+            // e.g. an island in a lake of fire should cut the rect for the fire river coming in from the edge
+            // and processing that second achieves that
+            foreach (DirectedEdge de in graph.GetAllEdges())
+            {
+                GeomLayout gl = de.Layout;
+
+                LoopSet loops = gl.MakeGeometry(de);
+
+                if (loops != null)
+                {
+                    AddLoops(loops);
+                }
+            }
+
             foreach (Node n in graph.GetAllNodes())
             {
                 GeomLayout gl = n.Layout;
@@ -64,18 +86,6 @@ namespace Assets.Generation.GeomRep
                 LoopSet loops = gl.MakeGeometry(n);
 
                 // can have node with no geometry...  at least in unit-tests
-                if (loops != null)
-                {
-                    AddLoops(loops);
-                }
-            }
-
-            foreach (DirectedEdge de in graph.GetAllEdges())
-            {
-                GeomLayout gl = de.Layout;
-
-                LoopSet loops = gl.MakeGeometry(de);
-
                 if (loops != null)
                 {
                     AddLoops(loops);

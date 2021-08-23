@@ -236,12 +236,18 @@ namespace Assets.Generation.GeomRep
 
             return new Tuple<float, float?>(hit1, hit2);
         }
+
         // only works for loops made of LineCurve
         public static float SignedPolygonArea(Loop l)
         {
+            return SignedPolygonArea(l.Curves);
+        }
+
+        public static float SignedPolygonArea(ICollection<Curve> curves)
+        {
             float ret = 0;
 
-            foreach (var c in l.Curves)
+            foreach (var c in curves)
             {
                 LineCurve lc = c as LineCurve;
 

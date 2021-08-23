@@ -57,6 +57,7 @@ namespace Assets.Behaviour.Drawing
                 {
                     CircleDrawerBehaviour cd = GameObject.Instantiate(CircleDrawerTemplate, transform).GetComponent<CircleDrawerBehaviour>();
                     cd.Node = node;
+                    cd.gameObject.tag = "WIP";
                     n_dict[node] = cd.gameObject;
                 }
             }
@@ -72,6 +73,7 @@ namespace Assets.Behaviour.Drawing
                 {
                     RectangleDrawerBehaviour rd = GameObject.Instantiate(RectangleDrawerTemplate, transform).GetComponent<RectangleDrawerBehaviour>();
                     rd.Edge = de;
+                    rd.gameObject.tag = "WIP";
                     n_dict[de] = rd.gameObject;
                 }
             }

@@ -10,7 +10,7 @@ namespace Assets.Generation.GeomRep
     {
         public static GeomLayout Instance { get; } = new CorridorLayout();
 
-        private CorridorLayout() { }
+        protected CorridorLayout() { }
 
         public override LoopSet MakeGeometry(DirectedEdge edge)
         {
@@ -45,7 +45,7 @@ namespace Assets.Generation.GeomRep
             }
         }
 
-        private static List<Curve> MakeRect(Vector2 start, Vector2 end, Vector2 dir, float length, Vector2 width_dir, float actual_half_width)
+        protected static List<Curve> MakeRect(Vector2 start, Vector2 end, Vector2 dir, float length, Vector2 width_dir, float actual_half_width)
         {
             Vector2 half_width = width_dir * actual_half_width;
 
@@ -62,6 +62,52 @@ namespace Assets.Generation.GeomRep
                 new LineCurve(start_right, width_dir, actual_half_width * 2)
             };
             return curves;
+        }
+    }
+
+    public class FireCorridorLayout : CorridorLayout
+    {
+        public new static GeomLayout Instance { get; } = new FireCorridorLayout();
+
+        private FireCorridorLayout() { }
+
+        public override LoopSet MakeGeometry(DirectedEdge edge)
+        {
+            Vector2 dir = edge.End.Position - edge.Start.Position;
+            float length = dir.magnitude;
+            dir = dir / length;
+
+            Vector2 width_dir = dir.Rot270();
+            // scale the corridor rectangle's width down slightly
+            // so that it doesn't precisely hit at a tangent to any adjoining junction-node's circle
+            // -- that causes awkward numerical precision problems in the curve-curve intersection routines
+            // which can throw out the union operation
+            float actual_half_width = edge.HalfWidth * 0.99f;
+
+            if (edge.WallThickness > 0)
+            {
+                float floor_half_width = actual_half_width - edge.WallThickness;
+
+                List<Curve> wall_curves = MakeRect(edge.Start.Position, edge.End.Position, dir, length, width_dir, actual_half_width);
+                List<Curve> floor_curves = MakeRect(edge.Start.Position, edge.End.Position, dir, length, width_dir, floor_half_width);
+                List<Curve> fire_curves = MakeRect(edge.Start.Position, edge.End.Position, dir, length, width_dir, floor_half_width * 0.5f);
+
+                return new LoopSet {
+                    new Loop("wall", wall_curves),
+                    new Loop("floor", floor_curves),
+                    new Loop("fire", fire_curves)
+                };
+            }
+            else
+            {
+                List<Curve> floor_curves = MakeRect(edge.Start.Position, edge.End.Position, dir, length, width_dir, actual_half_width);
+                List<Curve> fire_curves = MakeRect(edge.Start.Position, edge.End.Position, dir, length, width_dir, actual_half_width * 0.5f);
+
+                return new LoopSet {
+                    new Loop("floor", floor_curves),
+                    new Loop("fire", fire_curves)
+                };
+            }
         }
     }
 }

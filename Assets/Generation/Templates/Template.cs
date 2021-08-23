@@ -1,4 +1,5 @@
 ﻿using Assets.Generation.G;
+using Assets.Generation.GeomRep;
 using Assets.Generation.U;
 using System;
 using System.Collections.Generic;
@@ -81,8 +82,7 @@ namespace Assets.Generation.Templates
                 { FindNodeRecord("<target>"), target }
             };
 
-            HashSet<float> existing_corridor_widths = new HashSet<float>();
-            HashSet<float> existing_wall_thicknesses = new HashSet<float>();
+            HashSet<DirectedEdge> existing_corridors = new HashSet<DirectedEdge>();
 
             // find nodes for in-connections and map to their NodeRecords
             {
@@ -98,8 +98,7 @@ namespace Assets.Generation.Templates
 
                         template_to_graph.Add(nr, g_conn);
 
-                        existing_corridor_widths.Add(g_it.Current.HalfWidth);
-                        existing_wall_thicknesses.Add(g_it.Current.WallThickness);
+                        existing_corridors.Add(g_it.Current);
                     }
                 }
             }
@@ -118,23 +117,12 @@ namespace Assets.Generation.Templates
 
                         template_to_graph.Add(nr, g_conn);
 
-                        existing_corridor_widths.Add(g_it.Current.HalfWidth);
-                        existing_wall_thicknesses.Add(g_it.Current.WallThickness);
+                        existing_corridors.Add(g_it.Current);
                     }
                 }
             }
 
-            if (existing_corridor_widths.Count == 0)
-            {
-                existing_corridor_widths.Add(1);
-            }
-
-            if (existing_wall_thicknesses.Count == 0)
-            {
-                existing_wall_thicknesses.Add(0);
-            }
-
-            float chosen_existing_wall_thickness = Util.RemoveRandom(random, existing_wall_thicknesses.ToList());
+            var chosen_existing_corridor = Util.RemoveRandomOrDefault(random, existing_corridors.ToList(), DirectedEdge.Exemplar);
 
             // create nodes for each we are adding and map to their NodeRecords
             foreach (NodeRecord nr in m_nodes.Values)
@@ -145,7 +133,7 @@ namespace Assets.Generation.Templates
 
                     if (wall_thickness == -1)
                     {
-                        wall_thickness = chosen_existing_wall_thickness;
+                        wall_thickness = chosen_existing_corridor.WallThickness;
                     }
 
                     Node n = graph.AddNode(nr.Name, nr.Codes, nr.Radius, wall_thickness, nr.Layout);
@@ -153,10 +141,7 @@ namespace Assets.Generation.Templates
                 }
             }
 
-            ApplyConnections(target, template_to_graph, graph,
-                Util.RemoveRandom(random, existing_corridor_widths.ToList()),
-                chosen_existing_wall_thickness
-            );
+            ApplyConnections(target, template_to_graph, graph, chosen_existing_corridor);
 
             // make three attempts to position the nodes
             // no point if no random components, but pretty cheap to do...
@@ -190,7 +175,7 @@ namespace Assets.Generation.Templates
         }
 
         private void ApplyConnections(Node node_replacing, Dictionary<NodeRecord, Node> template_to_graph,
-                                      Graph graph, float existing_width, float existing_wall_thickness)
+                                      Graph graph, DirectedEdge existing_edge)
         {
             foreach (DirectedEdge e in node_replacing.GetConnections())
             {
@@ -207,17 +192,24 @@ namespace Assets.Generation.Templates
 
                 if (half_width == -1)
                 {
-                    half_width = existing_width;
+                    half_width = existing_edge.HalfWidth;
                 }
 
                 float wall_thickness = cr.WallThickness;
 
                 if (wall_thickness == -1)
                 {
-                    wall_thickness = existing_wall_thickness;
+                    wall_thickness = existing_edge.WallThickness;
                 }
 
-                DirectedEdge de = graph.Connect(nf, nt, cr.MaxLength, half_width, cr.Layout, wall_thickness);
+                GeomLayout layout = cr.Layout;
+
+                if (layout == null)
+                {
+                    layout = existing_edge.Layout;
+                }
+
+                DirectedEdge de = graph.Connect(nf, nt, cr.MaxLength, half_width, layout, wall_thickness);
             }
         }
 

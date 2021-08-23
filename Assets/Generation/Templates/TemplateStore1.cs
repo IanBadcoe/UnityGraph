@@ -14,9 +14,9 @@ namespace Assets.Generation.Templates
                 tb.AddNode(NodeRecord.NodeType.Internal, "e1", false, "<target>", "i", null, "e", 1, -1, CircularGeomLayout.Instance);
                 tb.AddNode(NodeRecord.NodeType.Internal, "e2", false, "<target>", "o", null, "e", 1, -1, CircularGeomLayout.Instance);
 
-                tb.Connect("i", "e1", 4.5f, -1, CorridorLayout.Instance, -1);
-                tb.Connect("e1", "e2", 4.5f, -1, CorridorLayout.Instance, -1);
-                tb.Connect("e2", "o", 4.5f, -1, CorridorLayout.Instance, -1);
+                tb.Connect("i", "e1", 4.5f, -1, null, -1);
+                tb.Connect("e1", "e2", 4.5f, -1, null, -1);
+                tb.Connect("e2", "o", 4.5f, -1, null, -1);
 
                 AddTemplate(tb.Build());
             }
@@ -55,8 +55,8 @@ namespace Assets.Generation.Templates
                 tb.AddNode(NodeRecord.NodeType.Internal, "j", false, "<target>", null, null, "e", 1f, 0.2f, CircularGeomLayout.Instance);
                 tb.AddNode(NodeRecord.NodeType.Internal, "side", true, "<target>", null, null, "e", 2f, 0.2f, CircularGeomLayout.Instance);
 
-                tb.Connect("i", "j", 4.5f, -1, CorridorLayout.Instance, -1);
-                tb.Connect("j", "o", 4.5f, -1, CorridorLayout.Instance, -1);
+                tb.Connect("i", "j", 4.5f, -1, null, -1);
+                tb.Connect("j", "o", 4.5f, -1, null, -1);
                 tb.Connect("j", "side", 4.5f, 0.5f, CorridorLayout.Instance, 0.2f);
 
                 AddTemplate(tb.Build());
@@ -113,7 +113,7 @@ namespace Assets.Generation.Templates
                       null, null, "", 4f, 0.5f,
                       FourCircularPillarsGeomLayout.Instance);
 
-                tb.Connect("i", "rotunda", 4.5f, -1, CorridorLayout.Instance, -1);
+                tb.Connect("i", "rotunda", 4.5f, -1, null, -1);
 
                 AddTemplate(tb.Build());
             }

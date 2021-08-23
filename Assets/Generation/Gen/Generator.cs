@@ -1,3 +1,4 @@
+using Assets.Behaviour;
 using Assets.Generation.G;
 using Assets.Generation.GeomRep;
 using Assets.Generation.Stepping;
@@ -21,6 +22,8 @@ namespace Assets.Generation.Gen
         // need a better way of making and setting these, but while we only have one...
         private readonly TemplateStore Templates = new TemplateStore1();
 
+        private readonly LayerConfigBehaviour LCB;
+
         public enum Phase
         {
             GraphExpand,
@@ -36,13 +39,16 @@ namespace Assets.Generation.Gen
 
         private readonly int m_reqSize;
 
-        public Generator(Graph graph, int req_size)
+        public Generator(Graph graph, int req_size,
+            LayerConfigBehaviour lcb)
         {
             //UnityEngine.Assertion.Assert.raiseExceptions = true;
 
             Graph = graph;
 
             m_reqSize = req_size;
+
+            LCB = lcb;
         }
 
         public StepperController.StatusReportInner Step(StepperController.Status status)
@@ -142,10 +148,7 @@ namespace Assets.Generation.Gen
 
             UnionHelper.GenerateGeometry(Graph);
 
-            while (!UnionHelper.UnionOne(Config.Rand()))
-            {
-                ;
-            }
+            UnionHelper.UnionAll(Config.Rand(), LCB);
 
             return new StepperController.StatusReportInner(StepperController.Status.StepOutSuccess,
                         null, "Geometry merged.");
@@ -153,16 +156,16 @@ namespace Assets.Generation.Gen
 
         private void MakeSeed()
         {
-            Node start = Graph.AddNode("Start", "<", 3f, CircularGeomLayout.Instance);
+            Node start = Graph.AddNode("Start", "<", 3f, 0.1f, CircularFireLakeGeomLayout.Instance);
             Node expander = Graph.AddNode("engine.StepperController", "e", 1f, CircularGeomLayout.Instance);
-            Node end = Graph.AddNode("End", ">", 3f, CircularGeomLayout.Instance);
+            Node end = Graph.AddNode("End", ">", 3f, 0.1f, CircularFireLakeGeomLayout.Instance);
 
             start.Position = new Vector2(0, -4);
             expander.Position = new Vector2(0, 0);
             end.Position = new Vector2(4, 0);
 
-            Graph.Connect(start, expander, 4.5f, 1, CorridorLayout.Instance);
-            Graph.Connect(expander, end, 4.5f, 1, CorridorLayout.Instance);
+            Graph.Connect(start, expander, 4.5f, 1, FireCorridorLayout.Instance, 0.1f);
+            Graph.Connect(expander, end, 4.5f, 1, FireCorridorLayout.Instance, 0.1f);
         }
     }
 }

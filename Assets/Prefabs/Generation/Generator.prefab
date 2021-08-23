@@ -108,3 +108,12 @@ MonoBehaviour:
     Colour: {r: 0.11525454, g: 0.44856885, b: 0.6603774, a: 1}
   - Name: decor
     Colour: {r: 0.509434, g: 0.28900954, b: 0, a: 1}
+  CutSequence:
+  - Cut: wall
+    CutBy: floor
+  - Cut: water
+    CutBy: decor
+  - Cut: floor
+    CutBy: decor
+  - Cut: floor
+    CutBy: water
