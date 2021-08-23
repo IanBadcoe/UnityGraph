@@ -106,15 +106,15 @@ public class IntersectorTest
         curves.Add(cd);
         curves.Add(ce);
 
-        Dictionary<Curve, Intersector.AnnotatedCurve> forward_annotations_map = Intersector.MakeForwardAnnotationsMap();
+        Dictionary<Curve, Intersector.AnnotatedCurve> ann_map = Intersector.MakeAnnotationsMap();
 
-        m_intersector.BuildAnnotationChains(curves, 1, forward_annotations_map);
+        m_intersector.BuildAnnotationChains(curves, 1, ann_map);
 
         foreach (Curve c in curves)
         {
-            Assert.IsNotNull(forward_annotations_map[c]);
-            Assert.IsNotNull(forward_annotations_map[c]);
-            Assert.AreEqual(1, forward_annotations_map[c].LoopNumber);
+            Assert.IsNotNull(ann_map[c]);
+            Assert.IsNotNull(ann_map[c]);
+            Assert.AreEqual(1, ann_map[c].LoopNumber);
         }
     }
 
@@ -135,12 +135,12 @@ public class IntersectorTest
             cc2
         };
 
-        var endSpliceMap = Intersector.MakeEndSpliceMap();
+        var ann_map = Intersector.MakeAnnotationsMap();
 
-        m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-        m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+        m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+        m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
+        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
 
         // we cut each curve twice, technically we could anneal the original curve across its
         // join at 2PI -> 0.0 but we don't currently try anything clever like that
@@ -179,12 +179,12 @@ public class IntersectorTest
             cc2
         };
 
-        var endSpliceMap = Intersector.MakeEndSpliceMap();
+        var ann_map = Intersector.MakeAnnotationsMap();
 
-        m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-        m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+        m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+        m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
+        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
 
         Assert.AreEqual(2, curves1.Count);
         Assert.AreEqual(2, curves2.Count);
@@ -217,12 +217,12 @@ public class IntersectorTest
             cc2
         };
 
-        var endSpliceMap = Intersector.MakeEndSpliceMap();
+        var ann_map = Intersector.MakeAnnotationsMap();
 
-        m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-        m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+        m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+        m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
+        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
 
         Assert.AreEqual(1, curves1.Count);
         Assert.AreEqual(1, curves2.Count);
@@ -252,57 +252,58 @@ public class IntersectorTest
             cc2
         };
 
-        var endSpliceMap = Intersector.MakeEndSpliceMap();
+        var ann_map = Intersector.MakeAnnotationsMap();
 
-        m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-        m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+        m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+        m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
+        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
 
         Assert.AreEqual(1, curves1.Count);
         Assert.AreEqual(2, curves2.Count);
     }
 
-    [Test]
-    public void TestSplitCurvesAtIntersections_Flower()
-    {
-        // one circle hits existing break in other
-        Curve cc1 = new CircleCurve(new Vector2(), 1);
+    // this used invalid input, in that curves2 was not a single loop
+    //[Test]
+    //public void TestSplitCurvesAtIntersections_Flower()
+    //{
+    //    // one circle hits existing break in other
+    //    Curve cc1 = new CircleCurve(new Vector2(), 1);
 
-        List<Curve> curves1 = new List<Curve>
-        {
-            cc1
-        };
+    //    List<Curve> curves1 = new List<Curve>
+    //    {
+    //        cc1
+    //    };
 
-        List<Curve> curves2 = new List<Curve>();
+    //    List<Curve> curves2 = new List<Curve>();
 
-        for (int i = 0; i < 6; i++)
-        {
-            float a = i * Mathf.PI / 3;
+    //    for (int i = 0; i < 6; i++)
+    //    {
+    //        float a = i * Mathf.PI / 3;
 
-            Curve cc2 = new CircleCurve(new Vector2(Mathf.Sin(a), Mathf.Cos(a)), 1);
+    //        Curve cc2 = new CircleCurve(new Vector2(Mathf.Sin(a), Mathf.Cos(a)), 1);
 
-            curves2.Add(cc2);
-        }
+    //        curves2.Add(cc2);
+    //    }
 
-        var endSpliceMap = Intersector.MakeEndSpliceMap();
+    //    var ann_map = Intersector.MakeAnnotationsMap();
 
-        m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-        m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+    //    m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+    //    m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
+    //    m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
 
-        Assert.AreEqual(6, curves1.Count);
+    //    Assert.AreEqual(6, curves1.Count);
 
-        for (int i = 0; i < curves1.Count; i++)
-        {
-            int next_i = (i + 1) % curves1.Count;
-            Assert.IsTrue(Util.ClockAwareAngleCompare(
-                ((CircleCurve)curves1[i]).AngleRange.End,
-                ((CircleCurve)curves1[next_i]).AngleRange.Start, 1e-5f));
-            Assert.IsTrue(curves1[i].EndPos.Equals(curves1[next_i].StartPos, 1e-5f));
-        }
-    }
+    //    for (int i = 0; i < curves1.Count; i++)
+    //    {
+    //        int next_i = (i + 1) % curves1.Count;
+    //        Assert.IsTrue(Util.ClockAwareAngleCompare(
+    //            ((CircleCurve)curves1[i]).AngleRange.End,
+    //            ((CircleCurve)curves1[next_i]).AngleRange.Start, 1e-5f));
+    //        Assert.IsTrue(curves1[i].EndPos.Equals(curves1[next_i].StartPos, 1e-5f));
+    //    }
+    //}
 
     [Test]
     public void TestTryFindIntersections()
@@ -831,8 +832,11 @@ public class IntersectorTest
     {
         public override bool RemoveUnwantedCurves(
             float tol, ClRand ClRand,
-            Dictionary<Curve, AnnotatedCurve> forward_annotations_map, HashSet<Curve> all_curves,
-            HashSet<Curve> open, HashSet<Vector2> curve_joints, float diameter,
+            Dictionary<Curve, AnnotatedCurve> ann_map,
+            HashSet<Curve> all_curves,
+            HashSet<Curve> open,
+            HashSet<Vector2> curve_joints,
+            float diameter,
             UnionType type)
         {
             return false;
@@ -1241,7 +1245,8 @@ public class IntersectorTest
             LoopSet ret = m_intersector.Union(new LoopSet(), ls1,
                 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
 
-            Assert.AreEqual(ls1, ret);
+            Assert.AreEqual(1, ret.Count);
+            Assert.IsTrue(new HashSet<Curve>(ls1[0].Curves).SetEquals(l.Curves));
 
             ret = m_intersector.Union(new LoopSet(), ls1,
                 1e-5f, new ClRand(1), Intersector.UnionType.WantNegative);
@@ -1262,7 +1267,8 @@ public class IntersectorTest
             ret = m_intersector.Union(new LoopSet(), ls1,
                 1e-5f, new ClRand(1), Intersector.UnionType.WantNegative);
 
-            Assert.AreEqual(ls1, ret);
+            Assert.AreEqual(1, ret.Count);
+            Assert.IsTrue(new HashSet<Curve>(ls1[0].Curves).SetEquals(l.Curves));
         }
     }
 
@@ -1988,14 +1994,14 @@ public class IntersectorTest
                 cc2
             };
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
 
-            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
         }
 
         {
@@ -2013,14 +2019,14 @@ public class IntersectorTest
                 cc2
             };
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
 
-            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
         }
 
         {
@@ -2038,14 +2044,14 @@ public class IntersectorTest
                 cc2
             };
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
 
-            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
         }
 
         {
@@ -2063,14 +2069,14 @@ public class IntersectorTest
                 cc2
             };
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
 
-            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
         }
 
         {
@@ -2088,14 +2094,14 @@ public class IntersectorTest
                 cc2
             };
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtIntersections(curves2, curves1, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtIntersections(curves2, curves1, 1e-5f, ann_map);
 
-            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
         }
 
         {
@@ -2113,21 +2119,21 @@ public class IntersectorTest
                 cc2
             };
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
 
-            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
         }
 
         {
             // all splits hit existing gaps
             // circles meet at one point and it hits the join in both
             Curve cc1 = new CircleCurve(new Vector2(), 1, 0, Mathf.PI);
-            Curve cc2 = new CircleCurve(new Vector2(0, 2), 1, Mathf.PI, Mathf.PI * 2);
+            Curve cc2 = new CircleCurve(new Vector2(), 1, Mathf.PI, Mathf.PI * 2);
 
             List<Curve> curves1 = new List<Curve>
             {
@@ -2136,14 +2142,14 @@ public class IntersectorTest
 
             List<Curve> curves2 = Loop.MakeRect(0, -1, 2, 1).Curves.ToList();
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
 
-            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
         }
 
         {
@@ -2181,23 +2187,23 @@ public class IntersectorTest
 
             new Loop("", curves2);
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
 
-            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
         }
     }
 
-    private void ValidateSpliceMap(Dictionary<Curve, Intersector.Splice> endSpliceMap,
+    private void ValidateAnnotations(Dictionary<Curve, Intersector.AnnotatedCurve> ann_map,
         IList<Curve> allCurves)
     {
         int size = allCurves.Count;
 
-        Assert.AreEqual(size, endSpliceMap.Count);
+        Assert.AreEqual(size, ann_map.Count);
 
         Dictionary<Curve, int> forward_counts = new Dictionary<Curve, int>(
             new Intersector.ReferenceComparer<Curve>());
@@ -2206,20 +2212,21 @@ public class IntersectorTest
 
         foreach(var c in allCurves)
         {
-            Assert.IsTrue(endSpliceMap.ContainsKey(c));
+            Assert.IsTrue(ann_map.ContainsKey(c));
         }
 
-        foreach (var c in endSpliceMap.Keys)
+        foreach (var c in ann_map.Keys)
         {
-            Assert.IsTrue(endSpliceMap[c].BackwardLinks.Contains(c));
+            Assert.IsTrue(ann_map[c].ForwardSplice.BackwardLinks.Contains(c));
+            Assert.IsTrue(ann_map[c].BackwardSplice.ForwardLinks.Contains(c));
         }
 
-        foreach (var c in endSpliceMap.Values.SelectMany(x => x.ForwardLinks))
+        foreach (var c in ann_map.Values.SelectMany(x => x.ForwardSplice.ForwardLinks))
         {
             forward_counts[c] = 0;
         }
 
-        foreach (var c in endSpliceMap.Values.SelectMany(x => x.BackwardLinks))
+        foreach (var c in ann_map.Values.SelectMany(x => x.ForwardSplice.BackwardLinks))
         {
             backward_counts[c] = 0;
         }
@@ -2235,20 +2242,20 @@ public class IntersectorTest
         Assert.IsTrue(hfk.SetEquals(hbk));
 
         // looking at _unique_ splices, each curve should enter and exit exactly one
-        foreach (var splice in endSpliceMap.Values.Distinct())
+        foreach (var splice in ann_map.Values.Select(x => x.ForwardSplice).Distinct())
         {
             Assert.AreEqual(splice.ForwardLinks.Count, splice.BackwardLinks.Count);
 
             foreach(var c in splice.ForwardLinks)
             {
-                Assert.IsTrue(endSpliceMap.ContainsKey(c));
+                Assert.IsTrue(ann_map.ContainsKey(c));
 
                 forward_counts[c]++;
             }
 
             foreach (var c in splice.BackwardLinks)
             {
-                Assert.IsTrue(endSpliceMap.ContainsKey(c));
+                Assert.IsTrue(ann_map.ContainsKey(c));
 
                 backward_counts[c]++;
             }
@@ -2276,12 +2283,12 @@ public class IntersectorTest
                 new CircleCurve(new Vector2(), 1)
             };
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
 
             Assert.AreEqual(1, curves1.Count);
             Assert.AreEqual(1, curves2.Count);
@@ -2299,12 +2306,12 @@ public class IntersectorTest
                 new CircleCurve(new Vector2(), 1, Mathf.PI, Mathf.PI * 3)
             };
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
 
             Assert.AreEqual(2, curves1.Count);
             Assert.AreEqual(2, curves2.Count);
@@ -2331,12 +2338,12 @@ public class IntersectorTest
                 new CircleCurve(new Vector2(), 1, Mathf.PI, Mathf.PI * 2)
             };
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
 
             Assert.AreEqual(2, curves1.Count);
             Assert.AreEqual(2, curves2.Count);
@@ -2376,12 +2383,12 @@ public class IntersectorTest
                 curves2 = temp;
             }
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
 
             Assert.AreEqual(3, curves1.Count);
             Assert.AreEqual(3, curves2.Count);
@@ -2404,12 +2411,12 @@ public class IntersectorTest
 
             List<Curve> curves2 = Loop.MakeRect(0, 1, 1, 2).Curves.ToList();
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
 
             Assert.AreEqual(4, curves1.Count);
             Assert.AreEqual(4, curves2.Count);
@@ -2421,12 +2428,12 @@ public class IntersectorTest
 
             List<Curve> curves2 = Loop.MakeRect(0.5f, 1, 1.5f, 2).Curves.ToList();
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
 
             Assert.AreEqual(5, curves1.Count);
             Assert.AreEqual(5, curves2.Count);
@@ -2438,12 +2445,12 @@ public class IntersectorTest
 
             List<Curve> curves2 = Loop.MakeRect(-0.5f, 1, 0.5f, 2).Curves.ToList();
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
 
             Assert.AreEqual(5, curves1.Count);
             Assert.AreEqual(5, curves2.Count);
@@ -2455,12 +2462,12 @@ public class IntersectorTest
 
             List<Curve> curves2 = Loop.MakeRect(0.25f, 1, 0.75f, 2).Curves.ToList();
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
 
             Assert.AreEqual(6, curves1.Count);
             Assert.AreEqual(4, curves2.Count);
@@ -2472,12 +2479,12 @@ public class IntersectorTest
 
             List<Curve> curves2 = Loop.MakeRect(0.25f, 0, 0.75f, 1).Curves.ToList();
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
 
             Assert.AreEqual(8, curves1.Count);
             Assert.AreEqual(4, curves2.Count);
@@ -2499,14 +2506,14 @@ public class IntersectorTest
                 new CircleCurve(new Vector2(), 1, Mathf.PI, Mathf.PI * 3)
             };
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
 
-            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
         }
 
         {
@@ -2522,14 +2529,14 @@ public class IntersectorTest
                 new CircleCurve(new Vector2(), 1, Mathf.PI, Mathf.PI * 2)
             };
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
 
-            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
         }
 
         for (int i = 0; i < 6; i++)
@@ -2558,14 +2565,14 @@ public class IntersectorTest
                 curves2 = temp;
             }
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
 
-            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
         }
 
         {
@@ -2574,14 +2581,14 @@ public class IntersectorTest
 
             List<Curve> curves2 = Loop.MakeRect(0, 1, 1, 2).Curves.ToList();
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
 
-            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
         }
 
         {
@@ -2590,14 +2597,14 @@ public class IntersectorTest
 
             List<Curve> curves2 = Loop.MakeRect(0.5f, 1, 1.5f, 2).Curves.ToList();
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
 
-            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
         }
 
         {
@@ -2606,14 +2613,14 @@ public class IntersectorTest
 
             List<Curve> curves2 = Loop.MakeRect(-0.5f, 1, 0.5f, 2).Curves.ToList();
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
 
-            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
         }
 
         {
@@ -2622,14 +2629,14 @@ public class IntersectorTest
 
             List<Curve> curves2 = Loop.MakeRect(0.25f, 1, 0.75f, 2).Curves.ToList();
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
 
-            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
         }
 
         {
@@ -2638,14 +2645,14 @@ public class IntersectorTest
 
             List<Curve> curves2 = Loop.MakeRect(0.25f, 0, 0.75f, 1).Curves.ToList();
 
-            var endSpliceMap = Intersector.MakeEndSpliceMap();
+            var ann_map = Intersector.MakeAnnotationsMap();
 
-            m_intersector.SetupInitialSplices(curves1, endSpliceMap);
-            m_intersector.SetupInitialSplices(curves2, endSpliceMap);
+            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
+            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, endSpliceMap);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
 
-            ValidateSpliceMap(endSpliceMap, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
         }
     }
 
