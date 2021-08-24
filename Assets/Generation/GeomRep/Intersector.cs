@@ -10,8 +10,8 @@ namespace Assets.Generation.GeomRep
 {
     public class Intersector
     {
-        Dictionary<Curve, AnnotatedCurve> AnnotationMap
-            = MakeAnnotationsMap();
+        Dictionary<Curve, AnnotatedCurve> AnnotationMap;
+        LoopSet Merged;
 
 
         [System.Diagnostics.DebuggerDisplay("Forward({ForwardLinks.Count}) Backward({BackwardLinks.Count})")]
@@ -62,19 +62,25 @@ namespace Assets.Generation.GeomRep
         public void Reset()
         {
             AnnotationMap = MakeAnnotationsMap();
+            Merged = new LoopSet();
         }
 
-        public LoopSet Cut(LoopSet to_cut, LoopSet cut_by, float tol, ClRand random, string layer)
+        public void Cut(LoopSet to_cut, LoopSet cut_by, float tol, ClRand random, string layer)
         {
             // assuming cut_by has no outer -ve curves (which it shouldn't have if it is the output of a previous union)
             // removing cut_by from cut is the same as unioning with the inverse
 
-            return Union(to_cut, cut_by.Reversed(), tol, random, layer);
+            Union(to_cut, cut_by.Reversed(), tol, random, layer);
         }
 
         public IReadOnlyDictionary<Curve, AnnotatedCurve> GetAnnotationMap()
         {
             return AnnotationMap;
+        }
+
+        public LoopSet GetMerged()
+        {
+            return new LoopSet(Merged);
         }
 
         // union operation cannot return a mix of positive and negative top-level curves
@@ -125,20 +131,17 @@ namespace Assets.Generation.GeomRep
             WantNegative
         }
 
-        public LoopSet Union(LoopSet previously_merged, LoopSet to_merge, float tol,
+        public void Union(LoopSet previously_merged, LoopSet to_merge, float tol,
                              ClRand random, string layer)
         {
-            return Union(previously_merged, to_merge, tol,
+            Union(previously_merged, to_merge, tol,
                 random, UnionType.WantPositive, layer);
         }
 
-        public LoopSet Union(LoopSet previously_merged, LoopSet to_merge, float tol,
+        public void Union(LoopSet previously_merged, LoopSet to_merge, float tol,
                              ClRand random,
                              UnionType type = UnionType.WantPositive, string layer = "")
         {
-            ValidatePreviouslyMerged(previously_merged, "previously_merged");
-            //            ValidateInputs(to_merge, "ls2");
-
             // any loops in to_merge can be struck off as they will have no effect
             // (and following code cannot handle them anyway, as they both overlap but don't intersect)
             RemoveIdenticalLoops(previously_merged, to_merge);
@@ -146,7 +149,8 @@ namespace Assets.Generation.GeomRep
             // if there is no input left, we're done
             if (to_merge.Count == 0)
             {
-                return previously_merged;
+                Merged = previously_merged;
+                return;
             }
 
             // needing to check +ve/-ve curve type shoots any simple early-outs in the foot
@@ -186,8 +190,6 @@ namespace Assets.Generation.GeomRep
                 BuildAnnotationChains(alc1, i);
             }
 
-
-            LoopSet ret = new LoopSet();
 
             // first, an easy bit, any loops from either set whose bounding boxes are disjunct from all loops in the
             // other set, they have no influence on any other loops and can be simply copied unchanged into
@@ -319,7 +321,8 @@ namespace Assets.Generation.GeomRep
                 diameter,
                 type))
             {
-                return null;
+                Reset();
+                return;
             }
 
             foreach(var c in AnnotationMap.Keys.ToList())
@@ -354,15 +357,13 @@ namespace Assets.Generation.GeomRep
 
                 if (loop != null)
                 {
-                    ret.Add(loop);
+                    Merged.Add(loop);
                 }
             }
 
 #if DEBUG
-            ValidatePreviouslyMerged(ret, "ret");
+            ValidatePreviouslyMerged();
 #endif
-
-            return ret;
         }
 
         private static Dictionary<Curve, AnnotatedCurve> MakeAnnotationsMap()
@@ -456,23 +457,23 @@ namespace Assets.Generation.GeomRep
             }
         }
 
-        private void ValidatePreviouslyMerged(LoopSet ls, string name)
+        private void ValidatePreviouslyMerged()
         {
-            for (int i = 0; i < ls.Count; i++)
+            for (int i = 0; i < Merged.Count; i++)
             {
-                var loop = ls[i];
-                CheckSelfIntersection(loop, name);
+                var loop = Merged[i];
+                CheckSelfIntersection(loop);
 
-                for (int j = i + 1; j < ls.Count; j++)
+                for (int j = i + 1; j < Merged.Count; j++)
                 {
-                    var loop2 = ls[j];
+                    var loop2 = Merged[j];
 
-                    CheckLoopIntersection(loop, loop2, name);
+                    CheckLoopIntersection(loop, loop2);
                 }
             }
         }
 
-        private static void CheckLoopIntersection(Loop loop, Loop loop2, string name)
+        private static void CheckLoopIntersection(Loop loop, Loop loop2)
         {
             for (int i = 0; i < loop.NumCurves - 1; i++)
             {
@@ -483,11 +484,11 @@ namespace Assets.Generation.GeomRep
                     var c2 = loop2.Curves[j];
                     if (ReferenceEquals(loop, loop2))
                     {
-                        throw new ArgumentException("Same curve object present twice in loop", name);
+                        throw new InvalidOperationException("Same curve object present twice in merged loop");
                     }
                     else if (loop == loop2)
                     {
-                        throw new ArgumentException("Two copies of the same loop", name);
+                        throw new InvalidOperationException("Two copies of the same loop in merged output");
                     }
                     else
                     {
@@ -506,7 +507,7 @@ namespace Assets.Generation.GeomRep
                                 // intersections at the ends of curves are permitted
                                 if (pd1 > 1e-4f || pd2 > 1e-4f)
                                 {
-                                    throw new ArgumentException("Curves in loop intersect", name);
+                                    throw new InvalidOperationException("Curves in merged loop intersect");
                                 }
                             }
                         }
@@ -515,7 +516,7 @@ namespace Assets.Generation.GeomRep
             }
         }
 
-        private static void CheckSelfIntersection(Loop loop, string name)
+        private static void CheckSelfIntersection(Loop loop)
         {
             for (int i = 0; i < loop.NumCurves - 1; i++)
             {
@@ -527,11 +528,11 @@ namespace Assets.Generation.GeomRep
 
                     if (ReferenceEquals(c1, c2))
                     {
-                        throw new ArgumentException("Same curve object present twice in loop", name);
+                        throw new InvalidOperationException("Same curve object present twice in merged loop");
                     }
                     else if (c1 == c2)
                     {
-                        throw new ArgumentException("Same curve present twice in loop", name);
+                        throw new InvalidOperationException("Same curve present twice in merged loop");
                     }
                     else
                     {
@@ -550,7 +551,7 @@ namespace Assets.Generation.GeomRep
                                 // intersections at the ends of curves are permitted
                                 if (pd1 > 1e-4f || pd2 > 1e-4f)
                                 {
-                                    throw new ArgumentException("Curves in loop intersect", name);
+                                    throw new InvalidOperationException("Curves in merged loop intersect");
                                 }
                             }
                         }
