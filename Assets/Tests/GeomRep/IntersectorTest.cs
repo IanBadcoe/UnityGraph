@@ -92,6 +92,8 @@ public class IntersectorTest
     [Test]
     public void TestBuildAnnotationChains()
     {
+        m_intersector.Reset();
+
         List<Curve> curves = new List<Curve>();
 
         Curve ca = new FakeCurve("a");
@@ -106,9 +108,9 @@ public class IntersectorTest
         curves.Add(cd);
         curves.Add(ce);
 
-        Dictionary<Curve, Intersector.AnnotatedCurve> ann_map = Intersector.MakeAnnotationsMap();
+        m_intersector.BuildAnnotationChains(curves, 1);
 
-        m_intersector.BuildAnnotationChains(curves, 1, ann_map);
+        var ann_map = m_intersector.GetAnnotationMap();
 
         foreach (Curve c in curves)
         {
@@ -121,6 +123,8 @@ public class IntersectorTest
     [Test]
     public void TestSplitCurvesAtIntersections_TwoCirclesTwoPoints()
     {
+        m_intersector.Reset();
+
         // circles meet at two points
         Curve cc1 = new CircleCurve(new Vector2(), 1);
         Curve cc2 = new CircleCurve(new Vector2(1, 0), 1);
@@ -135,12 +139,10 @@ public class IntersectorTest
             cc2
         };
 
-        var ann_map = Intersector.MakeAnnotationsMap();
+        m_intersector.BuildAnnotationChains(curves1, 1);
+        m_intersector.BuildAnnotationChains(curves2, 2);
 
-        m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-        m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
-
-        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
+        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
 
         // we cut each curve twice, technically we could anneal the original curve across its
         // join at 2PI -> 0.0 but we don't currently try anything clever like that
@@ -165,6 +167,8 @@ public class IntersectorTest
     [Test]
     public void TestSplitCurvesAtIntersections_TwoCirclesOnePoint()
     {
+        m_intersector.Reset();
+
         // circles meet at one point
         Curve cc1 = new CircleCurve(new Vector2(), 1);
         Curve cc2 = new CircleCurve(new Vector2(2, 0), 1);
@@ -179,12 +183,10 @@ public class IntersectorTest
             cc2
         };
 
-        var ann_map = Intersector.MakeAnnotationsMap();
+        m_intersector.BuildAnnotationChains(curves1, 1);
+        m_intersector.BuildAnnotationChains(curves2, 2);
 
-        m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-        m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
-
-        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
+        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
 
         Assert.AreEqual(2, curves1.Count);
         Assert.AreEqual(2, curves2.Count);
@@ -203,6 +205,8 @@ public class IntersectorTest
     [Test]
     public void TestSplitCurvesAtIntersections_SameCircleTwice()
     {
+        m_intersector.Reset();
+
         // same circle twice
         Curve cc1 = new CircleCurve(new Vector2(), 1);
         Curve cc2 = new CircleCurve(new Vector2(), 1);
@@ -217,12 +221,10 @@ public class IntersectorTest
             cc2
         };
 
-        var ann_map = Intersector.MakeAnnotationsMap();
+        m_intersector.BuildAnnotationChains(curves1, 1);
+        m_intersector.BuildAnnotationChains(curves2, 2);
 
-        m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-        m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
-
-        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
+        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
 
         Assert.AreEqual(1, curves1.Count);
         Assert.AreEqual(1, curves2.Count);
@@ -237,6 +239,8 @@ public class IntersectorTest
     [Test]
     public void TestSplitCurvesAtIntersections_OneCircleHitsBreakInOther()
     {
+        m_intersector.Reset();
+
         // one circle hits existing break in other
         Curve cc1 = new CircleCurve(new Vector2(), 1);
 
@@ -252,64 +256,22 @@ public class IntersectorTest
             cc2
         };
 
-        var ann_map = Intersector.MakeAnnotationsMap();
+        m_intersector.BuildAnnotationChains(curves1, 1);
+        m_intersector.BuildAnnotationChains(curves2, 2);
 
-        m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-        m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
-
-        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
+        m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
 
         Assert.AreEqual(1, curves1.Count);
         Assert.AreEqual(2, curves2.Count);
     }
-
-    // this used invalid input, in that curves2 was not a single loop
-    //[Test]
-    //public void TestSplitCurvesAtIntersections_Flower()
-    //{
-    //    // one circle hits existing break in other
-    //    Curve cc1 = new CircleCurve(new Vector2(), 1);
-
-    //    List<Curve> curves1 = new List<Curve>
-    //    {
-    //        cc1
-    //    };
-
-    //    List<Curve> curves2 = new List<Curve>();
-
-    //    for (int i = 0; i < 6; i++)
-    //    {
-    //        float a = i * Mathf.PI / 3;
-
-    //        Curve cc2 = new CircleCurve(new Vector2(Mathf.Sin(a), Mathf.Cos(a)), 1);
-
-    //        curves2.Add(cc2);
-    //    }
-
-    //    var ann_map = Intersector.MakeAnnotationsMap();
-
-    //    m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-    //    m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
-
-    //    m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
-
-    //    Assert.AreEqual(6, curves1.Count);
-
-    //    for (int i = 0; i < curves1.Count; i++)
-    //    {
-    //        int next_i = (i + 1) % curves1.Count;
-    //        Assert.IsTrue(Util.ClockAwareAngleCompare(
-    //            ((CircleCurve)curves1[i]).AngleRange.End,
-    //            ((CircleCurve)curves1[next_i]).AngleRange.Start, 1e-5f));
-    //        Assert.IsTrue(curves1[i].EndPos.Equals(curves1[next_i].StartPos, 1e-5f));
-    //    }
-    //}
 
     [Test]
     public void TestTryFindIntersections()
     {
         // one circle, expect 1, 0
         {
+            m_intersector.Reset();
+
             CircleCurve cc = new CircleCurve(new Vector2(), 5);
 
             HashSet<Curve> all_curves = Intersector.MakeAllCurvesSet(cc);
@@ -343,6 +305,8 @@ public class IntersectorTest
 
         // two concentric circles, expect 1, 2, 1, 0
         {
+            m_intersector.Reset();
+
             CircleCurve cc1 = new CircleCurve(new Vector2(), 5);
             CircleCurve cc2 = new CircleCurve(new Vector2(), 3);
 
@@ -389,6 +353,8 @@ public class IntersectorTest
 
         // two concentric circles, inner one -ve, expect 1, 0, 1, 0
         {
+            m_intersector.Reset();
+
             CircleCurve cc1 = new CircleCurve(new Vector2(), 5);
             CircleCurve cc2 = new CircleCurve(new Vector2(), 3, RotationDirection.Reverse);
 
@@ -443,6 +409,8 @@ public class IntersectorTest
         // one circle, built from two half-circles, should still work
         // expect 1, 0
         {
+            m_intersector.Reset();
+
             CircleCurve cc1 = new CircleCurve(new Vector2(), 5, 0, Mathf.PI);
             CircleCurve cc2 = new CircleCurve(new Vector2(), 5, Mathf.PI, 2 * Mathf.PI);
 
@@ -472,6 +440,8 @@ public class IntersectorTest
 
         // miss the circle, expect null
         {
+            m_intersector.Reset();
+
             CircleCurve cc1 = new CircleCurve(new Vector2(), 5);
 
             HashSet<Curve> all_curves = Intersector.MakeAllCurvesSet(new List<Curve>
@@ -492,6 +462,8 @@ public class IntersectorTest
 
         // clip the circle, to simplify the analysis we disregard these, expect null
         {
+            m_intersector.Reset();
+
             CircleCurve cc1 = new CircleCurve(new Vector2(), 5);
 
             HashSet<Curve> all_curves = Intersector.MakeAllCurvesSet(new List<Curve>
@@ -531,6 +503,8 @@ public class IntersectorTest
     {
         // nothing union nothing should equal nothing
         {
+            m_intersector.Reset();
+
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
 
@@ -541,6 +515,8 @@ public class IntersectorTest
 
         // something union nothing should equal something
         {
+            m_intersector.Reset();
+
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
 
@@ -556,6 +532,8 @@ public class IntersectorTest
 
         // nothing union something should equal something
         {
+            m_intersector.Reset();
+
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
 
@@ -571,6 +549,8 @@ public class IntersectorTest
 
         // union of two identical things should equal either one of them
         {
+            m_intersector.Reset();
+
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
 
@@ -592,6 +572,8 @@ public class IntersectorTest
 
         // union of two overlapping circles should be one two-part curve
         {
+            m_intersector.Reset();
+
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
 
@@ -642,6 +624,8 @@ public class IntersectorTest
         // union of two overlapping circles with holes in
         // should be one two-part curve around outside and two two-part curves in the interior
         {
+            m_intersector.Reset();
+
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
 
@@ -667,6 +651,8 @@ public class IntersectorTest
 
         // osculating circles, outside each other
         {
+            m_intersector.Reset();
+
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
 
@@ -716,6 +702,8 @@ public class IntersectorTest
         // osculating circles, outside each other
         // other way around
         {
+            m_intersector.Reset();
+
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
 
@@ -764,6 +752,8 @@ public class IntersectorTest
 
         // osculating circles, one smaller, reversed and inside the other
         {
+            m_intersector.Reset();
+
             LoopSet ls1 = new LoopSet();
             LoopSet ls2 = new LoopSet();
 
@@ -832,7 +822,6 @@ public class IntersectorTest
     {
         public override bool RemoveUnwantedCurves(
             float tol, ClRand ClRand,
-            Dictionary<Curve, AnnotatedCurve> ann_map,
             HashSet<Curve> all_curves,
             HashSet<Curve> open,
             HashSet<Vector2> curve_joints,
@@ -955,6 +944,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             // iron cross has four possible outputs from one curve
             var pcentre = new Vector2();
             var p1tl = new Vector2(-1.0f, 0.5f);
@@ -1002,6 +993,8 @@ public class IntersectorTest
         LineCurve lc2 = new LineCurve(new Vector2(), new Vector2(1 / Mathf.Sqrt(2), 1 / Mathf.Sqrt(2)), 10);
 
         {
+            m_intersector.Reset();
+
             HashSet<Vector2> hs = new HashSet<Vector2>
             {
                 new Vector2(1, 1)
@@ -1012,6 +1005,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             HashSet<Vector2> hs = new HashSet<Vector2>
             {
                 new Vector2(0, 0)
@@ -1022,6 +1017,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             HashSet<Vector2> hs = new HashSet<Vector2>
             {
                 new Vector2(2, 0)
@@ -1036,6 +1033,8 @@ public class IntersectorTest
     public void TestRemoveTinyCurves()
     {
         {
+            m_intersector.Reset();
+
             // discard a whole tiny circle
             var loop = new List<Curve>
             {
@@ -1052,6 +1051,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             // discard a whole tiny rect
             var loop = Loop.MakeRect(0, 0, 0.1f, 0.1f).Curves.ToList();
 
@@ -1065,6 +1066,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             Vector2 pos = new Vector2();
 
             var loop = new List<Curve>()
@@ -1093,6 +1096,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             Vector2 pos = new Vector2();
 
             var loop = new List<Curve>()
@@ -1122,6 +1127,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             // polygonize a circle built from many small bits (in real usage, curve merging would
             // join the circle parts if they were from identical circles...)
 
@@ -1238,6 +1245,8 @@ public class IntersectorTest
         Vector2 p4 = new Vector2(1, 0);
 
         {
+            m_intersector.Reset();
+
             // clockwise is forwards is a positive polygon
             Loop l = Loop.MakePolygon(new List<Vector2> { p1, p2, p3, p4 }, RotationDirection.Forwards);
             LoopSet ls1 = new LoopSet(l);
@@ -1248,6 +1257,8 @@ public class IntersectorTest
             Assert.AreEqual(1, ret.Count);
             Assert.IsTrue(new HashSet<Curve>(ls1[0].Curves).SetEquals(l.Curves));
 
+            m_intersector.Reset();
+
             ret = m_intersector.Union(new LoopSet(), ls1,
                 1e-5f, new ClRand(1), Intersector.UnionType.WantNegative);
 
@@ -1255,6 +1266,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             // anti-clockwise is reverse is a negative polygon
             Loop l = Loop.MakePolygon(new List<Vector2> { p1, p2, p3, p4 }, RotationDirection.Reverse);
             LoopSet ls1 = new LoopSet(l);
@@ -1263,6 +1276,8 @@ public class IntersectorTest
                 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
 
             Assert.AreEqual(0, ret.Count);
+
+            m_intersector.Reset();
 
             ret = m_intersector.Union(new LoopSet(), ls1,
                 1e-5f, new ClRand(1), Intersector.UnionType.WantNegative);
@@ -1315,6 +1330,8 @@ public class IntersectorTest
         LoopSet circ = new LoopSet(new Loop("", new CircleCurve(new Vector2(0, 0), 1)));
 
         {
+            m_intersector.Reset();
+
             LoopSet merged = m_intersector.Union(circ, p1f, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
 
             Assert.AreEqual(1, merged.Count);
@@ -1323,6 +1340,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             LoopSet merged = m_intersector.Union(circ, p1r, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
 
             Assert.AreEqual(1, merged.Count);
@@ -1331,6 +1350,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             LoopSet merged = m_intersector.Union(circ, p2f, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
 
             Assert.AreEqual(1, merged.Count);
@@ -1339,6 +1360,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             LoopSet merged = m_intersector.Union(circ, p2r, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
 
             Assert.AreEqual(1, merged.Count);
@@ -1347,6 +1370,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             LoopSet merged = m_intersector.Union(circ, p3f, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
 
             Assert.AreEqual(1, merged.Count);
@@ -1355,6 +1380,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             LoopSet merged = m_intersector.Union(circ, p3r, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
 
             // because our rule is, when two curves intersect, to change curve if possible, we get two pieces out here
@@ -1371,6 +1398,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             LoopSet merged = m_intersector.Union(circ, p4f, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
 
             Assert.AreEqual(1, merged.Count);
@@ -1379,6 +1408,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             LoopSet merged = m_intersector.Union(circ, p4r, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
 
             // cut cleanly into two
@@ -1393,6 +1424,8 @@ public class IntersectorTest
     public void TestCoincidentLines()
     {
         {
+            m_intersector.Reset();
+
             // simple degenerate polygon should disappear
             Vector2 p1 = new Vector2(0, 0);
             Vector2 p2 = new Vector2(1, 0);
@@ -1424,6 +1457,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             // slightly more complex degenerate polygon should disappear
             Vector2 p1 = new Vector2(0, 0);
             Vector2 p2 = new Vector2(1, 0);
@@ -1459,6 +1494,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             // degenerate U should disappear
 
             Vector2 p1 = new Vector2(0, 0);
@@ -1589,6 +1626,8 @@ public class IntersectorTest
         //}
 
         {
+            m_intersector.Reset();
+
             // two opposite circles should disappear
             LoopSet ls1 = new LoopSet(
                 new List<Loop> {
@@ -1612,6 +1651,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             // rects that take out parts of each other should work
             LoopSet ls1 = new LoopSet(Loop.MakeRect(0, 0, 20, 20));
             LoopSet ls2 = new LoopSet(Loop.MakeRect(5, 0, 15, 20).Reversed());
@@ -1621,15 +1662,21 @@ public class IntersectorTest
             Assert.AreEqual(2, merged.Count);
             Assert.AreEqual(new Box2(0, 0, 20, 20), merged.GetBounds());
 
+            m_intersector.Reset();
+
             merged = m_intersector.Union(ls2, ls1, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
 
             Assert.AreEqual(2, merged.Count);
             Assert.AreEqual(new Box2(0, 0, 20, 20), merged.GetBounds());
 
+            m_intersector.Reset();
+
             merged = m_intersector.Union(ls2.Reversed(), ls1.Reversed(), 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
 
             // in this case the outer -ve box should disappear, taking the inner box with it
             Assert.AreEqual(0, merged.Count);
+
+            m_intersector.Reset();
 
             merged = m_intersector.Union(ls1.Reversed(), ls2.Reversed(), 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
 
@@ -1637,6 +1684,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             // rects that abut should work
             LoopSet ls1 = new LoopSet(Loop.MakeRect(0, 0, 20, 20));
             LoopSet ls2 = new LoopSet(Loop.MakeRect(5, -10, 15, 0).Reversed());
@@ -1647,16 +1696,22 @@ public class IntersectorTest
             Assert.AreEqual(1, merged.Count);
             Assert.AreEqual(new Box2(0, 0, 20, 20), merged.GetBounds());
 
+            m_intersector.Reset();
+
             merged = m_intersector.Union(ls2, ls1, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
 
             Assert.AreEqual(1, merged.Count);
             Assert.AreEqual(new Box2(0, 0, 20, 20), merged.GetBounds());
+
+            m_intersector.Reset();
 
             // +ve touching rect should get merged in
             merged = m_intersector.Union(ls1, ls2.Reversed(), 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
 
             Assert.AreEqual(1, merged.Count);
             Assert.AreEqual(new Box2(0, -10, 20, 20), merged.GetBounds());
+
+            m_intersector.Reset();
 
             merged = m_intersector.Union(ls2.Reversed(), ls1, 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
 
@@ -1722,102 +1777,114 @@ public class IntersectorTest
     public void TestEliminateCancellingLines()
     {
         {
+            m_intersector.Reset();
+
             // whatever we add separated in distance doesn't get eliminated
             List<Intersector.Interval> list = new List<Intersector.Interval>();
 
             AddIntervals("p", 0, list);
 
-            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f);
 
             Assert.AreEqual(1, list.Count);
             CheckCrossings(list);
 
             AddIntervals("r", 1, list);
 
-            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f);
 
             Assert.AreEqual(2, list.Count);
             CheckCrossings(list);
 
             AddIntervals("p", 2, list);
 
-            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f);
 
             Assert.AreEqual(3, list.Count);
             CheckCrossings(list);
         }
 
         {
+            m_intersector.Reset();
+
             // multiple lines with the same orientation should not cancel
             List<Intersector.Interval> list = new List<Intersector.Interval>();
 
             AddIntervals("pp", 0, list);
 
-            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f);
 
             Assert.AreEqual(2, list.Count);
             CheckCrossings(list);
 
             AddIntervals("p", 0, list);
 
-            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f);
 
             Assert.AreEqual(3, list.Count);
             CheckCrossings(list);
         }
 
         {
+            m_intersector.Reset();
+
             // two opposite lines at the same point should cancel
             List<Intersector.Interval> list = new List<Intersector.Interval>();
 
             AddIntervals("pr", 0, list);
 
-            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f);
 
             Assert.AreEqual(0, list.Count);
         }
 
         {
+            m_intersector.Reset();
+
             // multiple pairs of opposite lines should cancel
             List<Intersector.Interval> list = new List<Intersector.Interval>();
 
             AddIntervals("prprprpr", 0, list);
 
-            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f);
 
             Assert.AreEqual(0, list.Count);
         }
 
         {
+            m_intersector.Reset();
+
             // order should not matter
             List<Intersector.Interval> list = new List<Intersector.Interval>();
 
             AddIntervals("pppprrrr", 0, list);
 
-            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f);
 
             Assert.AreEqual(0, list.Count);
 
             AddIntervals("rrrrpppp", 0, list);
 
-            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f);
 
             Assert.AreEqual(0, list.Count);
 
             AddIntervals("pprrprrp", 0, list);
 
-            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f);
 
             Assert.AreEqual(0, list.Count);
         }
 
         {
+            m_intersector.Reset();
+
             // any excess +ve or -ve lines should persist
             List<Intersector.Interval> list = new List<Intersector.Interval>();
 
             AddIntervals("ppprr", 0, list);
 
-            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f);
 
             Assert.AreEqual(1, list.Count);
             CheckCrossings(list);
@@ -1826,7 +1893,7 @@ public class IntersectorTest
 
             AddIntervals("rrrrppppr", 0, list);
 
-            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f);
 
             Assert.AreEqual(1, list.Count);
             CheckCrossings(list);
@@ -1835,27 +1902,29 @@ public class IntersectorTest
 
             AddIntervals("prpprrprp", 0, list);
 
-            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f);
 
             Assert.AreEqual(1, list.Count);
             CheckCrossings(list);
         }
 
         {
+            m_intersector.Reset();
+
             // multiple separate groups should behave the same
             List<Intersector.Interval> list = new List<Intersector.Interval>();
 
             AddIntervals("prpr", 0, list);
             AddIntervals("prpr", 1, list);
 
-            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f);
 
             Assert.AreEqual(0, list.Count);
 
             AddIntervals("prppr", 0, list);
             AddIntervals("prpr", 1, list);
 
-            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f);
 
             Assert.AreEqual(1, list.Count);
             Assert.AreEqual(0, list[0].Distance);
@@ -1866,7 +1935,7 @@ public class IntersectorTest
             AddIntervals("prpr", 0, list);
             AddIntervals("pprpr", 1, list);
 
-            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f);
 
             Assert.AreEqual(1, list.Count);
             Assert.AreEqual(1, list[0].Distance);
@@ -1874,6 +1943,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             // if there is lots of counting crossings up and down, it should remain stepwise after any cancellings
             List<Intersector.Interval> list = new List<Intersector.Interval>();
 
@@ -1882,7 +1953,7 @@ public class IntersectorTest
             AddIntervals("prrpr", 2, list);
             AddIntervals("r", 3, list);
 
-            m_intersector.EliminateCancellingLines(list, null, 1e-4f, null);
+            m_intersector.EliminateCancellingLines(list, null, 1e-4f);
 
             Assert.AreEqual(4, list.Count);
             CheckCrossings(list);
@@ -1893,6 +1964,8 @@ public class IntersectorTest
     public void TestClusterJoints()
     {
         {
+            m_intersector.Reset();
+
             // widely separated points should come through unchanged
             HashSet<Vector2> set = new HashSet<Vector2>
             {
@@ -1922,6 +1995,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             // clusters should decay into their centroids
             HashSet<Vector2> set = new HashSet<Vector2>
             {
@@ -1950,6 +2025,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             // order is irrelevant
             HashSet<Vector2> set = new HashSet<Vector2>
             {
@@ -1980,6 +2057,8 @@ public class IntersectorTest
     public void TestSplitCurvesAtIntersections_SpliceMap()
     {
         {
+            m_intersector.Reset();
+
             // circles miss
             Curve cc1 = new CircleCurve(new Vector2(), 1);
             Curve cc2 = new CircleCurve(new Vector2(3, 0), 1);
@@ -1994,17 +2073,17 @@ public class IntersectorTest
                 cc2
             };
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
 
-            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
-
-            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(m_intersector.GetAnnotationMap(), curves1.Concat(curves2).ToList());
         }
 
         {
+            m_intersector.Reset();
+
             // circles meet at two points
             Curve cc1 = new CircleCurve(new Vector2(), 1);
             Curve cc2 = new CircleCurve(new Vector2(1, 0), 1);
@@ -2019,17 +2098,17 @@ public class IntersectorTest
                 cc2
             };
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
 
-            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
-
-            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(m_intersector.GetAnnotationMap(), curves1.Concat(curves2).ToList());
         }
 
         {
+            m_intersector.Reset();
+
             // circles meet at one point
             Curve cc1 = new CircleCurve(new Vector2(), 1);
             Curve cc2 = new CircleCurve(new Vector2(2, 0), 1);
@@ -2044,17 +2123,17 @@ public class IntersectorTest
                 cc2
             };
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
 
-            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
-
-            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(m_intersector.GetAnnotationMap(), curves1.Concat(curves2).ToList());
         }
 
         {
+            m_intersector.Reset();
+
             // circles meet at one point and it hits the join in one
             Curve cc1 = new CircleCurve(new Vector2(), 1);
             Curve cc2 = new CircleCurve(new Vector2(0, 2), 1);
@@ -2069,17 +2148,17 @@ public class IntersectorTest
                 cc2
             };
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
 
-            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
-
-            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(m_intersector.GetAnnotationMap(), curves1.Concat(curves2).ToList());
         }
 
         {
+            m_intersector.Reset();
+
             // as above, but other way around
             Curve cc1 = new CircleCurve(new Vector2(), 1);
             Curve cc2 = new CircleCurve(new Vector2(0, 2), 1);
@@ -2094,17 +2173,17 @@ public class IntersectorTest
                 cc2
             };
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
+            m_intersector.SplitCurvesAtIntersections(curves2, curves1, 1e-5f);
 
-            m_intersector.SplitCurvesAtIntersections(curves2, curves1, 1e-5f, ann_map);
-
-            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(m_intersector.GetAnnotationMap(), curves1.Concat(curves2).ToList());
         }
 
         {
+            m_intersector.Reset();
+
             // circles meet at one point and it hits the join in both
             Curve cc1 = new CircleCurve(new Vector2(), 1);
             Curve cc2 = new CircleCurve(new Vector2(0, 2), 1, Mathf.PI, Mathf.PI * 3);
@@ -2119,17 +2198,17 @@ public class IntersectorTest
                 cc2
             };
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
 
-            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
-
-            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(m_intersector.GetAnnotationMap(), curves1.Concat(curves2).ToList());
         }
 
         {
+            m_intersector.Reset();
+
             // all splits hit existing gaps
             // circles meet at one point and it hits the join in both
             Curve cc1 = new CircleCurve(new Vector2(), 1, 0, Mathf.PI);
@@ -2142,17 +2221,17 @@ public class IntersectorTest
 
             List<Curve> curves2 = Loop.MakeRect(0, -1, 2, 1).Curves.ToList();
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
 
-            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
-
-            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(m_intersector.GetAnnotationMap(), curves1.Concat(curves2).ToList());
         }
 
         {
+            m_intersector.Reset();
+
             // figure 8 shape with another line hitting the cross over:
             //
             // +---+
@@ -2187,18 +2266,16 @@ public class IntersectorTest
 
             new Loop("", curves2);
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
+            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f);
 
-            m_intersector.SplitCurvesAtIntersections(curves1, curves2, 1e-5f, ann_map);
-
-            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(m_intersector.GetAnnotationMap(), curves1.Concat(curves2).ToList());
         }
     }
 
-    private void ValidateAnnotations(Dictionary<Curve, Intersector.AnnotatedCurve> ann_map,
+    private void ValidateAnnotations(IReadOnlyDictionary<Curve, Intersector.AnnotatedCurve> ann_map,
         IList<Curve> allCurves)
     {
         int size = allCurves.Count;
@@ -2272,6 +2349,8 @@ public class IntersectorTest
     public void TestSplitCoincidentCurves()
     {
         {
+            m_intersector.Reset();
+
             // two circles, breaking in the same place
             List<Curve> curves1 = new List<Curve>
             {
@@ -2283,18 +2362,18 @@ public class IntersectorTest
                 new CircleCurve(new Vector2(), 1)
             };
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
-
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f);
 
             Assert.AreEqual(1, curves1.Count);
             Assert.AreEqual(1, curves2.Count);
         }
 
         {
+            m_intersector.Reset();
+
             // two circles, breaking different places
             List<Curve> curves1 = new List<Curve>
             {
@@ -2306,12 +2385,10 @@ public class IntersectorTest
                 new CircleCurve(new Vector2(), 1, Mathf.PI, Mathf.PI * 3)
             };
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
-
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f);
 
             Assert.AreEqual(2, curves1.Count);
             Assert.AreEqual(2, curves2.Count);
@@ -2326,6 +2403,8 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             // two circles, one in two pieces
             List<Curve> curves1 = new List<Curve>
             {
@@ -2338,12 +2417,10 @@ public class IntersectorTest
                 new CircleCurve(new Vector2(), 1, Mathf.PI, Mathf.PI * 2)
             };
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
-
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f);
 
             Assert.AreEqual(2, curves1.Count);
             Assert.AreEqual(2, curves2.Count);
@@ -2359,6 +2436,8 @@ public class IntersectorTest
 
         for(int i = 0; i < 6; i++)
         {
+            m_intersector.Reset();
+
             // two circles, one in three pieces
             // (requiring the other to be split twice for one segment of the first)
             List<Curve> curves1 = new List<Curve>
@@ -2383,12 +2462,10 @@ public class IntersectorTest
                 curves2 = temp;
             }
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
-
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f);
 
             Assert.AreEqual(3, curves1.Count);
             Assert.AreEqual(3, curves2.Count);
@@ -2406,85 +2483,85 @@ public class IntersectorTest
         }
 
         {
+            m_intersector.Reset();
+
             // two rectangles, aligned along one edge
             List<Curve> curves1 = Loop.MakeRect(0, 0, 1, 1).Curves.ToList();
 
             List<Curve> curves2 = Loop.MakeRect(0, 1, 1, 2).Curves.ToList();
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
-
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f);
 
             Assert.AreEqual(4, curves1.Count);
             Assert.AreEqual(4, curves2.Count);
         }
 
         {
+            m_intersector.Reset();
+
             // two rectangles, offset along one edge
             List<Curve> curves1 = Loop.MakeRect(0, 0, 1, 1).Curves.ToList();
 
             List<Curve> curves2 = Loop.MakeRect(0.5f, 1, 1.5f, 2).Curves.ToList();
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
-
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f);
 
             Assert.AreEqual(5, curves1.Count);
             Assert.AreEqual(5, curves2.Count);
         }
 
         {
+            m_intersector.Reset();
+
             // two rectangles, offset (other way) along one edge
             List<Curve> curves1 = Loop.MakeRect(0, 0, 1, 1).Curves.ToList();
 
             List<Curve> curves2 = Loop.MakeRect(-0.5f, 1, 0.5f, 2).Curves.ToList();
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
-
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f);
 
             Assert.AreEqual(5, curves1.Count);
             Assert.AreEqual(5, curves2.Count);
         }
 
         {
+            m_intersector.Reset();
+
             // two rectangles, touching on one edge, one inside in both directions
             List<Curve> curves1 = Loop.MakeRect(0, 0, 1, 1).Curves.ToList();
 
             List<Curve> curves2 = Loop.MakeRect(0.25f, 1, 0.75f, 2).Curves.ToList();
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
-
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f);
 
             Assert.AreEqual(6, curves1.Count);
             Assert.AreEqual(4, curves2.Count);
         }
 
         {
+            m_intersector.Reset();
+
             // two rectangles, one inside the other and smaller on one axis
             List<Curve> curves1 = Loop.MakeRect(0, 0, 1, 1).Curves.ToList();
 
             List<Curve> curves2 = Loop.MakeRect(0.25f, 0, 0.75f, 1).Curves.ToList();
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
-
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f);
 
             Assert.AreEqual(8, curves1.Count);
             Assert.AreEqual(4, curves2.Count);
@@ -2495,6 +2572,8 @@ public class IntersectorTest
     public void TestSplitCoincidentCurves_SpliceMap()
     {
         {
+            m_intersector.Reset();
+
             // two circles, breaking different places
             List<Curve> curves1 = new List<Curve>
             {
@@ -2506,17 +2585,17 @@ public class IntersectorTest
                 new CircleCurve(new Vector2(), 1, Mathf.PI, Mathf.PI * 3)
             };
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
-
-            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(m_intersector.GetAnnotationMap(), curves1.Concat(curves2).ToList());
         }
 
         {
+            m_intersector.Reset();
+
             // two circles, one in two pieces
             List<Curve> curves1 = new List<Curve>
             {
@@ -2529,18 +2608,18 @@ public class IntersectorTest
                 new CircleCurve(new Vector2(), 1, Mathf.PI, Mathf.PI * 2)
             };
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
-
-            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(m_intersector.GetAnnotationMap(), curves1.Concat(curves2).ToList());
         }
 
         for (int i = 0; i < 6; i++)
         {
+            m_intersector.Reset();
+
             // two circles, one in three pieces
             // (requiring the other to be split twice for one segment of the first)
             List<Curve> curves1 = new List<Curve>
@@ -2565,94 +2644,92 @@ public class IntersectorTest
                 curves2 = temp;
             }
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
-
-            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(m_intersector.GetAnnotationMap(), curves1.Concat(curves2).ToList());
         }
 
         {
+            m_intersector.Reset();
+
             // two rectangles, aligned along one edge
             List<Curve> curves1 = Loop.MakeRect(0, 0, 1, 1).Curves.ToList();
 
             List<Curve> curves2 = Loop.MakeRect(0, 1, 1, 2).Curves.ToList();
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
-
-            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(m_intersector.GetAnnotationMap(), curves1.Concat(curves2).ToList());
         }
 
         {
+            m_intersector.Reset();
+
             // two rectangles, offset along one edge
             List<Curve> curves1 = Loop.MakeRect(0, 0, 1, 1).Curves.ToList();
 
             List<Curve> curves2 = Loop.MakeRect(0.5f, 1, 1.5f, 2).Curves.ToList();
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
-
-            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(m_intersector.GetAnnotationMap(), curves1.Concat(curves2).ToList());
         }
 
         {
+            m_intersector.Reset();
+
             // two rectangles, offset (other way) along one edge
             List<Curve> curves1 = Loop.MakeRect(0, 0, 1, 1).Curves.ToList();
 
             List<Curve> curves2 = Loop.MakeRect(-0.5f, 1, 0.5f, 2).Curves.ToList();
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
-
-            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(m_intersector.GetAnnotationMap(), curves1.Concat(curves2).ToList());
         }
 
         {
+            m_intersector.Reset();
+
             // two rectangles, touching on one edge, one inside in both directions
             List<Curve> curves1 = Loop.MakeRect(0, 0, 1, 1).Curves.ToList();
 
             List<Curve> curves2 = Loop.MakeRect(0.25f, 1, 0.75f, 2).Curves.ToList();
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
-
-            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(m_intersector.GetAnnotationMap(), curves1.Concat(curves2).ToList());
         }
 
         {
+            m_intersector.Reset();
+
             // two rectangles, one inside the other and smaller on one axis
             List<Curve> curves1 = Loop.MakeRect(0, 0, 1, 1).Curves.ToList();
 
             List<Curve> curves2 = Loop.MakeRect(0.25f, 0, 0.75f, 1).Curves.ToList();
 
-            var ann_map = Intersector.MakeAnnotationsMap();
+            m_intersector.BuildAnnotationChains(curves1, 1);
+            m_intersector.BuildAnnotationChains(curves2, 2);
 
-            m_intersector.BuildAnnotationChains(curves1, 1, ann_map);
-            m_intersector.BuildAnnotationChains(curves2, 2, ann_map);
+            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f);
 
-            m_intersector.SplitCurvesAtCoincidences(curves1, curves2, 1e-5f, ann_map);
-
-            ValidateAnnotations(ann_map, curves1.Concat(curves2).ToList());
+            ValidateAnnotations(m_intersector.GetAnnotationMap(), curves1.Concat(curves2).ToList());
         }
     }
 

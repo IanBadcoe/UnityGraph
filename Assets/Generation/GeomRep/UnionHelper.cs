@@ -44,6 +44,8 @@ namespace Assets.Generation.GeomRep
                     merged_layer_loops = new LoopSet();
                 }
 
+                m_intersector.Reset();
+
                 m_merged_loop_sets[layer] = m_intersector.Union(merged_layer_loops, new LoopSet(l), 1e-5f, r, layer);
 
                 Assertion.Assert(m_merged_loop_sets[layer] != null);
@@ -56,6 +58,8 @@ namespace Assets.Generation.GeomRep
                 if (m_merged_loop_sets.TryGetValue(cut_desc.CutBy, out LoopSet cut_by)
                     && m_merged_loop_sets.TryGetValue(cut_desc.Cut, out LoopSet cut))
                 {
+                    m_intersector.Reset();
+
                     m_merged_loop_sets[cut_desc.Cut] =
                         m_intersector.Cut(cut, cut_by, 1e-5f, r, cut_desc.Cut);
                 }

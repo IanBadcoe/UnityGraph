@@ -10,6 +10,9 @@ namespace Assets.Generation.GeomRep
 {
     public class Intersector
     {
+        Dictionary<Curve, AnnotatedCurve> AnnotationMap
+            = MakeAnnotationsMap();
+
 
         [System.Diagnostics.DebuggerDisplay("Forward({ForwardLinks.Count}) Backward({BackwardLinks.Count})")]
         public class Splice
@@ -51,12 +54,27 @@ namespace Assets.Generation.GeomRep
             }
         }
 
+        public Intersector()
+        {
+            Reset();
+        }
+
+        public void Reset()
+        {
+            AnnotationMap = MakeAnnotationsMap();
+        }
+
         public LoopSet Cut(LoopSet to_cut, LoopSet cut_by, float tol, ClRand random, string layer)
         {
             // assuming cut_by has no outer -ve curves (which it shouldn't have if it is the output of a previous union)
             // removing cut_by from cut is the same as unioning with the inverse
 
             return Union(to_cut, cut_by.Reversed(), tol, random, layer);
+        }
+
+        public IReadOnlyDictionary<Curve, AnnotatedCurve> GetAnnotationMap()
+        {
+            return AnnotationMap;
         }
 
         // union operation cannot return a mix of positive and negative top-level curves
@@ -154,21 +172,18 @@ namespace Assets.Generation.GeomRep
             }
 
             // build forward and reverse chains of annotation-curves around both loops
-            Dictionary<Curve, AnnotatedCurve> ann_map
-                = MakeAnnotationsMap();
-
             foreach (int i in working_loops1.Keys)
             {
                 IList<Curve> alc1 = working_loops1[i];
 
-                BuildAnnotationChains(alc1, i, ann_map);
+                BuildAnnotationChains(alc1, i);
             }
 
             foreach (int i in working_loops2.Keys)
             {
                 IList<Curve> alc1 = working_loops2[i];
 
-                BuildAnnotationChains(alc1, i, ann_map);
+                BuildAnnotationChains(alc1, i);
             }
 
 
@@ -196,7 +211,7 @@ namespace Assets.Generation.GeomRep
                 {
                     var alc2 = working_loops2[j];
 
-                    SplitCurvesAtIntersections(alc1, alc2, 1e-4f, ann_map);
+                    SplitCurvesAtIntersections(alc1, alc2, 1e-4f);
 #if DEBUG
                     // has a side effect of checking that the loops are still loops
                     new Loop("", alc1);
@@ -216,7 +231,7 @@ namespace Assets.Generation.GeomRep
                     //
                     // (where there is no actual gap between the horizontal lines)
                     // then this catches the need to split the long line at the central section
-                    SplitCurvesAtCoincidences(alc1, alc2, 1e-4f, ann_map);
+                    SplitCurvesAtCoincidences(alc1, alc2, 1e-4f);
 #if DEBUG
                     // has a side effect of checking that the loops are still loops
                     new Loop("", alc1);
@@ -248,7 +263,7 @@ namespace Assets.Generation.GeomRep
                 working_loops1.Values
                     .Concat(working_loops2.Values).SelectMany(x => x));
 
-            var open = MakeOpenSet(ann_map);
+            var open = MakeOpenSet(AnnotationMap);
 
             // this is used only for finding if stabbing lines are sufficiently clear of curve end-points
             // when removing unwanted curves
@@ -300,7 +315,6 @@ namespace Assets.Generation.GeomRep
             // try moving this before annotation chains and splices after we have it 100% working
             if (!RemoveUnwantedCurves(tol,
                 random,
-                ann_map,
                 all_curves, open, clustered_joints,
                 diameter,
                 type))
@@ -308,15 +322,15 @@ namespace Assets.Generation.GeomRep
                 return null;
             }
 
-            foreach(var c in ann_map.Keys.ToList())
+            foreach(var c in AnnotationMap.Keys.ToList())
             {
                 if (!open.Contains(c))
                 {
-                    ann_map.Remove(c);
+                    AnnotationMap.Remove(c);
                 }
                 else
                 {
-                    var spl = ann_map[c].ForwardSplice;
+                    var spl = AnnotationMap[c].ForwardSplice;
 
                     spl.ForwardLinks = spl.ForwardLinks.Where(x => open.Contains(x)).ToList();
                     spl.BackwardLinks = spl.BackwardLinks.Where(x => open.Contains(x)).ToList();
@@ -325,7 +339,7 @@ namespace Assets.Generation.GeomRep
 
 #if DEBUG
             // double check we didn't remove anything we needed :-)
-            ValidateAnnotations(ann_map, open.ToList());
+            ValidateAnnotations(open.ToList());
 #endif
 
             while (open.Count > 0)
@@ -336,7 +350,6 @@ namespace Assets.Generation.GeomRep
                 Loop loop = ExtractLoop(
                                       open,
                                       ac_current,
-                                      ann_map,
                                       layer);
 
                 if (loop != null)
@@ -352,7 +365,7 @@ namespace Assets.Generation.GeomRep
             return ret;
         }
 
-        public static Dictionary<Curve, AnnotatedCurve> MakeAnnotationsMap()
+        private static Dictionary<Curve, AnnotatedCurve> MakeAnnotationsMap()
         {
             return new Dictionary<Curve, AnnotatedCurve>(
                                 new ReferenceComparer<Curve>());
@@ -375,8 +388,8 @@ namespace Assets.Generation.GeomRep
         public static HashSet<Curve> MakeOpenSet(Dictionary<Curve, AnnotatedCurve> ann_map)
         {
             return new HashSet<Curve>(
-                            ann_map.Values.Select(x => x.Curve),
-                            new ReferenceComparer<Curve>());
+                ann_map.Values.Select(x => x.Curve),
+                new ReferenceComparer<Curve>());
         }
 
         // public for unit-testing
@@ -550,7 +563,6 @@ namespace Assets.Generation.GeomRep
         virtual public bool RemoveUnwantedCurves(
             float tol,
             ClRand random,
-            Dictionary<Curve, AnnotatedCurve> ann_map,
             HashSet<Curve> all_curves,
             HashSet<Curve> open,
             HashSet<Vector2> curve_joints,
@@ -566,7 +578,7 @@ namespace Assets.Generation.GeomRep
             //
             // each chain is either wholly wanted or wholly unwanted
 
-            IList<HashSet<Curve>> chains = FindChains(ann_map, open);
+            IList<HashSet<Curve>> chains = FindChains(open);
 
             // if we find a curve is non-internal while inspecting another, need not look at it again
             HashSet<AnnotatedCurve> seen = new HashSet<AnnotatedCurve>(
@@ -576,7 +588,7 @@ namespace Assets.Generation.GeomRep
 
             foreach (Curve c in all_curves)
             {
-                AnnotatedCurve ac_c = ann_map[c];
+                AnnotatedCurve ac_c = AnnotationMap[c];
 
                 if (!open.Contains(c) || seen.Contains(ac_c))
                 {
@@ -593,7 +605,7 @@ namespace Assets.Generation.GeomRep
                     throw new AnalysisFailedException("Could not find suitable intersection line for a curve.");
                 }
 
-                EliminateCancellingLines(intervals, open, tol, ann_map);
+                EliminateCancellingLines(intervals, open, tol);
 
                 // now use the intervals to decide what to do with the AnnotationEdges
                 int prev_crossings = 0;
@@ -602,7 +614,7 @@ namespace Assets.Generation.GeomRep
                 {
                     int crossings = intersection.CrossingNumber;
 
-                    AnnotatedCurve ac_intersecting = ann_map[intersection.Curve];
+                    AnnotatedCurve ac_intersecting = AnnotationMap[intersection.Curve];
 
                     if (open.Contains(intersection.Curve) && !seen.Contains(ac_intersecting))
                     {
@@ -625,7 +637,7 @@ namespace Assets.Generation.GeomRep
             return true;
         }
 
-        private IList<HashSet<Curve>> FindChains(Dictionary<Curve, AnnotatedCurve> ann_map, HashSet<Curve> open)
+        private IList<HashSet<Curve>> FindChains(HashSet<Curve> open)
         {
             var temp_open = new HashSet<Curve>(open, new ReferenceComparer<Curve>());
 
@@ -644,7 +656,7 @@ namespace Assets.Generation.GeomRep
 
                 while (true)
                 {
-                    var spl = ann_map[curr].ForwardSplice;
+                    var spl = AnnotationMap[curr].ForwardSplice;
 
                     if (spl.ForwardLinks.Count > 1)
                     {
@@ -671,7 +683,7 @@ namespace Assets.Generation.GeomRep
 
                     while (true)
                     {
-                        var spl = ann_map[curr].BackwardSplice;
+                        var spl = AnnotationMap[curr].BackwardSplice;
 
                         if (spl.BackwardLinks.Count > 1)
                         {
@@ -702,8 +714,7 @@ namespace Assets.Generation.GeomRep
         // we can cancel any pairs that lie in exactly opposite directions
         // (because we have already snipped curves to separate coincident subsections)
         public void EliminateCancellingLines(List<Interval> intervals,
-            HashSet<Curve> open, float tol,
-            Dictionary<Curve, AnnotatedCurve> ann_map)
+            HashSet<Curve> open, float tol)
         {
             int start = 0;
 
@@ -740,7 +751,7 @@ namespace Assets.Generation.GeomRep
                                 && int1.DotProduct * int2.DotProduct < 0)
                             {
                                 // we skip these params for unit-tests
-                                if (ann_map != null)
+                                if (open != null)
                                 {
                                     open.Remove(int1.Curve);
                                     open.Remove(int2.Curve);
@@ -774,7 +785,6 @@ namespace Assets.Generation.GeomRep
 
         Loop ExtractLoop(HashSet<Curve> open,
                          Curve start_c,
-                         Dictionary<Curve, AnnotatedCurve> ann_map,
                          string layer)
         {
             Curve c = start_c;
@@ -789,7 +799,7 @@ namespace Assets.Generation.GeomRep
                 open.Remove(c);
 
                 // look for a splice that ends this curve
-                var curr_ac = ann_map[c];
+                var curr_ac = AnnotationMap[c];
 
                 Assertion.Assert(curr_ac != null);
 
@@ -801,7 +811,7 @@ namespace Assets.Generation.GeomRep
                     || open.Where(x => splice.ForwardLinks.Contains(x)).Any());
 
                 List<AnnotatedCurve> still_open =
-                    open.Where(x => splice.ForwardLinks.Contains(x)).Select(x => ann_map[x]).ToList();
+                    open.Where(x => splice.ForwardLinks.Contains(x)).Select(x => AnnotationMap[x]).ToList();
                 List<AnnotatedCurve> different_loop =
                     still_open.Where(x => x.LoopNumber != curr_ac.LoopNumber).ToList();
 
@@ -1202,7 +1212,7 @@ namespace Assets.Generation.GeomRep
         // non-private only for unit-tests
         public bool SplitCurvesAtIntersections(
             IList<Curve> working_loop1, IList<Curve> working_loop2,
-            float tol, Dictionary<Curve, AnnotatedCurve> ann_map)
+            float tol)
         {
             int intersection_count = 0;
 
@@ -1239,13 +1249,13 @@ namespace Assets.Generation.GeomRep
                         // instead
                         for (int k = 0; k < ret.Count && !any_splits; k++)
                         {
-                            AnnotatedCurve c1_ac = ann_map[c1];
+                            AnnotatedCurve c1_ac = AnnotationMap[c1];
                             Splice c1_from = c1_ac.BackwardSplice;
                             Assertion.Assert(c1_from.ForwardLinks.Contains(c1));
                             Splice c1_to = c1_ac.ForwardSplice;
                             Assertion.Assert(c1_to.BackwardLinks.Contains(c1));
 
-                            AnnotatedCurve c2_ac = ann_map[c2];
+                            AnnotatedCurve c2_ac = AnnotationMap[c2];
                             Splice c2_from = c2_ac.BackwardSplice;
                             Assertion.Assert(c2_from.ForwardLinks.Contains(c2));
                             Splice c2_to = c2_ac.ForwardSplice;
@@ -1273,7 +1283,7 @@ namespace Assets.Generation.GeomRep
                                 working_loop1.Insert(i + 1, c1split2);
 
                                 // fix annotations and splices to swap of c1 to c1split1 and c1split2
-                                joint = FixAnnotationsForCurveSplit(ann_map, c1, c1split1, c1split2, joint);
+                                joint = FixAnnotationsForCurveSplit(c1, c1split1, c1split2, joint);
 
                                 // once we've split once any second split could be in either new curve
                                 // and also any further comparisons of the original c1 now need to be done separately on the two
@@ -1287,7 +1297,7 @@ namespace Assets.Generation.GeomRep
                                 c1 = c1split1;
 
 #if DEBUG
-                                ValidateAnnotations(ann_map, working_loop2.Concat(working_loop2).ToList());
+                                ValidateAnnotations(working_loop2.Concat(working_loop2).ToList());
 #endif
                             }
                             else if (start_dist > tol)
@@ -1317,7 +1327,7 @@ namespace Assets.Generation.GeomRep
                                 working_loop2.Insert(j + 1, c2split2);
 
                                 // fix annotations and splices to swap of c2 to c2split2 and c2split2
-                                joint = FixAnnotationsForCurveSplit(ann_map, c2, c2split1, c2split2, joint);
+                                joint = FixAnnotationsForCurveSplit(c2, c2split1, c2split2, joint);
 
                                 // see comment in previous if-block
                                 c2 = c2split1;
@@ -1325,18 +1335,18 @@ namespace Assets.Generation.GeomRep
                             else if (start_dist > tol && any_splits)
                             {
                                 // we're not adding a splice, but our end-splice is now merged with joint
-                                MergeSplices(ann_map, c2_to, joint);
+                                MergeSplices(c2_to, joint);
                             }
                             else if (any_splits)
                             {
                                 // we're not adding a splice, but our start-splice is now merged with joint
-                                MergeSplices(ann_map, c2_from, joint);
+                                MergeSplices(c2_from, joint);
                             }
 
 #if DEBUG
                             if (any_splits)
                             {
-                                ValidateAnnotations(ann_map, working_loop2.Concat(working_loop2).ToList());
+                                ValidateAnnotations(working_loop2.Concat(working_loop2).ToList());
                             }
 #endif
                         }
@@ -1351,7 +1361,7 @@ namespace Assets.Generation.GeomRep
         }
 
         // order of merge_from and merge_to should be irrelevant
-        private static void MergeSplices(Dictionary<Curve, AnnotatedCurve> ann_map, Splice merge_from, Splice merge_to)
+        private void MergeSplices(Splice merge_from, Splice merge_to)
         {
             merge_to.ForwardLinks.AddRange(merge_from.ForwardLinks);
             merge_to.BackwardLinks.AddRange(merge_from.BackwardLinks);
@@ -1359,26 +1369,25 @@ namespace Assets.Generation.GeomRep
             // there can be other curves using our old splice, and they all need swapping to the new one
             foreach (var c in merge_from.BackwardLinks)
             {
-                ann_map[c].ForwardSplice = merge_to;
+                AnnotationMap[c].ForwardSplice = merge_to;
             }
 
             foreach (var c in merge_from.ForwardLinks)
             {
-                ann_map[c].BackwardSplice = merge_to;
+                AnnotationMap[c].BackwardSplice = merge_to;
             }
         }
 
-        private static Splice FixAnnotationsForCurveSplit(Dictionary<Curve, AnnotatedCurve> ann_map,
-            Curve c, Curve csplit1, Curve csplit2, Splice joint)
+        private Splice FixAnnotationsForCurveSplit(Curve c, Curve csplit1, Curve csplit2, Splice joint)
         {
-            AnnotatedCurve c_ac = ann_map[c];
+            AnnotatedCurve c_ac = AnnotationMap[c];
             // make two new ACs for the new curves
             var new_ac1 = new AnnotatedCurve(csplit1, c_ac.LoopNumber);
             var new_ac2 = new AnnotatedCurve(csplit2, c_ac.LoopNumber);
 
-            ann_map.Remove(c);                     // fix up the map
-            ann_map[csplit1] = new_ac1;            //      "
-            ann_map[csplit2] = new_ac2;            //      "
+            AnnotationMap.Remove(c);                     // fix up the map
+            AnnotationMap[csplit1] = new_ac1;            //      "
+            AnnotationMap[csplit2] = new_ac2;            //      "
 
             // now we have two ACs and three splices
             // get the splices on the right places on the ACs
@@ -1401,10 +1410,9 @@ namespace Assets.Generation.GeomRep
             return joint;
         }
 
-        private static void FixAnnotationsForCurveSplit(Dictionary<Curve, AnnotatedCurve> ann_map,
-            Curve c, IList<Curve> splits)
+        private void FixAnnotationsForCurveSplit(Curve c, IList<Curve> splits)
         {
-            AnnotatedCurve c_ac = ann_map[c];
+            AnnotatedCurve c_ac = AnnotationMap[c];
 
             // clear references to the old curve from existing splices
             c_ac.BackwardSplice.ForwardLinks.Remove(c);
@@ -1414,10 +1422,10 @@ namespace Assets.Generation.GeomRep
             IList<AnnotatedCurve> new_acs = splits.Select(x => new AnnotatedCurve(x, c_ac.LoopNumber)).ToList();
 
             // fix up the map
-            ann_map.Remove(c);
+            AnnotationMap.Remove(c);
             foreach(var ac in new_acs)
             {
-                ann_map[ac.Curve] = ac;            //      "
+                AnnotationMap[ac.Curve] = ac;            //      "
 
             }
 
@@ -1441,7 +1449,7 @@ namespace Assets.Generation.GeomRep
             }
         }
 
-        private void ValidateAnnotations(Dictionary<Curve, AnnotatedCurve> ann_map, IList<Curve> allCurves)
+        private void ValidateAnnotations(IList<Curve> allCurves)
         {
             Dictionary<Curve, int> forward_counts = new Dictionary<Curve, int>(
                 new ReferenceComparer<Curve>());
@@ -1450,7 +1458,7 @@ namespace Assets.Generation.GeomRep
 
             // do a load of checking on the ForwardSplices
 
-            foreach (var pair in ann_map)
+            foreach (var pair in AnnotationMap)
             {
                 Assertion.Assert(pair.Key == pair.Value.Curve);
 
@@ -1459,28 +1467,28 @@ namespace Assets.Generation.GeomRep
 
                 foreach(var c in pair.Value.ForwardSplice.ForwardLinks)
                 {
-                    Assertion.Assert(ann_map[c].BackwardSplice == pair.Value.ForwardSplice);
+                    Assertion.Assert(AnnotationMap[c].BackwardSplice == pair.Value.ForwardSplice);
                 }
 
                 foreach (var c in pair.Value.BackwardSplice.BackwardLinks)
                 {
-                    Assertion.Assert(ann_map[c].ForwardSplice == pair.Value.BackwardSplice);
+                    Assertion.Assert(AnnotationMap[c].ForwardSplice == pair.Value.BackwardSplice);
                 }
             }
 
-            foreach (var c in ann_map.Values.SelectMany(x => x.ForwardSplice.ForwardLinks))
+            foreach (var c in AnnotationMap.Values.SelectMany(x => x.ForwardSplice.ForwardLinks))
             {
                 forward_counts[c] = 0;
             }
 
-            foreach (var c in ann_map.Values.SelectMany(x => x.ForwardSplice.BackwardLinks))
+            foreach (var c in AnnotationMap.Values.SelectMany(x => x.ForwardSplice.BackwardLinks))
             {
                 backward_counts[c] = 0;
             }
 
             var hfk = new HashSet<Curve>(forward_counts.Keys);
             var hbk = new HashSet<Curve>(backward_counts.Keys);
-            var hk = new HashSet<Curve>(ann_map.Keys);
+            var hk = new HashSet<Curve>(AnnotationMap.Keys);
             var hc = new HashSet<Curve>(allCurves);
 
             // we expect every curve to have an entry,
@@ -1489,20 +1497,20 @@ namespace Assets.Generation.GeomRep
             Assertion.Assert(hk.SetEquals(hfk));
             Assertion.Assert(hk.SetEquals(hbk));
 
-            foreach (var splice in ann_map.Values.Select(x => x.ForwardSplice).Distinct())
+            foreach (var splice in AnnotationMap.Values.Select(x => x.ForwardSplice).Distinct())
             {
                 Assertion.Assert(splice.ForwardLinks.Count == splice.BackwardLinks.Count);
 
                 foreach (var c in splice.ForwardLinks)
                 {
-                    Assertion.Assert(ann_map.ContainsKey(c));
+                    Assertion.Assert(AnnotationMap.ContainsKey(c));
 
                     forward_counts[c]++;
                 }
 
                 foreach (var c in splice.BackwardLinks)
                 {
-                    Assertion.Assert(ann_map.ContainsKey(c));
+                    Assertion.Assert(AnnotationMap.ContainsKey(c));
 
                     backward_counts[c]++;
                 }
@@ -1516,15 +1524,15 @@ namespace Assets.Generation.GeomRep
 
             // confirm BackwardSplices refer to the same objects
 
-            foreach(var ac in ann_map.Values)
+            foreach(var ac in AnnotationMap.Values)
             {
                 foreach (var c in ac.ForwardSplice.ForwardLinks)
                 {
-                    Assertion.Assert(ann_map[c].BackwardSplice == ac.ForwardSplice);
+                    Assertion.Assert(AnnotationMap[c].BackwardSplice == ac.ForwardSplice);
                 }
             }
 
-            HashSet<Curve> open = new HashSet<Curve>(ann_map.Keys, new ReferenceComparer<Curve>());
+            HashSet<Curve> open = new HashSet<Curve>(AnnotationMap.Keys, new ReferenceComparer<Curve>());
 
             // check we can take the curves by loops
             while(open.Count > 0)
@@ -1537,7 +1545,7 @@ namespace Assets.Generation.GeomRep
                 {
                     open.Remove(c);
 
-                    var splice = ann_map[c].ForwardSplice;
+                    var splice = AnnotationMap[c].ForwardSplice;
 
                     Curve next = null;
 
@@ -1566,9 +1574,7 @@ namespace Assets.Generation.GeomRep
         }
 
         // non-private only for unit-tests
-        public bool SplitCurvesAtCoincidences(
-            IList<Curve> working_loop1, IList<Curve> working_loop2,
-            float tol, Dictionary<Curve, AnnotatedCurve> ann_map)
+        public bool SplitCurvesAtCoincidences(IList<Curve> working_loop1, IList<Curve> working_loop2, float tol)
         {
             bool any_found = false;
 
@@ -1579,13 +1585,13 @@ namespace Assets.Generation.GeomRep
                 {
                     Curve c2 = working_loop2[j];
 
-                    AnnotatedCurve c1_ac = ann_map[c1];
+                    AnnotatedCurve c1_ac = AnnotationMap[c1];
                     Splice c1_from = c1_ac.BackwardSplice;
                     Assertion.Assert(c1_from.ForwardLinks.Contains(c1));
                     Splice c1_to = c1_ac.ForwardSplice;
                     Assertion.Assert(c1_to.BackwardLinks.Contains(c1));
 
-                    AnnotatedCurve c2_ac = ann_map[c2];
+                    AnnotatedCurve c2_ac = AnnotationMap[c2];
                     Splice c2_from = c2_ac.BackwardSplice;
                     Assertion.Assert(c2_from.ForwardLinks.Contains(c2));
                     Splice c2_to = c2_ac.ForwardSplice;
@@ -1614,12 +1620,12 @@ namespace Assets.Generation.GeomRep
                         }
 
                         // c1 is replaced now
-                        FixAnnotationsForCurveSplit(ann_map, c1, ret.Item1);
+                        FixAnnotationsForCurveSplit(c1, ret.Item1);
 
                         c1 = ret.Item1[0];
 
 #if DEBUG
-                        ValidateAnnotations(ann_map, working_loop2.Concat(working_loop2).ToList());
+                        ValidateAnnotations(working_loop2.Concat(working_loop2).ToList());
 #endif
                     }
 
@@ -1640,12 +1646,12 @@ namespace Assets.Generation.GeomRep
                         }
 
                         // c2 is replaced now
-                        FixAnnotationsForCurveSplit(ann_map, c2, ret.Item2);
+                        FixAnnotationsForCurveSplit(c2, ret.Item2);
 
                         c2 = ret.Item2[0];
 
 #if DEBUG
-                        ValidateAnnotations(ann_map, working_loop2.Concat(working_loop2).ToList());
+                        ValidateAnnotations(working_loop2.Concat(working_loop2).ToList());
 #endif
                     }
                 }
@@ -1659,12 +1665,12 @@ namespace Assets.Generation.GeomRep
             // that is also a bit tricky, so trying this for the moment
             foreach (var c1 in working_loop1)
             {
-                var spl1 = ann_map[c1].ForwardSplice;
+                var spl1 = AnnotationMap[c1].ForwardSplice;
                 var p1 = c1.EndPos;
 
                 foreach (var c2 in working_loop2)
                 {
-                    var spl2 = ann_map[c2].ForwardSplice;
+                    var spl2 = AnnotationMap[c2].ForwardSplice;
                     var p2 = c2.EndPos;
 
                     // don't try to merge anything that is already the same item :-)
@@ -1681,13 +1687,13 @@ namespace Assets.Generation.GeomRep
                         // there can be other curves using our old splice, and they all need swapping to the new one
                         foreach (var c in spl2.BackwardLinks)
                         {
-                            ann_map[c].ForwardSplice = spl1;
+                            AnnotationMap[c].ForwardSplice = spl1;
                         }
 
                         // there can be other curves using our old splice, and they all need swapping to the new one
                         foreach (var c in spl2.ForwardLinks)
                         {
-                            ann_map[c].BackwardSplice = spl1;
+                            AnnotationMap[c].BackwardSplice = spl1;
                         }
                     }
                 }
@@ -1696,7 +1702,7 @@ namespace Assets.Generation.GeomRep
 #if DEBUG
             if (any_merges)
             {
-                ValidateAnnotations(ann_map, working_loop2.Concat(working_loop2).ToList());
+                ValidateAnnotations(working_loop2.Concat(working_loop2).ToList());
             }
 #endif
 
@@ -1704,8 +1710,7 @@ namespace Assets.Generation.GeomRep
         }
 
         // only non-private for unit-testing
-        public void BuildAnnotationChains(IList<Curve> curves, int loop_number,
-                                          Dictionary<Curve, AnnotatedCurve> ann_map)
+        public void BuildAnnotationChains(IList<Curve> curves, int loop_number)
         {
             new Loop("", curves);
 
@@ -1717,7 +1722,7 @@ namespace Assets.Generation.GeomRep
                 ac.ForwardSplice.BackwardLinks.Add(prev);
                 ac.ForwardSplice.ForwardLinks.Add(curr);
 
-                ann_map.Add(prev, ac);
+                AnnotationMap.Add(prev, ac);
 
                 prev = curr;
             }
@@ -1726,12 +1731,12 @@ namespace Assets.Generation.GeomRep
 
             foreach(Curve curr in curves.Reverse())
             {
-                ann_map[prev].BackwardSplice = ann_map[curr].ForwardSplice;
+                AnnotationMap[prev].BackwardSplice = AnnotationMap[curr].ForwardSplice;
 
                 prev = curr;
             }
 
-            ValidateAnnotations(ann_map, new HashSet<Curve>(ann_map.Keys.Concat(curves)).ToList());
+            ValidateAnnotations(new HashSet<Curve>(AnnotationMap.Keys.Concat(curves)).ToList());
         }
 
 
