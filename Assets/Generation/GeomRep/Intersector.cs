@@ -12,6 +12,7 @@ namespace Assets.Generation.GeomRep
     {
         Dictionary<Curve, AnnotatedCurve> AnnotationMap;
         LoopSet Merged;
+        int LoopNumber;
 
 
         [System.Diagnostics.DebuggerDisplay("Forward({ForwardLinks.Count}) Backward({BackwardLinks.Count})")]
@@ -59,18 +60,44 @@ namespace Assets.Generation.GeomRep
             Reset();
         }
 
+        public Intersector(Loop l)
+        {
+            SetInitialLoop(l);
+        }
+
+        public void SetInitialLoop(Loop l)
+        {
+            Reset();
+
+            Merged.Add(l);
+
+            BuildAnnotationChains(l.Curves);
+        }
+
+        public void SetInitialLoopSet(LoopSet ls)
+        {
+            Reset();
+
+            Merged = ls;
+
+            foreach(var l in ls) {
+                BuildAnnotationChains(l.Curves);
+            }
+        }
+
         public void Reset()
         {
             AnnotationMap = MakeAnnotationsMap();
             Merged = new LoopSet();
+            LoopNumber = 1;
         }
 
-        public void Cut(LoopSet to_cut, LoopSet cut_by, float tol, ClRand random, string layer)
+        public void Cut(LoopSet cut_by, float tol, ClRand random, string layer)
         {
             // assuming cut_by has no outer -ve curves (which it shouldn't have if it is the output of a previous union)
             // removing cut_by from cut is the same as unioning with the inverse
 
-            Union(to_cut, cut_by.Reversed(), tol, random, layer);
+            Union(cut_by.Reversed(), tol, random, layer);
         }
 
         public IReadOnlyDictionary<Curve, AnnotatedCurve> GetAnnotationMap()
@@ -131,65 +158,49 @@ namespace Assets.Generation.GeomRep
             WantNegative
         }
 
-        public void Union(LoopSet previously_merged, LoopSet to_merge, float tol,
+        public void Union(LoopSet to_merge, float tol,
                              ClRand random, string layer)
         {
-            Union(previously_merged, to_merge, tol,
+            Union(to_merge, tol,
                 random, UnionType.WantPositive, layer);
         }
 
-        public void Union(LoopSet previously_merged, LoopSet to_merge, float tol,
+        public void Union(LoopSet to_merge, float tol,
                              ClRand random,
                              UnionType type = UnionType.WantPositive, string layer = "")
         {
             // any loops in to_merge can be struck off as they will have no effect
             // (and following code cannot handle them anyway, as they both overlap but don't intersect)
-            RemoveIdenticalLoops(previously_merged, to_merge);
+            RemoveIdenticalLoops(to_merge);
 
             // if there is no input left, we're done
             if (to_merge.Count == 0)
             {
-                Merged = previously_merged;
                 return;
             }
 
             // needing to check +ve/-ve curve type shoots any simple early-outs in the foot
             // ...
 
-            // used later as an id for which loop an AnnotationCurve comes from
-            int loop_count = 0;
+            IList<IList<Curve>> working_loops1 = new List<IList<Curve>>();
 
-            Dictionary<int, IList<Curve>> working_loops1 = new Dictionary<int, IList<Curve>>();
-
-            foreach (Loop l in previously_merged)
+            foreach (Loop l in Merged)
             {
-                working_loops1.Add(loop_count, new List<Curve>(l.Curves));
-                loop_count++;
+                working_loops1.Add(new List<Curve>(l.Curves));
             }
 
-            Dictionary<int, IList<Curve>> working_loops2 = new Dictionary<int, IList<Curve>>();
+            IList<IList<Curve>> working_loops2 = new List<IList<Curve>>();
 
             foreach (Loop l in to_merge)
             {
-                working_loops2.Add(loop_count, new List<Curve>(l.Curves));
-                loop_count++;
+                working_loops2.Add(new List<Curve>(l.Curves));
             }
 
-            // build forward and reverse chains of annotation-curves around both loops
-            foreach (int i in working_loops1.Keys)
+            // build annotation chains for new input
+            foreach (var alc1 in working_loops2)
             {
-                IList<Curve> alc1 = working_loops1[i];
-
-                BuildAnnotationChains(alc1, i);
+                BuildAnnotationChains(alc1);
             }
-
-            foreach (int i in working_loops2.Keys)
-            {
-                IList<Curve> alc1 = working_loops2[i];
-
-                BuildAnnotationChains(alc1, i);
-            }
-
 
             // first, an easy bit, any loops from either set whose bounding boxes are disjunct from all loops in the
             // other set, they have no influence on any other loops and can be simply copied unchanged into
@@ -206,13 +217,10 @@ namespace Assets.Generation.GeomRep
             // a gap that we would somehow have to detect and compensate for...
 
             // split all curves that intersect
-            foreach (int i in working_loops1.Keys)
+            foreach (var alc1 in working_loops1)
             {
-                var alc1 = working_loops1[i];
-                foreach (int j in working_loops2.Keys)
+                foreach (var alc2 in working_loops2)
                 {
-                    var alc2 = working_loops2[j];
-
                     SplitCurvesAtIntersections(alc1, alc2, 1e-4f);
 #if DEBUG
                     // has a side effect of checking that the loops are still loops
@@ -261,9 +269,7 @@ namespace Assets.Generation.GeomRep
             //    the annotation edges from open
             // 8) until there are no open AnnotationEdges
 
-            HashSet<Curve> all_curves = MakeAllCurvesSet(
-                working_loops1.Values
-                    .Concat(working_loops2.Values).SelectMany(x => x));
+            HashSet<Curve> all_curves = MakeAllCurvesSet(working_loops1.Concat(working_loops2).SelectMany(x => x));
 
             var open = MakeOpenSet(AnnotationMap);
 
@@ -344,6 +350,8 @@ namespace Assets.Generation.GeomRep
             // double check we didn't remove anything we needed :-)
             ValidateAnnotations(open.ToList());
 #endif
+
+            Merged = new LoopSet();
 
             while (open.Count > 0)
             {
@@ -436,11 +444,11 @@ namespace Assets.Generation.GeomRep
             return new HashSet<Vector2>(centroids);
         }
 
-        private static void RemoveIdenticalLoops(LoopSet previously_merged, LoopSet ls2)
+        private void RemoveIdenticalLoops(LoopSet ls2)
         {
             List<Loop> to_remove = new List<Loop>();
 
-            foreach (var loop1 in previously_merged)
+            foreach (var loop1 in Merged)
             {
                 foreach (var loop2 in ls2)
                 {
@@ -1711,7 +1719,7 @@ namespace Assets.Generation.GeomRep
         }
 
         // only non-private for unit-testing
-        public void BuildAnnotationChains(IList<Curve> curves, int loop_number)
+        public void BuildAnnotationChains(IList<Curve> curves)
         {
             new Loop("", curves);
 
@@ -1719,7 +1727,7 @@ namespace Assets.Generation.GeomRep
 
             foreach (Curve curr in curves)
             {
-                AnnotatedCurve ac = new AnnotatedCurve(prev, loop_number);
+                AnnotatedCurve ac = new AnnotatedCurve(prev, LoopNumber);
                 ac.ForwardSplice.BackwardLinks.Add(prev);
                 ac.ForwardSplice.ForwardLinks.Add(curr);
 
@@ -1727,6 +1735,8 @@ namespace Assets.Generation.GeomRep
 
                 prev = curr;
             }
+
+            LoopNumber++;
 
             prev = curves.First();
 

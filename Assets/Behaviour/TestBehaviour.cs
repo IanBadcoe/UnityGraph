@@ -56,8 +56,7 @@ namespace Assets.Behaviour
                     try
                     {
                         // point here is to run all the Unions internal logic/asserts
-                        intersector.Reset();
-                        intersector.Union(merged, lss[ShapeNum], 1e-5f, new ClRand(1));
+                        intersector.Union(lss[ShapeNum], 1e-5f, new ClRand(1));
                         merged = intersector.GetMerged();
                         ShapeNum++;
 
