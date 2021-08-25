@@ -27,7 +27,7 @@ namespace Assets.Generation.GeomRep
             Max = tr;
         }
 
-        public Box2(int x1, int y1, int x2, int y2)
+        public Box2(float x1, float y1, float x2, float y2)
             : this(new Vector2(x1, y1), new Vector2(x2, y2))
         {
         }
@@ -52,6 +52,17 @@ namespace Assets.Generation.GeomRep
             }
 
             return new Box2(Min.Min(rhs.Min), Max.Max(rhs.Max));
+        }
+
+        public Box2 Union(Vector2 rhs)
+        {
+            // empty areas add nothing to other areas
+            if (IsEmpty)
+            {
+                return new Box2(rhs, rhs);
+            }
+
+            return new Box2(Min.Min(rhs), Max.Max(rhs));
         }
 
         public bool Disjoint(Box2 rhs)
