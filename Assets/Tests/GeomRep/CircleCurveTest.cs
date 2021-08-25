@@ -211,6 +211,14 @@ public class CircleCurveTest
 
             Assert.AreEqual(new Box2(-1 / Mathf.Sqrt(2f), -1, 1, 1 / Mathf.Sqrt(2)), b);
         }
+
+        {
+            CircleCurve cc = new CircleCurve(new Vector2(), 1, 5 * Mathf.PI / 4, 9 * Mathf.PI / 4);
+
+            Box2 b = cc.BoundingArea;
+
+            Assert.AreEqual(new Box2(-1, -1 / Mathf.Sqrt(2f), 1 / Mathf.Sqrt(2f), 1), b);
+        }
     }
 
     [Test]
