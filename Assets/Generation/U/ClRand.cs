@@ -93,6 +93,11 @@ namespace Assets.Generation.U
             Seed = 1;
         }
 
+        internal ClRand Nextrand()
+        {
+            return new ClRand(Next());
+        }
+
         public ClRand(ClRand old)
         {
             inext = old.inext;

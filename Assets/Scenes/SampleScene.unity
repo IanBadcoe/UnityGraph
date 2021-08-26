@@ -215,7 +215,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2003294203, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: NodesLimit
-      value: 10
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2003294203, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: Config.RandomSeed

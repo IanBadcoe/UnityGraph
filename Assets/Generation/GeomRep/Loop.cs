@@ -22,6 +22,13 @@ namespace Assets.Generation.GeomRep
             Layer = layer;
         }
 
+        // only used in unit-tests atm
+        public Loop()
+        {
+            ParamRange = 0;
+            Layer = "";
+        }
+
         public Loop(string layer, Curve c)
             : this(layer)
         {
@@ -163,12 +170,16 @@ namespace Assets.Generation.GeomRep
         {
             get => new ReadOnlyCollection<Curve>(m_curves);
         }
+        public bool IsEmpty {
+            get => m_curves.Count == 0;
+        }
 
         public override int GetHashCode()
         {
             int h = 0;
 
-            foreach (Curve c in m_curves)
+            // standardise the curve order
+            foreach (Curve c in CyclicPermuteCurves(m_curves))
             {
                 h ^= c.GetHashCode();
                 h *= 3;
@@ -182,7 +193,7 @@ namespace Assets.Generation.GeomRep
             return h;
         }
 
-        public override bool Equals(object o)
+        public bool Equals(object o, float tol)
         {
             if (ReferenceEquals(o, this))
             {
@@ -201,15 +212,37 @@ namespace Assets.Generation.GeomRep
                 return false;
             }
 
+            var my_curves_ordered = CyclicPermuteCurves(m_curves);
+            var loop_o_curves_ordered = CyclicPermuteCurves(loop_o.m_curves);
+
             for (int i = 0; i < NumCurves; i++)
             {
-                if (!m_curves[i].Equals(loop_o.m_curves[i]))
+                if (!my_curves_ordered[i].Equals(loop_o_curves_ordered[i], tol))
                 {
                     return false;
                 }
             }
 
             return true;
+        }
+
+        public override bool Equals(object o)
+        {
+            return Equals(o, 0.0f);
+        }
+
+        private static IList<Curve> CyclicPermuteCurves(IEnumerable<Curve> curves)
+        {
+            int hash = int.MaxValue;
+
+            foreach (var c in curves)
+            {
+                hash = Math.Min(c.GetHashCode(), hash);
+            }
+
+            int which = curves.TakeWhile(x => x.GetHashCode() != hash).Count();
+
+            return curves.Skip(which).Concat(curves.Take(which)).ToList();
         }
 
         public Vector3[] Facet(float max_length)
@@ -276,11 +309,6 @@ namespace Assets.Generation.GeomRep
 
         public Box2 GetBounds()
         {
-            if (m_curves.Count == 0)
-            {
-                return new Box2();
-            }
-
             Box2 ret = new Box2();
 
             foreach (var c in m_curves)

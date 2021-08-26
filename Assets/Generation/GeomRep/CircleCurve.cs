@@ -34,7 +34,6 @@ namespace Assets.Generation.GeomRep
         readonly public AngleRange AngleRange;
         readonly public Vector2 Position;
         readonly public float Radius;
-        readonly public RotationDirection Rotation;
 
         public bool IsCyclic { get => AngleRange.IsCyclic; }
 
@@ -44,44 +43,28 @@ namespace Assets.Generation.GeomRep
         }
 
         public CircleCurve(Vector2 position, float radius,
+                           RotationDirection rotation)
+            : this(position, radius, new AngleRange(rotation))
+        {
+        }
+
+        public CircleCurve(Vector2 position, float radius,
                            float start_angle, float end_angle)
-            : this(position, radius, new AngleRange(start_angle, end_angle),
-                  new AngleRange(start_angle, end_angle).Direction)
+            : this(position, radius, new AngleRange(start_angle, end_angle))
         {
         }
 
         public CircleCurve(Vector2 position, float radius,
-                           RotationDirection rotation)
-            : this(position, radius, new AngleRange(rotation), rotation)
-        {
-        }
-
-        public CircleCurve(Vector2 position, float radius,
-                           float start_angle, float end_angle,
-                           RotationDirection rotation)
-            : this(position, radius, new AngleRange(start_angle, end_angle), rotation)
-        {
-        }
-
-        public CircleCurve(Vector2 position, float radius,
-                   AngleRange angle_range)
-            : this(position, radius, angle_range, angle_range.Direction)
-        {
-        }
-
-        public CircleCurve(Vector2 position, float radius,
-                           AngleRange angle_range,
-                           RotationDirection rotation)
+                           AngleRange angle_range)
             : base(0, 1)
         {
             AngleRange = angle_range;
 
             // we have to have a direction
-            Assertion.Assert(rotation != RotationDirection.DontCare);
+            Assertion.Assert(AngleRange.Direction != RotationDirection.DontCare);
 
             Position = position;
             Radius = radius;
-            Rotation = rotation;
 
             if (Position == null)
             {
@@ -91,11 +74,6 @@ namespace Assets.Generation.GeomRep
             if (Radius <= 0)
             {
                 throw new ArgumentException("-ve or zero radius");
-            }
-
-            if (rotation != angle_range.Direction && angle_range.Direction != RotationDirection.DontCare)
-            {
-                throw new ArgumentException("Inconsistent circle direction");
             }
         }
 
@@ -133,8 +111,7 @@ namespace Assets.Generation.GeomRep
             return base.GetHashCode_Inner() * 17
                   ^ AngleRange.GetHashCode() * 93
                   ^ Position.GetHashCode() * 31
-                  ^ Radius.GetHashCode() * 11
-                  ^ (Rotation == RotationDirection.Forwards ? 1 : 0);
+                  ^ Radius.GetHashCode() * 11;
         }
 
         public override bool Equals(Curve c, float tol)
@@ -157,8 +134,7 @@ namespace Assets.Generation.GeomRep
             }
 
             return Position.Equals(cc.Position)
-                  && Radius == cc.Radius
-                  && Rotation == cc.Rotation;
+                  && Radius == cc.Radius;
         }
 
         protected override float FindParamForPoint_Inner(Vector2 pnt)
@@ -178,7 +154,11 @@ namespace Assets.Generation.GeomRep
 
         public override Curve CloneWithChangedExtents(float start, float end)
         {
-            return new CircleCurve(Position, Radius, ParamToAngle(start), ParamToAngle(end), Rotation);
+            if (start > end)
+            {
+                throw new ArgumentException("Cannot reverse a curve when changing extents...", "end");
+            }
+            return new CircleCurve(Position, Radius, ParamToAngle(start), ParamToAngle(end));
         }
 
         public override Box2 BoundingArea
@@ -188,8 +168,34 @@ namespace Assets.Generation.GeomRep
             //
             // full solution is to union together startPos, EndPos and whichever of
             // 0, pi/2, pi and 3pi/2 points are within param range
-            get => new Box2(Position - new Vector2(Radius, Radius),
-                Position + new Vector2(Radius, Radius));
+            get
+            {
+                var ret = new Box2();
+
+                ret = ret.Union(StartPos).Union(EndPos);
+
+                if (AngleRange.InRange(0, true))
+                {
+                    ret = ret.Union(Position + new Vector2(0, Radius));
+                }
+
+                if (AngleRange.InRange(Mathf.PI / 2, true))
+                {
+                    ret = ret.Union(Position + new Vector2(Radius, 0));
+                }
+
+                if (AngleRange.InRange(Mathf.PI, true))
+                {
+                    ret = ret.Union(Position + new Vector2(0, -Radius));
+                }
+
+                if (AngleRange.InRange(3 * Mathf.PI / 2, true))
+                {
+                    ret = ret.Union(Position + new Vector2(-Radius, 0));
+                }
+
+                return ret;
+            }
         }
 
         public override Vector2 Tangent(float param)
@@ -198,7 +204,7 @@ namespace Assets.Generation.GeomRep
 
             var tang = new Vector2(Mathf.Cos(angle), -Mathf.Sin(angle));
 
-            if (Rotation == RotationDirection.Reverse)
+            if (AngleRange.Direction == RotationDirection.Reverse)
             {
                 tang = -tang;
             }
@@ -225,7 +231,7 @@ namespace Assets.Generation.GeomRep
                 return null;
             }
 
-            if (Rotation != c_cc.Rotation)
+            if (AngleRange.Direction != c_cc.AngleRange.Direction)
             {
                 return null;
             }
@@ -237,12 +243,12 @@ namespace Assets.Generation.GeomRep
 
             if (Util.ClockAwareAngleCompare(AngleRange.End, c_cc.AngleRange.Start, 1e-5f))
             {
-                return new CircleCurve(Position, Radius, AngleRange.Start, AngleRange.End + c_cc.AngleRange.Range, Rotation);
+                return new CircleCurve(Position, Radius, AngleRange.Start, AngleRange.End + c_cc.AngleRange.Range);
             }
 
             if (Util.ClockAwareAngleCompare(AngleRange.Start, c_cc.AngleRange.End, 1e-5f))
             {
-                return new CircleCurve(Position, Radius, c_cc.AngleRange.Start, c_cc.AngleRange.End + AngleRange.Range, Rotation);
+                return new CircleCurve(Position, Radius, c_cc.AngleRange.Start, c_cc.AngleRange.End + AngleRange.Range);
             }
 
             return null;
@@ -253,13 +259,18 @@ namespace Assets.Generation.GeomRep
             get => Radius * AngleRange.Length;
         }
 
+        public RotationDirection Rotation
+        {
+            get => AngleRange.Direction;
+        }
+
         public override Vector2 Normal(float param)
         {
             float angle = ParamToAngle(param);
 
             Vector2 normal = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle));
 
-            if (Rotation == RotationDirection.Reverse)
+            if (AngleRange.Direction == RotationDirection.Reverse)
             {
                 normal = -normal;
             }
