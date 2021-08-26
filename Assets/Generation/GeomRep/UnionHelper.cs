@@ -1,6 +1,7 @@
 ﻿using Assets.Behaviour;
 using Assets.Generation.G;
 using Assets.Generation.U;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -20,7 +21,24 @@ namespace Assets.Generation.GeomRep
         // and add some special piece of geometry
         public void AddLoops(LoopSet ls)
         {
+            foreach(var l in ls)
+            {
+                ValidateLoop(l);
+            }
+
             m_loops.AddRange(ls);
+        }
+
+        [System.Diagnostics.Conditional("DEBUG")]
+        private void ValidateLoop(Loop l)
+        {
+            foreach(var c in l.Curves)
+            {
+                foreach(var c2 in m_loops.SelectMany(x => x.Curves))
+                {
+                    Assertion.Assert(!ReferenceEquals(c, c2));
+                }
+            }
         }
 
         public IReadOnlyList<Loop> Loops
@@ -43,14 +61,13 @@ namespace Assets.Generation.GeomRep
                 }
                 else
                 {
-
                     merged_layer.Union(l, 1e-5f, layer);
+                }
 
-                    m_loops.RemoveAt(0);
-                }            
+                m_loops.RemoveAt(0);
             }
 
-            foreach(var cut_desc in lcb.CutSequence)
+            foreach (var cut_desc in lcb.CutSequence)
             {
                 if (m_merged_loop_sets.TryGetValue(cut_desc.CutBy, out Intersector cut_by)
                     && m_merged_loop_sets.TryGetValue(cut_desc.Cut, out Intersector cut))
