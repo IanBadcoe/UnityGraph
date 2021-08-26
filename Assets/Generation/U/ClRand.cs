@@ -250,6 +250,18 @@ namespace Assets.Generation.U
         }
 
 
+        public virtual int Nextintrange(int exclusive_max)
+        {
+            return Nextintrange(0, exclusive_max);
+        }
+
+
+        public virtual int Nextintrange(int inclusive_min, int exclusive_max)
+        {
+            return (int)(Sample() * (exclusive_max - inclusive_min) + inclusive_min);
+        }
+
+
         public virtual Vector2 Nextpos(float low, float high)
         {
             return new Vector2(

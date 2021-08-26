@@ -144,7 +144,7 @@ namespace Assets.Generation.U
 
         public static T RemoveRandom<T>(ClRand random, IList<T> col)
         {
-            int which = (int)(random.Nextfloat() * col.Count);
+            int which = random.Nextintrange(col.Count);
 
             var ret = col[which];
             col.RemoveAt(which);
@@ -159,7 +159,7 @@ namespace Assets.Generation.U
                 return _default;
             }
 
-            int which = (int)(random.Nextfloat() * col.Count);
+            int which = random.Nextintrange(col.Count);
 
             var ret = col[which];
             col.RemoveAt(which);
