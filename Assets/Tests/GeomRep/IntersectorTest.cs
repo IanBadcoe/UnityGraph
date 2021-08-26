@@ -2817,6 +2817,202 @@ public class IntersectorTest
         }
     }
 
+    [Test]
+    public void TestComplex()
+    {
+        // +---------------+---------------+
+        // |               |               |
+        // |     r1        |        r2     |
+        // |               |               |
+        // |       +---------------+       |
+        // |       |       |       |       |
+        // |       |     __+__   __+__     |
+        // |       |    /  |  \ /  |  \    |
+        // +-------+---+---+---+---+---+---+
+        // |       |    \__|__/ \__|__/    |
+        // |  rc-> |   /   +       +   \   |
+        // |       | c0    |       |    c  |
+        // |       +---------------+       |
+        // |               |               |
+        // |    r3         |        r4     |
+        // |               |               |
+        // +---------------+---------------+
+
+        var r1 = Loop.MakeRect(-10, 0, 0, 10);
+        var r2 = Loop.MakeRect(0, 0, 10, 10);
+        var r3 = Loop.MakeRect(-10, -10, 0, 0);
+        var r4 = Loop.MakeRect(0, -10, 10, 0);
+        var rc = Loop.MakeRect(-5, -5, 5, 5);
+        var c = new Loop("", new CircleCurve(new Vector2(5, 0), 2.5f));
+        var c0 = new Loop("", new CircleCurve(new Vector2(0, 0), 2.5f));
+
+        {
+            // ((r1 + r2 + r3) - rc) + c
+            var intr = new Intersector(r1);
+            intr.Union(r2, 1e-5f, new ClRand(1));
+            intr.Union(r3, 1e-5f, new ClRand(1));
+
+            intr.Cut(rc, 1e-5f, new ClRand(1));
+
+            intr.Union(c, 1e-5f, new ClRand(1));
+
+            LoopSet m = intr.Merged;
+            Assert.AreEqual(1, m.Count);
+
+            Assert.AreEqual(new Box2(-10, -10, 10, 10), m.GetBounds());
+            Assert.AreEqual(11, m[0].Curves.Count);
+            Assert.IsTrue(m[0].Curves.OfType<CircleCurve>().First().Equals(new CircleCurve(new Vector2(5, 0), 2.5f, Mathf.PI / 2, 2 * Mathf.PI), 1e-5f));
+        }
+
+        {
+            // (r1 + r2 + r3) - (rc + c)
+            var intr = new Intersector(r1);
+            intr.Union(r2, 1e-5f, new ClRand(1));
+            intr.Union(r3, 1e-5f, new ClRand(1));
+
+            var intr2 = new Intersector(rc);
+            intr2.Union(c, 1e-5f, new ClRand(1));
+
+            intr.Cut(intr2, 1e-5f, new ClRand(1));
+
+            LoopSet m = intr.Merged;
+            Assert.AreEqual(1, m.Count);
+
+            Assert.AreEqual(new Box2(-10, -10, 10, 10), m.GetBounds());
+            Assert.AreEqual(11, m[0].Curves.Count);
+            Assert.IsTrue(m[0].Curves.OfType<CircleCurve>().First().Equals(new CircleCurve(new Vector2(5, 0), 2.5f, Mathf.PI / 2, 0), 1e-5f));
+        }
+
+        LoopSet k1 = null;
+        LoopSet k2 = null;
+
+        {
+            // rc - r1 - r4
+            var intr = new Intersector(rc);
+            intr.Cut(r1, 1e-5f, new ClRand(1));
+            intr.Cut(r4, 1e-5f, new ClRand(1));
+
+            LoopSet m = intr.Merged;
+            Assert.AreEqual(2, m.Count);
+
+            Assert.AreEqual(new Box2(-5, -5, 0, 0), m.OrderBy(x => x.GetBounds().Min.x).First().GetBounds());
+            Assert.AreEqual(new Box2(0, 0, 5, 5), m.OrderBy(x => -x.GetBounds().Min.x).First().GetBounds());
+
+            // ... + c
+            intr.Union(c0, 1e-5f, new ClRand(1));
+            k1 = m = intr.Merged;
+            Assert.AreEqual(1, m.Count);
+
+            Assert.AreEqual(new Box2(-5, -5, 5, 5), m[0].GetBounds());
+
+
+            // ... - c (should cut it into two parts again)
+            intr.Cut(c0, 1e-5f, new ClRand(1));
+            k2 = m = intr.Merged;
+            Assert.AreEqual(2, m.Count);
+
+            Assert.AreEqual(new Box2(-5, -5, 0, 0), m.OrderBy(x => x.GetBounds().Min.x).First().GetBounds());
+            Assert.AreEqual(new Box2(0, 0, 5, 5), m.OrderBy(x => -x.GetBounds().Min.x).First().GetBounds());
+        }
+
+        {
+            // rc - (r1 - r4)
+            var intr = new Intersector(rc);
+
+            var intr2 = new Intersector(r1);
+            intr2.Union(r4, 1e-5f, new ClRand(1));
+
+            intr.Cut(intr2, 1e-5f, new ClRand(1));
+
+            LoopSet m = intr.Merged;
+            // doing it this way we get one figure-8 instead of two squares touching at the corner
+            // if we wanted that consistent we'd stop looking at LoopNumber in ExtractLoop, but that will
+            // change the previous case, not this one..
+            Assert.AreEqual(1, m.Count);
+
+            Assert.AreEqual(new Box2(-5, -5, 5, 5), m[0].GetBounds());
+
+            // ... + c
+            intr.Union(c0, 1e-5f, new ClRand(1));
+            m = intr.Merged;
+            Assert.AreEqual(1, m.Count);
+
+            Assert.AreEqual(new Box2(-5, -5, 5, 5), m[0].GetBounds());
+
+            Assert.IsTrue(k1[0].Equals(m[0], 1e-5f));
+
+            // ... - c (should cut it into two parts again)
+            intr.Cut(c0, 1e-5f, new ClRand(1));
+            m = intr.Merged;
+            Assert.AreEqual(2, m.Count);
+
+            Assert.AreEqual(new Box2(-5, -5, 0, 0), m.OrderBy(x => x.GetBounds().Min.x).First().GetBounds());
+            Assert.AreEqual(new Box2(0, 0, 5, 5), m.OrderBy(x => -x.GetBounds().Min.x).First().GetBounds());
+
+            Assert.IsTrue(k2.OrderBy(x => x.GetHashCode()).First().Equals(m.OrderBy(x => x.GetHashCode()).First(), 1e-5f));
+            Assert.IsTrue(k2.OrderBy(x => x.GetHashCode()).Last().Equals(m.OrderBy(x => x.GetHashCode()).Last(), 1e-5f));
+        }
+
+        {
+            // rc - c0 - c
+            var intr = new Intersector(rc);
+
+            intr.Cut(c0, 1e-5f, new ClRand(1));
+            intr.Cut(c, 1e-5f, new ClRand(1));
+
+            LoopSet m = intr.Merged;
+            Assert.AreEqual(1, m.Count);
+
+            Assert.AreEqual(new Box2(-5, -5, 5, 5), m[0].GetBounds());
+
+            // now subtract that from (r2 + r4) should leave us with a rect, with a rect notch in one side
+            // and a truncated hour glass in the notch
+
+            var intr2 = new Intersector(r2);
+            intr2.Union(r4, 1e-5f, new ClRand());
+
+            intr2.Cut(intr, 1e-5f, new ClRand(1));
+
+            m = intr2.Merged;
+
+            Assert.AreEqual(1, m.Count);
+            Assert.AreEqual(14, m[0].Curves.Count);
+
+            Assert.AreEqual(new Box2(0, -10, 10, 10), m[0].GetBounds());
+        }
+
+        {
+            // rc - (c0 + c)
+            var intr = new Intersector(rc);
+
+            var intr2 = new Intersector(c0);
+            intr2.Union(c, 1e-5f, new ClRand(1));
+
+            intr.Cut(intr2, 1e-5f, new ClRand(1));
+
+            LoopSet m = intr.Merged;
+            // see comment two cases up, this could come out in two parts, but it doesn't :-)
+            Assert.AreEqual(1, m.Count);
+
+            Assert.AreEqual(new Box2(-5, -5, 5, 5), m[0].GetBounds());
+
+            // now subtract that from (r2 + r4) should leave us with a rect, with a rect notch in one side
+            // and a truncated hour glass in the notch
+
+            intr2.SetInitialLoop(r2);
+            intr2.Union(r4, 1e-5f, new ClRand());
+
+            intr2.Cut(intr, 1e-5f, new ClRand(1));
+
+            m = intr2.Merged;
+
+            Assert.AreEqual(1, m.Count);
+            Assert.AreEqual(14, m[0].Curves.Count);
+
+            Assert.AreEqual(new Box2(0, -10, 10, 10), m[0].GetBounds());
+        }
+    }
+
     //// This one asserts because it somehow tries to make a discontinuous loop
     //// but, pragmatically, I don't need this test yet
     ////   [Test]

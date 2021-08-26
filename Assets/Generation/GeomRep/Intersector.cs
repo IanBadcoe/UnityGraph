@@ -271,6 +271,9 @@ namespace Assets.Generation.GeomRep
             ValidateAnnotations(InternalMerged.SelectMany(x => x.Curves).ToList(),
                 AnnotationMap);
 
+            ValidateAnnotations(to_merge.InternalMerged.SelectMany(x => x.Curves).ToList(),
+                to_merge.AnnotationMap);
+
             ValidateInput(to_merge);
 
             if (to_merge.IsEmpty)
@@ -991,14 +994,20 @@ namespace Assets.Generation.GeomRep
                 {
                     c = different_loop[0].Curve;
                 }
-                else if (different_loop.Count != 0)
+                else if (different_loop.Count != 0 || still_open.Count != 0)
                 {
+                    // if we hit a joint that was from a single loop, we'll get here with still_open containing a choice
+                    // but different_loop empty...
+                    //
+                    // but that is OK, we just look through open as there is no hint from loop numbers
+                    var who_to_look_at = different_loop.Count > 0 ? different_loop : still_open;
+
                     // if there is more than one option on a different loop, take the sharpest clockwise corner
                     // first
                     float found_ang = float.MaxValue;
                     AnnotatedCurve found_ac = null;
 
-                    foreach (var ac in different_loop)
+                    foreach (var ac in who_to_look_at)
                     {
                         var cur_normal = c.Normal(c.EndParam);
                         var try_normal = -ac.Curve.Normal(ac.Curve.EndParam);
@@ -1775,6 +1784,7 @@ namespace Assets.Generation.GeomRep
                         if (open.Contains(f))
                         {
                             next = f;
+                            break;
                         }
                     }
 

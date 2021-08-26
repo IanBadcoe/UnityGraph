@@ -193,7 +193,7 @@ namespace Assets.Generation.GeomRep
             return h;
         }
 
-        public override bool Equals(object o)
+        public bool Equals(object o, float tol)
         {
             if (ReferenceEquals(o, this))
             {
@@ -217,13 +217,18 @@ namespace Assets.Generation.GeomRep
 
             for (int i = 0; i < NumCurves; i++)
             {
-                if (!my_curves_ordered[i].Equals(loop_o_curves_ordered[i]))
+                if (!my_curves_ordered[i].Equals(loop_o_curves_ordered[i], tol))
                 {
                     return false;
                 }
             }
 
             return true;
+        }
+
+        public override bool Equals(object o)
+        {
+            return Equals(o, 0.0f);
         }
 
         private static IList<Curve> CyclicPermuteCurves(IEnumerable<Curve> curves)
