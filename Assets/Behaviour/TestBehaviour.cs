@@ -15,7 +15,7 @@ namespace Assets.Behaviour
         public bool NeedSetup = true;
 
         ClRand test_rand;
-        Intersector intersector = new Intersector();
+        Intersector intersector = new Intersector(new ClRand(1));
         LoopSet merged = new LoopSet();
         Loop[] Loops = new Loop[5];
 
@@ -56,7 +56,7 @@ namespace Assets.Behaviour
                     try
                     {
                         // point here is to run all the Unions internal logic/asserts
-                        intersector.Union(Loops[ShapeNum], 1e-5f, new ClRand(1));
+                        intersector.Union(Loops[ShapeNum], 1e-5f);
                         merged = intersector.Merged;
                         ShapeNum++;
 

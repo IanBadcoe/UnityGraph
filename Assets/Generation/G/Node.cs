@@ -12,10 +12,7 @@ namespace Assets.Generation.G
     [System.Diagnostics.DebuggerDisplay("Name = {Name}")]
     public class Node : IRelaxationParamSource, IHMChild
     {
-        private readonly int m_num;
         private readonly HashSet<DirectedEdge> m_connections = new HashSet<DirectedEdge>();
-
-        private static readonly ClRand s_rand = new ClRand(1);
 
         public GeomLayout Layout { get; }
 
@@ -64,8 +61,6 @@ namespace Assets.Generation.G
         {
             Name = name;
             Codes = codes;
-
-            m_num = s_rand.Next();
 
             Radius = rad;
             WallThickness = wall_thickness;     // zero means no wall

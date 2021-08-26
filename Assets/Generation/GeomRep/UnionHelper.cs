@@ -16,8 +16,6 @@ namespace Assets.Generation.GeomRep
         private Box2 m_bounds;
         private Vector2 m_start_pos;
 
-        private readonly Intersector m_intersector = new Intersector();
-
         // exposed for testing but there could be cases where client code wants to reach-in
         // and add some special piece of geometry
         public void AddLoops(LoopSet ls)
@@ -41,12 +39,12 @@ namespace Assets.Generation.GeomRep
 
                 if (!m_merged_loop_sets.TryGetValue(layer, out Intersector merged_layer))
                 {
-                    m_merged_loop_sets[layer] = merged_layer = new Intersector(l);
+                    m_merged_loop_sets[layer] = merged_layer = new Intersector(l, r.Nextrand());
                 }
                 else
                 {
 
-                    merged_layer.Union(l, 1e-5f, r, layer);
+                    merged_layer.Union(l, 1e-5f, layer);
 
                     m_loops.RemoveAt(0);
                 }            
@@ -57,7 +55,7 @@ namespace Assets.Generation.GeomRep
                 if (m_merged_loop_sets.TryGetValue(cut_desc.CutBy, out Intersector cut_by)
                     && m_merged_loop_sets.TryGetValue(cut_desc.Cut, out Intersector cut))
                 {
-                    cut.Cut(cut_by, 1e-5f, r, cut_desc.Cut);
+                    cut.Cut(cut_by, 1e-5f, cut_desc.Cut);
                 }
             }
         }

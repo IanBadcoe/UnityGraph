@@ -13,6 +13,7 @@ namespace Assets.Generation.GeomRep
         Dictionary<Curve, AnnotatedCurve> AnnotationMap;
         LoopSet InternalMerged;
         int LoopNumber;
+        ClRand Random;
 
         public bool IsEmpty {
             get => InternalMerged.Count == 0;
@@ -66,21 +67,16 @@ namespace Assets.Generation.GeomRep
             }
         }
 
-        public Intersector()
+        public Intersector(ClRand rand)
         {
+            Random = rand;
             Reset();
         }
 
-        public Intersector(Loop l)
+        public Intersector(Loop l, ClRand rand)
         {
+            Random = rand;
             SetInitialLoop(l);
-        }
-
-        private Intersector(Dictionary<Curve, AnnotatedCurve> ann_map, LoopSet merged, int loop_number)
-        {
-            AnnotationMap = ann_map;
-            InternalMerged = merged;
-            LoopNumber = loop_number;
         }
 
         public void SetInitialLoop(Loop l)
@@ -112,22 +108,22 @@ namespace Assets.Generation.GeomRep
             get => new LoopSet(InternalMerged);
         }
 
-        public void Cut(Loop cut_by, float tol, ClRand random, string layer = "")
+        public void Cut(Loop cut_by, float tol, string layer = "")
         {
             // assuming cut_by has no outer -ve curves (which it shouldn't have if it is the output of a previous union)
             // removing cut_by from cut is the same as unioning with the inverse
 
-            Union(cut_by.Reversed(), tol, random, layer);
+            Union(cut_by.Reversed(), tol, layer);
         }
 
-        public void Cut(Intersector cut_by, float tol, ClRand random, string layer = "")
+        public void Cut(Intersector cut_by, float tol, string layer = "")
         {
-            Union(cut_by.Reversed(), tol, random, layer);
+            Union(cut_by.Reversed(), tol, layer);
         }
 
         private Intersector Reversed()
         {
-            var ret = new Intersector();
+            var ret = new Intersector(Random.Nextrand());
 
             Dictionary<Curve, Curve> rev_map = new Dictionary<Curve, Curve>(new ReferenceComparer<Curve>());
 
@@ -233,29 +229,29 @@ namespace Assets.Generation.GeomRep
         }
 
         public void Union(Loop to_merge, float tol,
-                          ClRand random, string layer)
+                          string layer)
         {
             Union(to_merge, tol,
-                random, UnionType.WantPositive, layer);
+                UnionType.WantPositive, layer);
         }
 
         public void Union(Loop to_merge, float tol,
-                          ClRand random, UnionType type = UnionType.WantPositive, string layer = "")
+                          UnionType type = UnionType.WantPositive, string layer = "")
         {
-            Union(new Intersector(to_merge), tol,
-                random, type, layer);
+            Union(new Intersector(to_merge, Random.Nextrand()), tol,
+                type, layer);
         }
 
         public void Union(Intersector to_merge, float tol,
-                          ClRand random, string layer)
+                          string layer)
         {
             Union(to_merge, tol,
-                random, UnionType.WantPositive, layer);
+                UnionType.WantPositive, layer);
         }
 
         public void Union(Intersector to_merge, float tol,
-                          ClRand random,
-                          UnionType type = UnionType.WantPositive, string layer = "")
+                          UnionType type = UnionType.WantPositive,
+                          string layer = "")
         {
             ValidateAnnotations(InternalMerged.SelectMany(x => x.Curves).ToList(),
                 AnnotationMap);
@@ -410,7 +406,7 @@ namespace Assets.Generation.GeomRep
 
             // try moving this before annotation chains and splices after we have it 100% working
             if (!RemoveUnwantedCurves(tol,
-                random,
+                Random,
                 all_curves, open, clustered_joints,
                 diameter,
                 type))
