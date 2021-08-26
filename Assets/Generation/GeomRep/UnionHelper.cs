@@ -41,14 +41,12 @@ namespace Assets.Generation.GeomRep
 
                 if (!m_merged_loop_sets.TryGetValue(layer, out Intersector merged_layer))
                 {
-                    m_merged_loop_sets[layer] = new Intersector(l);
+                    m_merged_loop_sets[layer] = merged_layer = new Intersector(l);
                 }
                 else
                 {
 
-                    m_intersector.Union(new LoopSet(l), 1e-5f, r, layer);
-
-                    Assertion.Assert(m_merged_loop_sets[layer] != null);
+                    merged_layer.Union(l, 1e-5f, r, layer);
 
                     m_loops.RemoveAt(0);
                 }            
@@ -59,7 +57,7 @@ namespace Assets.Generation.GeomRep
                 if (m_merged_loop_sets.TryGetValue(cut_desc.CutBy, out Intersector cut_by)
                     && m_merged_loop_sets.TryGetValue(cut_desc.Cut, out Intersector cut))
                 {
-                    cut.Cut(cut_by.GetMerged(), 1e-5f, r, cut_desc.Cut);
+                    cut.Cut(cut_by, 1e-5f, r, cut_desc.Cut);
                 }
             }
         }
@@ -107,14 +105,14 @@ namespace Assets.Generation.GeomRep
         {
             m_bounds = m_merged_loop_sets
                 .Values
-                .Select(l => l.GetMerged().GetBounds())
+                .Select(l => l.Merged.GetBounds())
                 .Aggregate(new Box2(), (a, b) => a.Union(b));
         }
 
         public IReadOnlyDictionary<string, LoopSet> MergedLoops
         {
             get => m_merged_loop_sets
-                .Select(x => new KeyValuePair<string, LoopSet>(x.Key, x.Value.GetMerged()))
+                .Select(x => new KeyValuePair<string, LoopSet>(x.Key, x.Value.Merged))
                 .ToDictionary(x => x.Key, x => x.Value);
         }
     }
