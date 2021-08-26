@@ -2,6 +2,7 @@
 using Assets.Generation.U;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
@@ -405,23 +406,17 @@ namespace Assets.Generation.GeomRep
             // but follows the same rule (this only works if we follow the intended usage, 
 
             // try moving this before annotation chains and splices after we have it 100% working
-            if (!RemoveUnwantedCurves(tol,
+            RemoveUnwantedCurves(tol,
                 Random,
                 all_curves, open, clustered_joints,
                 diameter,
-                type))
-            {
-                Reset();
-                return;
-            }
+                type);
 
-#if DEBUG
             // double check we didn't remove anything we needed :-)
             ValidateAnnotations(open.ToList(), AnnotationMap);
 
             // but we did remove things we don't need
             Assertion.Assert(AnnotationMap.Count == open.Count);
-#endif
 
             InternalMerged = new LoopSet();
 
@@ -441,10 +436,8 @@ namespace Assets.Generation.GeomRep
                 }
             }
 
-#if DEBUG
             ValidateAnnotations(InternalMerged.SelectMany(x => x.Curves).ToList(), AnnotationMap);
             ValidatePreviouslyMerged();
-#endif
         }
 
         private void ValidateInput(Intersector to_merge)
@@ -708,7 +701,7 @@ namespace Assets.Generation.GeomRep
         }
 
         // public and virtual only for unit-tests
-        virtual public bool RemoveUnwantedCurves(
+        virtual public void RemoveUnwantedCurves(
             float tol,
             ClRand random,
             HashSet<Curve> all_curves,
@@ -779,8 +772,6 @@ namespace Assets.Generation.GeomRep
                     prev_crossings = crossings;
                 }
             }
-
-            return true;
         }
 
         private IList<HashSet<Curve>> FindChains(HashSet<Curve> open)
@@ -1470,9 +1461,7 @@ namespace Assets.Generation.GeomRep
                                 // at indices < j, but hardly seems worth worrying about for small-ish curve numbers with few splits
                                 c1 = c1split1;
 
-#if DEBUG
                                 ValidateAnnotations(working_loop2.Concat(working_loop2).ToList(), AnnotationMap);
-#endif
                             }
                             else if (start_dist > tol)
                             {
@@ -1517,12 +1506,10 @@ namespace Assets.Generation.GeomRep
                                 MergeSplices(c2_from, joint, true);
                             }
 
-#if DEBUG
                             if (any_splits)
                             {
                                 ValidateAnnotations(working_loop2.Concat(working_loop2).ToList(), AnnotationMap);
                             }
-#endif
                         }
                     } while (any_splits);
                 }
@@ -1657,6 +1644,7 @@ namespace Assets.Generation.GeomRep
             }
         }
 
+        [Conditional("Debug")]
         private static void ValidateAnnotations(IList<Curve> allCurves, Dictionary<Curve, AnnotatedCurve> ann_map)
         {
             Dictionary<Curve, int> forward_counts = new Dictionary<Curve, int>(
@@ -1833,9 +1821,7 @@ namespace Assets.Generation.GeomRep
 
                         c1 = ret.Item1[0];
 
-#if DEBUG
                         ValidateAnnotations(working_loop2.Concat(working_loop2).ToList(), AnnotationMap);
-#endif
                     }
 
                     if (ret.Item2 != null)
@@ -1859,9 +1845,7 @@ namespace Assets.Generation.GeomRep
 
                         c2 = ret.Item2[0];
 
-#if DEBUG
                         ValidateAnnotations(working_loop2.Concat(working_loop2).ToList(), AnnotationMap);
-#endif
                     }
                 }
             }
@@ -1908,12 +1892,10 @@ namespace Assets.Generation.GeomRep
                 }
             }
 
-#if DEBUG
             if (any_merges)
             {
                 ValidateAnnotations(working_loop2.Concat(working_loop2).ToList(), AnnotationMap);
             }
-#endif
 
             return any_found;
         }

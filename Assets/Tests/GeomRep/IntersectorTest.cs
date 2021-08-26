@@ -796,24 +796,6 @@ public class IntersectorTest
         Assert.IsFalse(ac1.Equals(0));
     }
 
-    class IntersectorDummy1 : Intersector
-    {
-        public IntersectorDummy1() : base(new ClRand(1))
-        {
-        }
-
-        public override bool RemoveUnwantedCurves(
-            float tol, ClRand ClRand,
-            HashSet<Curve> all_curves,
-            HashSet<Curve> open,
-            HashSet<Vector2> curve_joints,
-            float diameter,
-            UnionType type)
-        {
-            return false;
-        }
-    }
-
     class IntersectorDummy2 : Intersector
     {
         public IntersectorDummy2() : base(new ClRand(1))
@@ -857,20 +839,6 @@ public class IntersectorTest
             LoopSet ret = i.Merged;
 
             Assert.AreEqual(l1, ret[0]);
-        }
-
-        // if extractInternalCurves fails, we bail...
-        {
-            Loop l1 = new Loop("", new CircleCurve(new Vector2(), 1));
-            Loop l2 = new Loop("", new CircleCurve(new Vector2(1, 0), 1));
-
-            Intersector i = new IntersectorDummy1();
-
-            i.SetInitialLoop(l1);
-            i.Union(l2, 1e-5f);
-            LoopSet ret = i.Merged;
-
-            Assert.AreEqual(0, ret.Count);
         }
 
         // if tryFindIntersections fails, we throw
