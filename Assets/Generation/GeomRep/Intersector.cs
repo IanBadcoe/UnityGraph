@@ -95,17 +95,6 @@ namespace Assets.Generation.GeomRep
             }
         }
 
-        public void SetInitialLoopSet(LoopSet ls)
-        {
-            Reset();
-
-            InternalMerged = ls;
-
-            foreach(var l in ls) {
-                BuildAnnotationChains(l.Curves);
-            }
-        }
-
         public void Reset()
         {
             AnnotationMap = MakeAnnotationsMap();
