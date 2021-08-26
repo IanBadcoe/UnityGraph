@@ -70,6 +70,10 @@ namespace Assets.Generation.G
             Parent = parent;
 
             Children = new List<IHMChild>();
+
+            // mere edge joins do not have sizes
+            Assertion.Assert(!Codes.Contains("j") || Radius == 0);
+            Assertion.Assert(!Codes.Contains("j") || WallThickness == 0);
         }
 
         public bool Connects(Node n)

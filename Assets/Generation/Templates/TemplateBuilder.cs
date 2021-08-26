@@ -81,10 +81,22 @@ namespace Assets.Generation.Templates
         // types In and Out ignore all parameters after "name"
 
         public void AddNode(NodeRecord.NodeType type, string name, bool nudge,
-             string positionOnName, string positionTowardsName,
-             string positionAwayFromName,
-             string codes, float radius, float wall_thickness,
-             GeomLayout layout)
+            string positionOnName, string positionTowardsName,
+            string positionAwayFromName,
+            string codes,
+            GeomLayout layout)
+        {
+            AddNode(type, name, nudge,
+                positionOnName, positionTowardsName, positionAwayFromName,
+                codes,
+                0, 0, layout);
+        }
+
+        public void AddNode(NodeRecord.NodeType type, string name, bool nudge,
+            string positionOnName, string positionTowardsName,
+            string positionAwayFromName,
+            string codes, float radius, float wall_thickness,
+            GeomLayout layout)
         {
             if (name.Contains("->"))
             {

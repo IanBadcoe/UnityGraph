@@ -25,7 +25,7 @@ namespace Assets.Generation.G
             MinLength = 1;
             HalfWidth = 1;
             WallThickness = 0.1f;
-            Layout = CorridorLayout.Instance;
+            Layout = CorridorLayout.Default;
         }
 
         // for identity/searching purposes, only start and end count...

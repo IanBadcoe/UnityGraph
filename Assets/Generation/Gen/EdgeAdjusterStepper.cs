@@ -80,8 +80,9 @@ namespace Assets.Generation.Gen
                 return false;
             }
 
-            Node c = Graph.AddNode("c", "",
-                e.HalfWidth, CircularGeomLayout.Instance);
+            // corridor corners have no radius as the edge energy does their separation, and the edge adds
+            // circles to the geometry for the junction
+            Node c = Graph.AddNode("c", "", CircularGeomLayout.Instance);
 
             Vector2 mid = (e.Start.Position + e.End.Position) / 2;
 
@@ -91,9 +92,9 @@ namespace Assets.Generation.Gen
             // idea of lengths is to force no more length but allow
             // a longer corridor if required
             DirectedEdge de1 = Graph.Connect(e.Start, c, e.MaxLength, e.HalfWidth,
-                CorridorLayout.Instance);
+                e.Layout);
             DirectedEdge de2 = Graph.Connect(c, e.End, e.MaxLength, e.HalfWidth,
-                CorridorLayout.Instance);
+                e.Layout);
 
             // if we are unambiguously inside some template's output
             // then the new node is also inside that

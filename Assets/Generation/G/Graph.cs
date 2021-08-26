@@ -16,6 +16,12 @@ namespace Assets.Generation.G
 
         public GraphRestore Restore { get; private set; }
 
+        public Node AddNode(string name, string codes,
+                            GeomLayout layout, HierarchyMetadata parent = null)
+        {
+            return AddNode(name, codes, 0, 0, layout, parent);
+        }
+
         public Node AddNode(string name, string codes, float rad,
                             GeomLayout layout, HierarchyMetadata parent = null)
         {

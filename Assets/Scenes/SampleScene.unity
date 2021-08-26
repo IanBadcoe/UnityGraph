@@ -215,7 +215,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2003294203, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: NodesLimit
-      value: 3
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2003294203, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: Config.RandomSeed
@@ -267,19 +267,35 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: Colours.Array.size
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: CutSequence.Array.size
-      value: 5
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: Colours.Array.data[4].Name
       value: fire
       objectReference: {fileID: 0}
     - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: Colours.Array.data[5].Name
+      value: grass
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: CutSequence.Array.data[4].Cut
       value: floor
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: CutSequence.Array.data[5].Cut
+      value: floor
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: CutSequence.Array.data[6].Cut
+      value: grass
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: CutSequence.Array.data[7].Cut
+      value: grass
       objectReference: {fileID: 0}
     - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: Colours.Array.data[0].Colour.b
@@ -310,8 +326,36 @@ PrefabInstance:
       value: 0.31132078
       objectReference: {fileID: 0}
     - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: Colours.Array.data[5].Colour.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: Colours.Array.data[5].Colour.b
+      value: 0.011764698
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: Colours.Array.data[5].Colour.g
+      value: 0.30980393
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: Colours.Array.data[5].Colour.r
+      value: 0.041889668
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: CutSequence.Array.data[4].CutBy
       value: fire
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: CutSequence.Array.data[5].CutBy
+      value: grass
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: CutSequence.Array.data[6].CutBy
+      value: fire
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: CutSequence.Array.data[7].CutBy
+      value: water
       objectReference: {fileID: 0}
     - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: Colours.Array.data[0].DrawPriority
@@ -331,6 +375,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
       propertyPath: Colours.Array.data[4].DrawPriority
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}
+      propertyPath: Colours.Array.data[5].DrawPriority
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7384941104995489138, guid: 3afaa86f42d72784fa57d857c9feb3eb, type: 3}

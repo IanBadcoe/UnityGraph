@@ -269,12 +269,24 @@ namespace Assets.Generation.Gen
             for (int i = 0; i < m_nodes.Count - 1; i++)
             {
                 var n1 = m_nodes[i];
+
+                if (n1.Radius == 0)
+                {
+                    continue;
+                }
+
                 int n1_idx = m_source2pars_idx[n1];
                 Vector2D n1pos = new Vector2D(pars[n1_idx], pars[n1_idx + 1]);
 
                 for (int j = i + 1; j < m_nodes.Count; j++)
                 {
                     var n2 = m_nodes[j];
+
+                    if (n2.Radius == 0)
+                    {
+                        continue;
+                    }
+
                     int n2_idx = m_source2pars_idx[n2];
                     Vector2D n2pos = new Vector2D(pars[n2_idx], pars[n2_idx + 1]);
 

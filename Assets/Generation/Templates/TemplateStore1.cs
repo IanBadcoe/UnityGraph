@@ -1,18 +1,38 @@
-﻿using Assets.Generation.GeomRep;
+﻿using Assets.Generation.G;
+using Assets.Generation.GeomRep;
 using Assets.Generation.GeomRep.Layouts;
+using Assets.Generation.U;
+using UnityEngine;
 
 namespace Assets.Generation.Templates
 {
     public class TemplateStore1 : TemplateStore
     {
         public TemplateStore1()
-        {
+        {                      
+            CorridorLayout.RegisterCustom("standard",
+                new CorridorLayout.LayerData("floor", 0.8f),
+                new CorridorLayout.LayerData("wall", 1)
+            );
+
+            CorridorLayout.RegisterCustom("fire_grass",
+                new CorridorLayout.LayerData("floor", 1.4f),
+                new CorridorLayout.LayerData("fire", 0.4f),
+                new CorridorLayout.LayerData("grass", 1)
+            );
+
+            CorridorLayout.RegisterCustom("walled_fire",
+                new CorridorLayout.LayerData("wall", 1),
+                new CorridorLayout.LayerData("fire", 0.7f),
+                new CorridorLayout.LayerData("floor", 0.8f)
+            );
+
             {
                 TemplateBuilder tb = new TemplateBuilder("Extend Corridor", "e");
                 tb.AddNode(NodeRecord.NodeType.In, "i");
                 tb.AddNode(NodeRecord.NodeType.Out, "o");
-                tb.AddNode(NodeRecord.NodeType.Internal, "e1", false, "<target>", "i", null, "e", 1, -1, CircularGeomLayout.Instance);
-                tb.AddNode(NodeRecord.NodeType.Internal, "e2", false, "<target>", "o", null, "e", 1, -1, CircularGeomLayout.Instance);
+                tb.AddNode(NodeRecord.NodeType.Internal, "e2", false, "<target>", "o", null, "e", CircularGeomLayout.Instance);
+                tb.AddNode(NodeRecord.NodeType.Internal, "e1", false, "<target>", "i", null, "e", CircularGeomLayout.Instance);
 
                 tb.Connect("i", "e1", 4.5f, -1, null, -1);
                 tb.Connect("e1", "e2", 4.5f, -1, null, -1);
@@ -52,12 +72,12 @@ namespace Assets.Generation.Templates
                 TemplateBuilder tb = new TemplateBuilder("Tee", "e");
                 tb.AddNode(NodeRecord.NodeType.In, "i");
                 tb.AddNode(NodeRecord.NodeType.Out, "o");
-                tb.AddNode(NodeRecord.NodeType.Internal, "j", false, "<target>", null, null, "e", 1f, 0.2f, CircularGeomLayout.Instance);
+                tb.AddNode(NodeRecord.NodeType.Internal, "j", false, "<target>", null, null, "je", CircularGeomLayout.Instance);
                 tb.AddNode(NodeRecord.NodeType.Internal, "side", true, "<target>", null, null, "e", 2f, 0.2f, CircularGeomLayout.Instance);
 
                 tb.Connect("i", "j", 4.5f, -1, null, -1);
                 tb.Connect("j", "o", 4.5f, -1, null, -1);
-                tb.Connect("j", "side", 4.5f, 0.5f, CorridorLayout.Instance, 0.2f);
+                tb.Connect("j", "side", 4.5f, 0.5f, CorridorLayout.Custom("walled_fire"), 0.2f);
 
                 AddTemplate(tb.Build());
             }
@@ -229,6 +249,20 @@ namespace Assets.Generation.Templates
             //
             //         AddTemplate(tb.Build());
             //      }
+        }
+
+        public override void MakeSeed(Graph g, ClRand clRand)
+        {
+            Node start = g.AddNode("Start", "<", 3f, 0.1f, CircularFireLakeGeomLayout.Instance);
+            Node expander = g.AddNode("engine.StepperController", "e", 1f, CircularGeomLayout.Instance);
+            Node end = g.AddNode("End", ">", 3f, 0.1f, CircularFireLakeGeomLayout.Instance);
+
+            start.Position = new Vector2(0, -4);
+            expander.Position = new Vector2(0, 0);
+            end.Position = new Vector2(4, 0);
+
+            g.Connect(start, expander, 4.5f, 1, CorridorLayout.Custom("fire_grass"));
+            g.Connect(expander, end, 4.5f, 1, CorridorLayout.Custom("fire_grass"));
         }
     }
 }
