@@ -51,9 +51,7 @@ namespace Assets.Behaviour
                 Config = Config
             };
 
-            GameObject go = new GameObject();
-            go.transform.parent = transform.parent;
-            StepperBehaviour sb = go.AddComponent<StepperBehaviour>();
+            StepperBehaviour sb = gameObject.AddComponent<StepperBehaviour>();
 
             sb.Controller = new StepperController(m_generator);
         }
