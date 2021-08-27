@@ -76,7 +76,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4950fecd6b750b541bad8629df3bfd76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NodesLimit: 16
+  NodesLimit: 10
   Config:
     RelaxationMinimumSeparation: 0.5
     EdgeToNodeForceScale: 1
@@ -86,7 +86,7 @@ MonoBehaviour:
     RelaxationMaxMove: 1
     IntermediateRelaxationMoveTarget: 0.5
     FinalRelaxationMoveTarget: 0.05
-    RandomSeed: 31
+    RandomSeed: 124
 --- !u!114 &7384941104995489138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -102,12 +102,16 @@ MonoBehaviour:
   Colours:
   - Name: floor
     Colour: {r: 1, g: 1, b: 1, a: 1}
+    DrawPriority: 0
   - Name: wall
     Colour: {r: 0.5377358, g: 0.5377358, b: 0.5377358, a: 1}
+    DrawPriority: 0
   - Name: water
     Colour: {r: 0.11525454, g: 0.44856885, b: 0.6603774, a: 1}
+    DrawPriority: 0
   - Name: decor
     Colour: {r: 0.509434, g: 0.28900954, b: 0, a: 1}
+    DrawPriority: 0
   CutSequence:
   - Cut: wall
     CutBy: floor
