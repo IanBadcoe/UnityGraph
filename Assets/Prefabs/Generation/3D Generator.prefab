@@ -1,0 +1,123 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &9020293378318520130
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6519645942250547586}
+  - component: {fileID: 5915779746768243298}
+  - component: {fileID: 921310462}
+  - component: {fileID: 2003294203}
+  - component: {fileID: 7384941104995489138}
+  m_Layer: 0
+  m_Name: 3D Generator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6519645942250547586
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9020293378318520130}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5915779746768243298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9020293378318520130}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce1ebd12f5b80ea4fa05cad7f68b3978, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CircleDrawerTemplate: {fileID: 3984474223022568685, guid: 17c8f939b1f40e549b66005bf96c9a6d, type: 3}
+  RectangleDrawerTemplate: {fileID: 3984474223022568685, guid: 7297d11495d5a9d45af61fbb8b7e53b3, type: 3}
+  DP: {fileID: 2003294203}
+--- !u!114 &921310462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9020293378318520130}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90030c1d68874cf43877312b0fb2fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DP: {fileID: 2003294203}
+  LoopDrawTemplate: {fileID: 3984474223022568685, guid: ef073f2b385f0aa4799a679761e21868, type: 3}
+  ControlCamera: 0
+--- !u!114 &2003294203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9020293378318520130}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4950fecd6b750b541bad8629df3bfd76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NodesLimit: 10
+  Config:
+    RelaxationMinimumSeparation: 0.5
+    EdgeToNodeForceScale: 1
+    EdgeLengthForceScale: 0.01
+    NodeToNodeForceScale: 1
+    ExtraForceScale: 0.02
+    RelaxationMaxMove: 1
+    IntermediateRelaxationMoveTarget: 0.5
+    FinalRelaxationMoveTarget: 0.05
+    RandomSeed: 124
+--- !u!114 &7384941104995489138
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9020293378318520130}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0dcf4473ac33d854b93f3433ee8a4f54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Colours:
+  - Name: floor
+    Colour: {r: 1, g: 1, b: 1, a: 1}
+    DrawPriority: 0
+  - Name: wall
+    Colour: {r: 0.5377358, g: 0.5377358, b: 0.5377358, a: 1}
+    DrawPriority: 0
+  - Name: water
+    Colour: {r: 0.11525454, g: 0.44856885, b: 0.6603774, a: 1}
+    DrawPriority: 0
+  - Name: decor
+    Colour: {r: 0.509434, g: 0.28900954, b: 0, a: 1}
+    DrawPriority: 0
+  CutSequence:
+  - Cut: wall
+    CutBy: floor
+  - Cut: water
+    CutBy: decor
+  - Cut: floor
+    CutBy: decor
+  - Cut: floor
+    CutBy: water
