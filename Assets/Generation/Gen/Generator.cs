@@ -156,16 +156,7 @@ namespace Assets.Generation.Gen
 
         private void MakeSeed()
         {
-            Node start = Graph.AddNode("Start", "<", 3f, 0.1f, CircularFireLakeGeomLayout.Instance);
-            Node expander = Graph.AddNode("engine.StepperController", "e", 1f, CircularGeomLayout.Instance);
-            Node end = Graph.AddNode("End", ">", 3f, 0.1f, CircularFireLakeGeomLayout.Instance);
-
-            start.Position = new Vector2(0, -4);
-            expander.Position = new Vector2(0, 0);
-            end.Position = new Vector2(4, 0);
-
-            Graph.Connect(start, expander, 4.5f, 1, FireCorridorLayout.Instance, 0.1f);
-            Graph.Connect(expander, end, 4.5f, 1, FireCorridorLayout.Instance, 0.1f);
+            Templates.MakeSeed(Graph, Config.Rand());
         }
     }
 }

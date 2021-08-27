@@ -1,5 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Assets.Generation.G;
+using Assets.Generation.GeomRep;
+using Assets.Generation.U;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Assets.Generation.Templates
 {
@@ -43,6 +48,20 @@ namespace Assets.Generation.Templates
         public bool Contains(string name)
         {
             return m_templates.ContainsKey(name);
+        }
+
+        public virtual void MakeSeed(Graph g, ClRand clRand)
+        {
+            Node start = g.AddNode("Start", "<", 3f, 0.1f, CircularGeomLayout.Instance);
+            Node expander = g.AddNode("engine.StepperController", "e", 1f, CircularGeomLayout.Instance);
+            Node end = g.AddNode("End", ">", 3f, 0.1f, CircularGeomLayout.Instance);
+
+            start.Position = new Vector2(0, -4);
+            expander.Position = new Vector2(0, 0);
+            end.Position = new Vector2(4, 0);
+
+            g.Connect(start, expander, 4.5f, 1, CorridorLayout.Default, 0.1f);
+            g.Connect(expander, end, 4.5f, 1, CorridorLayout.Default, 0.1f);
         }
     }
 }
