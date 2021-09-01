@@ -1659,7 +1659,7 @@ namespace Assets.Generation.GeomRep
             }
         }
 
-        [Conditional("Debug")]
+        [Conditional("DEBUG")]
         private static void ValidateAnnotations(IList<Curve> allCurves, Dictionary<Curve, AnnotatedCurve> ann_map)
         {
             Dictionary<Curve, int> forward_counts = new Dictionary<Curve, int>(
@@ -1853,7 +1853,7 @@ namespace Assets.Generation.GeomRep
                         working_loop2.RemoveAt(j);
                         for (int k = 0; k < ret.Item2.Count; k++)
                         {
-                            working_loop2.Insert(i + k, ret.Item2[k]);
+                            working_loop2.Insert(j + k, ret.Item2[k]);
                         }
 
                         // c2 is replaced now
