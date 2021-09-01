@@ -123,10 +123,10 @@ namespace Assets.Generation.GeomRep
                 .Aggregate(new Box2(), (a, b) => a.Union(b));
         }
 
-        public IReadOnlyDictionary<string, LoopSet> MergedLoops
+        public IReadOnlyDictionary<string, ILoopSet> MergedLoops
         {
             get => m_merged_loop_sets
-                .Select(x => new KeyValuePair<string, LoopSet>(x.Key, x.Value.Merged))
+                .Select(x => new KeyValuePair<string, ILoopSet>(x.Key, x.Value.Merged))
                 .ToDictionary(x => x.Key, x => x.Value);
         }
     }

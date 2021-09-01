@@ -46,7 +46,6 @@ namespace Assets.Behaviour.Drawing
                     {
                         LCB.ColourDict.TryGetValue(layer, out col);
                         LCB.PriorityDict.TryGetValue(layer, out draw_priority);
-
                     }
 
                     foreach (var loop in loopset.Value)

@@ -7,7 +7,7 @@ namespace Assets.Behaviour
 {
     class TestBehaviour : DataProvider
     {
-        readonly Dictionary<string, LoopSet> m_loops = new Dictionary<string, LoopSet>();
+        readonly Dictionary<string, ILoopSet> m_loops = new Dictionary<string, ILoopSet>();
         public int TestNum = 62;
         public int ShapeNum = 0;
         public int StepControl = -1;
@@ -16,10 +16,10 @@ namespace Assets.Behaviour
 
         ClRand test_rand;
         readonly Intersector intersector = new Intersector(new ClRand(1));
-        LoopSet merged = new LoopSet();
+        ILoopSet merged = new LoopSet();
         readonly Loop[] Loops = new Loop[5];
 
-        public override IReadOnlyDictionary<string, LoopSet> GetLoops()
+        public override IReadOnlyDictionary<string, ILoopSet> GetLoops()
         {
             return m_loops;
         }

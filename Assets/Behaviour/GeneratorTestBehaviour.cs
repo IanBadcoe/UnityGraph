@@ -22,7 +22,7 @@ namespace Assets.Behaviour
             LCB = Transform.FindObjectOfType<LayerConfigBehaviour>();
         }
 
-        public override IReadOnlyDictionary<string, LoopSet> GetLoops()
+        public override IReadOnlyDictionary<string, ILoopSet> GetLoops()
         {
             if (m_generator != null && m_generator.UnionHelper != null)
             {

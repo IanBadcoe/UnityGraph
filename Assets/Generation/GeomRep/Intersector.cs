@@ -13,6 +13,7 @@ namespace Assets.Generation.GeomRep
     {
         Dictionary<Curve, AnnotatedCurve> AnnotationMap;
         LoopSet InternalMerged;
+        ReadOnlyLoopSet MergedCache;
         int LoopNumber;
         readonly ClRand Random;
 
@@ -105,9 +106,17 @@ namespace Assets.Generation.GeomRep
             return AnnotationMap;
         }
 
-        public LoopSet Merged
+        public ILoopSet Merged
         {
-            get => new LoopSet(InternalMerged);
+            get
+            {
+                if (ReferenceEquals(MergedCache, null) || !MergedCache.Equals(InternalMerged))
+                {
+                    MergedCache = new ReadOnlyLoopSet(InternalMerged);
+                }
+
+                return MergedCache;
+            }
         }
 
         public void Cut(Loop cut_by, float tol, string layer = "")
