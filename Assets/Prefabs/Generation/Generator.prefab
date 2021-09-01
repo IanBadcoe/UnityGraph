@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 5915779746768243298}
   - component: {fileID: 921310462}
   - component: {fileID: 2003294203}
-  - component: {fileID: 7384941104995489138}
   m_Layer: 0
   m_Name: Generator
   m_TagString: Untagged
@@ -30,7 +29,8 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 876469019340991589}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -88,51 +88,65 @@ MonoBehaviour:
     IntermediateRelaxationMoveTarget: 0.5
     FinalRelaxationMoveTarget: 0.05
     RandomSeed: 124
---- !u!114 &7384941104995489138
-MonoBehaviour:
+--- !u!1001 &508149310085745691
+PrefabInstance:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 6519645942250547586}
+    m_Modifications:
+    - target: {fileID: 802934820655145086, guid: c7bb66456938e3841a349a40dba9c69a, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 802934820655145086, guid: c7bb66456938e3841a349a40dba9c69a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 802934820655145086, guid: c7bb66456938e3841a349a40dba9c69a, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 802934820655145086, guid: c7bb66456938e3841a349a40dba9c69a, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 802934820655145086, guid: c7bb66456938e3841a349a40dba9c69a, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 802934820655145086, guid: c7bb66456938e3841a349a40dba9c69a, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 802934820655145086, guid: c7bb66456938e3841a349a40dba9c69a, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 802934820655145086, guid: c7bb66456938e3841a349a40dba9c69a, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 802934820655145086, guid: c7bb66456938e3841a349a40dba9c69a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 802934820655145086, guid: c7bb66456938e3841a349a40dba9c69a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 802934820655145086, guid: c7bb66456938e3841a349a40dba9c69a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8871862980653253127, guid: c7bb66456938e3841a349a40dba9c69a, type: 3}
+      propertyPath: m_Name
+      value: LayerConfig
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c7bb66456938e3841a349a40dba9c69a, type: 3}
+--- !u!4 &876469019340991589 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 802934820655145086, guid: c7bb66456938e3841a349a40dba9c69a, type: 3}
+  m_PrefabInstance: {fileID: 508149310085745691}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9020293378318520130}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0dcf4473ac33d854b93f3433ee8a4f54, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Colours:
-  - Name: floor
-    Colour: {r: 1, g: 1, b: 1, a: 1}
-    DrawPriority: 0
-  - Name: wall
-    Colour: {r: 0.5377358, g: 0.5377358, b: 0.5377358, a: 1}
-    DrawPriority: 1
-  - Name: water
-    Colour: {r: 0.11525454, g: 0.44856885, b: 0.6603774, a: 1}
-    DrawPriority: 2
-  - Name: decor
-    Colour: {r: 0.509434, g: 0.28900954, b: 0, a: 1}
-    DrawPriority: 3
-  - Name: fire
-    Colour: {r: 0.31132078, g: 0.0102794655, b: 0.03222934, a: 1}
-    DrawPriority: 5
-  - Name: grass
-    Colour: {r: 0.041889668, g: 0.30980393, b: 0.011764698, a: 1}
-    DrawPriority: 4
-  CutSequence:
-  - Cut: wall
-    CutBy: floor
-  - Cut: water
-    CutBy: decor
-  - Cut: floor
-    CutBy: decor
-  - Cut: floor
-    CutBy: water
-  - Cut: floor
-    CutBy: fire
-  - Cut: floor
-    CutBy: grass
-  - Cut: grass
-    CutBy: fire
-  - Cut: grass
-    CutBy: water
