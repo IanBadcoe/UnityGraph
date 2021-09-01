@@ -2235,7 +2235,7 @@ public class IntersectorTest
         Dictionary<Curve, int> backward_counts = new Dictionary<Curve, int>(
             new Intersector.ReferenceComparer<Curve>());
 
-        foreach(var c in allCurves)
+        foreach (var c in allCurves)
         {
             Assert.IsTrue(ann_map.ContainsKey(c));
         }
@@ -2271,7 +2271,7 @@ public class IntersectorTest
         {
             Assert.AreEqual(splice.ForwardLinks.Count, splice.BackwardLinks.Count);
 
-            foreach(var c in splice.ForwardLinks)
+            foreach (var c in splice.ForwardLinks)
             {
                 Assert.IsTrue(ann_map.ContainsKey(c));
 
@@ -2286,7 +2286,7 @@ public class IntersectorTest
             }
         }
 
-        foreach(var c in forward_counts.Keys)
+        foreach (var c in forward_counts.Keys)
         {
             Assert.AreEqual(1, forward_counts[c]);
             Assert.AreEqual(1, backward_counts[c]);
@@ -2382,7 +2382,7 @@ public class IntersectorTest
             Assert.IsTrue(right1.Equals(right2, 1e-5f));
         }
 
-        for(int i = 0; i < 6; i++)
+        for (int i = 0; i < 6; i++)
         {
             var intr = new Intersector(new ClRand(1));
 

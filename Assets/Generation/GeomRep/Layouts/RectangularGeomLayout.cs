@@ -1,8 +1,6 @@
 ﻿using Assets.Extensions;
 using Assets.Generation.G;
-using Assets.Generation.U;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Assets.Generation.GeomRep
@@ -21,8 +19,8 @@ namespace Assets.Generation.GeomRep
             }
         }
 
-        LayerData[] Layers;
-        static Dictionary<string, CorridorLayout> CustomLayouts = new Dictionary<string, CorridorLayout>();
+        readonly LayerData[] Layers;
+        static readonly Dictionary<string, CorridorLayout> CustomLayouts = new Dictionary<string, CorridorLayout>();
 
         public static GeomLayout Default { get; } = new CorridorLayout();
 
@@ -86,7 +84,7 @@ namespace Assets.Generation.GeomRep
 
             LoopSet ret = new LoopSet();
 
-            foreach(var l in Layers)
+            foreach (var l in Layers)
             {
                 var actual_half_width = l.HalfWidth * 0.99f;
 

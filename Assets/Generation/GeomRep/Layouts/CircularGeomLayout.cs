@@ -10,10 +10,11 @@ namespace Assets.Generation.GeomRep
 
         public override LoopSet MakeGeometry(Node node)
         {
-            if (node.Radius == 0) {
+            if (node.Radius == 0)
+            {
                 return null;
             }
-    
+
             if (node.WallThickness > 0)
             {
                 return new LoopSet {

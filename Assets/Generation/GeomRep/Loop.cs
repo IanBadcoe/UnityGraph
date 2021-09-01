@@ -170,7 +170,8 @@ namespace Assets.Generation.GeomRep
         {
             get => new ReadOnlyCollection<Curve>(m_curves);
         }
-        public bool IsEmpty {
+        public bool IsEmpty
+        {
             get => m_curves.Count == 0;
         }
 

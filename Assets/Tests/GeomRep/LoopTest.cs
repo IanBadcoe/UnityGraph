@@ -1,11 +1,8 @@
-﻿using Assets.Generation.GeomRep;
-using Assets.Extensions;
+﻿using Assets.Extensions;
+using Assets.Generation.GeomRep;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 public class LoopTest
@@ -24,7 +21,7 @@ public class LoopTest
         {
             Curve c0 = new CircleCurve(new Vector2(), 1, 0, Mathf.PI);
 
-            Assert.Throws<ArgumentException>(() =>new Loop("", c0));
+            Assert.Throws<ArgumentException>(() => new Loop("", c0));
         }
 
         // several parts that form a loop work
@@ -34,11 +31,13 @@ public class LoopTest
             Curve c3 = new CircleCurve(new Vector2(-2, 0), 1, Mathf.PI, 2 * Mathf.PI);
             Curve c4 = new LineCurve(new Vector2(-2, 1), new Vector2(1, 0), 2);
 
-            List<Curve> list = new List<Curve>();
-            list.Add(c1);
-            list.Add(c2);
-            list.Add(c3);
-            list.Add(c4);
+            List<Curve> list = new List<Curve>
+            {
+                c1,
+                c2,
+                c3,
+                c4
+            };
 
             new Loop("", list);
         }
@@ -49,10 +48,12 @@ public class LoopTest
             Curve c2 = new LineCurve(new Vector2(0, -1), new Vector2(-1, 0), 2);
             Curve c3 = new CircleCurve(new Vector2(-2, 0), 1, Mathf.PI, 2 * Mathf.PI);
 
-            List<Curve> list = new List<Curve>();
-            list.Add(c1);
-            list.Add(c2);
-            list.Add(c3);
+            List<Curve> list = new List<Curve>
+            {
+                c1,
+                c2,
+                c3
+            };
 
             Assert.Throws<ArgumentException>(() => new Loop("", list));
         }
@@ -68,12 +69,13 @@ public class LoopTest
             Curve c3 = new CircleCurve(new Vector2(-2, 0), 1, Mathf.PI, 2 * Mathf.PI);
             Curve c4 = new LineCurve(new Vector2(-2, 1), new Vector2(1, 0), 2);
 
-            List<Curve> list = new List<Curve>();
-
-            list.Add(c1);
-            list.Add(c2);
-            list.Add(c3);
-            list.Add(c4);
+            List<Curve> list = new List<Curve>
+            {
+                c1,
+                c2,
+                c3,
+                c4
+            };
 
             Loop l = new Loop("", list);
 
@@ -89,12 +91,13 @@ public class LoopTest
             Curve c3 = new CircleCurve(new Vector2(-2, 0), 1, Mathf.PI, 2 * Mathf.PI);
             Curve c4 = new LineCurve(new Vector2(-2, 1), new Vector2(1, 0), 2);
 
-            List<Curve> list = new List<Curve>();
-
-            list.Add(c3);
-            list.Add(c4);
-            list.Add(c1);
-            list.Add(c2);
+            List<Curve> list = new List<Curve>
+            {
+                c3,
+                c4,
+                c1,
+                c2
+            };
 
             Loop l = new Loop("", list);
 
@@ -110,12 +113,13 @@ public class LoopTest
         Curve c3 = new CircleCurve(new Vector2(-2, 0), 1, Mathf.PI, 2 * Mathf.PI);
         Curve c4 = new LineCurve(new Vector2(-2, 1), new Vector2(1, 0), 2);
 
-        List<Curve> list = new List<Curve>();
-
-        list.Add(c1);
-        list.Add(c2);
-        list.Add(c3);
-        list.Add(c4);
+        List<Curve> list = new List<Curve>
+        {
+            c1,
+            c2,
+            c3,
+            c4
+        };
 
         Loop l = new Loop("", list);
 
@@ -218,7 +222,7 @@ public class LoopTest
     }
 
     [Test]
-   public void TestFacet()
+    public void TestFacet()
     {
         {
             Loop l = new Loop("", new CircleCurve(new Vector2(), 1));
@@ -240,12 +244,13 @@ public class LoopTest
             Curve c3 = new CircleCurve(new Vector2(-Mathf.PI, 0), 1, Mathf.PI, 2 * Mathf.PI);
             Curve c4 = new LineCurve(new Vector2(-Mathf.PI, 1), new Vector2(1, 0), Mathf.PI);
 
-            List<Curve> list = new List<Curve>();
-
-            list.Add(c1);
-            list.Add(c2);
-            list.Add(c3);
-            list.Add(c4);
+            List<Curve> list = new List<Curve>
+            {
+                c1,
+                c2,
+                c3,
+                c4
+            };
 
             Loop l = new Loop("", list);
 
