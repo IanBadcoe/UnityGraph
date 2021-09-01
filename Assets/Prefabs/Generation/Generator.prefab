@@ -48,6 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CircleDrawerTemplate: {fileID: 3984474223022568685, guid: 17c8f939b1f40e549b66005bf96c9a6d, type: 3}
   RectangleDrawerTemplate: {fileID: 3984474223022568685, guid: 7297d11495d5a9d45af61fbb8b7e53b3, type: 3}
+  ControlCamera: 1
   DP: {fileID: 2003294203}
 --- !u!114 &921310462
 MonoBehaviour:
@@ -105,13 +106,19 @@ MonoBehaviour:
     DrawPriority: 0
   - Name: wall
     Colour: {r: 0.5377358, g: 0.5377358, b: 0.5377358, a: 1}
-    DrawPriority: 0
+    DrawPriority: 1
   - Name: water
     Colour: {r: 0.11525454, g: 0.44856885, b: 0.6603774, a: 1}
-    DrawPriority: 0
+    DrawPriority: 2
   - Name: decor
     Colour: {r: 0.509434, g: 0.28900954, b: 0, a: 1}
-    DrawPriority: 0
+    DrawPriority: 3
+  - Name: fire
+    Colour: {r: 0.31132078, g: 0.0102794655, b: 0.03222934, a: 1}
+    DrawPriority: 5
+  - Name: grass
+    Colour: {r: 0.041889668, g: 0.30980393, b: 0.011764698, a: 1}
+    DrawPriority: 4
   CutSequence:
   - Cut: wall
     CutBy: floor
@@ -120,4 +127,12 @@ MonoBehaviour:
   - Cut: floor
     CutBy: decor
   - Cut: floor
+    CutBy: water
+  - Cut: floor
+    CutBy: fire
+  - Cut: floor
+    CutBy: grass
+  - Cut: grass
+    CutBy: fire
+  - Cut: grass
     CutBy: water

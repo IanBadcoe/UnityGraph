@@ -12,6 +12,7 @@ namespace Assets.Behaviour.Drawing
     {
         public GameObject CircleDrawerTemplate;
         public GameObject RectangleDrawerTemplate;
+        public bool ControlCamera = true;
 
         Dictionary<object, GameObject> AllDrawers = new Dictionary<object, GameObject>();
 
@@ -86,15 +87,18 @@ namespace Assets.Behaviour.Drawing
                 }
             }
 
-            Box2 bounds = graph.Bounds();
-            Camera.transform.position = bounds.Centre() + new Vector3(0, 0, -300);
-
-            float aspect_ratio = Screen.width / (float)Screen.height;
-            float req_size = Mathf.Max(bounds.Diagonal.y, bounds.Diagonal.x / aspect_ratio);
-
-            Camera.orthographicSize = req_size / 2;
-
             AllDrawers = n_dict;
+
+            if (ControlCamera)
+            {
+                Box2 bounds = graph.Bounds();
+                Camera.transform.position = bounds.Centre() + new Vector3(0, 0, -300);
+
+                float aspect_ratio = Screen.width / (float)Screen.height;
+                float req_size = Mathf.Max(bounds.Diagonal.y, bounds.Diagonal.x / aspect_ratio);
+
+                Camera.orthographicSize = req_size / 2;
+            }
         }
     }
 }
