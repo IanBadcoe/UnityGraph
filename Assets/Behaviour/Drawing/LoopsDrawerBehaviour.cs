@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static Assets.Behaviour.LayerConfigBehaviour;
 
 namespace Assets.Behaviour.Drawing
 {
@@ -39,13 +40,11 @@ namespace Assets.Behaviour.Drawing
                 {
                     string layer = loopset.Key;
 
-                    Color col = new Color(1, 0.5f, 0.5f);
-                    int draw_priority = 0;
+                    var layer_data = LayerData.Default;
 
                     if (LCB != null)
                     {
-                        LCB.ColourDict.TryGetValue(layer, out col);
-                        LCB.PriorityDict.TryGetValue(layer, out draw_priority);
+                        LCB.LayerDict.TryGetValue(layer, out layer_data);
                     }
 
                     foreach (var loop in loopset.Value)
@@ -63,8 +62,8 @@ namespace Assets.Behaviour.Drawing
 
                             lr.positionCount = points.Length;
                             lr.SetPositions(points);
-                            lr.startColor = lr.endColor = col;
-                            lr.sortingOrder = draw_priority;
+                            lr.startColor = lr.endColor = layer_data.Colour;
+                            lr.sortingOrder = layer_data.DrawPriority;
                         }
                     }
                 }

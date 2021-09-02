@@ -1,23 +1,36 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Assets.Behaviour
 {
     public class LayerConfigBehaviour : MonoBehaviour
     {
         [Serializable]
-        public struct LayerMaterial
+        public struct LayerData
         {
+            // just for reasonable defaults
+            public readonly static LayerData Default = new LayerData
+            {
+                Name = "default",
+                Colour = new Color(1.0f, 0.5f, 1.0f),
+                DrawPriority = 1,
+                BaseHeight = -2,
+                TopHeight = 0
+            };
+
             public string Name;
             public Color Colour;
             public int DrawPriority;
+            public float BaseHeight;
+            public float TopHeight;
         }
 
-        public Dictionary<string, Color> ColourDict;
-        public Dictionary<string, int> PriorityDict;
+        public Dictionary<string, LayerData> LayerDict;
 
-        public LayerMaterial[] Colours;
+        [FormerlySerializedAs("Colours")]
+        public LayerData[] Layers;
 
         [Serializable]
         public struct LayerCut
@@ -51,13 +64,11 @@ namespace Assets.Behaviour
 
         private void Start()
         {
-            ColourDict = new Dictionary<string, Color>();
-            PriorityDict = new Dictionary<string, int>();
+            LayerDict = new Dictionary<string, LayerData>();
 
-            foreach (var ent in Colours)
+            foreach (var ent in Layers)
             {
-                ColourDict[ent.Name] = ent.Colour;
-                PriorityDict[ent.Name] = ent.DrawPriority;
+                LayerDict[ent.Name] = ent;
             }
         }
     }

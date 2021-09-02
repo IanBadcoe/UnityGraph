@@ -11,20 +11,20 @@ namespace Assets.Generation.Templates
         public TemplateStore1()
         {
             CorridorLayout.RegisterCustom("standard",
-                new CorridorLayout.LayerData("floor", 0.8f),
-                new CorridorLayout.LayerData("wall", 1)
+                new CorridorLayout.CorridorLayer("floor", 0.8f),
+                new CorridorLayout.CorridorLayer("wall", 1)
             );
 
             CorridorLayout.RegisterCustom("fire_grass",
-                new CorridorLayout.LayerData("floor", 1.4f),
-                new CorridorLayout.LayerData("fire", 0.4f),
-                new CorridorLayout.LayerData("grass", 1)
+                new CorridorLayout.CorridorLayer("floor", 1.4f),
+                new CorridorLayout.CorridorLayer("fire", 0.4f),
+                new CorridorLayout.CorridorLayer("grass", 1)
             );
 
             CorridorLayout.RegisterCustom("walled_fire",
-                new CorridorLayout.LayerData("wall", 1),
-                new CorridorLayout.LayerData("fire", 0.7f),
-                new CorridorLayout.LayerData("floor", 0.8f)
+                new CorridorLayout.CorridorLayer("wall", 1),
+                new CorridorLayout.CorridorLayer("fire", 0.7f),
+                new CorridorLayout.CorridorLayer("floor", 0.8f)
             );
 
             {

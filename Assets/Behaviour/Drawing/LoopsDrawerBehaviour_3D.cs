@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static Assets.Behaviour.LayerConfigBehaviour;
 
 namespace Assets.Behaviour.Drawing
 {
@@ -43,8 +44,15 @@ namespace Assets.Behaviour.Drawing
                 {
                     if (!RendererMap.ContainsKey(loopset.Value))
                     {
-                        GameObject renderer = CreateRenderer(loopset.Key, loopset.Value);
-                        CreateCollision(loopset.Value, renderer);
+                        var layer_data = LayerData.Default;
+
+                        if (LCB != null)
+                        {
+                            LCB.LayerDict.TryGetValue(loopset.Key, out layer_data);
+                        }
+
+                        GameObject renderer = CreateRenderer(loopset.Value, layer_data);
+                        CreateCollision(loopset.Value, renderer, layer_data);
 
                         RendererMap[loopset.Value] = renderer;
                     }
@@ -81,27 +89,20 @@ namespace Assets.Behaviour.Drawing
             //}
         }
 
-        private void CreateCollision(ILoopSet loopset, GameObject renderer)
+        private void CreateCollision(ILoopSet loopset, GameObject renderer, LayerData data)
         {
             // 50cm resolution should be OK, because every curve's start and end are included anyway
             // so nothing small should be missed, it will just be circles are a bit more polygonal
-            Mesh mesh = Tessellate(loopset, 0.5f, true);
+            Mesh mesh = RenderSolid(loopset, 0.5f, true, data.BaseHeight, data.TopHeight);
 
             MeshCollider mc = renderer.transform.GetComponent<MeshCollider>();
 
             mc.sharedMesh = mesh;
         }
 
-        private GameObject CreateRenderer(string layer, ILoopSet loopset)
+        private GameObject CreateRenderer(ILoopSet loopset, LayerData data)
         {
-            Color col = new Color(1, 0.5f, 0.5f);
-
-            if (LCB != null)
-            {
-                LCB.ColourDict.TryGetValue(layer, out col);
-            }
-
-            Mesh mesh = Tessellate(loopset, 0.1f, true);
+            Mesh mesh = RenderSolid(loopset, 0.1f, true, data.BaseHeight, data.TopHeight);
 
             var renderer = Instantiate(MeshDrawTemplate, transform);
 
@@ -110,12 +111,12 @@ namespace Assets.Behaviour.Drawing
 
             mf.mesh = mesh;
 
-            mr.materials[0].color = col;
+            mr.materials[0].color = data.Colour;
 
             return renderer;
         }
 
-        private static Mesh Tessellate(ILoopSet loopset, float max_length, bool separate_side_normals)
+        private static Mesh RenderSolid(ILoopSet loopset, float max_length, bool separate_side_normals, float bottom, float top)
         {
             Tess tess = new Tess();
 
@@ -145,8 +146,8 @@ namespace Assets.Behaviour.Drawing
             // we do not expect tesselation to add any verts
             Assertion.Assert(total_verts == tess.Vertices.Length);
 
-            Vector3[] top_verts = tess.Vertices.Select(x => new Vector3(x.Position.X, x.Position.Z, x.Position.Y)).ToArray();
-            Vector3[] bot_verts = tess.Vertices.Select(x => new Vector3(x.Position.X, x.Position.Z - 1, x.Position.Y)).ToArray();
+            Vector3[] top_verts = tess.Vertices.Select(x => new Vector3(x.Position.X, top, x.Position.Y)).ToArray();
+            Vector3[] bot_verts = tess.Vertices.Select(x => new Vector3(x.Position.X, bottom, x.Position.Y)).ToArray();
 
             int[] top_tris = tess.Elements;
             int[] bot_tris = new int[top_tris.Length];
@@ -175,7 +176,7 @@ namespace Assets.Behaviour.Drawing
 
             List<int[]> side_tris = new List<int[]>();
 
-            Vector3[] temp_verts = tess.Vertices.Select(x => new Vector3(x.Position.X, x.Position.Z, x.Position.Y)).ToArray();
+            Vector3[] temp_verts = tess.Vertices.Select(x => new Vector3(x.Position.X, top, x.Position.Y)).ToArray();
 
             for (int i = 0; i < tess.Elements.Length; i += 2)
             {

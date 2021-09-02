@@ -7,19 +7,19 @@ namespace Assets.Generation.GeomRep
 {
     public class CorridorLayout : GeomLayout
     {
-        public struct LayerData
+        public struct CorridorLayer
         {
             public readonly string LayerName;
             public readonly float HalfWidth;
 
-            public LayerData(string name, float half_width) : this()
+            public CorridorLayer(string name, float half_width) : this()
             {
                 LayerName = name;
                 HalfWidth = half_width;
             }
         }
 
-        readonly LayerData[] Layers;
+        readonly CorridorLayer[] Layers;
         static readonly Dictionary<string, CorridorLayout> CustomLayouts = new Dictionary<string, CorridorLayout>();
 
         public static GeomLayout Default { get; } = new CorridorLayout();
@@ -29,14 +29,14 @@ namespace Assets.Generation.GeomRep
             return CustomLayouts[name];
         }
 
-        public static void RegisterCustom(string name, params LayerData[] layers)
+        public static void RegisterCustom(string name, params CorridorLayer[] layers)
         {
             CustomLayouts[name] = new CorridorLayout(layers);
         }
 
         protected CorridorLayout() { }
 
-        private CorridorLayout(params LayerData[] layers)
+        private CorridorLayout(params CorridorLayer[] layers)
         {
             Layers = layers;
         }
