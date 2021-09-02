@@ -270,6 +270,40 @@ namespace Assets.Generation.GeomRep
             return temp.ToArray();
         }
 
+        // just a tiny bit smarter than "Facet"
+        public Vector3[] SmartFacet(float max_length)
+        {
+            List<Vector3> temp = new List<Vector3>();
+
+            foreach (Curve c in m_curves)
+            {
+                if (c is LineCurve)
+                {
+                    // all we need for a line is the begining and end
+                    // and the end comes from the start of the following curve
+                    temp.Add(c.StartPos);
+                }
+                else
+                {
+                    float param_step = c.ParamRange
+                        * (max_length / c.Length);
+
+                    float p = 0;
+
+                    float start_p = c.StartParam;
+
+                    while (p < c.ParamRange)
+                    {
+                        temp.Add(c.Pos(start_p + p, false));
+
+                        p += param_step;
+                    }
+                }
+            }
+
+            return temp.ToArray();
+        }
+
         public List<Tuple<Vector2, Vector2>> FacetWithNormals(float max_length)
         {
             List<Tuple<Vector2, Vector2>> ret = new List<Tuple<Vector2, Vector2>>();

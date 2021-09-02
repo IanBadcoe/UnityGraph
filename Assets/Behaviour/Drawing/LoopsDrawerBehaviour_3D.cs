@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Assets.Behaviour.Drawing
 {
-    public class LoopsDrawerBehaviour_Filled : MonoBehaviour
+    public class LoopsDrawerBehaviour_3D : MonoBehaviour
     {
         public DataProvider DP;
         public GameObject MeshDrawTemplate;
@@ -61,7 +61,7 @@ namespace Assets.Behaviour.Drawing
                         {
                             float len = loop.ParamRange;
 
-                            var points = loop.Facet(0.1f);
+                            var points = loop.SmartFacet(0.1f);
 
                             var contour = points.Select(x => new ContourVertex()
                             {
@@ -129,13 +129,20 @@ namespace Assets.Behaviour.Drawing
                                 int old_idx1 = vert_map[v1];
                                 int old_idx2 = vert_map[v2];
 
-                                tris[j * 6 + 0] = old_idx1;
-                                tris[j * 6 + 2] = old_idx2 + total_verts;
-                                tris[j * 6 + 1] = old_idx1 + total_verts;
+                                // we need to give the sides their own normals, so we need to duplicate the verts
+                                // thus the arrangement of verts is:
+                                //               0  <=  idx  <  total_verts       -->   top face
+                                //     total_verts  <=  idx  <  total_verts * 2   -->   bottom face
+                                // total_verts * 2  <=  idx  <  total_verts * 3   -->   top face verts for edges
+                                // total_verts * 3  <=  idx  <  total_verts * 4   -->   bottom face verts for edges
+ 
+                                tris[j * 6 + 0] = old_idx1 + total_verts * 2;
+                                tris[j * 6 + 2] = old_idx2 + total_verts * 3;
+                                tris[j * 6 + 1] = old_idx1 + total_verts * 3;
 
-                                tris[j * 6 + 3] = old_idx2;
-                                tris[j * 6 + 4] = old_idx1;
-                                tris[j * 6 + 5] = old_idx2 + total_verts;
+                                tris[j * 6 + 3] = old_idx2 + total_verts * 2;
+                                tris[j * 6 + 4] = old_idx1 + total_verts * 2;
+                                tris[j * 6 + 5] = old_idx2 + total_verts * 3;
 
                                 side_tris.Add(tris);
                             }
@@ -147,12 +154,17 @@ namespace Assets.Behaviour.Drawing
                         MeshFilter mf = renderer.transform.GetComponent<MeshFilter>();
                         var mesh = new Mesh
                         {
-                            vertices = top_verts.Concat(bot_verts).ToArray(),
+                            vertices =
+                                top_verts.Concat(bot_verts)
+                                .Concat(top_verts).Concat(bot_verts)
+                                .ToArray(),
                             triangles = top_tris
                                 .Concat(bot_tris)
                                 .Concat(side_tris.SelectMany(x => x))
                                 .ToArray()
                         };
+
+                        mesh.RecalculateNormals();
 
                         mf.mesh = mesh;
 

@@ -62,7 +62,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4950fecd6b750b541bad8629df3bfd76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NodesLimit: 10
+  NodesLimit: 12
   Config:
     RelaxationMinimumSeparation: 0.5
     EdgeToNodeForceScale: 1
