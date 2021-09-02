@@ -1390,12 +1390,10 @@ namespace Assets.Generation.GeomRep
         }
 
         // non-private only for unit-tests
-        public bool SplitCurvesAtIntersections(
+        public void SplitCurvesAtIntersections(
             IList<Curve> working_loop1, IList<Curve> working_loop2,
             float tol)
         {
-            int intersection_count = 0;
-
             for (int i = 0; i < working_loop1.Count; i++)
             {
                 Curve c1 = working_loop1[i];
@@ -1448,9 +1446,6 @@ namespace Assets.Generation.GeomRep
                             float start_dist = c1.ParamCoordinateDist(c1.StartParam, split_points.Item1);
                             float end_dist = c1.ParamCoordinateDist(c1.EndParam, split_points.Item1);
 
-                            // this is still an intersection, even if we do not have to add a split because it hits an existing one
-                            intersection_count++;
-
                             // if we are far enough from existing splits
                             if (start_dist > tol && end_dist > tol)
                             {
@@ -1486,9 +1481,6 @@ namespace Assets.Generation.GeomRep
                             {
                                 joint = c1_from;
                             }
-
-                            // this is still an intersection, even if we do not have to add a split because it hits an existing one
-                            intersection_count++;
 
                             start_dist = c2.ParamCoordinateDist(c2.StartParam, split_points.Item2);
                             end_dist = c2.ParamCoordinateDist(c2.EndParam, split_points.Item2);
@@ -1529,11 +1521,6 @@ namespace Assets.Generation.GeomRep
                     } while (any_splits);
                 }
             }
-
-            // we expect even numbers of crossings
-            Assertion.Assert(intersection_count % 2 == 0);
-
-            return intersection_count > 0;
         }
 
         // order of merge_from and merge_to should be irrelevant
@@ -1786,10 +1773,8 @@ namespace Assets.Generation.GeomRep
         }
 
         // non-private only for unit-tests
-        public bool SplitCurvesAtCoincidences(IList<Curve> working_loop1, IList<Curve> working_loop2, float tol)
+        public void SplitCurvesAtCoincidences(IList<Curve> working_loop1, IList<Curve> working_loop2, float tol)
         {
-            bool any_found = false;
-
             for (int i = 0; i < working_loop1.Count; i++)
             {
                 Curve c1 = working_loop1[i];
@@ -1818,8 +1803,6 @@ namespace Assets.Generation.GeomRep
 
                     if (ret.Item1 != null)
                     {
-                        any_found = true;
-
                         // once we've split once the new curves still need testing against the rest of the
                         // other loop, further splits could be in any new curve
                         //
@@ -1842,8 +1825,6 @@ namespace Assets.Generation.GeomRep
 
                     if (ret.Item2 != null)
                     {
-                        any_found = true;
-
                         // once we've split once the new curves still need testing against the rest of the
                         // other loop, further splits could be in any new curve
                         //
@@ -1914,8 +1895,6 @@ namespace Assets.Generation.GeomRep
             {
                 ValidateAnnotations(working_loop2.Concat(working_loop2).ToList(), AnnotationMap);
             }
-
-            return any_found;
         }
 
         // only non-private for unit-testing
