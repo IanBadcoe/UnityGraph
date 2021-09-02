@@ -9,7 +9,7 @@ namespace Assets.Generation.Templates
     public class TemplateStore1 : TemplateStore
     {
         public TemplateStore1()
-        {                      
+        {
             CorridorLayout.RegisterCustom("standard",
                 new CorridorLayout.LayerData("floor", 0.8f),
                 new CorridorLayout.LayerData("wall", 1)

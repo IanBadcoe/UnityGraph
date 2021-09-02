@@ -17,7 +17,7 @@ namespace Assets.Behaviour
             return null;
         }
 
-        public virtual IReadOnlyDictionary<string, LoopSet> GetLoops()
+        public virtual IReadOnlyDictionary<string, ILoopSet> GetLoops()
         {
             return null;
         }

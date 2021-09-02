@@ -506,7 +506,7 @@ public class IntersectorTest
             Loop ls2 = new Loop();
 
             intr.Union(ls2, 1e-5f);
-            LoopSet ret = intr.Merged;
+            ILoopSet ret = intr.Merged;
 
             Assert.IsTrue(ret.Count == 0);
         }
@@ -521,7 +521,7 @@ public class IntersectorTest
 
             intr.SetInitialLoop(l1);
             intr.Union(ls2, 1e-5f);
-            LoopSet ret = intr.Merged;
+            ILoopSet ret = intr.Merged;
 
             Assert.IsNotNull(ret);
             Assert.AreEqual(1, ret.Count);
@@ -535,7 +535,7 @@ public class IntersectorTest
             Loop l2 = new Loop("", new CircleCurve(new Vector2(), 1));
 
             intr.Union(l2, 1e-5f);
-            LoopSet ret = intr.Merged;
+            ILoopSet ret = intr.Merged;
 
             Assert.IsNotNull(ret);
             Assert.AreEqual(1, ret.Count);
@@ -554,7 +554,7 @@ public class IntersectorTest
 
             intr.SetInitialLoop(l1);
             intr.Union(l2, 1e-5f);
-            LoopSet ret = intr.Merged;
+            ILoopSet ret = intr.Merged;
 
             Assert.IsNotNull(ret);
             Assert.AreEqual(1, ret.Count);
@@ -570,7 +570,7 @@ public class IntersectorTest
 
             intr.SetInitialLoop(l1);
             intr.Union(l2, 1e-5f);
-            LoopSet ret = intr.Merged;
+            ILoopSet ret = intr.Merged;
 
             Assert.IsNotNull(ret);
             Assert.AreEqual(1, ret.Count);
@@ -624,7 +624,7 @@ public class IntersectorTest
             ls2.Union(l2b, 1e-5f);
 
             intr.Union(ls2, 1e-5f);
-            LoopSet ret = intr.Merged;
+            ILoopSet ret = intr.Merged;
 
             Assert.IsNotNull(ret);
             Assert.AreEqual(3, ret.Count);
@@ -644,7 +644,7 @@ public class IntersectorTest
 
             intr.SetInitialLoop(l1);
             intr.Union(l2, 1e-5f);
-            LoopSet ret = intr.Merged;
+            ILoopSet ret = intr.Merged;
 
             Assert.IsNotNull(ret);
             Assert.AreEqual(1, ret.Count);
@@ -694,7 +694,7 @@ public class IntersectorTest
 
             intr.SetInitialLoop(l2);
             intr.Union(l1, 1e-5f);
-            LoopSet ret = intr.Merged;
+            ILoopSet ret = intr.Merged;
 
             Assert.IsNotNull(ret);
             Assert.AreEqual(1, ret.Count);
@@ -741,7 +741,7 @@ public class IntersectorTest
 
             intr.SetInitialLoop(l1);
             intr.Union(l2, 1e-5f);
-            LoopSet ret = intr.Merged;
+            ILoopSet ret = intr.Merged;
 
             Assert.IsNotNull(ret);
             Assert.AreEqual(1, ret.Count);
@@ -836,7 +836,7 @@ public class IntersectorTest
             Intersector i = new Intersector(l1, new ClRand(1));
 
             i.Union(l2, 1e-5f);
-            LoopSet ret = i.Merged;
+            ILoopSet ret = i.Merged;
 
             Assert.AreEqual(l1, ret[0]);
         }
@@ -1118,7 +1118,7 @@ public class IntersectorTest
     //        // let us jump straight to a given test
     //        ClRand test_rand = new ClRand(i);
 
-    //        LoopSet merged = new LoopSet();
+    //        ILoopSet merged = new LoopSet();
 
     //        for (int j = 0; j < NumShapes; j++)
     //        {
@@ -1178,7 +1178,7 @@ public class IntersectorTest
 
             intr.Union(l,
                 1e-5f, Intersector.UnionType.WantPositive);
-            LoopSet ret = intr.Merged;
+            ILoopSet ret = intr.Merged;
 
             Assert.AreEqual(1, ret.Count);
             Assert.IsTrue(new HashSet<Curve>(l.Curves).SetEquals(ret[0].Curves));
@@ -1200,7 +1200,7 @@ public class IntersectorTest
 
             intr.Union(l,
                 1e-5f, Intersector.UnionType.WantPositive);
-            LoopSet ret = intr.Merged;
+            ILoopSet ret = intr.Merged;
 
             Assert.AreEqual(0, ret.Count);
 
@@ -1261,7 +1261,7 @@ public class IntersectorTest
             var intr = new Intersector(circ, new ClRand(1));
 
             intr.Union(p1f, 1e-5f, Intersector.UnionType.WantPositive);
-            LoopSet merged = intr.Merged;
+            ILoopSet merged = intr.Merged;
 
             Assert.AreEqual(1, merged.Count);
             Assert.AreEqual(4, merged[0].Curves.Count);
@@ -1272,7 +1272,7 @@ public class IntersectorTest
             var intr = new Intersector(circ, new ClRand(1));
 
             intr.Union(p1r, 1e-5f, Intersector.UnionType.WantPositive);
-            LoopSet merged = intr.Merged;
+            ILoopSet merged = intr.Merged;
 
             Assert.AreEqual(1, merged.Count);
             Assert.AreEqual(1, merged[0].Curves.Count);
@@ -1283,7 +1283,7 @@ public class IntersectorTest
             var intr = new Intersector(circ, new ClRand(1));
 
             intr.Union(p2f, 1e-5f, Intersector.UnionType.WantPositive);
-            LoopSet merged = intr.Merged;
+            ILoopSet merged = intr.Merged;
 
             Assert.AreEqual(1, merged.Count);
             Assert.AreEqual(1, merged[0].Curves.Count);
@@ -1294,7 +1294,7 @@ public class IntersectorTest
             var intr = new Intersector(circ, new ClRand(1));
 
             intr.Union(p2r, 1e-5f, Intersector.UnionType.WantPositive);
-            LoopSet merged = intr.Merged;
+            ILoopSet merged = intr.Merged;
 
             Assert.AreEqual(1, merged.Count);
             Assert.AreEqual(4, merged[0].Curves.Count);
@@ -1305,7 +1305,7 @@ public class IntersectorTest
             var intr = new Intersector(circ, new ClRand(1));
 
             intr.Union(p3f, 1e-5f, Intersector.UnionType.WantPositive);
-            LoopSet merged = intr.Merged;
+            ILoopSet merged = intr.Merged;
 
             Assert.AreEqual(1, merged.Count);
             Assert.AreEqual(4, merged[0].Curves.Count);
@@ -1316,7 +1316,7 @@ public class IntersectorTest
             var intr = new Intersector(circ, new ClRand(1));
 
             intr.Union(p3r, 1e-5f, Intersector.UnionType.WantPositive);
-            LoopSet merged = intr.Merged;
+            ILoopSet merged = intr.Merged;
 
             // because our rule is, when two curves intersect, to change curve if possible, we get two pieces out here
             //          ____
@@ -1335,7 +1335,7 @@ public class IntersectorTest
             var intr = new Intersector(circ, new ClRand(1));
 
             intr.Union(p4f, 1e-5f, Intersector.UnionType.WantPositive);
-            LoopSet merged = intr.Merged;
+            ILoopSet merged = intr.Merged;
 
             Assert.AreEqual(1, merged.Count);
             Assert.AreEqual(7, merged[0].Curves.Count);
@@ -1346,7 +1346,7 @@ public class IntersectorTest
             var intr = new Intersector(circ, new ClRand(1));
 
             intr.Union(p4r, 1e-5f, Intersector.UnionType.WantPositive);
-            LoopSet merged = intr.Merged;
+            ILoopSet merged = intr.Merged;
 
             // cut cleanly into two
             Assert.AreEqual(2, merged.Count);
@@ -1382,7 +1382,7 @@ public class IntersectorTest
             // (because the order of presenting the two curves will make it look like a zero-sized
             // +ve poly or a zero-sized -ve poly...)
             intr.Union(ls1, 1e-5f, Intersector.UnionType.WantPositive);
-            LoopSet merged = intr.Merged;
+            ILoopSet merged = intr.Merged;
 
             Assert.AreEqual(0, merged.Count);
 
@@ -1419,7 +1419,7 @@ public class IntersectorTest
             // (because the order of presenting the two curves will make it look like a zero-sized
             // +ve poly or a zero-sized -ve poly...)
             intr.Union(ls1, 1e-5f, Intersector.UnionType.WantPositive);
-            LoopSet merged = intr.Merged;
+            ILoopSet merged = intr.Merged;
 
             Assert.AreEqual(0, merged.Count);
 
@@ -1456,7 +1456,7 @@ public class IntersectorTest
             Loop ls1r = ls1.Reversed();
 
             intr.Union(ls1, 1e-5f, Intersector.UnionType.WantPositive);
-            LoopSet merged = intr.Merged;
+            ILoopSet merged = intr.Merged;
 
             Assert.AreEqual(0, merged.Count);
 
@@ -1553,7 +1553,7 @@ public class IntersectorTest
         //    // +ve poly or a zero-sized -ve poly...)
 
         //    // box4 and box5 presented together should just merge
-        //    LoopSet merged = m_intersector.Union(new LoopSet(), box5.Concatenate(box4), 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
+        //    ILoopSet merged = m_intersector.Union(new LoopSet(), box5.Concatenate(box4), 1e-5f, new ClRand(1), Intersector.UnionType.WantPositive);
 
         //    Assert.AreEqual(1, merged.Count);
         //    Assert.AreEqual()
@@ -1580,7 +1580,7 @@ public class IntersectorTest
             // (because the order of presenting the two curves will make it look like a zero-sized
             // +ve poly or a zero-sized -ve poly...)
             intr.Union(ls1, 1e-5f, Intersector.UnionType.WantPositive);
-            LoopSet merged = intr.Merged;
+            ILoopSet merged = intr.Merged;
 
             Assert.AreEqual(0, merged.Count);
 
@@ -1601,7 +1601,7 @@ public class IntersectorTest
 
             intr.SetInitialLoop(l1);
             intr.Union(l2, 1e-5f, Intersector.UnionType.WantPositive);
-            LoopSet merged = intr.Merged;
+            ILoopSet merged = intr.Merged;
 
             Assert.AreEqual(2, merged.Count);
             Assert.AreEqual(new Box2(0, 0, 20, 20), merged.GetBounds());
@@ -1639,7 +1639,7 @@ public class IntersectorTest
             // -ve touching rect should just dissappear
             intr.SetInitialLoop(l1);
             intr.Union(l2, 1e-5f, Intersector.UnionType.WantPositive);
-            LoopSet merged = intr.Merged;
+            ILoopSet merged = intr.Merged;
 
             Assert.AreEqual(1, merged.Count);
             Assert.AreEqual(new Box2(0, 0, 20, 20), merged.GetBounds());
@@ -2235,7 +2235,7 @@ public class IntersectorTest
         Dictionary<Curve, int> backward_counts = new Dictionary<Curve, int>(
             new Intersector.ReferenceComparer<Curve>());
 
-        foreach(var c in allCurves)
+        foreach (var c in allCurves)
         {
             Assert.IsTrue(ann_map.ContainsKey(c));
         }
@@ -2271,7 +2271,7 @@ public class IntersectorTest
         {
             Assert.AreEqual(splice.ForwardLinks.Count, splice.BackwardLinks.Count);
 
-            foreach(var c in splice.ForwardLinks)
+            foreach (var c in splice.ForwardLinks)
             {
                 Assert.IsTrue(ann_map.ContainsKey(c));
 
@@ -2286,7 +2286,7 @@ public class IntersectorTest
             }
         }
 
-        foreach(var c in forward_counts.Keys)
+        foreach (var c in forward_counts.Keys)
         {
             Assert.AreEqual(1, forward_counts[c]);
             Assert.AreEqual(1, backward_counts[c]);
@@ -2382,7 +2382,7 @@ public class IntersectorTest
             Assert.IsTrue(right1.Equals(right2, 1e-5f));
         }
 
-        for(int i = 0; i < 6; i++)
+        for (int i = 0; i < 6; i++)
         {
             var intr = new Intersector(new ClRand(1));
 
@@ -2836,7 +2836,7 @@ public class IntersectorTest
 
             intr.Union(c, 1e-5f);
 
-            LoopSet m = intr.Merged;
+            ILoopSet m = intr.Merged;
             Assert.AreEqual(1, m.Count);
 
             Assert.AreEqual(new Box2(-10, -10, 10, 10), m.GetBounds());
@@ -2855,7 +2855,7 @@ public class IntersectorTest
 
             intr.Cut(intr2, 1e-5f);
 
-            LoopSet m = intr.Merged;
+            ILoopSet m = intr.Merged;
             Assert.AreEqual(1, m.Count);
 
             Assert.AreEqual(new Box2(-10, -10, 10, 10), m.GetBounds());
@@ -2863,8 +2863,8 @@ public class IntersectorTest
             Assert.IsTrue(m[0].Curves.OfType<CircleCurve>().First().Equals(new CircleCurve(new Vector2(5, 0), 2.5f, Mathf.PI / 2, 0), 1e-5f));
         }
 
-        LoopSet k1 = null;
-        LoopSet k2 = null;
+        ILoopSet k1 = null;
+        ILoopSet k2 = null;
 
         {
             // rc - r1 - r4
@@ -2872,7 +2872,7 @@ public class IntersectorTest
             intr.Cut(r1, 1e-5f);
             intr.Cut(r4, 1e-5f);
 
-            LoopSet m = intr.Merged;
+            ILoopSet m = intr.Merged;
             Assert.AreEqual(2, m.Count);
 
             Assert.AreEqual(new Box2(-5, -5, 0, 0), m.OrderBy(x => x.GetBounds().Min.x).First().GetBounds());
@@ -2904,7 +2904,7 @@ public class IntersectorTest
 
             intr.Cut(intr2, 1e-5f);
 
-            LoopSet m = intr.Merged;
+            ILoopSet m = intr.Merged;
             // doing it this way we get one figure-8 instead of two squares touching at the corner
             // if we wanted that consistent we'd stop looking at LoopNumber in ExtractLoop, but that will
             // change the previous case, not this one..
@@ -2940,7 +2940,7 @@ public class IntersectorTest
             intr.Cut(c0, 1e-5f);
             intr.Cut(c, 1e-5f);
 
-            LoopSet m = intr.Merged;
+            ILoopSet m = intr.Merged;
             Assert.AreEqual(1, m.Count);
 
             Assert.AreEqual(new Box2(-5, -5, 5, 5), m[0].GetBounds());
@@ -2970,7 +2970,7 @@ public class IntersectorTest
 
             intr.Cut(intr2, 1e-5f);
 
-            LoopSet m = intr.Merged;
+            ILoopSet m = intr.Merged;
             // see comment two cases up, this could come out in two parts, but it doesn't :-)
             Assert.AreEqual(1, m.Count);
 

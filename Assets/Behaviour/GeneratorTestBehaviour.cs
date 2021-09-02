@@ -22,7 +22,7 @@ namespace Assets.Behaviour
             LCB = Transform.FindObjectOfType<LayerConfigBehaviour>();
         }
 
-        public override IReadOnlyDictionary<string, LoopSet> GetLoops()
+        public override IReadOnlyDictionary<string, ILoopSet> GetLoops()
         {
             if (m_generator != null && m_generator.UnionHelper != null)
             {
@@ -51,9 +51,7 @@ namespace Assets.Behaviour
                 Config = Config
             };
 
-            GameObject go = new GameObject();
-            go.transform.parent = transform.parent;
-            StepperBehaviour sb = go.AddComponent<StepperBehaviour>();
+            StepperBehaviour sb = gameObject.AddComponent<StepperBehaviour>();
 
             sb.Controller = new StepperController(m_generator);
         }

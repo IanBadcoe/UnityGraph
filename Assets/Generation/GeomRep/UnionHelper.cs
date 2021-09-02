@@ -1,7 +1,6 @@
 ﻿using Assets.Behaviour;
 using Assets.Generation.G;
 using Assets.Generation.U;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -21,7 +20,7 @@ namespace Assets.Generation.GeomRep
         // and add some special piece of geometry
         public void AddLoops(LoopSet ls)
         {
-            foreach(var l in ls)
+            foreach (var l in ls)
             {
                 ValidateLoop(l);
             }
@@ -32,9 +31,9 @@ namespace Assets.Generation.GeomRep
         [System.Diagnostics.Conditional("DEBUG")]
         private void ValidateLoop(Loop l)
         {
-            foreach(var c in l.Curves)
+            foreach (var c in l.Curves)
             {
-                foreach(var c2 in m_loops.SelectMany(x => x.Curves))
+                foreach (var c2 in m_loops.SelectMany(x => x.Curves))
                 {
                     Assertion.Assert(!ReferenceEquals(c, c2));
                 }
@@ -124,10 +123,10 @@ namespace Assets.Generation.GeomRep
                 .Aggregate(new Box2(), (a, b) => a.Union(b));
         }
 
-        public IReadOnlyDictionary<string, LoopSet> MergedLoops
+        public IReadOnlyDictionary<string, ILoopSet> MergedLoops
         {
             get => m_merged_loop_sets
-                .Select(x => new KeyValuePair<string, LoopSet>(x.Key, x.Value.Merged))
+                .Select(x => new KeyValuePair<string, ILoopSet>(x.Key, x.Value.Merged))
                 .ToDictionary(x => x.Key, x => x.Value);
         }
     }

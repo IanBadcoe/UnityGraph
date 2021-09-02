@@ -7,7 +7,7 @@ namespace Assets.Behaviour
 {
     class TestBehaviour : DataProvider
     {
-        Dictionary<string, LoopSet> m_loops = new Dictionary<string, LoopSet>();
+        readonly Dictionary<string, ILoopSet> m_loops = new Dictionary<string, ILoopSet>();
         public int TestNum = 62;
         public int ShapeNum = 0;
         public int StepControl = -1;
@@ -15,24 +15,26 @@ namespace Assets.Behaviour
         public bool NeedSetup = true;
 
         ClRand test_rand;
-        Intersector intersector = new Intersector(new ClRand(1));
-        LoopSet merged = new LoopSet();
-        Loop[] Loops = new Loop[5];
+        readonly Intersector intersector = new Intersector(new ClRand(1));
+        ILoopSet merged = new LoopSet();
+        readonly Loop[] Loops = new Loop[5];
 
-        public override IReadOnlyDictionary<string, LoopSet> GetLoops()
+        public override IReadOnlyDictionary<string, ILoopSet> GetLoops()
         {
             return m_loops;
         }
 
         private void Update()
         {
-            switch (StepControl) {
+            switch (StepControl)
+            {
                 case -1:
                     test_rand = new ClRand(TestNum);
 
                     int j = 0;
 
-                    for(int i = 0; i < 5; i++) {
+                    for (int i = 0; i < 5; i++)
+                    {
                         var ls = RandShapeLoop(test_rand);
 
                         if (SkipShapes == null || !SkipShapes.Contains(i))

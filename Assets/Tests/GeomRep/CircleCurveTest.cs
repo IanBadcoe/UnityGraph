@@ -1,5 +1,5 @@
-﻿using Assets.Generation.GeomRep;
-using Assets.Extensions;
+﻿using Assets.Extensions;
+using Assets.Generation.GeomRep;
 using Assets.Generation.U;
 using NUnit.Framework;
 using System;
@@ -849,7 +849,7 @@ public class CircleCurveTest
 
         foreach (var c in curves)
         {
-            var lc = c as CircleCurve;
+            var lc = c;
             Assert.IsNotNull(lc);
             Assert.IsTrue(input.SameSupercurve(lc, 1e-4f));
         }

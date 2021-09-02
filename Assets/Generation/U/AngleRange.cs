@@ -24,7 +24,8 @@ namespace Assets.Generation.U
                 if (Start < End)
                 {
                     return RotationDirection.Forwards;
-                } else if (Start > End)
+                }
+                else if (Start > End)
                 {
                     return RotationDirection.Reverse;
                 }
@@ -66,7 +67,7 @@ namespace Assets.Generation.U
                 throw new ArgumentException("More than a full turn in AngleRange");
             }
 
-            switch(Direction)
+            switch (Direction)
             {
                 case RotationDirection.Forwards:
                     FixupAngles(ref Start, ref End);
@@ -281,7 +282,9 @@ namespace Assets.Generation.U
             {
                 // anything is in range of a full rotation
                 if (IsCyclic)
+                {
                     return true;
+                }
 
                 // otherwise bring us round to the same rotation
                 angle = FixAngleForRange(angle, tol);

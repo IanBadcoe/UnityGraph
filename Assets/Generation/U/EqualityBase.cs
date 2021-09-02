@@ -6,14 +6,9 @@
         public abstract override int GetHashCode();
         public static bool operator ==(EqualityBase lhs, EqualityBase rhs)
         {
-            if (ReferenceEquals(lhs, null) && ReferenceEquals(rhs, null))
+            if (ReferenceEquals(lhs, null))
             {
-                return true;
-            }
-
-            if (ReferenceEquals(lhs, null) || ReferenceEquals(rhs, null))
-            {
-                return false;
+                return ReferenceEquals(rhs, null);
             }
 
             return lhs.Equals(rhs);
