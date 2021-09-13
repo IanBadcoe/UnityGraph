@@ -1,7 +1,6 @@
 ﻿using Assets.Generation.GeomRep;
 using Assets.Generation.U;
 using LibTessDotNet;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
